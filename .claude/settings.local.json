@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(npx playwright *)",
+      "WebFetch(domain:localhost)",
+      "Bash(node -e ' *)",
+      "Bash(Read /private/tmp/claude-501/-Users-danibezerra-Documents-Meus-sites-zapable/f6ad83c6-45bb-4050-a11e-dfd6ec667fb5/tasks/bn0xt1all.output)",
+      "Bash(ls /Users/danibezerra/Library/Caches/ms-playwright/ 2>/dev/null)",
+      "Read(//Users/danibezerra/Library/Caches/ms-playwright/**)"
+    ]
+  }
+}

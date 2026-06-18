@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Zapia defaults */
+    --background: 210 40% 98%;        /* #f8fafc */
+    --foreground: 222 84% 5%;         /* #020617 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 84% 5%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 84% 5%;
+
+    --primary: 83 78% 56%;            /* #a3e635 */
+    --primary-foreground: 222 84% 5%;
+
+    --secondary: 81 90% 89%;          /* #ecfccb lime-100 */
+    --secondary-foreground: 88 61% 20%; /* #365314 lime-900 */
+
+    --muted: 210 40% 96%;             /* #f1f5f9 */
+    --muted-foreground: 215 14% 47%;  /* #64748b */
+
+    --accent: 83 78% 56%;             /* #a3e635 */
+    --accent-foreground: 222 84% 5%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 98%;               /* #fafafa */
+    --input: 214 32% 91%;             /* #e2e8f0 */
+    --ring: 83 78% 56%;               /* #a3e635 */
+
+    --radius: 0.5rem;
+
+    /* Per-store catalog theme (overridden at runtime via JS) */
+    --color-primary: #a3e635;
+    --color-primary-fg: #020617;
+    --color-primary-hover: #84cc16;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 14%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 14%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 83 78% 56%;
+    --primary-foreground: 222 84% 5%;
+    --secondary: 222 47% 20%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 47% 20%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 222 47% 20%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 222 47% 22%;
+    --input: 222 47% 22%;
+    --ring: 83 78% 56%;
+  }
+}
+
+/* Chat typing indicator bounce */
+@keyframes chatBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* Landing page animations */
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.4); }
+}
+@keyframes notifSlide {
+  from { opacity: 0; transform: translateX(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateX(0)   scale(1); }
+}
+@keyframes heroBadge {
+  0%,100% { box-shadow: 0 0 0 0 rgba(163,230,53,0); }
+  50%     { box-shadow: 0 0 0 8px rgba(163,230,53,0.15); }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  *::before,
+  *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  [class*="bg-gradient"],
+  [class*="from-"],
+  [class*="via-"],
+  [class*="to-"],
+  [style*="gradient"] {
+    background-image: none !important;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-family: 'DM Sans', sans-serif !important;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'DM Sans', sans-serif !important;
+    letter-spacing: -0.015em;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  h1, h2, h3, h4 {
+    @apply font-display text-z-ink;
+  }
+}
+
+@layer utilities {
+  .sidebar-aurora {
+    background-image:
+      linear-gradient(
+        0deg,
+        rgba(163, 230, 53, 0.12) 0%,
+        rgba(132, 204, 22, 0.06) 38%,
+        rgba(2, 6, 23, 0.03) 72%,
+        transparent 100%
+      ) !important;
+  }
+}
