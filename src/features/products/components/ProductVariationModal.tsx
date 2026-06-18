@@ -73,7 +73,7 @@ function ModalContent({
   )
 
   const label =
-    type === 'color' ? 'Cor' : type === 'size' ? 'Tamanho' : customLabel || 'Outro tipo'
+    type === 'color' ? 'Cor' : type === 'size' ? 'Tamanho' : customLabel || 'Opções do produto'
   const currentProductName = productName?.trim() ?? ''
 
   const presets = type === 'color' ? COLOR_PRESETS : type === 'size' ? SIZE_PRESETS : []

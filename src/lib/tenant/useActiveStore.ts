@@ -1,4 +1,8 @@
-import { useMyStores } from '@/features/catalog'
+// Imported from the concrete hook file (not the '@/features/catalog' barrel)
+// because that barrel also re-exports zod schemas used only by dashboard
+// onboarding forms, pulling react-hook-form/zod into every storefront visit
+// (this hook is called from StoreLayout to detect owner-mode).
+import { useMyStores } from '@/features/catalog/hooks/useMyStores'
 import { useSession } from '@/features/auth'
 
 /**

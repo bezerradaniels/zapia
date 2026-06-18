@@ -94,7 +94,7 @@ export function Topbar({ onMenuToggle }: TopbarProps) {
 
     const orderResults = (orders.data ?? [])
       .filter((order) =>
-        [order.customer_name, order.customer_phone, order.coupon_code, order.id]
+        [order.customer_name, order.customer_phone, order.id]
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(query)),
       )

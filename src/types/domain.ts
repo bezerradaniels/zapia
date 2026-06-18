@@ -51,6 +51,7 @@ export type Store = {
   name: string
   owner_id: string
   slogan: string | null
+  category: string | null
   about_us: string | null
   cnpj: string | null
   logo_url: string | null
@@ -118,6 +119,7 @@ export type Product = {
   id: string
   store_id: string
   name: string
+  slug: string
   description: string | null
   price_in_cents: number
   promo_price_in_cents: number | null
@@ -155,15 +157,33 @@ export type Order = {
   id: string
   store_id: string
   status: OrderStatus
-  source: OrderSource
-  seller_id: string | null
+  order_number: number
   customer_name: string
   customer_phone: string
   customer_notes: string | null
   total_in_cents: number
+  subtotal_in_cents: number
   discount_in_cents: number
+  delivery_fee_in_cents: number
+  payment_method: PaymentMethod
+  shipping_method: ShippingMethod
   coupon_id: string | null
-  coupon_code: string | null
+  customer_id: string | null
+  notes: string | null
+  address_cep: string | null
+  address_street: string | null
+  address_number: string | null
+  address_complement: string | null
+  address_neighborhood: string | null
+  address_city: string | null
+  address_state: string | null
+  cpf_cnpj: string | null
+  payment_proof_url: string | null
+  cancel_reason: string | null
+  cancelled_at: string | null
+  confirmed_at: string | null
+  completed_at: string | null
+  cart_snapshot: Record<string, unknown>
   created_at: string
   updated_at: string
 }
@@ -217,21 +237,17 @@ export type Subscription = {
 }
 
 export type PlanFeatures = {
-  plan_id: PlanId
-  name: string
-  price_in_cents: number
-  max_products: number | null
+  id: PlanId
+  max_products: number
+  has_ai_helpers: boolean
+  has_custom_theme: boolean
+  has_digital_products: boolean
+  has_multiple_sellers: boolean
   max_sellers: number | null
   max_coupons: number | null
-  has_ai_helpers: boolean
   has_pdf_export: boolean
-  has_custom_theme: boolean
   has_featured_products: boolean
   has_gallery: boolean
-  stripe_price_id: string | null
-  stripe_price_monthly: string | null
-  stripe_price_annual: string | null
-  trial_period_days: number
 }
 
 export type Invoice = {

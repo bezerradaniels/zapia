@@ -29,7 +29,7 @@ export async function createCoupon(
     .insert({
       store_id: storeId,
       code: normalizeCode(input.code),
-      description: input.description?.trim() || null,
+      description: input.description?.trim() || '',
       discount_type: input.discount_type,
       discount_value: input.discount_value,
       min_subtotal_in_cents: input.min_subtotal_in_cents ?? 0,
@@ -54,7 +54,7 @@ export async function updateCoupon(
   const payload: TablesUpdate<'store_coupons'> = {}
   if (input.code !== undefined) payload.code = normalizeCode(input.code)
   if (input.description !== undefined)
-    payload.description = input.description?.trim() || null
+    payload.description = input.description?.trim() || ''
   if (input.discount_type !== undefined) payload.discount_type = input.discount_type
   if (input.discount_value !== undefined) payload.discount_value = input.discount_value
   if (input.min_subtotal_in_cents !== undefined)

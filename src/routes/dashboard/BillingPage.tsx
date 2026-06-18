@@ -182,7 +182,7 @@ export default function BillingPage() {
           <div className="text-lg font-semibold">
             Plano atual:{' '}
             <span className="text-[#10b981]">
-              {planList.find((p) => p.plan_id === currentPlanId)?.name ?? '—'}
+              {planList.find((p) => p.id === currentPlanId) ? PLANS[currentPlanId!].name : '—'}
             </span>
           </div>
           <div className="text-sm text-z-text-muted">
@@ -223,11 +223,11 @@ export default function BillingPage() {
           </div>
         ) : (
           planList.map((plan) => {
-            const isCurrent = plan.plan_id === currentPlanId
-            const features = PLAN_FEATURE_TEXT[plan.plan_id]
+            const isCurrent = plan.id === currentPlanId
+            const features = PLAN_FEATURE_TEXT[plan.id]
             return (
               <div
-                key={plan.plan_id}
+                key={plan.id}
                 className={cn(
                   'flex flex-col gap-4 rounded-2xl border bg-white p-6',
                   isCurrent
@@ -238,24 +238,24 @@ export default function BillingPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="text-xl font-bold text-black">
-                      Plano {plan.name}
+                      Plano {PLANS[plan.id].name}
                     </h2>
                     {billingPeriod === 'annual' && (
                       <span className="rounded-full bg-z-green/10 px-2 py-0.5 text-[11px] font-bold text-[#10b981]">
-                        -{Math.round((PLANS[plan.plan_id].priceInCents * 12 - PLANS[plan.plan_id].priceInCentsAnnual) / (PLANS[plan.plan_id].priceInCents * 12) * 100)}%
+                        -{Math.round((PLANS[plan.id].priceInCents * 12 - PLANS[plan.id].priceInCentsAnnual) / (PLANS[plan.id].priceInCents * 12) * 100)}%
                       </span>
                     )}
                   </div>
                   <p className="mt-1 text-sm text-z-text-muted">
-                    {PLAN_SUBTITLE[plan.plan_id]}
+                    {PLAN_SUBTITLE[plan.id]}
                   </p>
                   {isCurrent && <Badge tone="green" className="mt-2 inline-block">Atual</Badge>}
                 </div>
                 <div>
                   <span className="text-3xl font-bold tracking-tighter">
                     {billingPeriod === 'annual'
-                      ? formatMoney(Math.round(PLANS[plan.plan_id].priceInCentsAnnual / 12))
-                      : formatMoney(plan.price_in_cents)}
+                      ? formatMoney(Math.round(PLANS[plan.id].priceInCentsAnnual / 12))
+                      : formatMoney(PLANS[plan.id].priceInCents)}
                   </span>
                   <span className="text-sm text-z-text-muted">/mês</span>
                   <p className="mt-1 text-xs text-z-text-hint">
@@ -264,10 +264,10 @@ export default function BillingPage() {
                   {billingPeriod === 'annual' && (
                     <>
                       <p className="mt-0.5 text-xs font-semibold text-[#10b981]">
-                        Economize {formatMoney(plan.price_in_cents * 12 - PLANS[plan.plan_id].priceInCentsAnnual)}
+                        Economize {formatMoney(PLANS[plan.id].priceInCents * 12 - PLANS[plan.id].priceInCentsAnnual)}
                       </p>
                       <p className="mt-1 text-xs font-medium text-black">
-                        Pagamento único por ano {formatMoney(PLANS[plan.plan_id].priceInCentsAnnual)}
+                        Pagamento único por ano {formatMoney(PLANS[plan.id].priceInCentsAnnual)}
                       </p>
                     </>
                   )}
@@ -278,7 +278,7 @@ export default function BillingPage() {
                   )}
                 </div>
                 <ul className="flex flex-col gap-1.5 text-sm">
-                  {features.map((f) => (
+                  {features.map((f: string) => (
                     <li
                       key={f}
                       className="flex items-start gap-2 text-z-text-muted"
@@ -296,7 +296,7 @@ export default function BillingPage() {
                   variant={isCurrent ? 'outline' : 'primary'}
                   fullWidth
                   disabled={isCurrent || isPending}
-                  onClick={() => handleStartCheckout(plan.plan_id)}
+                  onClick={() => handleStartCheckout(plan.id)}
                   className={cn(!isCurrent && 'bg-green-100 text-green-800 hover:bg-green-200')}
                 >
                   {isCurrent ? 'Plano atual' : 'Mudar para este plano'}

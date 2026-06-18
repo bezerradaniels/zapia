@@ -16,8 +16,6 @@ import {
   MailIcon,
   CallIcon,
   MapPinIcon,
-  SecurityCheckIcon,
-  GoogleIcon,
   Edit01Icon,
   EyeIcon,
   Clock01Icon,
@@ -26,8 +24,14 @@ import { toast } from 'sonner'
 import { buildStorePath, buildStoreUrl, isStoreDomain, useCurrentStore, useActiveStore } from '@/lib/tenant'
 import { OptimizedImage } from '@/components/ui/OptimizedImage'
 import { useCartStore } from '@/features/cart'
+// Imported from the concrete hook file (not the '@/features/products' barrel)
+// because that barrel also re-exports ProductForm, which pulls dashboard-only
+// weight (category editor, image cropper) into every storefront visit.
+import { usePublicProducts } from '@/features/products/hooks/useProducts'
 import { useStoreCatalogStatus, canAccessCatalog } from '@/features/billing'
-import { useSession } from '@/features/auth'
+// Direct file import (not the '@/features/auth' barrel) because that barrel
+// also re-exports zod schemas used only by dashboard login/signup forms.
+import { useSession } from '@/features/auth/hooks/useSession'
 import { fromE164BR } from '@/lib/br'
 import { buildWhatsAppLink } from '@/lib/whatsapp'
 import { OwnerSidebarMenu } from '@/components/layout/OwnerSidebarMenu'
@@ -92,6 +96,11 @@ function GtmScript({ gtmId }: { gtmId: string }) {
 export default function StoreLayout() {
   const { data: store, isLoading, slug } = useCurrentStore()
   const catalogStatus = useStoreCatalogStatus(store?.id)
+  // Warms the React Query cache for the products list as soon as the store
+  // id is known, in parallel with catalogStatus, instead of waiting for the
+  // <Outlet> (StorePage) to mount after catalogStatus resolves. StorePage's
+  // own usePublicProducts call below shares this same query.
+  usePublicProducts(store?.id)
   const location = useLocation()
   const cartCount = useCartStore((s) =>
     s.items.reduce((sum, i) => sum + i.quantity, 0),
@@ -217,7 +226,7 @@ function StoreHeader({
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const logoSize = isScrolled ? 28 : 55
+  const logoSize = 40
 
   return (
     <header
@@ -228,13 +237,13 @@ function StoreHeader({
       }}
     >
       <div
-        className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 sm:px-6 transition-all duration-300"
+        className="mx-auto flex max-w-[800px] items-center justify-between gap-2 px-4 sm:px-6 transition-all duration-300"
         style={{ height: isScrolled ? 64 : 80 }}
       >
         <div className="relative flex min-w-0 flex-1 items-center gap-2 sm:gap-2.5">
           <Link to={homePath} className="flex min-w-0 flex-1 items-center gap-2 text-white sm:gap-2.5">
             <div
-              className="relative shrink-0 overflow-hidden rounded-md bg-white/10 ring-1 ring-white/30 transition-all duration-300"
+              className="relative shrink-0 overflow-hidden rounded-md bg-white/10 ring-1 ring-white/30"
               style={{ width: logoSize, height: logoSize }}
             >
               {store.logo_url ? (
@@ -243,12 +252,12 @@ function StoreHeader({
                   alt={store.name}
                   fetchPriority="high"
                   decoding="async"
-                  className="object-cover transition-all duration-300"
+                  className="object-cover"
                   style={{ width: logoSize, height: logoSize }}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-white">
-                  <HugeiconsIcon icon={StoreLocationIcon} size={isScrolled ? 16 : 32} />
+                  <HugeiconsIcon icon={StoreLocationIcon} size={20} />
                 </div>
               )}
             </div>
@@ -377,8 +386,8 @@ function StoreHero({
 
   if (store.banner_url) {
     return (
-      <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
-        <div className="relative w-full overflow-hidden rounded-2xl bg-z-bg2" style={{ aspectRatio: '16/10', maxHeight: '480px' }}>
+      <div className="mx-auto w-full max-w-[800px] px-4 pt-4 sm:px-6">
+        <div className="relative w-full overflow-hidden rounded-2xl bg-z-bg2" style={{ aspectRatio: '8/3', maxHeight: '300px' }}>
           <OptimizedImage
             src={store.banner_url}
             transform={{ width: 1400, quality: 85 }}
@@ -402,12 +411,10 @@ function StoreHero({
   }
   // Fallback: subtle illustrative pattern using the store's primary color.
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
+    <div className="mx-auto w-full max-w-[800px] px-4 pt-4 sm:px-6">
       <div
-        className="relative h-40 w-full overflow-hidden rounded-2xl sm:h-48"
-        style={{
-          background: 'var(--store-primary)',
-        }}
+        className="relative w-full overflow-hidden rounded-2xl"
+        style={{ aspectRatio: '8/3', maxHeight: '300px', background: 'var(--store-primary)' }}
       >
         {/* Discreet pattern overlay */}
         <div 
@@ -515,7 +522,7 @@ function StoreFooter({
 
   return (
     <footer className="border-t border-z-border bg-white">
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:grid-cols-2 sm:gap-8 sm:px-6 sm:py-10 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-[800px] gap-6 px-4 py-8 sm:grid-cols-2 sm:gap-8 sm:px-6 sm:py-10 lg:grid-cols-3">
         <FooterColumn title="Formas de pagamento">
           {(store.accepted_payment_methods?.length
             ? store.accepted_payment_methods
@@ -591,25 +598,6 @@ function StoreFooter({
           )}
         </FooterColumn>
 
-        <FooterColumn title="Segurança">
-          <div className="flex items-center gap-3">
-            <SecurityBadge
-              icon={SecurityCheckIcon}
-              top="SITE"
-              bottom="SEGURO"
-              tone="green"
-            />
-            <SecurityBadge
-              icon={GoogleIcon}
-              top="Google"
-              bottom="Safe Browsing"
-              tone="neutral"
-            />
-          </div>
-          <p className="mt-2 text-[11px] leading-snug text-z-text-hint">
-            Seus dados são protegidos por SSL 256 bits e enviados via WhatsApp.
-          </p>
-        </FooterColumn>
       </div>
 
       {showEditOverlays && (
@@ -689,32 +677,6 @@ function FooterRow({
   return <div className={className}>{inner}</div>
 }
 
-function SecurityBadge({
-  icon,
-  top,
-  bottom,
-  tone,
-}: {
-  icon: IconSvgElement
-  top: string
-  bottom: string
-  tone: 'green' | 'neutral'
-}) {
-  const accent = tone === 'green' ? 'text-[#10b981]' : 'text-z-text-muted'
-  return (
-    <div className="flex items-center gap-1.5 rounded-md border border-z-border bg-white px-2 py-1.5">
-      <HugeiconsIcon icon={icon} size={20} className={accent} />
-      <div className="leading-tight">
-        <div className="text-[9px] font-bold uppercase tracking-wider text-z-text-hint">
-          {top}
-        </div>
-        <div className={`text-[10px] font-bold uppercase tracking-wider ${accent}`}>
-          {bottom}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 /* -------------------------------------------------------------------------- */
 /* Owner floating toolbar                                                     */

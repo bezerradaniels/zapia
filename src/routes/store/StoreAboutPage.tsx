@@ -12,11 +12,14 @@ import type { Store } from '@/types/domain'
 import { buildWhatsAppLink } from '@/lib/whatsapp'
 import { buildStorePath } from '@/lib/tenant'
 import { ImageCarousel, ImageCarouselThumbnails } from '@/components/ui/ImageCarousel'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 
 export default function StoreAboutPage() {
   const store = useOutletContext<Store>()
   const homePath = buildStorePath(store.slug)
   const [galleryActive, setGalleryActive] = useState(0)
+
+  useDocumentMeta({ title: `Sobre - ${store.name} - Catálogo por Zapia` })
 
   const whatsappUrl = store.whatsapp_phone
     ? buildWhatsAppLink(store.whatsapp_phone, `Olá! Vi o catálogo da ${store.name}.`)
@@ -30,7 +33,7 @@ export default function StoreAboutPage() {
   const customLinks = store.custom_links?.filter((l) => l.label && l.url) ?? []
 
   return (
-    <div className="mx-auto max-w-[728px] px-4 py-5 sm:px-6">
+    <div className="mx-auto max-w-[800px] px-4 py-5 sm:px-6">
       <div className="mb-4">
         <Link
           to={homePath}

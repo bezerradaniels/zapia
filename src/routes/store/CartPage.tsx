@@ -13,18 +13,28 @@ import {
   WhatsappIcon,
 } from '@hugeicons/core-free-icons'
 import { useCartStore } from '@/features/cart'
-import { effectivePrice, getVariationImage, getVariationStock } from '@/features/products'
+// Direct file imports (not the '@/features/products' barrel) so this
+// storefront page doesn't pull in ProductForm's dashboard-only weight.
+import { effectivePrice } from '@/features/products/utils/price'
+import { getVariationImage, getVariationStock } from '@/features/products/utils/variation'
 import {
   validateCouponCode,
   CouponValidationError,
   couponErrorMessage,
 } from '@/features/coupons'
-import { formatMoney } from '@/lib/format'
+import { formatMoney, toTitleCase } from '@/lib/format'
 import { buildStorePath } from '@/lib/tenant'
 import type { Store } from '@/types/domain'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 
 export default function CartPage() {
   const store = useOutletContext<Store>()
+
+  useDocumentMeta({
+    title: `Carrinho - ${store.name}`,
+    description: `Revise os itens do seu carrinho na ${store.name} e finalize seu pedido pelo WhatsApp.`,
+  })
+
   const [searchParams] = useSearchParams()
   const items = useCartStore((s) => s.items)
   const updateQuantity = useCartStore((s) => s.updateQuantity)
@@ -127,7 +137,7 @@ export default function CartPage() {
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-z-bg2 text-z-text-hint">
           <HugeiconsIcon icon={ShoppingCartIcon} size={28} />
         </div>
-        <h1 className="text-lg font-bold tracking-tight">Seu carrinho está vazio</h1>
+        <h1 className="text-[14px] font-bold tracking-tight">Seu carrinho está vazio</h1>
         <Link to={homePath} className="text-sm font-medium text-[#10b981] hover:underline">
           Voltar ao catálogo
         </Link>
@@ -136,8 +146,8 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-5 pb-28 sm:px-6 sm:pb-8">
-      <div className="lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-10">
+    <div className="mx-auto w-full max-w-[800px] px-4 py-5 pb-28 sm:px-6 sm:pb-8">
+      <div className="lg:grid lg:grid-cols-[7fr_3fr] lg:items-start lg:gap-10">
         {/* Left Column: Items */}
         <div className="flex flex-col gap-4">
           <div className="mb-2 flex items-center gap-2">
@@ -148,7 +158,7 @@ export default function CartPage() {
             >
               <HugeiconsIcon icon={ArrowLeft02Icon} size={18} />
             </Link>
-            <h1 className="text-xl font-bold tracking-tight">
+            <h1 className="text-[14px] font-bold tracking-tight">
               Carrinho ({items.length})
             </h1>
           </div>
@@ -161,7 +171,8 @@ export default function CartPage() {
               return (
               <div
                 key={cartKey}
-                className="flex gap-4 rounded-xl border border-z-border bg-white p-4 shadow-sm"
+                className="flex gap-4 rounded-xl border bg-white p-4 shadow-sm"
+                style={{ borderColor: '#cbd5e1' }}
               >
                 <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-z-bg2 ring-1 ring-z-border">
                   {image ? (
@@ -177,25 +188,25 @@ export default function CartPage() {
                   )}
                 </div>
                 <div className="flex flex-1 flex-col justify-center">
-                  <div className="text-[22px] font-bold leading-tight tracking-tight text-z-ink">
-                    {product.name}
+                  <div className="text-[14px] font-bold leading-tight tracking-tight text-z-ink">
+                    {toTitleCase(product.name)}
                   </div>
                   {selectedVariation && (
                     <div className="mt-0.5 inline-flex">
-                      <span className="rounded-full border border-z-border bg-z-bg px-2.5 py-0.5 text-[12px] font-medium text-z-text">
-                        {selectedVariation}
+                      <span className="rounded-full border border-z-border bg-z-bg px-2.5 py-0.5 text-[14px] font-medium text-z-text">
+                        {toTitleCase(selectedVariation)}
                       </span>
                     </div>
                   )}
                   {product.promo_price_in_cents != null && product.promo_price_in_cents < product.price_in_cents && (
-                    <div className="mt-0.5 text-[13px] text-z-text-hint line-through">
+                    <div className="mt-0.5 text-[14px] text-z-text-hint line-through">
                       {formatMoney(product.price_in_cents)} / un.
                     </div>
                   )}
-                  <div className="text-[17px] font-bold text-z-ink">
+                  <div className="text-[14px] font-bold text-z-ink">
                     {formatMoney(effectivePrice(product))} / un.
                     {product.promo_price_in_cents != null && product.promo_price_in_cents < product.price_in_cents && (
-                      <span className="ml-2 text-[12px] font-semibold text-[#02a650]">
+                      <span className="ml-2 text-[14px] font-semibold text-[#02a650]">
                         {Math.round((1 - product.promo_price_in_cents / product.price_in_cents) * 100)}% OFF
                       </span>
                     )}
@@ -213,7 +224,7 @@ export default function CartPage() {
                       >
                         <HugeiconsIcon icon={MinusSignIcon} size={14} />
                       </button>
-                      <span className="w-6 text-center text-[16px] font-bold tabular-nums">
+                      <span className="w-6 text-center text-[14px] font-bold tabular-nums">
                         {quantity}
                       </span>
                       <button
@@ -245,8 +256,8 @@ export default function CartPage() {
 
         {/* Right Column: Sticky Summary & Coupon */}
         <div className="lg:sticky lg:top-24 flex flex-col gap-4 mt-6 lg:mt-0">
-          <div className="rounded-xl border border-z-border bg-white p-6 shadow-sm">
-            <h2 className="text-base font-bold mb-5 text-z-ink border-b border-z-border pb-4">Resumo do pedido</h2>
+          <div className="rounded-xl border bg-white p-6 shadow-sm" style={{ borderColor: '#cbd5e1' }}>
+            <h2 className="text-[14px] font-bold mb-5 text-z-ink border-b border-z-border pb-4">Resumo do pedido</h2>
             
             <div className="flex flex-col gap-2">
               <div className="mb-3 flex flex-col gap-2 border-b border-z-border pb-4">
@@ -259,9 +270,9 @@ export default function CartPage() {
                       <span className="font-semibold text-z-text">
                         {quantity}x
                       </span>{' '}
-                      {product.name}
+                      {toTitleCase(product.name)}
                       {selectedVariation && (
-                        <span className="text-z-text-hint"> · {selectedVariation}</span>
+                        <span className="text-z-text-hint"> · {toTitleCase(selectedVariation)}</span>
                       )}
                     </span>
                     <span className="shrink-0 font-semibold tabular-nums text-z-text">
@@ -272,26 +283,26 @@ export default function CartPage() {
               </div>
 
               {(promoDiscount > 0 || discount > 0) && (
-                <div className="flex justify-between text-[15px]">
+                <div className="flex justify-between text-[14px]">
                   <span className="text-z-text-muted">Subtotal</span>
                   <span className="tabular-nums text-z-text-muted">{formatMoney(originalSubtotal)}</span>
                 </div>
               )}
               {promoDiscount > 0 && (
-                <div className="flex justify-between text-[15px]">
+                <div className="flex justify-between text-[14px]">
                   <span className="text-[#02a650]">Desconto produtos</span>
                   <span className="font-semibold text-[#02a650] tabular-nums">−{formatMoney(promoDiscount)}</span>
                 </div>
               )}
               {discount > 0 && (
-                <div className="flex justify-between text-[15px]">
+                <div className="flex justify-between text-[14px]">
                   <span className="text-[#02a650]">
                     Cupom{appliedCoupon ? ` · ${appliedCoupon.code}` : ''}
                   </span>
                   <span className="font-semibold text-[#02a650] tabular-nums">−{formatMoney(discount)}</span>
                 </div>
               )}
-              <div className="mt-1 flex justify-between border-t border-z-border pt-3 text-[22px] font-bold tracking-tight text-z-ink">
+              <div className="mt-1 flex justify-between border-t border-z-border pt-3 text-[14px] font-bold tracking-tight text-z-ink">
                 <span>Total</span>
                 <span className="tabular-nums">{formatMoney(total)}</span>
               </div>
@@ -301,11 +312,11 @@ export default function CartPage() {
               <Link
                 ref={checkoutBtnRef}
                 to={checkoutPath}
-                className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-[16px] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-[14px] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]"
                 style={{ background: '#34d399' }}
               >
                 <HugeiconsIcon icon={WhatsappIcon} size={20} />
-                Finalizar no WhatsApp
+                Fechar pedido
               </Link>
               <Link
                 to={homePath}
@@ -318,7 +329,7 @@ export default function CartPage() {
           </div>
 
           {/* Coupon */}
-          <div className="rounded-xl border border-z-border bg-white p-5 shadow-sm">
+          <div className="rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: '#cbd5e1' }}>
             <div className="mb-3 text-[14px] font-bold text-z-ink">Cupom de desconto</div>
             {appliedCoupon ? (
               <div className="flex items-center justify-between gap-3 rounded-lg bg-z-bg2 px-3 py-3">
@@ -355,19 +366,20 @@ export default function CartPage() {
                       }
                     }}
                     placeholder="Inserir código"
-                    className="flex-1 rounded-lg border border-z-border bg-white px-4 py-2.5 text-sm uppercase placeholder:normal-case placeholder:text-z-text-hint focus:border-z-ink focus:outline-none"
+                    className="flex-1 rounded-lg border border-z-border bg-z-bg px-4 py-2.5 text-sm uppercase placeholder:normal-case placeholder:text-z-text-hint focus:border-z-ink focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => void onApplyCoupon()}
                     disabled={isValidating || !code.trim()}
-                    className="rounded-lg bg-z-bg2 px-4 py-2.5 text-sm font-bold text-z-ink hover:bg-z-border disabled:opacity-50"
+                    className="rounded-lg px-4 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-50"
+                    style={{ background: '#34d399' }}
                   >
                     {isValidating ? '...' : 'Aplicar'}
                   </button>
                 </div>
                 {error && (
-                  <div className="mt-2 px-1 text-xs font-semibold text-rose-600">
+                  <div className="mt-2 px-1 text-[14px] font-semibold text-rose-600">
                     {error}
                   </div>
                 )}
@@ -383,9 +395,9 @@ export default function CartPage() {
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}
       >
         <div className="min-w-0 flex-1">
-          <div className="text-[11px] text-z-text-hint">Total</div>
+          <div className="text-[14px] text-z-text-hint">Total</div>
           <div
-            className="text-[18px] font-bold tracking-tight tabular-nums"
+            className="text-[14px] font-bold tracking-tight tabular-nums"
             style={{ color: 'var(--store-primary)' }}
           >
             {formatMoney(total)}
@@ -393,11 +405,11 @@ export default function CartPage() {
         </div>
         <Link
           to={checkoutPath}
-          className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-full px-6 text-[13px] font-bold uppercase tracking-wider text-white transition-all active:scale-[0.98]"
+          className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-full px-6 text-[14px] font-bold uppercase tracking-wider text-white transition-all active:scale-[0.98]"
           style={{ background: '#34d399' }}
         >
           <HugeiconsIcon icon={WhatsappIcon} size={18} />
-          Finalizar no WhatsApp
+          Fechar pedido
         </Link>
       </div>
     </div>

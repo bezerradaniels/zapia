@@ -6,17 +6,26 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowLeft02Icon, WhatsappIcon } from '@hugeicons/core-free-icons'
 import type { Store } from '@/types/domain'
 import { useCartStore } from '@/features/cart'
-import { effectivePrice } from '@/features/products'
+// Direct file import (not the '@/features/products' barrel) so this
+// storefront page doesn't pull in ProductForm's dashboard-only weight.
+import { effectivePrice } from '@/features/products/utils/price'
 import { checkoutSchema, type CheckoutInput, useCreateOrder } from '@/features/orders'
-import { formatMoney } from '@/lib/format'
-import { maskPhoneBR } from '@/lib/br'
+import { formatMoney, toTitleCase } from '@/lib/format'
+import { maskPhoneBR, validatePhoneBR } from '@/lib/br'
 import { buildOrderMessage, buildWhatsAppLink } from '@/lib/whatsapp'
 import { PhoneInput } from '@/components/forms/PhoneInput'
 import { Input } from '@/components/ui'
 import { buildStorePath } from '@/lib/tenant'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 
 export default function CheckoutPage() {
   const store = useOutletContext<Store>()
+
+  useDocumentMeta({
+    title: `Finalizar pedido - ${store.name}`,
+    description: `Finalize seu pedido na ${store.name} e receba a confirmação pelo WhatsApp.`,
+  })
+
   const navigate = useNavigate()
   const items = useCartStore((s) => s.items)
   const subtotal = useCartStore((s) => s.subtotalInCents())
@@ -33,6 +42,11 @@ export default function CheckoutPage() {
     resolver: zodResolver(checkoutSchema),
     defaultValues: { name: '', phone: '', notes: '' },
   })
+
+  const name = form.watch('name')
+  const phone = form.watch('phone')
+  const isFormComplete =
+    name.trim().length >= 2 && validatePhoneBR(phone ?? '') && deliveryConfirmed
 
   if (items.length === 0) return <Navigate to={cartPath} replace />
 
@@ -108,7 +122,7 @@ export default function CheckoutPage() {
   })
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-5 pb-28 sm:px-6 sm:pb-8">
+    <div className="mx-auto w-full max-w-[800px] px-4 py-5 pb-28 sm:px-6 sm:pb-8">
       <div className="mb-5 flex items-center gap-2">
         <Link
           to={cartPath}
@@ -122,18 +136,22 @@ export default function CheckoutPage() {
 
       <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          <div className="rounded-2xl border border-z-border bg-white p-5">
+          <div className="rounded-2xl border bg-white p-5" style={{ borderColor: '#cbd5e1' }}>
             <div className="mb-4 text-[15px] font-bold">Dados pessoais</div>
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-z-text" htmlFor="checkout-name">
+                <label className="flex items-center gap-1.5 text-sm font-medium text-z-text" htmlFor="checkout-name">
                   Nome completo
+                  <span className="rounded-full bg-[#e8f8ef] px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
+                    Obrigatório
+                  </span>
                 </label>
                 <Input
                   id="checkout-name"
                   autoComplete="name"
                   placeholder="Seu nome"
                   aria-invalid={!!form.formState.errors.name || undefined}
+                  className="bg-z-bg border-[#cbd5e1]"
                   {...form.register('name')}
                 />
                 {form.formState.errors.name && (
@@ -143,12 +161,15 @@ export default function CheckoutPage() {
                 )}
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-z-text" htmlFor="checkout-phone">
+                <label className="flex items-center gap-1.5 text-sm font-medium text-z-text" htmlFor="checkout-phone">
                   WhatsApp
+                  <span className="rounded-full bg-[#e8f8ef] px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
+                    Obrigatório
+                  </span>
                 </label>
                 <PhoneInput
                   id="checkout-phone"
-                  className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
+                  className="h-11 w-full rounded-lg border border-[#cbd5e1] bg-z-bg px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                   value={form.watch('phone') ?? ''}
                   onChange={(masked) =>
                     form.setValue('phone', masked, {
@@ -166,8 +187,13 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-z-border bg-white p-5">
-            <div className="mb-3 text-[15px] font-bold">Confirmar forma de entrega</div>
+          <div className="rounded-2xl border bg-white p-5" style={{ borderColor: '#cbd5e1' }}>
+            <div className="mb-3 flex items-center gap-1.5 text-[15px] font-bold">
+              Confirmar forma de entrega
+              <span className="rounded-full bg-[#e8f8ef] px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
+                Obrigatório
+              </span>
+            </div>
             <button
               type="button"
               aria-pressed={deliveryConfirmed}
@@ -177,10 +203,10 @@ export default function CheckoutPage() {
               }}
               className="flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors"
               style={{
-                background: deliveryConfirmed ? 'rgba(0,168,45,0.04)' : 'white',
+                background: deliveryConfirmed ? 'rgba(0,168,45,0.04)' : '#f8fafc',
                 border: deliveryConfirmed
                   ? '2px solid var(--store-primary)'
-                  : '1px solid var(--z-border, #e5e7eb)',
+                  : '1px solid #cbd5e1',
               }}
             >
               <div
@@ -211,14 +237,14 @@ export default function CheckoutPage() {
             </button>
           </div>
 
-          <div className="rounded-2xl border border-z-border bg-white p-5">
+          <div className="rounded-2xl border bg-white p-5" style={{ borderColor: '#cbd5e1' }}>
             <label className="mb-2 block text-sm font-medium text-z-text">
               Observação (opcional)
             </label>
             <textarea
               rows={3}
               placeholder="Algum detalhe especial para o pedido?"
-              className="w-full resize-y rounded-lg border border-z-border bg-white px-3.5 py-2.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
+              className="w-full resize-y rounded-lg border border-[#cbd5e1] bg-z-bg px-3.5 py-2.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
               {...form.register('notes')}
             />
           </div>
@@ -231,7 +257,7 @@ export default function CheckoutPage() {
         </form>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-2xl border border-z-border bg-white p-5">
+          <div className="rounded-2xl border bg-white p-5" style={{ borderColor: '#cbd5e1' }}>
             <div className="mb-4 text-[15px] font-bold">Resumo do pedido</div>
             <ul className="flex flex-col gap-2.5 text-[13px]">
               {items.map((item) => (
@@ -241,11 +267,11 @@ export default function CheckoutPage() {
                 >
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate">
-                      {item.product.name} ×{item.quantity}
+                      {toTitleCase(item.product.name)} ×{item.quantity}
                     </span>
                     {item.selectedVariation && (
                       <span className="mt-0.5 w-fit rounded-full border border-z-border bg-z-bg px-2 py-px text-[11px] font-medium text-z-text">
-                        {item.selectedVariation}
+                        {toTitleCase(item.selectedVariation)}
                       </span>
                     )}
                   </span>
@@ -276,7 +302,7 @@ export default function CheckoutPage() {
             <button
               type="submit"
               onClick={onSubmit}
-              disabled={createOrder.isPending}
+              disabled={createOrder.isPending || !isFormComplete}
               className="mt-4 hidden w-full items-center justify-center gap-2 rounded-lg py-3.5 text-[15px] font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-60 sm:flex"
               style={{ background: '#34d399' }}
             >
@@ -301,7 +327,7 @@ export default function CheckoutPage() {
         <button
           type="submit"
           onClick={onSubmit}
-          disabled={createOrder.isPending}
+          disabled={createOrder.isPending || !isFormComplete}
           className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full px-5 text-[13px] font-bold uppercase tracking-wider text-white transition-opacity active:opacity-80 disabled:opacity-60"
           style={{ background: '#34d399' }}
         >

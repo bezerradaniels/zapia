@@ -49,3 +49,17 @@ export async function getProductById(id: string): Promise<Product | null> {
   if (error) throw error
   return (data as Product | null) ?? null
 }
+
+export async function getProductBySlug(storeId: string, slug: string): Promise<Product | null> {
+  const supabase = createBrowserClient()
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('store_id', storeId)
+    .eq('slug', slug)
+    .is('deleted_at', null)
+    .maybeSingle()
+
+  if (error) throw error
+  return (data as Product | null) ?? null
+}

@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { PLANS } from '@/config/plans'
 import type { PlanFeatures, Subscription } from '@/types/domain'
 import { useSubscription } from '../hooks/useSubscription'
 import { usePlanFeatures } from '../hooks/usePlanFeatures'
@@ -29,25 +30,30 @@ export function usePlanLimits(storeId: string | undefined): PlanLimits {
   return useMemo<PlanLimits>(() => {
     const subscription = sub.data ?? null
     const planId = subscription?.plan_id
-    const plan =
-      (planId && plans.data?.find((p) => p.plan_id === planId)) ?? null
+    // `plan_features` (DB) only carries the limits read at the SQL/RPC layer
+    // (max_products, has_ai_helpers, has_custom_theme); the rest of the
+    // feature gates live in the static `PLANS` config per CLAUDE.md §13.12
+    // ("never hardcode plan limits in components — import from
+    // src/config/plans.ts or query plan_features").
+    const plan = (planId && plans.data?.find((p) => p.id === planId)) ?? null
+    const config = planId ? PLANS[planId] : null
 
     return {
       plan,
       subscription,
       isLoading: sub.isLoading || plans.isLoading,
       canUse: (feature) => {
-        if (!plan) return false
-        if (feature === 'pdf') return plan.has_pdf_export
-        if (feature === 'theme') return plan.has_custom_theme
-        if (feature === 'ai') return plan.has_ai_helpers
-        if (feature === 'featured') return plan.has_featured_products
-        if (feature === 'gallery') return plan.has_gallery
+        if (!config) return false
+        if (feature === 'pdf') return config.hasPdfExport
+        if (feature === 'theme') return config.hasCustomTheme
+        if (feature === 'ai') return config.hasAiHelpers
+        if (feature === 'featured') return config.hasFeaturedProducts
+        if (feature === 'gallery') return config.hasCustomTheme
         return false
       },
-      productLimit: plan?.max_products ?? null,
-      sellerLimit: plan?.max_sellers ?? null,
-      couponLimit: plan?.max_coupons ?? null,
+      productLimit: config?.maxProducts ?? null,
+      sellerLimit: config && Number.isFinite(config.maxSellers) ? config.maxSellers : null,
+      couponLimit: config && Number.isFinite(config.maxCoupons) ? config.maxCoupons : null,
     }
   }, [sub.data, sub.isLoading, plans.data, plans.isLoading])
 }

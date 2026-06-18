@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { ROUTES } from '@/config/routes'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { MarketingNavbar } from './_shared/MarketingNavbar'
 
 const MarketingFooter = lazy(() =>
@@ -1158,6 +1159,8 @@ function FinalCTA() {
 
 /* ─── Page ───────────────────────────────────────────────────────────────── */
 export default function LandingPage() {
+  useDocumentMeta({ title: 'Zapia Catálogos Digitais' })
+
   return (
     <div className="min-h-screen bg-white">
       <MarketingNavbar />

@@ -1,5 +1,10 @@
 import { useMemo } from 'react'
-import { useProducts } from '@/features/products'
+// Imports the hook directly (not via '@/features/products') to avoid a
+// circular barrel dependency: that barrel also re-exports ProductForm,
+// which imports usePlanLimits from this feature's barrel. The cycle forced
+// bundlers to merge dashboard-only weight (ProductForm, category editor,
+// image cropper) into the chunk every storefront visitor downloads.
+import { useProducts } from '@/features/products/hooks/useProducts'
 import { PLANS } from '@/config/plans'
 import type { PlanId } from '@/types/domain'
 

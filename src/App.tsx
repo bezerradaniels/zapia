@@ -100,7 +100,7 @@ function StoreRoutes() {
     <Routes>
       <Route path="/" element={<AppProviders><StoreLayout /></AppProviders>}>
         <Route index element={<StorePage />} />
-        <Route path="produto/:id" element={<ProductPage />} />
+        <Route path="produto/:slug" element={<ProductPage />} />
         <Route path="carrinho" element={<CartPage />} />
         <Route path="checkout" element={<CheckoutPage />} />
         <Route path="pedido/:id" element={<OrderConfirmationPage />} />
@@ -170,7 +170,7 @@ function AppRoutes() {
 
       <Route path=":storeSlug" element={<AppProviders><StoreLayout /></AppProviders>}>
         <Route index element={<StorePage />} />
-        <Route path="produto/:id" element={<ProductPage />} />
+        <Route path="produto/:slug" element={<ProductPage />} />
         <Route path="carrinho" element={<CartPage />} />
         <Route path="checkout" element={<CheckoutPage />} />
         <Route path="pedido/:id" element={<OrderConfirmationPage />} />

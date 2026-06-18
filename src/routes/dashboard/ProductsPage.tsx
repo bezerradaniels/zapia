@@ -17,6 +17,7 @@ import {
 import { usePlanLimits } from '@/features/billing'
 import { formatMoney } from '@/lib/format'
 import { ROUTES } from '@/config/routes'
+import { PLANS } from '@/config/plans'
 import { Badge, Button } from '@/components/ui'
 
 export default function ProductsPage() {
@@ -41,7 +42,7 @@ export default function ProductsPage() {
               <>
                 {' '}
                 de <strong className="text-z-text">{limit}</strong> no plano{' '}
-                {limits.plan?.name ?? '—'}
+                {limits.plan ? PLANS[limits.plan.id].name : '—'}
               </>
             )}
             .
@@ -74,7 +75,7 @@ export default function ProductsPage() {
         <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
           <span className="text-amber-900">
             Você atingiu o limite de <strong>{limit}</strong> produtos do plano{' '}
-            <strong>{limits.plan?.name}</strong>. Faça upgrade para adicionar
+            <strong>{limits.plan ? PLANS[limits.plan.id].name : '—'}</strong>. Faça upgrade para adicionar
             mais.
           </span>
           <Link

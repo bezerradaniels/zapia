@@ -31,6 +31,10 @@ export function useUpdateProduct(storeId: string, id: string) {
       qc.invalidateQueries({ queryKey: productsKeys.list(storeId) })
       qc.invalidateQueries({ queryKey: productsKeys.publicList(storeId) })
       qc.invalidateQueries({ queryKey: productsKeys.byId(id) })
+      // Slug is part of the query key but isn't known here; invalidate every
+      // bySlug entry for this store so the public product page (if open in
+      // the same session, e.g. owner previewing) refetches fresh data.
+      qc.invalidateQueries({ queryKey: [...productsKeys.all, 'bySlug', storeId] })
     },
   })
 }

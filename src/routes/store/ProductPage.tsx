@@ -6,26 +6,32 @@ import {
   ArrowLeft02Icon,
   ArrowRight02Icon,
   PackageIcon,
-  ShoppingBagAddIcon,
-  WhatsappIcon,
   PlusSignIcon,
   MinusSignIcon,
   CheckmarkCircle01Icon,
 } from '@hugeicons/core-free-icons'
 import type { Product, Store, VariationOption } from '@/types/domain'
-import {
-  useProduct,
-  usePublicProducts,
-  discountPercent,
-  getTotalVariationStock,
-  getVariationStock,
-} from '@/features/products'
+// Direct file imports (not the '@/features/products' barrel) so this
+// storefront page doesn't pull in ProductForm's dashboard-only weight.
+import { useProductBySlug } from '@/features/products/hooks/useProductBySlug'
+import { usePublicProducts } from '@/features/products/hooks/useProducts'
+import { discountPercent } from '@/features/products/utils/price'
+import { getTotalVariationStock, getVariationStock } from '@/features/products/utils/variation'
 import { useCartStore, buildCartKey } from '@/features/cart'
-import { formatMoney } from '@/lib/format'
+import { buildStoreTitle } from '@/features/catalog'
+import { formatMoney, toTitleCase } from '@/lib/format'
 import { OptimizedImage } from '@/components/ui/OptimizedImage'
-import { buildWhatsAppLink } from '@/lib/whatsapp'
+import { ProductCard } from '@/components/store/ProductCard'
 import { buildStorePath } from '@/lib/tenant'
 import { sanitizeRichText } from '@/lib/sanitize/sanitizeHtml'
+import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+
+const MAX_PRODUCT_DESCRIPTION_LENGTH = 170
+
+function truncate(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text
+  return `${text.slice(0, maxLength - 1).trimEnd()}…`
+}
 
 type VariationGroup = {
   label: string
@@ -93,12 +99,13 @@ function findMatchingVariationOption(
 }
 
 export default function ProductPage() {
-  const { id } = useParams<{ id: string }>()
+  const { slug } = useParams<{ slug: string }>()
   const store = useOutletContext<Store>()
-  const product = useProduct(id)
+  const product = useProductBySlug(store.id, slug)
   const allProducts = usePublicProducts(store.id)
   const addItem = useCartStore((s) => s.addItem)
   const updateQty = useCartStore((s) => s.updateQuantity)
+  const cartItems = useCartStore((s) => s.items)
   const [qty, setQty] = useState(1)
   const [activeImg, setActiveImg] = useState(0)
   const [selectedVariation, setSelectedVariation] = useState<string | null>(null)
@@ -106,6 +113,17 @@ export default function ProductPage() {
   const homePath = buildStorePath(store.slug)
 
   const p = product.data
+
+  useDocumentMeta({
+    title: p ? `${toTitleCase(p.name)} - ${store.name}` : buildStoreTitle(store),
+    description: p
+      ? truncate(
+          `Confira ${toTitleCase(p.name)} no catálogo da ${store.name} e faça seu pedido pelo WhatsApp.`,
+          MAX_PRODUCT_DESCRIPTION_LENGTH,
+        )
+      : undefined,
+  })
+
   const variationLabel = p?.variation_label ?? 'Variação'
   const variationGroups = useMemo(
     () => buildVariationGroups(p?.variation_options ?? [], variationLabel),
@@ -131,9 +149,9 @@ export default function ProductPage() {
 
   // Reset selection when the product changes, adjusting state during render
   // instead of in an effect to avoid a cascading re-render.
-  const [prevId, setPrevId] = useState(id)
-  if (id !== prevId) {
-    setPrevId(id)
+  const [prevSlug, setPrevSlug] = useState(slug)
+  if (slug !== prevSlug) {
+    setPrevSlug(slug)
     setSelectedVariation(null)
     setSelectedVariationValues({})
     setActiveImg(0)
@@ -183,6 +201,16 @@ export default function ProductPage() {
     (p.variation_options ?? []).length > 0 &&
     selectedVariation === null
 
+  const cartKey = buildCartKey(p.id, selectedVariation)
+  const cartItem = cartItems.find((i) => i.cartKey === cartKey)
+  const displayedQty = cartItem ? cartItem.quantity : qty
+  const cartQuantityByOption = cartItems
+    .filter((i) => i.product.id === p.id && i.selectedVariation)
+    .reduce<Record<string, number>>((acc, i) => {
+      acc[i.selectedVariation!] = i.quantity
+      return acc
+    }, {})
+
   const handleGallerySelect = (index: number) => {
     setActiveImg(index)
   }
@@ -194,8 +222,7 @@ export default function ProductPage() {
   const handleAdd = () => {
     if (mustPickVariation || stock === 0) return
     addItem(p, selectedVariation)
-    const key = buildCartKey(p.id, selectedVariation)
-    if (qty > 1) updateQty(key, stock == null ? qty : Math.min(qty, stock))
+    if (qty > 1) updateQty(cartKey, stock == null ? qty : Math.min(qty, stock))
   }
 
   const handleVariationSelect = (name: string) => {
@@ -238,15 +265,6 @@ export default function ProductPage() {
     )
   }
 
-  const handleWhatsApp = () => {
-    if (!store.whatsapp_phone) return
-    const variationSuffix = selectedVariation ? ` (${selectedVariation})` : ''
-    const message = `Olá! Tenho interesse no produto *${p.name}${variationSuffix}* (${formatMoney(
-      finalPrice,
-    )}).`
-    window.open(buildWhatsAppLink(store.whatsapp_phone, message), '_blank')
-  }
-
   const productFacts: Array<{ label: string; value: string }> = [
     p.brand && { label: 'Marca', value: p.brand },
     p.category && { label: 'Categoria', value: p.category },
@@ -260,7 +278,7 @@ export default function ProductPage() {
   ].filter(Boolean) as Array<{ label: string; value: string }>
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-4 pb-28 sm:px-6 sm:py-6 sm:pb-8">
+    <div className="mx-auto w-full max-w-[800px] px-4 py-4 pb-28 sm:px-6 sm:py-6 sm:pb-8">
       {/* Back link */}
       <div className="mb-4">
         <Link
@@ -286,13 +304,8 @@ export default function ProductPage() {
         {/* Info */}
         <div className="flex flex-col gap-6">
           <div>
-            {p.category && (
-              <span className="text-[13px] font-medium uppercase tracking-wider text-z-text-hint">
-                {p.category}
-              </span>
-            )}
-            <h1 className="mt-1 text-[30px] font-bold leading-tight tracking-tight text-z-ink sm:text-[34px]">
-              {p.name}
+            <h1 className="text-[30px] font-bold leading-tight tracking-tight text-z-ink sm:text-[34px]">
+              {toTitleCase(p.name)}
             </h1>
           </div>
 
@@ -337,6 +350,7 @@ export default function ProductPage() {
               groups={variationGroups}
               selected={selectedVariation}
               selectedValues={selectedVariationValues}
+              cartQuantityByOption={cartQuantityByOption}
               onSelect={handleVariationSelect}
               onValueSelect={handleVariationValueSelect}
             />
@@ -351,16 +365,16 @@ export default function ProductPage() {
               <div className="hidden shrink-0 items-center gap-4 sm:flex">
                 <span className="text-[14px] font-bold text-z-ink">Quantidade</span>
                 <QuantityStepper
-                  qty={qty}
+                  qty={displayedQty}
                   max={stock ?? undefined}
-                  onChange={setQty}
+                  onChange={(next) => (cartItem ? updateQty(cartKey, next) : setQty(next))}
                 />
               </div>
               <div className="sm:hidden">
                 <QuantityStepper
-                  qty={qty}
+                  qty={displayedQty}
                   max={stock ?? undefined}
-                  onChange={setQty}
+                  onChange={(next) => (cartItem ? updateQty(cartKey, next) : setQty(next))}
                 />
               </div>
 
@@ -368,11 +382,10 @@ export default function ProductPage() {
                 type="button"
                 onClick={handleAdd}
                 disabled={stock === 0 || mustPickVariation}
-                className="flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-4 text-[12px] font-bold uppercase tracking-wide text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 sm:px-6 sm:text-[14px] sm:tracking-wider"
+                className="flex h-9 min-w-0 flex-1 items-center justify-center rounded-lg px-4 text-[12px] font-bold uppercase tracking-wide text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 sm:px-6 sm:text-[14px] sm:tracking-wider"
                 style={{ background: 'var(--store-primary)' }}
               >
-                <HugeiconsIcon icon={ShoppingBagAddIcon} size={18} />
-                {mustPickVariation ? 'Selecione uma opção' : 'Adicionar ao pedido'}
+                Adicionar
               </button>
             </div>
 
@@ -384,16 +397,6 @@ export default function ProductPage() {
               </p>
             )}
 
-            {store.whatsapp_phone && (
-              <button
-                type="button"
-                onClick={handleWhatsApp}
-                className="flex h-12 items-center justify-center gap-2 rounded-full border border-[#25d366] text-[14px] font-bold uppercase tracking-wider text-[#25d366] transition-colors hover:bg-[#25d366]/10"
-              >
-                <HugeiconsIcon icon={WhatsappIcon} size={20} />
-                Pedir via WhatsApp
-              </button>
-            )}
           </div>
 
           {/* Additional details if any */}
@@ -416,9 +419,9 @@ export default function ProductPage() {
 
       {/* Description card */}
       {p.description && (
-        <div className="mt-6 rounded-2xl border border-z-border bg-white p-5 shadow-sm sm:p-6">
+        <div className="mt-6 rounded-2xl border bg-white p-5 shadow-sm sm:p-6" style={{ borderColor: '#cbd5e1' }}>
           <ProductFacts facts={productFacts} className="mb-5 lg:hidden" />
-          <h2 className="mb-3 text-[13px] font-bold uppercase tracking-wider text-z-text-hint">
+          <h2 className="mb-3 text-[15px] font-bold text-z-ink">
             Descrição
           </h2>
           <div
@@ -439,7 +442,7 @@ export default function ProductPage() {
           <h2 className="mb-4 text-base font-bold">Você também pode gostar</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {related.map((r) => (
-              <RelatedCard
+              <ProductCard
                 key={r.id}
                 product={r}
                 storeSlug={store.slug}
@@ -498,6 +501,7 @@ function VariationPicker({
   groups,
   selected,
   selectedValues,
+  cartQuantityByOption,
   onSelect,
   onValueSelect,
 }: {
@@ -506,6 +510,7 @@ function VariationPicker({
   groups: VariationGroup[]
   selected: string | null
   selectedValues: Record<string, string>
+  cartQuantityByOption: Record<string, number>
   onSelect: (name: string) => void
   onValueSelect: (label: string, value: string) => void
 }) {
@@ -520,7 +525,7 @@ function VariationPicker({
               <span className="text-[14px] font-bold text-z-ink">{group.label}</span>
               {selectedValues[group.label] ? (
                 <span className="text-[13px] font-medium text-z-text-muted">
-                  · {selectedValues[group.label]}
+                  · {toTitleCase(selectedValues[group.label])}
                 </span>
               ) : (
                 <span className="text-[12px] font-semibold text-rose-500">
@@ -532,6 +537,7 @@ function VariationPicker({
             <div className="flex flex-wrap gap-2">
               {group.values.map((item) => {
                 const isSelected = selectedValues[group.label] === item.value
+                const itemQuantity = cartQuantityByOption[item.value] ?? 0
                 return (
                   <button
                     key={`${group.label}-${item.value}`}
@@ -539,12 +545,9 @@ function VariationPicker({
                     onClick={() => onValueSelect(group.label, item.value)}
                     disabled={item.isOutOfStock}
                     className={cn(
-                      'flex min-h-11 items-center gap-2 rounded-xl border px-3 py-2 text-[13px] font-medium transition-all',
-                      isSelected
-                        ? 'text-z-ink shadow-sm'
-                        : 'border-z-border text-z-text hover:border-z-ink',
-                      item.isOutOfStock &&
-                        'cursor-not-allowed opacity-45 hover:border-z-border',
+                      'flex min-h-11 items-center gap-2 rounded-xl border bg-white px-3 py-2 text-[13px] font-medium transition-all',
+                      isSelected ? 'text-z-ink shadow-sm' : 'text-z-text hover:border-z-ink',
+                      item.isOutOfStock && 'cursor-not-allowed opacity-45',
                     )}
                     style={
                       isSelected
@@ -553,13 +556,24 @@ function VariationPicker({
                             backgroundColor:
                               'color-mix(in srgb, var(--store-primary) 12%, transparent)',
                           }
-                        : undefined
+                        : { borderColor: '#cbd5e1' }
                     }
                   >
-                    {item.value}
+                    {toTitleCase(item.value)}
                     {item.isOutOfStock && (
                       <span className="text-[11px] font-semibold text-z-text-hint">
                         Esgotado
+                      </span>
+                    )}
+                    {itemQuantity > 0 && (
+                      <span
+                        className={cn(
+                          'text-[12px] font-bold',
+                          !isSelected && 'text-z-text-muted',
+                        )}
+                        style={isSelected ? { color: 'var(--store-primary)' } : undefined}
+                      >
+                        ({itemQuantity})
                       </span>
                     )}
                     {isSelected && (
@@ -578,7 +592,7 @@ function VariationPicker({
 
         {selected ? (
           <p className="text-[12px] font-medium text-z-text-muted">
-            Opção selecionada: {selected}
+            Opção selecionada: {selected ? toTitleCase(selected) : selected}
           </p>
         ) : (
           <p className="text-[12px] font-semibold text-rose-500">
@@ -594,7 +608,9 @@ function VariationPicker({
       <div className="flex items-center gap-2">
         <span className="text-[14px] font-bold text-z-ink">{label}</span>
         {selected ? (
-          <span className="text-[13px] font-medium text-z-text-muted">· {selected}</span>
+          <span className="text-[13px] font-medium text-z-text-muted">
+            · {selected ? toTitleCase(selected) : selected}
+          </span>
         ) : (
           <span className="text-[12px] font-semibold text-rose-500">Selecione uma opção</span>
         )}
@@ -603,6 +619,7 @@ function VariationPicker({
         {options.map((opt) => {
           const isSelected = selected === opt.name
           const isOutOfStock = opt.stock === 0
+          const itemQuantity = cartQuantityByOption[opt.name] ?? 0
           return (
             <button
               key={opt.name}
@@ -610,11 +627,9 @@ function VariationPicker({
               onClick={() => onSelect(opt.name)}
               disabled={isOutOfStock}
               className={cn(
-                'flex items-center gap-2 rounded-xl border px-3 py-2 text-[13px] font-medium transition-all',
-                isSelected
-                  ? 'text-z-ink shadow-sm'
-                  : 'border-z-border text-z-text hover:border-z-ink',
-                isOutOfStock && 'cursor-not-allowed opacity-45 hover:border-z-border',
+                'flex items-center gap-2 rounded-xl border bg-white px-3 py-2 text-[13px] font-medium transition-all',
+                isSelected ? 'text-z-ink shadow-sm' : 'text-z-text hover:border-z-ink',
+                isOutOfStock && 'cursor-not-allowed opacity-45',
               )}
               style={
                 isSelected
@@ -622,13 +637,21 @@ function VariationPicker({
                       borderColor: 'var(--store-primary)',
                       backgroundColor: 'color-mix(in srgb, var(--store-primary) 12%, transparent)',
                     }
-                  : undefined
+                  : { borderColor: '#cbd5e1' }
               }
             >
-              {opt.name}
+              {toTitleCase(opt.name)}
               {isOutOfStock && (
                 <span className="text-[11px] font-semibold text-z-text-hint">
                   Esgotado
+                </span>
+              )}
+              {itemQuantity > 0 && (
+                <span
+                  className={cn('text-[12px] font-bold', !isSelected && 'text-z-text-muted')}
+                  style={isSelected ? { color: 'var(--store-primary)' } : undefined}
+                >
+                  ({itemQuantity})
                 </span>
               )}
               {isSelected && (
@@ -666,7 +689,10 @@ function Gallery({
   return (
     <div className="flex flex-col gap-3">
       {/* Main image — high priority, above fold */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-z-border shadow-sm">
+      <div
+        className="relative aspect-square w-full overflow-hidden rounded-2xl border shadow-sm"
+        style={{ borderColor: '#cbd5e1' }}
+      >
         {hasAnyImage && (
           <span className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm backdrop-blur-sm">
             {activeImg + 1}/{images.length} {images.length === 1 ? 'foto' : 'fotos'}
@@ -768,160 +794,31 @@ function QuantityStepper({
   onChange: (next: number) => void
 }) {
   return (
-    <div className="inline-flex h-12 shrink-0 items-stretch overflow-hidden rounded-full border border-z-border bg-white">
+    <div
+      className="inline-flex h-9 shrink-0 items-stretch overflow-hidden rounded-lg border bg-white"
+      style={{ borderColor: '#cbd5e1' }}
+    >
       <button
         type="button"
         onClick={() => onChange(Math.max(1, qty - 1))}
         disabled={qty <= 1}
-        className="flex w-11 items-center justify-center text-z-text hover:bg-z-bg2 disabled:opacity-40"
+        className="flex w-8 items-center justify-center text-z-text hover:bg-z-bg2 disabled:opacity-40"
         aria-label="Diminuir"
       >
         <HugeiconsIcon icon={MinusSignIcon} size={14} />
       </button>
-      <div className="flex w-10 items-center justify-center text-center text-base font-bold tabular-nums">
+      <div className="flex w-7 items-center justify-center text-center text-base font-bold tabular-nums">
         {qty}
       </div>
       <button
         type="button"
         onClick={() => onChange(qty + 1)}
         disabled={max !== undefined && qty >= max}
-        className="flex w-11 items-center justify-center text-z-text hover:bg-z-bg2 disabled:opacity-40"
+        className="flex w-8 items-center justify-center text-z-text hover:bg-z-bg2 disabled:opacity-40"
         aria-label="Aumentar"
       >
         <HugeiconsIcon icon={PlusSignIcon} size={14} />
       </button>
     </div>
-  )
-}
-
-function RelatedCard({
-  product: p,
-  storeSlug,
-  onAdd,
-}: {
-  product: Product
-  storeSlug: string
-  onAdd: () => void
-}) {
-  const discount = discountPercent(p)
-  const finalPrice = p.promo_price_in_cents ?? p.price_in_cents
-  const hasPromo = discount !== null
-  const cartItems = useCartStore((s) => s.items)
-  const removeItem = useCartStore((s) => s.removeItem)
-  const isInCart = cartItems.some((item) => item.product.id === p.id)
-  const cartKey = buildCartKey(p.id, null)
-
-  return (
-    <article className="group flex flex-col rounded-2xl border border-z-border bg-white p-3 shadow-sm transition-shadow hover:shadow-md">
-      <Link to={buildStorePath(storeSlug, `produto/${p.id}`)} className="block">
-        <div className="relative aspect-square w-full overflow-hidden rounded-xl transition-shadow">
-          {p.images[0] ? (
-            <OptimizedImage
-              src={p.images[0]}
-              transform={{ width: 400, quality: 82 }}
-              alt={p.name}
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center text-z-text-hint" style={{ backgroundColor: '#f9f6f2' }}>
-              <HugeiconsIcon icon={PackageIcon} size={36} />
-              <span className="mt-2 text-xs">produto sem imagem</span>
-            </div>
-          )}
-
-        </div>
-
-        <div className="mt-3">
-          <h3 className="line-clamp-2 min-h-[1.5em] text-[18px] font-bold leading-tight tracking-tight text-z-ink">
-            {p.name}
-          </h3>
-
-          <div className="mt-1 flex flex-col gap-0.5">
-            {hasPromo && (
-              <span className="text-[12px] text-z-text-hint line-through">
-                {formatMoney(p.price_in_cents)}
-              </span>
-            )}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[20px] font-bold leading-none text-z-ink">
-                {finalPrice === 0 ? 'A combinar' : formatMoney(finalPrice)}
-              </span>
-              {hasPromo && (
-                <span className="rounded-md bg-[#e8f8ef] px-1.5 py-0.5 text-[11px] font-bold text-[#02a650]">
-                  {discount}% OFF
-                </span>
-              )}
-            </div>
-            {p.installment_count != null && p.installment_total_in_cents != null && (
-              <span className="text-[11px] text-z-text-muted">
-                <span className="font-semibold text-[#02a650]">{p.installment_count}x </span>
-                <span className="font-semibold text-z-ink">
-                  {formatMoney(Math.ceil(p.installment_total_in_cents / p.installment_count))}
-                </span>
-                {p.installment_total_in_cents <= finalPrice
-                  ? <span className="text-[#02a650]"> sem juros</span>
-                  : null
-                }
-              </span>
-            )}
-          </div>
-        </div>
-      </Link>
-
-      {/* If product has variations, send to product page instead of direct add */}
-      {p.has_variations ? (
-        <Link
-          to={buildStorePath(storeSlug, `produto/${p.id}`)}
-          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-z-border text-[12px] font-bold text-z-ink transition-all hover:bg-z-bg2 active:scale-[0.98]"
-        >
-          Ver opções
-        </Link>
-      ) : (
-        <>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onAdd()
-            }}
-            className={cn(
-              'mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-xl text-[12px] font-bold text-white transition-all active:scale-[0.98]',
-              isInCart ? 'bg-gray-200 text-gray-600' : 'hover:opacity-90',
-            )}
-            style={!isInCart ? { background: 'var(--store-primary)' } : undefined}
-          >
-            {isInCart ? (
-              <>
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-400">
-                  <HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} className="text-white" />
-                </div>
-                Adicionado
-              </>
-            ) : (
-              <>
-                <HugeiconsIcon icon={ShoppingBagAddIcon} size={16} />
-                Adicionar ao pedido
-              </>
-            )}
-          </button>
-          {isInCart && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                removeItem(cartKey)
-              }}
-              className="mt-2 text-center text-xs text-red-500 hover:text-red-600"
-            >
-              Remover
-            </button>
-          )}
-        </>
-      )}
-    </article>
   )
 }

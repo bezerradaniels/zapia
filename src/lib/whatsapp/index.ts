@@ -30,35 +30,34 @@ export function buildOrderMessage({
   coupon,
 }: OrderPayload): string {
   const lines: string[] = []
-  lines.push(`*Novo pedido — ${store.name}*`)
+  lines.push(`🛍️ *Novo pedido recebido!*`)
+  lines.push(`🏬 *Loja:* ${store.name}`)
   lines.push('')
   lines.push(`👤 *Cliente:* ${customer.name}`)
   if (customer.phone) lines.push(`📞 *Telefone:* ${customer.phone}`)
   lines.push('')
-  lines.push('*Itens:*')
+  lines.push('🧾 *Itens do pedido:*')
   let subtotalSum = 0
   for (const item of items) {
     const subtotal = effectivePrice(item.product) * item.quantity
     subtotalSum += subtotal
     const variationSuffix = item.selectedVariation ? ` (${item.selectedVariation})` : ''
     lines.push(
-      `• ${item.quantity}x ${item.product.name}${variationSuffix} — ${formatMoney(subtotal)}`,
+      `▫️ ${item.quantity}x ${item.product.name}${variationSuffix} — ${formatMoney(subtotal)}`,
     )
   }
   lines.push('')
   if (coupon && coupon.discountInCents > 0) {
-    lines.push(`*Subtotal:* ${formatMoney(subtotalSum)}`)
-    lines.push(
-      `*Cupom* (${coupon.code}): −${formatMoney(coupon.discountInCents)}`,
-    )
+    lines.push(`Subtotal: ${formatMoney(subtotalSum)}`)
+    lines.push(`🎟️ Cupom (${coupon.code}): −${formatMoney(coupon.discountInCents)}`)
   }
-  lines.push(`*Total:* ${formatMoney(totalInCents)}`)
+  lines.push(`💰 *Total: ${formatMoney(totalInCents)}*`)
   if (customer.notes?.trim()) {
     lines.push('')
     lines.push(`📝 *Observações:* ${customer.notes.trim()}`)
   }
   lines.push('')
   const rootDomain = import.meta.env.VITE_ROOT_DOMAIN ?? 'zapia.app'
-  lines.push(`Pedido enviado via ${rootDomain}/${store.slug}`)
+  lines.push(`✅ Pedido enviado via ${rootDomain}/${store.slug}`)
   return lines.join('\n')
 }
