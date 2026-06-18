@@ -1,11 +1,8 @@
-import { lazy, Suspense, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { QueryProvider } from '@/providers/QueryProvider'
-import { AuthProvider } from '@/providers/AuthProvider'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { CookieConsentBanner } from '@/components/CookieConsentBanner'
 import { ROUTES } from '@/config/routes'
-import { isStoreDomain } from '@/lib/tenant'
+import { isStoreDomain } from '@/lib/tenant/resolveStore'
 
 // All routes are lazy-loaded so the dashboard pages (which pull in
 // react-hook-form + zod) never land in the initial bundle served to public
@@ -56,12 +53,45 @@ const AdminLayout = lazy(() => import('@/routes/admin/AdminLayout'))
 const AdminHomePage = lazy(() => import('@/routes/admin/AdminHomePage'))
 const AdminStoresPage = lazy(() => import('@/routes/admin/AdminStoresPage'))
 const AdminStorePage = lazy(() => import('@/routes/admin/AdminStorePage'))
+const AppProviders = lazy(() => import('@/providers/AppProviders'))
+const CookieConsentBanner = lazy(() =>
+  import('@/components/CookieConsentBanner').then((module) => ({
+    default: module.CookieConsentBanner,
+  })),
+)
 
-function AppProviders({ children }: { children: ReactNode }) {
+function DeferredCookieConsentBanner() {
+  const [canLoad, setCanLoad] = useState(false)
+
+  useEffect(() => {
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number
+      cancelIdleCallback?: (handle: number) => void
+    }
+    let idleId: number | undefined
+    let timeoutId: number | undefined
+    const load = () => setCanLoad(true)
+
+    if (idleWindow.requestIdleCallback) {
+      idleId = idleWindow.requestIdleCallback(load, { timeout: 2200 })
+    } else {
+      timeoutId = window.setTimeout(load, 1200)
+    }
+
+    return () => {
+      if (idleId !== undefined && idleWindow.cancelIdleCallback) {
+        idleWindow.cancelIdleCallback(idleId)
+      }
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId)
+    }
+  }, [])
+
+  if (!canLoad) return null
+
   return (
-    <QueryProvider>
-      <AuthProvider>{children}</AuthProvider>
-    </QueryProvider>
+    <Suspense fallback={null}>
+      <CookieConsentBanner />
+    </Suspense>
   )
 }
 
@@ -87,7 +117,7 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path={ROUTES.home} element={<AppProviders><LandingPage /></AppProviders>} />
+      <Route path={ROUTES.home} element={<LandingPage />} />
       <Route path={ROUTES.pricing} element={<PricingPage />} />
       <Route path={ROUTES.terms} element={<TermsPage />} />
       <Route path={ROUTES.privacy} element={<PrivacyPage />} />
@@ -166,7 +196,7 @@ export function App() {
         <Suspense fallback={null}>
           <AppRoutes />
         </Suspense>
-        <CookieConsentBanner />
+        <DeferredCookieConsentBanner />
       </BrowserRouter>
     </ErrorBoundary>
   )

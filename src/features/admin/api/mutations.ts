@@ -14,6 +14,7 @@ export async function grantComplimentary(
   notes?: string,
 ): Promise<void> {
   const supabase = createBrowserClient()
+  // @ts-expect-error - RPC function exists in DB but not in generated types
   const { error } = await supabase.rpc('admin_grant_complimentary', {
     p_store_id: storeId,
     p_plan_id: planId,

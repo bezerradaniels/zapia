@@ -1,5 +1,5 @@
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Download02Icon, ExternalLinkIcon } from '@hugeicons/core-free-icons'
+import { Download02Icon, ExternalLink } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import type { MlProductResult } from '../../types'
 
@@ -83,7 +83,7 @@ export function ResultCard({ result, isImporting, onImport }: Props) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
             >
-              <HugeiconsIcon icon={ExternalLinkIcon} className="h-3 w-3" />
+              <HugeiconsIcon icon={ExternalLink} className="h-3 w-3" />
               Ver no ML
             </a>
           )}

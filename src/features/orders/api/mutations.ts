@@ -53,6 +53,7 @@ export async function createOrder(
   input: CreateOrderInput,
 ): Promise<OrderWithItems> {
   const supabase = createBrowserClient();
+  // @ts-expect-error - RPC function exists in DB but not in generated types
   const { data, error } = await supabase.rpc("create_catalog_order", {
     p_store_id: input.storeId,
     p_customer_name: input.customerName.trim(),

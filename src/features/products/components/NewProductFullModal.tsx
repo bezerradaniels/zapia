@@ -26,6 +26,79 @@ import { productSchema, type ProductInput } from '../schemas'
 import { ROUTES } from '@/config/routes'
 import { buildStorePath } from '@/lib/tenant'
 
+function FieldLabel({ children }: { children: ReactNode }) {
+  return (
+    <label className="text-base font-semibold text-[#40558a]">
+      {children}
+      <HugeiconsIcon
+        icon={InformationCircleIcon}
+        size={14}
+        className="ml-1 inline text-[#6f7da4]"
+      />
+    </label>
+  )
+}
+
+function SectionDivider() {
+  return <div className="h-px bg-[#d8dfef]" />
+}
+
+function CreateCategoryDialog({
+  title,
+  helper,
+  value,
+  isSubmitting,
+  onChange,
+  onClose,
+  onCreate,
+}: {
+  title: string
+  helper?: string
+  value: string
+  isSubmitting?: boolean
+  onChange: (value: string) => void
+  onClose: () => void
+  onCreate: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/40 p-4 sm:items-center">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+        <h3 className="font-semibold text-z-text">{title}</h3>
+        {helper && <p className="mt-1 text-sm text-z-text-muted">{helper}</p>}
+        <input
+          autoFocus
+          type="text"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="Nome"
+          className="mt-4 h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') onCreate()
+            if (event.key === 'Escape') onClose()
+          }}
+        />
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 rounded-xl border border-z-border px-4 py-2.5 text-sm font-medium text-z-text-muted hover:bg-z-bg"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={onCreate}
+            disabled={!value.trim() || isSubmitting}
+            className="flex-1 rounded-xl bg-z-green px-4 py-2.5 text-sm font-semibold text-z-ink hover:bg-green-600 disabled:opacity-60"
+          >
+            {isSubmitting ? 'Criando...' : 'Criar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 type Props = {
   storeId: string
   storeSlug: string
@@ -160,7 +233,7 @@ export function NewProductFullModal({
   })
 
   return (
-    <>
+    <div>
     {mlSearchOpen && (
       <MercadoLibreSearch
         storeId={storeId}
@@ -673,79 +746,6 @@ export function NewProductFullModal({
         />
       )}
     </div>
-  )
-}
-
-function FieldLabel({ children }: { children: ReactNode }) {
-  return (
-    <label className="text-base font-semibold text-[#40558a]">
-      {children}
-      <HugeiconsIcon
-        icon={InformationCircleIcon}
-        size={14}
-        className="ml-1 inline text-[#6f7da4]"
-      />
-    </label>
-  )
-}
-
-function SectionDivider() {
-  return <div className="h-px bg-[#d8dfef]" />
-}
-
-function CreateCategoryDialog({
-  title,
-  helper,
-  value,
-  isSubmitting,
-  onChange,
-  onClose,
-  onCreate,
-}: {
-  title: string
-  helper?: string
-  value: string
-  isSubmitting?: boolean
-  onChange: (value: string) => void
-  onClose: () => void
-  onCreate: () => void
-}) {
-  return (
-    <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/40 p-4 sm:items-center">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-        <h3 className="font-semibold text-z-text">{title}</h3>
-        {helper && <p className="mt-1 text-sm text-z-text-muted">{helper}</p>}
-        <input
-          autoFocus
-          type="text"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder="Nome"
-          className="mt-4 h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') onCreate()
-            if (event.key === 'Escape') onClose()
-          }}
-        />
-        <div className="mt-4 flex gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 rounded-xl border border-z-border px-4 py-2.5 text-sm font-medium text-z-text-muted hover:bg-z-bg"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            onClick={onCreate}
-            disabled={!value.trim() || isSubmitting}
-            className="flex-1 rounded-xl bg-z-green px-4 py-2.5 text-sm font-semibold text-z-ink hover:bg-green-600 disabled:opacity-60"
-          >
-            {isSubmitting ? 'Criando...' : 'Criar'}
-          </button>
-        </div>
-      </div>
     </div>
-    </>
   )
 }

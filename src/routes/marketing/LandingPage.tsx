@@ -1,34 +1,41 @@
-import { useRef, useEffect, useState } from 'react'
+import { lazy, Suspense, useRef, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
-import {
-  ArrowRight02Icon,
-  StoreLocation01Icon,
-  PackageIcon,
-  WhatsappIcon,
-  DashboardSquare01Icon,
-  AiMagicIcon,
-  PaintBrush02Icon,
-  CreditCardIcon,
-  Tick02Icon,
-  HomeIcon,
-  ShoppingCart01Icon,
-  UserGroupIcon,
-  UserIcon,
-  InvoiceIcon,
-  Money02Icon,
-  CustomerSupportIcon,
-  Search01Icon,
-  Notification02Icon,
-} from '@hugeicons/core-free-icons'
+import ArrowRight02Icon from '@hugeicons/core-free-icons/ArrowRight02Icon'
+import StoreLocation01Icon from '@hugeicons/core-free-icons/StoreLocation01Icon'
+import PackageIcon from '@hugeicons/core-free-icons/PackageIcon'
+import WhatsappIcon from '@hugeicons/core-free-icons/WhatsappIcon'
+import DashboardSquare01Icon from '@hugeicons/core-free-icons/DashboardSquare01Icon'
+import AiMagicIcon from '@hugeicons/core-free-icons/AiMagicIcon'
+import PaintBrush02Icon from '@hugeicons/core-free-icons/PaintBrush02Icon'
+import CreditCardIcon from '@hugeicons/core-free-icons/CreditCardIcon'
+import Tick02Icon from '@hugeicons/core-free-icons/Tick02Icon'
+import HomeIcon from '@hugeicons/core-free-icons/Home01Icon'
+import ShoppingCart01Icon from '@hugeicons/core-free-icons/ShoppingCart01Icon'
+import UserGroupIcon from '@hugeicons/core-free-icons/UserGroupIcon'
+import UserIcon from '@hugeicons/core-free-icons/UserIcon'
+import InvoiceIcon from '@hugeicons/core-free-icons/InvoiceIcon'
+import Money02Icon from '@hugeicons/core-free-icons/Money02Icon'
+import CustomerSupportIcon from '@hugeicons/core-free-icons/CustomerSupportIcon'
+import Search01Icon from '@hugeicons/core-free-icons/Search01Icon'
+import Notification02Icon from '@hugeicons/core-free-icons/Notification02Icon'
 import { cn } from '@/lib/utils'
-import { Button, Badge } from '@/components/ui'
+import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
 import { ROUTES } from '@/config/routes'
-import { useSession } from '@/features/auth'
-import type { User } from '@supabase/supabase-js'
 import { MarketingNavbar } from './_shared/MarketingNavbar'
-import { MarketingFooter } from './_shared/MarketingFooter'
-import { PricingTable } from './_shared/PricingTable'
+
+const MarketingFooter = lazy(() =>
+  import('./_shared/MarketingFooter').then((module) => ({
+    default: module.MarketingFooter,
+  })),
+)
+
+const PricingTable = lazy(() =>
+  import('./_shared/PricingTable').then((module) => ({
+    default: module.PricingTable,
+  })),
+)
 
 /* ─── Scroll-reveal hook ─────────────────────────────────────────────────── */
 function useReveal(threshold = 0.1) {
@@ -433,58 +440,17 @@ function HeroSalesMockup() {
 }
 
 /* ─── Hero ───────────────────────────────────────────────────────────────── */
-function getUserFirstName(user: User | null) {
-  const metadataName = user?.user_metadata?.name
-  const fullName = typeof metadataName === 'string' ? metadataName.trim() : ''
-  const emailName = user?.email?.split('@')[0]?.replace(/[._-]+/g, ' ').trim()
-  return (fullName || emailName || 'lojista').split(/\s+/)[0]
-}
-
-function getHeroGreeting(date: Date) {
-  const hour = date.getHours()
-  if (hour >= 5 && hour < 12) return 'Bom dia ☀️'
-  if (hour >= 12 && hour < 18) return 'Boa tarde 🚀'
-  return 'Boa noite 🌙'
-}
-
-function getLoggedInHeroSub(date: Date) {
-  const day = date.getDay()
-  if (day === 1) return '🚀 A semana está começando com boas oportunidades, vamos conquistar novos clientes juntos?'
-  if (day === 5) return '🔥 Vamos fechar a semana com mais pedidos e novos clientes?'
-  if (day === 0 || day === 6) return '✨ O fim de semana também tem potencial, vamos conquistar novos clientes juntos?'
-  return '💪 Esta semana tem potencial, vamos conquistar novos clientes juntos?'
-}
-
 function Hero() {
-  const { session, user } = useSession()
-  const now = new Date()
-  const isLoggedIn = Boolean(session)
-  const loggedInGreeting = `${getHeroGreeting(now)}, ${getUserFirstName(user)}.`
-
   return (
     <section className="relative overflow-hidden bg-[#f5f1ec] px-6 pb-16 md:pb-0 pt-10 md:pt-16">
       {/* Centered copy */}
       <div className="relative mx-auto max-w-2xl text-center">
-        {isLoggedIn ? (
-          <>
-            <h1 className="text-[36px] font-black leading-tight tracking-tight text-z-text md:text-[52px]">
-              <span className="block">{loggedInGreeting}</span>
-              <span className="block text-z-text-muted">Que bom ver você novamente.</span>
-            </h1>
-            <p className="mt-5 text-lg leading-relaxed text-z-text-muted md:text-xl">
-              {getLoggedInHeroSub(now)}
-            </p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-[36px] font-black leading-[1.05] tracking-tighter text-z-text md:text-[56px] lg:text-[62px]" style={{ letterSpacing: '-0.055em' }}>
-              Crie seu catálogo digital em poucos passos
-            </h1>
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-z-text-muted md:text-[22px]">
-              Cadastre seus produtos, compartilhe o link do seu catálogo e receba pedidos diretamente no seu WhatsApp.
-            </p>
-          </>
-        )}
+        <h1 className="text-[36px] font-black leading-[1.05] tracking-tighter text-z-text md:text-[56px] lg:text-[62px]" style={{ letterSpacing: '-0.055em' }}>
+          Crie seu catálogo digital em poucos passos
+        </h1>
+        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-z-text-muted md:text-[22px]">
+          Cadastre seus produtos, compartilhe o link do seu catálogo e receba pedidos diretamente no seu WhatsApp.
+        </p>
 
         {/* CTAs */}
         <div className="mt-8 flex flex-col items-center gap-3">
@@ -493,8 +459,8 @@ function Hero() {
             size="lg"
             className="h-14 rounded-2xl bg-[#a4e636] px-8 text-base font-bold text-[#020617] hover:bg-[#a4e636]/90 shadow-sm transition-all duration-300 hover:scale-[1.02]"
           >
-            <Link id="lp-hero-cta-signup" to={isLoggedIn ? ROUTES.dashboard : ROUTES.signup}>
-              {isLoggedIn ? 'Ir para dashboard' : 'Crie seu catálogo grátis'}
+            <Link id="lp-hero-cta-signup" to={ROUTES.signup}>
+              Crie seu catálogo grátis
               <HugeiconsIcon icon={ArrowRight02Icon} size={18} />
             </Link>
           </Button>
@@ -902,6 +868,45 @@ function PreviewMockups({ visible }: { visible: boolean }) {
 }
 
 /* ─── Pricing ────────────────────────────────────────────────────────────── */
+function PricingTableFallback() {
+  return <div className="min-h-[520px]" aria-hidden="true" />
+}
+
+function DeferredMarketingFooter() {
+  const [canLoad, setCanLoad] = useState(false)
+
+  useEffect(() => {
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number
+      cancelIdleCallback?: (handle: number) => void
+    }
+    let idleId: number | undefined
+    let timeoutId: number | undefined
+    const load = () => setCanLoad(true)
+
+    if (idleWindow.requestIdleCallback) {
+      idleId = idleWindow.requestIdleCallback(load, { timeout: 2500 })
+    } else {
+      timeoutId = window.setTimeout(load, 1600)
+    }
+
+    return () => {
+      if (idleId !== undefined && idleWindow.cancelIdleCallback) {
+        idleWindow.cancelIdleCallback(idleId)
+      }
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId)
+    }
+  }, [])
+
+  if (!canLoad) return null
+
+  return (
+    <Suspense fallback={null}>
+      <MarketingFooter />
+    </Suspense>
+  )
+}
+
 function PricingSection() {
   const { ref, visible } = useReveal()
   return (
@@ -926,7 +931,13 @@ function PricingSection() {
         </div>
 
         <div style={revealStyle(visible, 200)}>
-          <PricingTable />
+          {visible ? (
+            <Suspense fallback={<PricingTableFallback />}>
+              <PricingTable />
+            </Suspense>
+          ) : (
+            <PricingTableFallback />
+          )}
         </div>
 
         <div
@@ -1158,7 +1169,7 @@ export default function LandingPage() {
       <PricingSection />
       <FAQ />
       <FinalCTA />
-      <MarketingFooter />
+      <DeferredMarketingFooter />
     </div>
   )
 }
