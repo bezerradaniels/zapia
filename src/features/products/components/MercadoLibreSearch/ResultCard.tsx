@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Download02Icon, ExternalLink } from '@hugeicons/core-free-icons'
+import { Download02Icon, ExternalLink, Package01Icon } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import type { MlProductResult } from '../../types'
 
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export function ResultCard({ result, isImporting, onImport }: Props) {
+  const [imgFailed, setImgFailed] = useState(false)
+
   return (
     <div
       className={cn(
@@ -19,19 +22,17 @@ export function ResultCard({ result, isImporting, onImport }: Props) {
     >
       {/* Thumbnail */}
       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border bg-muted">
-        {result.thumbnail ? (
+        {result.thumbnail && !imgFailed ? (
           <img
             src={result.thumbnail}
             alt={result.title}
             className="h-full w-full object-contain p-1"
             loading="lazy"
-            onError={(e) => {
-              ;(e.target as HTMLImageElement).style.display = 'none'
-            }}
+            onError={() => setImgFailed(true)}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-            Sem imagem
+          <div className="flex h-full w-full items-center justify-center text-muted-foreground/40">
+            <HugeiconsIcon icon={Package01Icon} className="h-7 w-7" />
           </div>
         )}
         {result.source === 'catalog' && (

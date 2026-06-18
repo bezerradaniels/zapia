@@ -16,6 +16,7 @@ import {
   ShoppingCart01Icon,
 } from '@hugeicons/core-free-icons'
 import { MercadoLibreSearch } from './MercadoLibreSearch/MercadoLibreSearch'
+import { ProductRichTextEditor } from './ProductRichTextEditor'
 import type { MlImportPayload } from '../types'
 import { ProductImagesUploader } from '@/components/forms/ProductImagesUploader'
 import { MoneyInput } from '@/components/forms/MoneyInput'
@@ -161,7 +162,7 @@ export function NewProductFullModal({
   })
 
   const name = form.watch('name') ?? ''
-  const description = form.watch('description') ?? ''
+
   const images = form.watch('images') ?? []
   const priceCents = form.watch('price_in_cents') ?? 0
   const promoCents = form.watch('promo_price_in_cents') ?? null
@@ -174,7 +175,7 @@ export function NewProductFullModal({
   )
   const autoSku = form.watch('auto_sku')
   const remainingNameChars = 120 - name.length
-  const remainingDescriptionChars = 10000 - description.length
+
 
   const handleCreateCategory = async () => {
     const name = newCategoryName.trim()
@@ -314,16 +315,17 @@ export function NewProductFullModal({
                     className="ml-1 inline text-[#6f7da4]"
                   />
                 </label>
-                <textarea
-                  rows={8}
-                  maxLength={10000}
-                  placeholder="Conte algo sobre o produto..."
-                  className="min-h-[220px] resize-y rounded-lg border border-[#cfd8eb] bg-white px-4 py-3 text-base leading-relaxed text-[#263d6b] placeholder:text-[#8a96ba] focus:border-[#40558a] focus:outline-none focus:ring-2 focus:ring-[#40558a]/15"
-                  {...form.register('description')}
+                <Controller
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <ProductRichTextEditor
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      placeholder="Conte algo sobre o produto..."
+                    />
+                  )}
                 />
-                <span className="text-sm font-medium text-[#7482aa]">
-                  {remainingDescriptionChars} caracteres restantes
-                </span>
                 {form.formState.errors.description && (
                   <span className="text-xs text-destructive">
                     {form.formState.errors.description.message}

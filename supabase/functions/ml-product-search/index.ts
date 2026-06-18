@@ -152,9 +152,9 @@ async function searchCatalog(query: string): Promise<MlProductResult[]> {
       const pictures: { url: string }[] =
         (item.pictures as { url: string }[] | undefined) ?? []
       const rawImages = pictures.map((p) => p.url).filter(Boolean)
-      // Derive high-res images by upgrading size suffix
       const images = rawImages.slice(0, 5).map((u) => upgradeImageUrl(u, '-F'))
-      const thumbnail = images[0] ? upgradeImageUrl(images[0], '-N') : ''
+      // Use the original first picture as thumbnail (guaranteed to exist)
+      const thumbnail = rawImages[0] ? upgradeImageUrl(rawImages[0], '-I') : ''
 
       return {
         mlId: String(item.id ?? ''),
@@ -174,13 +174,13 @@ async function searchCatalog(query: string): Promise<MlProductResult[]> {
     .filter((r) => r.mlId && r.title)
 }
 
-// Fallback: site-level search, kept only when items have a catalog_product_id
-// (meaning ML itself has matched them to an official catalog entry).
+// Fallback: site-level search. Prefers items with a catalog_product_id (official
+// catalog entries with verified data) but falls back to all listings so the
+// user always sees results even when no catalog match exists.
 async function searchSite(query: string): Promise<MlProductResult[]> {
   const url = new URL(`${ML_BASE}/sites/MLB/search`)
   url.searchParams.set('q', query)
-  url.searchParams.set('limit', String(MAX_RESULTS * 2)) // fetch extra so we can filter
-  url.searchParams.set('catalog_listing', 'true')
+  url.searchParams.set('limit', String(MAX_RESULTS * 2))
 
   const res = await fetch(url.toString(), { headers: await mlHeaders() })
 
@@ -189,30 +189,41 @@ async function searchSite(query: string): Promise<MlProductResult[]> {
   const body = await res.json()
   const items: unknown[] = body?.results ?? []
 
-  const seen = new Set<string>()
-  const results: MlProductResult[] = []
+  const seenCatalog = new Set<string>()
+  const seenItem = new Set<string>()
+  const catalogResults: MlProductResult[] = []
+  const listingResults: MlProductResult[] = []
 
   for (const item of items) {
     if (typeof item !== 'object' || item === null) continue
     const it = item as Record<string, unknown>
 
+    const itemId = String(it.id ?? '')
+    if (!itemId) continue
+
     const catalogId = it.catalog_product_id as string | undefined
-    if (!catalogId) continue // skip uncatalogued listings
-    if (seen.has(catalogId)) continue // deduplicate by catalog entry
-    seen.add(catalogId)
+
+    // Deduplicate by catalog entry when available
+    if (catalogId) {
+      if (seenCatalog.has(catalogId)) continue
+      seenCatalog.add(catalogId)
+    } else {
+      if (seenItem.has(itemId)) continue
+      seenItem.add(itemId)
+    }
 
     const attrs = (it.attributes as MlAttribute[] | undefined) ?? []
     const brand = attrs.find((a) => a.id === 'BRAND')?.value_name ?? null
     const barcode =
       attrs.find((a) => ['GTIN', 'EAN'].includes(a.id))?.value_name ?? null
 
-    // Upgrade thumbnail to medium then derive up to one high-res image
     const rawThumb = String(it.thumbnail ?? '')
-    const thumbnail = upgradeImageUrl(rawThumb, '-N')
+    // Use the thumbnail URL as-is — ML guarantees this URL exists for search results
+    const thumbnail = rawThumb
     const highRes = upgradeImageUrl(rawThumb, '-F')
 
-    results.push({
-      mlId: catalogId,
+    const result: MlProductResult = {
+      mlId: catalogId ?? itemId,
       title: String(it.title ?? ''),
       brand,
       thumbnail,
@@ -222,14 +233,19 @@ async function searchSite(query: string): Promise<MlProductResult[]> {
         .map((a) => ({ name: a.name, value: a.value_name! })),
       description: null,
       permalink: (it.permalink as string | undefined) ?? null,
-      source: 'listing',
+      source: catalogId ? 'catalog' : 'listing',
       barcode,
-    })
+    }
 
-    if (results.length >= MAX_RESULTS) break
+    if (catalogId) {
+      catalogResults.push(result)
+    } else {
+      listingResults.push(result)
+    }
   }
 
-  return results
+  // Return catalog-matched results first, then plain listings, up to MAX_RESULTS
+  return [...catalogResults, ...listingResults].slice(0, MAX_RESULTS)
 }
 
 // ---------------------------------------------------------------------------
@@ -305,13 +321,29 @@ serve(async (req: Request) => {
     return jsonResponse({ ...cached, source: 'cache' }, { req })
   }
 
-  // Search ML catalog first (higher quality)
-  let results = await searchCatalog(rawQuery)
+  // Run both searches in parallel: catalog has richer data, site has thumbnails
+  const [catalogResults, siteResults] = await Promise.all([
+    searchCatalog(rawQuery),
+    searchSite(rawQuery),
+  ])
 
-  // Fall back to site search filtered to catalog-matched listings
-  if (results.length === 0) {
-    results = await searchSite(rawQuery)
+  // Build a thumbnail map from site results (mlId → thumbnail)
+  const siteThumbByMlId = new Map<string, string>()
+  for (const r of siteResults) {
+    if (r.thumbnail) siteThumbByMlId.set(r.mlId, r.thumbnail)
   }
+
+  // Enrich catalog results with thumbnails from matching site listings
+  const enrichedCatalog = catalogResults.map((r) => ({
+    ...r,
+    thumbnail: r.thumbnail || siteThumbByMlId.get(r.mlId) || '',
+  }))
+
+  // Append site-only results (not already covered by catalog)
+  const catalogMlIds = new Set(catalogResults.map((r) => r.mlId))
+  const siteOnly = siteResults.filter((r) => !catalogMlIds.has(r.mlId))
+
+  const results = [...enrichedCatalog, ...siteOnly].slice(0, MAX_RESULTS)
 
   const payload: CachedPayload = { results }
   await setCached(cacheKey, payload, ttl)

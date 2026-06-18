@@ -35,8 +35,7 @@ export function buildDescriptionFromAttributes(
   const relevant = attributes.filter((a) => !EXCLUDED_ATTRIBUTE_IDS.has(a.name.toUpperCase()))
   if (relevant.length === 0) return ''
 
-  const rows = relevant.map((a) => `<li><strong>${a.name}:</strong> ${a.value}</li>`).join('\n')
-  return `<ul>\n${rows}\n</ul>`
+  return relevant.map((a) => `<p>${a.name}: ${a.value}</p>`).join('')
 }
 
 // ---------------------------------------------------------------------------

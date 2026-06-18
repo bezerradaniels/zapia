@@ -67,7 +67,7 @@ export function MercadoLibreSearch({ storeId, onImport, onClose }: Props) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/50"
+        className="fixed inset-0 z-[80] bg-black/50"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -77,7 +77,7 @@ export function MercadoLibreSearch({ storeId, onImport, onClose }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label="Importar do Mercado Livre"
-        className="fixed inset-x-4 top-[10%] z-50 mx-auto flex max-h-[80vh] max-w-lg flex-col rounded-xl bg-background shadow-2xl"
+        className="fixed inset-x-4 top-[10%] z-[90] mx-auto flex max-h-[80vh] max-w-lg flex-col rounded-xl bg-background shadow-2xl"
       >
         {/* Header */}
         <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
