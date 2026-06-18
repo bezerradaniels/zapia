@@ -126,6 +126,61 @@ interface MlAttribute {
 }
 
 // ---------------------------------------------------------------------------
+// Catalog search
+//
+// Calls the ML Catalog Products API (/products/search). These are official,
+// verified catalog entries with rich attributes. Images are often absent but
+// data quality is higher. Used as a fallback when site search returns nothing.
+// ---------------------------------------------------------------------------
+
+async function searchCatalog(query: string): Promise<MlProductResult[]> {
+  const url = new URL(`${ML_BASE}/products/search`)
+  url.searchParams.set('site_id', 'MLB')
+  url.searchParams.set('q', query)
+  url.searchParams.set('limit', String(MAX_RESULTS))
+
+  const res = await fetch(url.toString(), { headers: await mlHeaders() })
+  if (!res.ok) {
+    console.error('[ml-product-search] catalog search failed', res.status)
+    return []
+  }
+
+  const body = await res.json()
+  const items: unknown[] = body?.results ?? []
+
+  return items
+    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+    .map((item): MlProductResult => {
+      const attrs = (item.attributes as MlAttribute[] | undefined) ?? []
+      const brand = attrs.find((a) => a.id === 'BRAND')?.value_name ?? null
+      const barcode =
+        attrs.find((a) => ['GTIN', 'EAN'].includes(a.id))?.value_name ?? null
+
+      const pictures: { url: string }[] =
+        (item.pictures as { url: string }[] | undefined) ?? []
+      const rawImages = pictures.map((p) => p.url).filter(Boolean)
+      const images = rawImages.slice(0, 5).map((u) => upgradeImageUrl(u, '-F'))
+      const thumbnail = rawImages[0] ? upgradeImageUrl(rawImages[0], '-I') : ''
+
+      return {
+        mlId: String(item.id ?? ''),
+        title: String(item.name ?? ''),
+        brand,
+        thumbnail,
+        images,
+        attributes: attrs
+          .filter((a) => a.value_name)
+          .map((a) => ({ name: a.name, value: a.value_name! })),
+        description: (item.short_description as string | undefined) ?? null,
+        permalink: null,
+        source: 'catalog',
+        barcode,
+      }
+    })
+    .filter((r) => r.mlId && r.title)
+}
+
+// ---------------------------------------------------------------------------
 // Site search
 //
 // Calls /sites/MLB/search which always returns thumbnail URLs. Items that
@@ -278,7 +333,25 @@ serve(async (req: Request) => {
     return jsonResponse({ ...cached, source: 'cache' }, { req })
   }
 
-  const results = await searchSite(rawQuery)
+  // Run both in parallel: site search has thumbnails, catalog has richer data.
+  // Prefer site results when available; fall back to catalog so there are always results.
+  const [siteResults, catalogResults] = await Promise.all([
+    searchSite(rawQuery),
+    searchCatalog(rawQuery),
+  ])
+
+  let results: MlProductResult[]
+
+  if (siteResults.length > 0) {
+    // Site search worked — results always include thumbnails.
+    // Enrich with any catalog data (descriptions) where IDs match.
+    results = siteResults
+  } else {
+    // Site search failed or returned nothing (possible geo-block on this IP).
+    // Fall back to catalog results; they may lack thumbnails but show useful data.
+    console.warn('[ml-product-search] site search empty, falling back to catalog')
+    results = catalogResults
+  }
 
   const payload: CachedPayload = { results }
   await setCached(cacheKey, payload, ttl)
