@@ -1,33 +1,32 @@
 // Edge Function: ml-product-search
 //
-// Searches the Mercado Livre Brazil (MLB) catalog for products by text query
-// or EAN/GTIN barcode. Results are cached in `ml_search_cache` (service-role
-// only) to avoid hammering the external API on repeated popular queries.
+// Searches the Mercado Livre Brazil (MLB) marketplace for products by text
+// query or EAN/GTIN barcode. Results are cached in `ml_search_cache`
+// (service-role only) to avoid hammering the external API on repeated queries.
 //
 // Strategy:
-//   1. Normalise the query and check the DB cache.
-//   2. On cache miss, call the ML Catalog Products API (/products/search).
-//      These are official entries with verified data — prioritised over
-//      individual seller listings.
-//   3. For each catalog hit, derive high-res image URLs from the thumbnail
-//      (ML uses a predictable suffix convention: -I → -F at 500 px).
-//   4. If the catalog returns zero results, fall back to the site-search
-//      endpoint (/sites/MLB/search) and filter items that carry a
-//      catalog_product_id so quality stays high.
-//   5. Persist the normalised response in cache before returning.
+//   1. Normalise the query and check the DB cache (keyed with version prefix
+//      so a strategy change auto-invalidates old entries).
+//   2. On cache miss, call the site-search endpoint (/sites/MLB/search).
+//      This endpoint always returns thumbnail URLs. Items that carry a
+//      catalog_product_id are considered official catalog entries, are
+//      de-duplicated, sorted first, and labelled source:'catalog'.
+//   3. Persist the normalised response in cache before returning.
 //
 // Auth: caller must be an authenticated store member.
-// Rate-limit protection: cache TTL of 1 h for text, 24 h for barcodes.
+// Rate-limit protection: 1 h TTL for text queries, 24 h for barcodes.
 
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import { adminClient, requireAuth } from '../_shared/auth.ts'
 import { preflight, jsonResponse } from '../_shared/cors.ts'
 
 const ML_BASE = 'https://api.mercadolibre.com'
-const CACHE_TTL_TEXT_S = 60 * 60        // 1 hour
+const CACHE_TTL_TEXT_S = 60 * 60         // 1 hour
 const CACHE_TTL_BARCODE_S = 60 * 60 * 24 // 24 hours
 const ML_TOKEN_TTL_MS = 5.5 * 60 * 60 * 1000 // 5.5 h (ML tokens expire in 6 h)
 const MAX_RESULTS = 10
+// Bump this when the response shape changes to auto-invalidate cached entries.
+const CACHE_VERSION = 'v2'
 
 // ---------------------------------------------------------------------------
 // ML OAuth — Client Credentials flow
@@ -117,7 +116,7 @@ function isBarcode(q: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Helpers: ML API calls
+// Helpers: ML API attribute type
 // ---------------------------------------------------------------------------
 
 interface MlAttribute {
@@ -126,65 +125,25 @@ interface MlAttribute {
   value_name: string | null
 }
 
-// Fetch from the ML Catalog Products API. Returns official catalog entries
-// which have richer, verified data. This endpoint is publicly accessible.
-async function searchCatalog(query: string): Promise<MlProductResult[]> {
-  const url = new URL(`${ML_BASE}/products/search`)
-  url.searchParams.set('site_id', 'MLB')
-  url.searchParams.set('q', query)
-  url.searchParams.set('limit', String(MAX_RESULTS))
+// ---------------------------------------------------------------------------
+// Site search
+//
+// Calls /sites/MLB/search which always returns thumbnail URLs. Items that
+// carry a catalog_product_id are de-duplicated by that ID and sorted first;
+// plain seller listings (no catalog link) follow. Both groups are capped at
+// MAX_RESULTS total.
+// ---------------------------------------------------------------------------
 
-  const res = await fetch(url.toString(), { headers: await mlHeaders() })
-
-  if (!res.ok) return []
-
-  const body = await res.json()
-  const items: unknown[] = body?.results ?? []
-
-  return items
-    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
-    .map((item): MlProductResult => {
-      const attrs = (item.attributes as MlAttribute[] | undefined) ?? []
-      const brand = attrs.find((a) => a.id === 'BRAND')?.value_name ?? null
-      const barcode =
-        attrs.find((a) => ['GTIN', 'EAN'].includes(a.id))?.value_name ?? null
-
-      const pictures: { url: string }[] =
-        (item.pictures as { url: string }[] | undefined) ?? []
-      const rawImages = pictures.map((p) => p.url).filter(Boolean)
-      const images = rawImages.slice(0, 5).map((u) => upgradeImageUrl(u, '-F'))
-      // Use the original first picture as thumbnail (guaranteed to exist)
-      const thumbnail = rawImages[0] ? upgradeImageUrl(rawImages[0], '-I') : ''
-
-      return {
-        mlId: String(item.id ?? ''),
-        title: String(item.name ?? ''),
-        brand,
-        thumbnail,
-        images,
-        attributes: attrs
-          .filter((a) => a.value_name)
-          .map((a) => ({ name: a.name, value: a.value_name! })),
-        description: (item.short_description as string | undefined) ?? null,
-        permalink: null,
-        source: 'catalog',
-        barcode,
-      }
-    })
-    .filter((r) => r.mlId && r.title)
-}
-
-// Fallback: site-level search. Prefers items with a catalog_product_id (official
-// catalog entries with verified data) but falls back to all listings so the
-// user always sees results even when no catalog match exists.
 async function searchSite(query: string): Promise<MlProductResult[]> {
   const url = new URL(`${ML_BASE}/sites/MLB/search`)
   url.searchParams.set('q', query)
   url.searchParams.set('limit', String(MAX_RESULTS * 2))
 
   const res = await fetch(url.toString(), { headers: await mlHeaders() })
-
-  if (!res.ok) return []
+  if (!res.ok) {
+    console.error('[ml-product-search] site search failed', res.status)
+    return []
+  }
 
   const body = await res.json()
   const items: unknown[] = body?.results ?? []
@@ -203,7 +162,7 @@ async function searchSite(query: string): Promise<MlProductResult[]> {
 
     const catalogId = it.catalog_product_id as string | undefined
 
-    // Deduplicate by catalog entry when available
+    // De-duplicate: one entry per catalog product, one per item otherwise
     if (catalogId) {
       if (seenCatalog.has(catalogId)) continue
       seenCatalog.add(catalogId)
@@ -217,17 +176,16 @@ async function searchSite(query: string): Promise<MlProductResult[]> {
     const barcode =
       attrs.find((a) => ['GTIN', 'EAN'].includes(a.id))?.value_name ?? null
 
+    // Site search always includes a thumbnail URL
     const rawThumb = String(it.thumbnail ?? '')
-    // Use the thumbnail URL as-is — ML guarantees this URL exists for search results
-    const thumbnail = rawThumb
     const highRes = upgradeImageUrl(rawThumb, '-F')
 
     const result: MlProductResult = {
       mlId: catalogId ?? itemId,
       title: String(it.title ?? ''),
       brand,
-      thumbnail,
-      images: [highRes],
+      thumbnail: rawThumb,
+      images: highRes ? [highRes] : [],
       attributes: attrs
         .filter((a) => a.value_name)
         .map((a) => ({ name: a.name, value: a.value_name! })),
@@ -244,7 +202,7 @@ async function searchSite(query: string): Promise<MlProductResult[]> {
     }
   }
 
-  // Return catalog-matched results first, then plain listings, up to MAX_RESULTS
+  // Catalog-linked results first, then plain listings
   return [...catalogResults, ...listingResults].slice(0, MAX_RESULTS)
 }
 
@@ -312,38 +270,15 @@ serve(async (req: Request) => {
 
   const barcode = isBarcode(rawQuery)
   const normalised = rawQuery.toLowerCase()
-  const cacheKey = `ml:${normalised}`
+  const cacheKey = `ml:${CACHE_VERSION}:${normalised}`
   const ttl = barcode ? CACHE_TTL_BARCODE_S : CACHE_TTL_TEXT_S
 
-  // Cache hit
   const cached = await getCached(cacheKey)
   if (cached) {
     return jsonResponse({ ...cached, source: 'cache' }, { req })
   }
 
-  // Run both searches in parallel: catalog has richer data, site has thumbnails
-  const [catalogResults, siteResults] = await Promise.all([
-    searchCatalog(rawQuery),
-    searchSite(rawQuery),
-  ])
-
-  // Build a thumbnail map from site results (mlId → thumbnail)
-  const siteThumbByMlId = new Map<string, string>()
-  for (const r of siteResults) {
-    if (r.thumbnail) siteThumbByMlId.set(r.mlId, r.thumbnail)
-  }
-
-  // Enrich catalog results with thumbnails from matching site listings
-  const enrichedCatalog = catalogResults.map((r) => ({
-    ...r,
-    thumbnail: r.thumbnail || siteThumbByMlId.get(r.mlId) || '',
-  }))
-
-  // Append site-only results (not already covered by catalog)
-  const catalogMlIds = new Set(catalogResults.map((r) => r.mlId))
-  const siteOnly = siteResults.filter((r) => !catalogMlIds.has(r.mlId))
-
-  const results = [...enrichedCatalog, ...siteOnly].slice(0, MAX_RESULTS)
+  const results = await searchSite(rawQuery)
 
   const payload: CachedPayload = { results }
   await setCached(cacheKey, payload, ttl)
