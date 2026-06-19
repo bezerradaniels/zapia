@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 import { customerSchema, type CustomerFormValues } from '../schemas/customerSchema'
 import type { Customer } from '../types'
 import { ProductRichTextEditor } from '@/features/products/components/ProductRichTextEditor'
+import { PhoneInput } from '@/components/forms/PhoneInput'
 
 const PLATFORMS = [
   { value: 'instagram', label: 'Instagram' },
@@ -192,16 +193,11 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
                 <label className="mb-1.5 block text-xs font-medium text-z-text-muted">
                   WhatsApp <span className="text-rose-500">*</span>
                 </label>
-                <div className="flex h-10 overflow-hidden rounded-lg border border-z-border focus-within:border-z-green">
-                  <span className="flex items-center border-r border-z-border bg-z-bg2 px-3 text-sm text-z-text-muted">
-                    +55
-                  </span>
-                  <input
-                    {...register('whatsapp_phone')}
-                    placeholder="(77) 99999-9999"
-                    className="flex-1 bg-white px-3 text-sm placeholder:text-z-text-hint focus:outline-none"
-                  />
-                </div>
+                <PhoneInput
+                  className="h-10 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
+                  value={watch('whatsapp_phone')}
+                  onChange={(value) => setValue('whatsapp_phone', value)}
+                />
                 {errors.whatsapp_phone && (
                   <p className="mt-1 text-xs text-rose-500">{errors.whatsapp_phone.message}</p>
                 )}
@@ -210,16 +206,11 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
                 <label className="mb-1.5 block text-xs font-medium text-z-text-muted">
                   Telefone secundário
                 </label>
-                <div className="flex h-10 overflow-hidden rounded-lg border border-z-border focus-within:border-z-green">
-                  <span className="flex items-center border-r border-z-border bg-z-bg2 px-3 text-sm text-z-text-muted">
-                    +55
-                  </span>
-                  <input
-                    {...register('secondary_phone')}
-                    placeholder="Digite aqui"
-                    className="flex-1 bg-white px-3 text-sm placeholder:text-z-text-hint focus:outline-none"
-                  />
-                </div>
+                <PhoneInput
+                  className="h-10 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
+                  value={watch('secondary_phone') ?? ''}
+                  onChange={(value) => setValue('secondary_phone', value)}
+                />
               </div>
             </div>
 

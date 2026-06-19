@@ -14,28 +14,19 @@ import {
 import { useActiveStore, buildStoreUrl } from '@/lib/tenant'
 import { useSession } from '@/features/auth'
 import {
-  useMembers,
-  useRemoveSeller,
-  type StoreMemberWithProfile,
+  useSellerCatalogs,
 } from '@/features/sellers'
 import { usePlanLimits } from '@/features/billing'
 import { ROUTES } from '@/config/routes'
 import { track } from '@/features/analytics'
 import { cn } from '@/lib/utils'
 import { NewSellerModal } from './NewSellerModal'
+import type { SellerCatalog } from '@/features/sellers/types'
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/)
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-}
-
-function nameToSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '')
 }
 
 const AVATAR_COLORS = [
@@ -57,7 +48,7 @@ function avatarColor(name: string) {
 // ─── Seller row ──────────────────────────────────────────────────────────────
 
 type SellerRowProps = {
-  member: StoreMemberWithProfile
+  catalog: SellerCatalog
   catalogUrl: string
   isSelected: boolean
   isOwner: boolean
@@ -65,14 +56,14 @@ type SellerRowProps = {
   onRemove: () => void
 }
 
-function SellerRow({ member, catalogUrl, isSelected, isOwner, onSelect, onRemove }: SellerRowProps) {
+function SellerRow({ catalog, catalogUrl, isSelected, isOwner, onSelect, onRemove }: SellerRowProps) {
   const [copied, setCopied] = useState(false)
-  const displayName = member.name ?? member.email
+  const displayName = catalog.name
   const colorClass = avatarColor(displayName)
 
   function copyLink() {
     navigator.clipboard.writeText(catalogUrl).then(() => {
-      track('share_link_copied', { link_type: 'seller', item_id: member.user_id })
+      track('share_link_copied', { link_type: 'seller', item_id: catalog.id })
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     })
@@ -137,7 +128,7 @@ function SellerRow({ member, catalogUrl, isSelected, isOwner, onSelect, onRemove
         >
           <HugeiconsIcon icon={Edit02Icon} size={15} />
         </button>
-        {isOwner && member.role === 'seller' && (
+        {isOwner && (
           <button
             type="button"
             title="Remover vendedor"
@@ -155,21 +146,21 @@ function SellerRow({ member, catalogUrl, isSelected, isOwner, onSelect, onRemove
 // ─── Seller detail panel ─────────────────────────────────────────────────────
 
 type DetailPanelProps = {
-  member: StoreMemberWithProfile
+  catalog: SellerCatalog
   catalogUrl: string
   isOwner: boolean
   onRemove: () => void
 }
 
-function SellerDetailPanel({ member, catalogUrl, isOwner, onRemove }: DetailPanelProps) {
+function SellerDetailPanel({ catalog, catalogUrl, isOwner, onRemove }: DetailPanelProps) {
   const [copied, setCopied] = useState(false)
-  const displayName = member.name ?? member.email
+  const displayName = catalog.name
   const colorClass = avatarColor(displayName)
   const firstName = displayName.split(' ')[0]
 
   function copyLink() {
     navigator.clipboard.writeText(catalogUrl).then(() => {
-      track('share_link_copied', { link_type: 'seller', item_id: member.user_id })
+      track('share_link_copied', { link_type: 'seller', item_id: catalog.id })
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     })
@@ -205,10 +196,12 @@ function SellerDetailPanel({ member, catalogUrl, isOwner, onRemove }: DetailPane
           <button type="button" title="Copiar link" onClick={copyLink} className="flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-bg2 hover:text-z-text">
             <HugeiconsIcon icon={copied ? CopyCheckIcon : Copy01Icon} size={15} />
           </button>
-          <Link to={`${ROUTES.dashboardOrders}?seller=${member.user_id}`} title="Ver pedidos" className="flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-bg2 hover:text-z-text">
-            <HugeiconsIcon icon={ShoppingCart01Icon} size={15} />
-          </Link>
-          {isOwner && member.role === 'seller' && (
+          {catalog.linked_user_id && (
+            <Link to={`${ROUTES.dashboardOrders}?seller=${catalog.linked_user_id}`} title="Ver pedidos" className="flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-bg2 hover:text-z-text">
+              <HugeiconsIcon icon={ShoppingCart01Icon} size={15} />
+            </Link>
+          )}
+          {isOwner && (
             <button type="button" title="Remover vendedor" onClick={onRemove} className="flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-primary/10 hover:text-z-primary">
               <HugeiconsIcon icon={Delete02Icon} size={15} />
             </button>
@@ -272,9 +265,11 @@ function SellerDetailPanel({ member, catalogUrl, isOwner, onRemove }: DetailPane
 
       {/* Footer */}
       <div className="flex items-center justify-between border-t border-z-border px-5 py-3">
-        <Link to={`${ROUTES.dashboardOrders}?seller=${member.user_id}`} className="text-xs font-semibold text-z-primary hover:underline">
-          Ver pedidos
-        </Link>
+        {catalog.linked_user_id && (
+          <Link to={`${ROUTES.dashboardOrders}?seller=${catalog.linked_user_id}`} className="text-xs font-semibold text-z-primary hover:underline">
+            Ver pedidos
+          </Link>
+        )}
         <button type="button" className="text-xs font-semibold text-z-primary hover:underline">
           Editar cadastro
         </button>
@@ -288,35 +283,34 @@ function SellerDetailPanel({ member, catalogUrl, isOwner, onRemove }: DetailPane
 export default function SellersPage() {
   const { user } = useSession()
   const { store } = useActiveStore()
-  const members = useMembers(store?.id)
-  const removeSeller = useRemoveSeller(store?.id ?? '')
+  const sellerCatalogs = useSellerCatalogs(store?.id)
   const limits = usePlanLimits(store?.id)
 
   const [search, setSearch] = useState('')
-  const [selected, setSelected] = useState<StoreMemberWithProfile | null>(null)
+  const [selected, setSelected] = useState<SellerCatalog | null>(null)
   const [showNewSellerModal, setShowNewSellerModal] = useState(false)
 
   if (!store) return <p className="text-sm text-z-text-muted">Carregando...</p>
 
   const isOwner = store.owner_id === user?.id
-  const list = members.data ?? []
+  const list = sellerCatalogs.data ?? []
   const sellerLimit = limits.sellerLimit
   const atLimit = sellerLimit !== null && list.length >= sellerLimit
 
   const filtered = search.trim()
-    ? list.filter((m) => (m.name ?? m.email).toLowerCase().includes(search.toLowerCase()))
+    ? list.filter((m) => m.name.toLowerCase().includes(search.toLowerCase()))
     : list
 
   const storeBaseUrl = buildStoreUrl(store.slug)
 
-  function getCatalogUrl(member: StoreMemberWithProfile) {
-    return `${storeBaseUrl}/s/${nameToSlug(member.name ?? member.email)}`
+  function getCatalogUrl(catalog: SellerCatalog) {
+    return `${storeBaseUrl}/s/${catalog.catalog_slug}`
   }
 
-  function handleRemove(member: StoreMemberWithProfile) {
-    if (!confirm(`Remover ${member.name ?? member.email} da equipe?`)) return
-    removeSeller.mutate(member.user_id)
-    if (selected?.user_id === member.user_id) setSelected(null)
+  function handleRemove(catalog: SellerCatalog) {
+    if (!confirm(`Remover ${catalog.name} da equipe?`)) return
+    // TODO: Implement delete seller catalog
+    if (selected?.id === catalog.id) setSelected(null)
   }
 
   return (
@@ -364,7 +358,7 @@ export default function SellersPage() {
             <span>{list.length}/{sellerLimit ?? '∞'} vendedores</span>
           </div>
 
-          {members.isLoading ? (
+          {sellerCatalogs.isLoading ? (
             <p className="py-6 text-center text-sm text-z-text-muted">Carregando...</p>
           ) : list.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-12 text-center">
@@ -378,15 +372,15 @@ export default function SellersPage() {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {filtered.map((m) => (
+              {filtered.map((catalog) => (
                 <SellerRow
-                  key={m.user_id}
-                  member={m}
-                  catalogUrl={getCatalogUrl(m)}
-                  isSelected={selected?.user_id === m.user_id}
+                  key={catalog.id}
+                  catalog={catalog}
+                  catalogUrl={getCatalogUrl(catalog)}
+                  isSelected={selected?.id === catalog.id}
                   isOwner={isOwner}
-                  onSelect={() => setSelected(selected?.user_id === m.user_id ? null : m)}
-                  onRemove={() => handleRemove(m)}
+                  onSelect={() => setSelected(selected?.id === catalog.id ? null : catalog)}
+                  onRemove={() => handleRemove(catalog)}
                 />
               ))}
               {filtered.length === 0 && search && (
@@ -402,7 +396,7 @@ export default function SellersPage() {
         {selected && (
           <div className="overflow-hidden rounded-2xl border border-z-border bg-white lg:w-[360px] lg:shrink-0">
             <SellerDetailPanel
-              member={selected}
+              catalog={selected}
               catalogUrl={getCatalogUrl(selected)}
               isOwner={isOwner}
               onRemove={() => handleRemove(selected)}

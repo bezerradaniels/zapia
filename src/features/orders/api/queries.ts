@@ -10,7 +10,7 @@ export async function listOrdersForStore(storeId: string): Promise<Order[]> {
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  return (data ?? []) as Order[]
+  return (data ?? []) as unknown as Order[]
 }
 
 export async function getOrderById(id: string): Promise<OrderWithItems | null> {
@@ -33,5 +33,5 @@ export async function getOrderById(id: string): Promise<OrderWithItems | null> {
 
   if (itemsError) throw itemsError
 
-  return { ...(order as Order), items: (items ?? []) as OrderItem[] }
+  return { ...(order as unknown as Order), items: (items ?? []) as OrderItem[] }
 }

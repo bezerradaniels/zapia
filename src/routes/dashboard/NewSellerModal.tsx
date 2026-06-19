@@ -11,6 +11,7 @@ import {
 import { useCreateSellerCatalog } from '@/features/sellers'
 import { useProducts } from '@/features/products'
 import { cn } from '@/lib/utils'
+import { PhoneInput } from '@/components/forms/PhoneInput'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -161,7 +162,7 @@ export function NewSellerModal({ open, ...props }: Props) {
   return <NewSellerModalContent {...props} />
 }
 
-function NewSellerModalContent({ onClose, storeId, storeSlug, storeWhatsapp }: Omit<Props, 'open'>) {
+function NewSellerModalContent({ onClose, storeId, storeSlug }: Omit<Props, 'open' | 'storeWhatsapp'>) {
   const createCatalog = useCreateSellerCatalog(storeId)
 
   const {
@@ -265,18 +266,15 @@ function NewSellerModalContent({ onClose, storeId, storeSlug, storeWhatsapp }: O
                         WhatsApp do vendedor
                         <HugeiconsIcon icon={InformationCircleIcon} size={13} className="text-z-text-hint" />
                       </label>
-                      <div className={cn(
-                        'flex h-10 overflow-hidden rounded-lg border focus-within:border-z-green',
-                        useStoreWhatsapp ? 'border-z-border bg-z-bg2 opacity-60' : 'border-z-border',
-                      )}>
-                        <span className="flex items-center border-r border-z-border bg-z-bg2 px-3 text-sm text-z-text-muted">+55</span>
-                        <input
-                          {...register('whatsapp_phone')}
-                          disabled={useStoreWhatsapp}
-                          placeholder={useStoreWhatsapp && storeWhatsapp ? storeWhatsapp.replace('+55', '') : '(61) 99999-9999'}
-                          className="flex-1 bg-transparent px-3 text-sm placeholder:text-z-text-hint focus:outline-none disabled:cursor-not-allowed"
-                        />
-                      </div>
+                      <PhoneInput
+                        className={cn(
+                          'h-10 w-full rounded-lg border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20',
+                          useStoreWhatsapp ? 'border-z-border bg-z-bg2 opacity-60' : 'border-z-border',
+                        )}
+                        value={watch('whatsapp_phone')}
+                        onChange={(value) => setValue('whatsapp_phone', value)}
+                        disabled={useStoreWhatsapp}
+                      />
 
                       <div className="mt-2 flex items-center justify-between">
                         <label className="text-xs text-z-text-muted">Usar o mesmo WhatsApp da loja</label>
