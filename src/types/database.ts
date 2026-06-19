@@ -481,26 +481,41 @@ export type Database = {
         Row: {
           has_ai_helpers: boolean
           has_custom_theme: boolean
-          has_digital_products: boolean
-          has_multiple_sellers: boolean
-          id: Database["public"]["Enums"]["plan_id"]
+          has_pdf_export: boolean
+          plan_id: Database["public"]["Enums"]["plan_id"]
           max_products: number
+          max_sellers: number
+          name: string
+          price_in_cents: number
+          stripe_price_id: string | null
+          stripe_price_monthly: string | null
+          stripe_price_annual: string | null
         }
         Insert: {
           has_ai_helpers?: boolean
           has_custom_theme?: boolean
-          has_digital_products?: boolean
-          has_multiple_sellers?: boolean
-          id: Database["public"]["Enums"]["plan_id"]
+          has_pdf_export?: boolean
+          plan_id: Database["public"]["Enums"]["plan_id"]
           max_products?: number
+          max_sellers?: number
+          name: string
+          price_in_cents: number
+          stripe_price_id?: string | null
+          stripe_price_monthly?: string | null
+          stripe_price_annual?: string | null
         }
         Update: {
           has_ai_helpers?: boolean
           has_custom_theme?: boolean
-          has_digital_products?: boolean
-          has_multiple_sellers?: boolean
-          id?: Database["public"]["Enums"]["plan_id"]
+          has_pdf_export?: boolean
+          plan_id?: Database["public"]["Enums"]["plan_id"]
           max_products?: number
+          max_sellers?: number
+          name?: string
+          price_in_cents?: number
+          stripe_price_id?: string | null
+          stripe_price_monthly?: string | null
+          stripe_price_annual?: string | null
         }
         Relationships: []
       }

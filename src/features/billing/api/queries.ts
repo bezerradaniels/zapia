@@ -38,7 +38,7 @@ export async function listPlanFeatures(): Promise<PlanFeatures[]> {
   const supabase = createBrowserClient()
   const { data, error } = await supabase
     .from('plan_features')
-    .select('*')
+    .select('id:plan_id, name, price_in_cents, max_products, max_sellers, has_ai_helpers, has_pdf_export, has_custom_theme, stripe_price_id, stripe_price_monthly, stripe_price_annual')
     .order('price_in_cents', { ascending: true })
 
   if (error) throw error

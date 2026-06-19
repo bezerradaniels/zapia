@@ -238,16 +238,16 @@ export type Subscription = {
 
 export type PlanFeatures = {
   id: PlanId
+  name: string
+  price_in_cents: number
   max_products: number
+  max_sellers: number
   has_ai_helpers: boolean
-  has_custom_theme: boolean
-  has_digital_products: boolean
-  has_multiple_sellers: boolean
-  max_sellers: number | null
-  max_coupons: number | null
   has_pdf_export: boolean
-  has_featured_products: boolean
-  has_gallery: boolean
+  has_custom_theme: boolean
+  stripe_price_id: string | null
+  stripe_price_monthly: string | null
+  stripe_price_annual: string | null
 }
 
 export type Invoice = {
