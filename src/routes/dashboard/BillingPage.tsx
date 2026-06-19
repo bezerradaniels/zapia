@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   Tick02Icon,
@@ -22,6 +23,7 @@ import { useActiveStore } from '@/lib/tenant'
 import { formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { PLANS, TRIAL_DAYS } from '@/config/plans'
+import { track } from '@/features/analytics'
 import type { PlanId, SubscriptionStatus } from '@/types/domain'
 
 const PLAN_FEATURE_TEXT: Record<PlanId, string[]> = {
@@ -82,6 +84,21 @@ export default function BillingPage() {
   const subscription = useSubscription(store?.id)
   const plans = usePlanFeatures()
   const invoices = useInvoices(store?.id)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('checkout') !== 'success') return
+    const planId = sessionStorage.getItem('zapia_checkout_plan')
+    if (planId) {
+      track('subscription_started', { store_id: store?.id, plan_tier: planId })
+      sessionStorage.removeItem('zapia_checkout_plan')
+    }
+    setSearchParams((params) => {
+      params.delete('checkout')
+      return params
+    }, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
   const sub = subscription.data
   const status = sub?.status ?? 'none'

@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Experimente grátis — Zapia Catálogos Digitais</title>
+    <meta
+      name="description"
+      content="Crie seu catálogo digital, compartilhe o link e receba pedidos direto no WhatsApp. Experimente grátis por 7 dias, sem cartão de crédito."
+    />
+    <meta name="robots" content="noindex, follow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['DM Sans', 'sans-serif'],
+            },
+            colors: {
+              zgreen: '#07feda',
+              zgreenhover: '#0ab89e',
+              zink: '#020617',
+              zmuted: '#475569',
+              zhint: '#94a3b8',
+              zborder: '#e2e8f0',
+              zbg: '#f8fafc',
+              zstorebg: '#f1f5f9',
+            },
+          },
+        },
+      }
+    </script>
+
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+    </style>
+  </head>
+  <body class="font-sans text-zink bg-white leading-snug antialiased">
+    <!-- ───────── Header ───────── -->
+    <header class="py-5">
+      <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
+        <a href="https://zapia.app" class="inline-flex items-center gap-2">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-zink shrink-0">
+            <path d="M20.1765 12.5113C19.8261 9.50898 19.3142 7.25784 18.8394 5.65851C18.4501 4.34711 18.2554 3.69141 17.4572 3.0957C16.659 2.5 15.8431 2.5 14.2113 2.5H8.78876C7.15697 2.5 6.34107 2.5 5.54283 3.0957C4.74459 3.69141 4.54994 4.34711 4.16063 5.65851C3.68586 7.25784 3.1739 9.50898 2.82352 12.5113C2.41058 16.0497 2.20411 17.8189 3.39731 19.1594C4.59052 20.5 6.52422 20.5 10.3916 20.5H11.6084" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+            <path d="M8.5 6.5C8.5 8.15685 9.84315 9.5 11.5 9.5C13.1569 9.5 14.5 8.15685 14.5 6.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+            <path d="M14.5 19.5C14.5 19.5 15.5 19.5 16.5 21.5C16.5 21.5 18.6765 16.5 21.5 15.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          </svg>
+          <span class="text-xl font-bold tracking-tight leading-none text-gray-900">Zap.IA</span>
+        </a>
+        <span class="inline-flex items-center gap-1.5 bg-[#e8fcf9] text-[#0f574c] text-[13px] font-bold px-3.5 py-1.5 rounded-full leading-none">
+          7 dias grátis · sem cartão
+        </span>
+      </div>
+    </header>
+
+    <!-- ───────── Hero ───────── -->
+    <section class="bg-[#f5f1ec] pt-10 md:pt-16">
+      <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 md:gap-12 items-center md:pb-16">
+        <div class="text-center md:text-left pb-10 md:pb-0">
+          <div class="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-tight text-emerald-500 mb-4 leading-none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Oferta exclusiva desta campanha
+          </div>
+          <h1 class="text-4xl md:text-5xl lg:text-[56px] font-extrabold leading-[1.05] tracking-tight mb-5">
+            Experimente grátis e crie o catálogo da sua loja em <span class="text-emerald-500">poucos minutos</span>
+          </h1>
+          <p class="text-lg text-zmuted leading-snug mb-7 max-w-md mx-auto md:mx-0">
+            Cadastre seus produtos, compartilhe o link nas redes sociais e receba
+            pedidos direto no seu WhatsApp. Sem cartão de crédito, sem complicação.
+          </p>
+          <a href="/cadastrar-trial" id="cta-hero" class="inline-flex h-14 px-8 items-center justify-center gap-2 rounded-2xl bg-zgreen hover:bg-zgreenhover text-zink font-bold text-base leading-none transition-colors">
+            Quero experimentar grátis
+          </a>
+          <div class="mt-4 text-[13px] text-zhint font-medium leading-snug">Sem cartão de crédito · Cancele quando quiser</div>
+        </div>
+        <div>
+          <img
+            src="/images/hero-model-marketplace.svg"
+            alt="Catálogo digital Zapia"
+            loading="eager"
+            class="w-full rounded-t-3xl rounded-b-none md:rounded-[28px]"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Como funciona ───────── -->
+    <section class="py-20">
+      <div class="max-w-5xl mx-auto px-6">
+        <div class="text-center max-w-xl mx-auto mb-14">
+          <div class="text-[12px] font-bold uppercase tracking-tight text-emerald-500 mb-2 leading-none">Como funciona</div>
+          <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-tight mb-3">Do zero ao primeiro pedido em 4 passos</h2>
+          <p class="text-base text-zmuted leading-snug">Sem código, sem complicação. Comece a vender ainda hoje.</p>
+        </div>
+
+        <div class="relative grid md:grid-cols-4 gap-8 md:gap-6 before:hidden md:before:block before:absolute before:content-[''] before:top-9 before:left-[12.5%] before:right-[12.5%] before:h-px before:bg-zborder before:z-0">
+          <!-- Passo 1 -->
+          <div class="relative z-10 text-center">
+            <div class="w-[72px] h-[72px] mx-auto mb-4 rounded-full bg-emerald-500 border-4 border-emerald-50 flex items-center justify-center text-white">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-7 h-7">
+                <path d="M15 7.5C15 7.5 15.5 7.5 16 8.5C16 8.5 17.5882 6 19 5.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+                <path d="M22 7C22 9.76142 19.7614 12 17 12C14.2386 12 12 9.76142 12 7C12 4.23858 14.2386 2 17 2C19.7614 2 22 4.23858 22 7Z" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"/>
+                <path d="M2.9 13.816L3.37834 13.2383L3.37834 13.2383L2.9 13.816ZM2.9 16.6667L2.15 16.6667V16.6667H2.9ZM18.3092 21.219L18.8362 21.7526V21.7526L18.3092 21.219ZM3.69081 21.219L3.16379 21.7526L3.16379 21.7526L3.69081 21.219ZM7.37364 11.7778L8.09752 11.5816C7.99917 11.2187 7.64735 10.9847 7.27467 11.0343C6.902 11.0839 6.62364 11.4018 6.62364 11.7778H7.37364ZM2.10213 12.7026L2.80388 12.438L2.10213 12.7026ZM2.4119 10.958L3.05989 11.3356L3.05989 11.3356L2.4119 10.958ZM3.2792 9.46982L2.63122 9.09217H2.63122L3.2792 9.46982ZM2.01147 11.9813L1.26412 11.9183L2.01147 11.9813ZM9.06189 6.75C9.47611 6.75 9.81189 6.41421 9.81189 6C9.81189 5.58579 9.47611 5.25 9.06189 5.25V6.75ZM13.3513 14.559C13.7082 14.3488 13.8272 13.889 13.617 13.5321C13.4068 13.1752 12.947 13.0563 12.5901 13.2665L13.3513 14.559ZM19.85 14.7215C19.85 14.3073 19.5142 13.9715 19.1 13.9715C18.6858 13.9715 18.35 14.3073 18.35 14.7215H19.85ZM2.15 13.816L2.15 16.6667L3.65 16.6667L3.65 13.816L2.15 13.816ZM8.3 22.75H13.7V21.25H8.3V22.75ZM13.7 22.75C14.9518 22.75 15.9653 22.7516 16.7614 22.6458C17.5781 22.5374 18.2779 22.304 18.8362 21.7526L17.7822 20.6853C17.5497 20.9149 17.2177 21.0721 16.5639 21.1589C15.8895 21.2484 14.9937 21.25 13.7 21.25V22.75ZM18.35 16.6667C18.35 17.9452 18.3484 18.8277 18.258 19.4916C18.1707 20.1329 18.0133 20.457 17.7822 20.6853L18.8362 21.7526C19.3958 21.1999 19.6339 20.5049 19.7443 19.6939C19.8516 18.9054 19.85 17.9023 19.85 16.6667H18.35ZM2.15 16.6667C2.15 17.9023 2.14837 18.9054 2.25571 19.6939C2.36611 20.5049 2.60416 21.1999 3.16379 21.7526L4.21784 20.6853C3.98665 20.457 3.82929 20.1329 3.742 19.4916C3.65163 18.8277 3.65 17.9452 3.65 16.6667H2.15ZM8.3 21.25C7.00626 21.25 6.11048 21.2484 5.43609 21.1589C4.78232 21.0721 4.45032 20.9149 4.21784 20.6853L3.16379 21.7526C3.72212 22.304 4.42191 22.5374 5.23864 22.6458C6.03474 22.7516 7.04815 22.75 8.3 22.75V21.25ZM6.62364 11.7778C6.62364 12.8225 5.75576 13.6944 4.65387 13.6944V15.1944C6.55616 15.1944 8.12364 13.6786 8.12364 11.7778H6.62364ZM4.65387 13.6944C4.16509 13.6944 3.72116 13.5222 3.37834 13.2383L2.42166 14.3936C3.02588 14.894 3.80601 15.1944 4.65387 15.1944V13.6944ZM3.37834 13.2383C3.12025 13.0246 2.92117 12.749 2.80388 12.438L1.40038 12.9673C1.61215 13.5288 1.96823 14.0182 2.42166 14.3936L3.37834 13.2383ZM11 13.6944C9.57871 13.6944 8.42067 12.7738 8.09752 11.5816L6.64976 11.974C7.15794 13.8488 8.93188 15.1944 11 15.1944V13.6944ZM3.05989 11.3356L3.92718 9.84747L2.63122 9.09217L1.76392 10.5803L3.05989 11.3356ZM4.49729 7.74163C4.49729 7.20784 4.94277 6.75 5.5236 6.75V5.25C4.14237 5.25 2.99729 6.35167 2.99729 7.74163H4.49729ZM3.92718 9.84747C4.30039 9.20711 4.49729 8.4812 4.49729 7.74163H2.99729C2.99729 8.21444 2.87149 8.6799 2.63122 9.09217L3.92718 9.84747ZM2.80388 12.438C2.75954 12.3204 2.75687 12.3069 2.75414 12.2897C2.75122 12.2713 2.74453 12.2137 2.75882 12.0443L1.26412 11.9183L2.75882 12.0443ZM2.80388 12.438L2.80388 12.438ZM1.76392 10.5803C1.52232 10.9948 1.31307 11.3377 1.26412 11.9183L2.75882 12.0443C2.77615 11.8386 2.81176 11.7614 3.05989 11.3356L1.76392 10.5803ZM5.5236 6.75H9.06189V5.25H5.5236V6.75ZM12.5901 13.2665C12.1314 13.5366 11.5874 13.6944 11 13.6944V15.1944C11.8588 15.1944 12.6652 14.963 13.3513 14.559L12.5901 13.2665ZM19.85 16.6667V14.7215H18.35V16.6667H19.85Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="text-[12px] font-bold text-zhint mb-1.5 leading-none">PASSO 1</div>
+            <h3 class="text-base font-bold mb-1.5 tracking-tight leading-tight">Crie seu catálogo</h3>
+            <p class="text-sm text-zmuted leading-snug">Cadastre-se e configure sua loja em poucos minutos.</p>
+          </div>
+
+          <!-- Passo 2 -->
+          <div class="relative z-10 text-center">
+            <div class="w-[72px] h-[72px] mx-auto mb-4 rounded-full bg-emerald-500 border-4 border-emerald-50 flex items-center justify-center text-white">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-7 h-7">
+                <path d="M11 22C10.1818 22 9.40019 21.6698 7.83693 21.0095C3.94564 19.3657 2 18.5438 2 17.1613C2 16.7742 2 10.0645 2 7M11 22L11 11.3548M11 22C11.7248 22 12.293 21.7409 13.5 21.2226M20 7V11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+                <path d="M15 17.5H22M18.5 21L18.5 14" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"/>
+                <path d="M7.32592 9.69138L4.40472 8.27785C2.80157 7.5021 2 7.11423 2 6.5C2 5.88577 2.80157 5.4979 4.40472 4.72215L7.32592 3.30862C9.12883 2.43621 10.0303 2 11 2C11.9697 2 12.8712 2.4362 14.6741 3.30862L17.5953 4.72215C19.1984 5.4979 20 5.88577 20 6.5C20 7.11423 19.1984 7.5021 17.5953 8.27785L14.6741 9.69138C12.8712 10.5638 11.9697 11 11 11C10.0303 11 9.12883 10.5638 7.32592 9.69138Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+                <path d="M5 12L7 13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+                <path d="M16 4L6 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="text-[12px] font-bold text-zhint mb-1.5 leading-none">PASSO 2</div>
+            <h3 class="text-base font-bold mb-1.5 tracking-tight leading-tight">Adicione seus produtos</h3>
+            <p class="text-sm text-zmuted leading-snug">Fotos, preços e descrições — tudo em um único painel.</p>
+          </div>
+
+          <!-- Passo 3 -->
+          <div class="relative z-10 text-center">
+            <div class="w-[72px] h-[72px] mx-auto mb-4 rounded-full bg-emerald-500 border-4 border-emerald-50 flex items-center justify-center text-white">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="18" cy="5" r="3" stroke="white" stroke-width="2"/><circle cx="6" cy="12" r="3" stroke="white" stroke-width="2"/><circle cx="18" cy="19" r="3" stroke="white" stroke-width="2"/><path d="M8.6 13.5L15.4 17.5M15.4 6.5L8.6 10.5" stroke="white" stroke-width="2"/></svg>
+            </div>
+            <div class="text-[12px] font-bold text-zhint mb-1.5 leading-none">PASSO 3</div>
+            <h3 class="text-base font-bold mb-1.5 tracking-tight leading-tight">Compartilhe o link</h3>
+            <p class="text-sm text-zmuted leading-snug">Divulgue nas redes sociais e no status do WhatsApp.</p>
+          </div>
+
+          <!-- Passo 4 -->
+          <div class="relative z-10 text-center">
+            <div class="w-[72px] h-[72px] mx-auto mb-4 rounded-full bg-emerald-500 border-4 border-emerald-50 flex items-center justify-center text-white">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-7 h-7">
+                <path d="M17.5 5C18.3284 5 19 5.67157 19 6.5C19 7.32843 18.3284 8 17.5 8C16.6716 8 16 7.32843 16 6.5C16 5.67157 16.6716 5 17.5 5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+                <path d="M2.77423 11.1439C1.77108 12.2643 1.7495 13.9546 2.67016 15.1437C4.49711 17.5033 6.49674 19.5029 8.85633 21.3298C10.0454 22.2505 11.7357 22.2289 12.8561 21.2258C15.8979 18.5022 18.6835 15.6559 21.3719 12.5279C21.6377 12.2187 21.8039 11.8397 21.8412 11.4336C22.0062 9.63798 22.3452 4.46467 20.9403 3.05974C19.5353 1.65481 14.362 1.99377 12.5664 2.15876C12.1603 2.19608 11.7813 2.36233 11.472 2.62811C8.34412 5.31646 5.49781 8.10211 2.77423 11.1439Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M13.7884 12.3666C13.8097 11.9656 13.9222 11.232 13.3125 10.6745M13.3125 10.6745C13.1238 10.502 12.866 10.3463 12.5149 10.2225C11.2583 9.77964 9.71484 11.262 10.8067 12.6189C11.3936 13.3482 11.8461 13.5726 11.8035 14.4008C11.7735 14.9835 11.2012 15.5922 10.4469 15.8241C9.7916 16.0255 9.06876 15.7588 8.61156 15.2479C8.05332 14.6242 8.1097 14.0361 8.10492 13.7798M13.3125 10.6745L14.0006 9.98639M8.66131 15.3257L8.00781 15.9792" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="text-[12px] font-bold text-zhint mb-1.5 leading-none">PASSO 4</div>
+            <h3 class="text-base font-bold mb-1.5 tracking-tight leading-tight">Receba pedidos no WhatsApp</h3>
+            <p class="text-sm text-zmuted leading-snug">Cada pedido chega formatado, pronto para você atender.</p>
+          </div>
+        </div>
+
+        <div class="text-center mt-12">
+          <a href="/cadastrar-trial" id="cta-how" class="inline-flex h-14 px-8 items-center justify-center gap-2 rounded-2xl bg-zgreen hover:bg-zgreenhover text-zink font-bold text-base leading-none transition-colors">
+            Quero experimentar grátis
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Feature: Catálogo de produtos ───────── -->
+    <section class="bg-zbg py-16 md:py-20">
+      <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 md:gap-14 items-center">
+        <div class="text-center md:text-left">
+          <div class="text-[12px] font-bold uppercase tracking-tight text-emerald-500 mb-3 leading-none">Catálogo de produtos</div>
+          <h3 class="text-2xl md:text-[28px] font-extrabold tracking-tight leading-tight mb-3">Um catálogo profissional, pronto para vender</h3>
+          <p class="text-base text-zmuted leading-snug mb-6 max-w-md mx-auto md:mx-0">
+            Fotos, categorias e busca inteligente. Seus clientes encontram o que
+            precisam em segundos, direto do celular, sem precisar instalar nada.
+          </p>
+          <a href="/cadastrar-trial" id="cta-feature-catalogo" class="inline-flex h-12 px-6 items-center justify-center gap-2 rounded-[14px] bg-zgreen hover:bg-zgreenhover text-zink font-bold text-sm leading-none transition-colors">
+            Quero meu catálogo grátis
+          </a>
+        </div>
+        <div class="bg-white border border-zborder rounded-3xl p-5 shadow-[0_24px_60px_-16px_rgba(2,6,23,0.12)]">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-2xl bg-zbg p-2.5">
+              <img src="https://picsum.photos/seed/zapia-skincare/300/220" alt="Kit Skincare" class="h-24 w-full object-cover rounded-xl mb-2" />
+              <div class="text-xs font-semibold leading-tight">Kit Skincare</div>
+              <div class="text-[13px] font-bold text-emerald-500 leading-tight">R$ 89,90</div>
+            </div>
+            <div class="rounded-2xl bg-zbg p-2.5">
+              <img src="https://picsum.photos/seed/zapia-serum/300/220" alt="Sérum Facial" class="h-24 w-full object-cover rounded-xl mb-2" />
+              <div class="text-xs font-semibold leading-tight">Sérum Facial</div>
+              <div class="text-[13px] font-bold text-emerald-500 leading-tight">R$ 69,90</div>
+            </div>
+            <div class="rounded-2xl bg-zbg p-2.5">
+              <img src="https://picsum.photos/seed/zapia-protetor/300/220" alt="Protetor Solar" class="h-24 w-full object-cover rounded-xl mb-2" />
+              <div class="text-xs font-semibold leading-tight">Protetor Solar</div>
+              <div class="text-[13px] font-bold text-emerald-500 leading-tight">R$ 45,90</div>
+            </div>
+            <div class="rounded-2xl bg-zbg p-2.5">
+              <img src="https://picsum.photos/seed/zapia-hidratante/300/220" alt="Hidratante 200ml" class="h-24 w-full object-cover rounded-xl mb-2" />
+              <div class="text-xs font-semibold leading-tight">Hidratante 200ml</div>
+              <div class="text-[13px] font-bold text-emerald-500 leading-tight">R$ 34,90</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Feature: Pedidos no WhatsApp ───────── -->
+    <section class="py-16 md:py-20">
+      <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 md:gap-14 items-center">
+        <div class="order-2 md:order-1 bg-white border border-zborder rounded-3xl p-5 shadow-[0_24px_60px_-16px_rgba(2,6,23,0.12)]">
+          <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-9 h-9 rounded-full bg-[#25d366] flex items-center justify-center text-white shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.6 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.2-3.4-.7-2.9-1.1-4.7-4-4.9-4.2-.1-.2-1.2-1.5-1.2-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.7.7 1.8.1.1.1.3 0 .5-.3.6-.6.9-.8 1.2-.2.2-.4.5-.2.9.5 1 1.2 1.8 2 2.4.9.7 1.6.9 1.9 1 .3.1.5.1.7-.1.2-.3.7-.9.9-1.2.2-.3.4-.2.7-.1l1.8.9c.2.1.4.2.5.4.1.3.1.9-.1 1.6Z"/></svg>
+            </div>
+            <div class="leading-tight">
+              <strong class="text-sm block">Pedido via WhatsApp</strong>
+              <span class="text-xs text-zhint">#1042 · há 2 min</span>
+            </div>
+          </div>
+          <div class="bg-[#dcf8c6] rounded-2xl px-3.5 py-3 text-[13px] leading-snug text-gray-700 max-w-[90%] mb-2.5">
+            Olá! Vim do seu catálogo 👋 Quero confirmar meu pedido:<br />
+            1x Sérum Facial — R$ 69,90<br />
+            Nome: Ana Souza · Pagamento: Pix
+          </div>
+          <div class="bg-zbg rounded-2xl px-3.5 py-3 text-[13px] leading-snug text-gray-700 max-w-[90%] ml-auto">
+            Recebido! Já estou preparando seu pedido 🙌
+          </div>
+        </div>
+        <div class="order-1 md:order-2 text-center md:text-left">
+          <div class="text-[12px] font-bold uppercase tracking-tight text-emerald-500 mb-3 leading-none">Pedidos no WhatsApp</div>
+          <h3 class="text-2xl md:text-[28px] font-extrabold tracking-tight leading-tight mb-3">Cada pedido chega direto no seu WhatsApp</h3>
+          <p class="text-base text-zmuted leading-snug mb-6 max-w-md mx-auto md:mx-0">
+            O cliente finaliza a compra no catálogo e uma mensagem já formatada
+            cai no seu WhatsApp — com itens, valores e dados de contato prontos
+            para você atender.
+          </p>
+          <a href="/cadastrar-trial" id="cta-feature-whatsapp" class="inline-flex h-12 px-6 items-center justify-center gap-2 rounded-[14px] bg-zgreen hover:bg-zgreenhover text-zink font-bold text-sm leading-none transition-colors">
+            Quero vender pelo WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Feature: Gestão de vendedores ───────── -->
+    <section class="bg-zbg py-16 md:py-20">
+      <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 md:gap-14 items-center">
+        <div class="text-center md:text-left">
+          <div class="text-[12px] font-bold uppercase tracking-tight text-emerald-500 mb-3 leading-none">Gestão de vendedores</div>
+          <h3 class="text-2xl md:text-[28px] font-extrabold tracking-tight leading-tight mb-3">Sua equipe de vendas, organizada em um só lugar</h3>
+          <p class="text-base text-zmuted leading-snug mb-6 max-w-md mx-auto md:mx-0">
+            Adicione vendedores, atribua pedidos e acompanhe o desempenho de
+            cada um — sem planilha, sem grupo de WhatsApp para controlar quem
+            atendeu o quê.
+          </p>
+          <a href="/cadastrar-trial" id="cta-feature-vendedores" class="inline-flex h-12 px-6 items-center justify-center gap-2 rounded-[14px] bg-zgreen hover:bg-zgreenhover text-zink font-bold text-sm leading-none transition-colors">
+            Quero organizar minha equipe
+          </a>
+        </div>
+        <div class="bg-white border border-zborder rounded-3xl p-5 shadow-[0_24px_60px_-16px_rgba(2,6,23,0.12)]">
+          <div class="flex items-center gap-3 py-3 border-b border-zborder">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex items-center justify-center text-xs font-bold text-emerald-900 shrink-0">JL</div>
+            <div class="leading-tight">
+              <strong class="text-[13px] block">Juliana Lima</strong>
+              <span class="text-xs text-zhint">12 pedidos esta semana</span>
+            </div>
+            <span class="ml-auto text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-500 leading-none">Ativo</span>
+          </div>
+          <div class="flex items-center gap-3 py-3 border-b border-zborder">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex items-center justify-center text-xs font-bold text-emerald-900 shrink-0">CM</div>
+            <div class="leading-tight">
+              <strong class="text-[13px] block">Carlos Mendes</strong>
+              <span class="text-xs text-zhint">8 pedidos esta semana</span>
+            </div>
+            <span class="ml-auto text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-500 leading-none">Ativo</span>
+          </div>
+          <div class="flex items-center gap-3 py-3">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex items-center justify-center text-xs font-bold text-emerald-900 shrink-0">BR</div>
+            <div class="leading-tight">
+              <strong class="text-[13px] block">Bruna Ramos</strong>
+              <span class="text-xs text-zhint">5 pedidos esta semana</span>
+            </div>
+            <span class="ml-auto text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-500 leading-none">Ativo</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Feature: Controle de vendas ───────── -->
+    <section class="py-16 md:py-20">
+      <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 md:gap-14 items-center">
+        <div class="order-2 md:order-1 bg-white border border-zborder rounded-3xl p-5 shadow-[0_24px_60px_-16px_rgba(2,6,23,0.12)]">
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-zbg rounded-2xl p-3.5">
+              <div class="text-[11px] text-zhint mb-1 leading-none">Vendas do mês</div>
+              <div class="text-lg font-extrabold leading-tight">R$ 8.450</div>
+              <div class="text-[11px] text-emerald-500 font-semibold mt-0.5 leading-none">+12%</div>
+            </div>
+            <div class="bg-zbg rounded-2xl p-3.5">
+              <div class="text-[11px] text-zhint mb-1 leading-none">Pedidos</div>
+              <div class="text-lg font-extrabold leading-tight">256</div>
+              <div class="text-[11px] text-emerald-500 font-semibold mt-0.5 leading-none">+15%</div>
+            </div>
+          </div>
+          <div class="bg-zbg rounded-2xl p-3.5">
+            <div class="text-xs font-semibold text-zmuted mb-2 leading-none">Vendas nos últimos 7 dias</div>
+            <svg viewBox="0 0 260 60" width="100%" height="60">
+              <polyline fill="none" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="10,48 50,54 90,32 130,42 170,14 210,28 250,18"/>
+            </svg>
+          </div>
+        </div>
+        <div class="order-1 md:order-2 text-center md:text-left">
+          <div class="text-[12px] font-bold uppercase tracking-tight text-emerald-500 mb-3 leading-none">Controle de vendas</div>
+          <h3 class="text-2xl md:text-[28px] font-extrabold tracking-tight leading-tight mb-3">Acompanhe tudo em tempo real</h3>
+          <p class="text-base text-zmuted leading-snug mb-6 max-w-md mx-auto md:mx-0">
+            Receita, pedidos e ticket médio em um dashboard simples. Saiba o
+            que está vendendo bem e tome decisões sem precisar de planilhas.
+          </p>
+          <a href="/cadastrar-trial" id="cta-feature-vendas" class="inline-flex h-12 px-6 items-center justify-center gap-2 rounded-[14px] bg-zgreen hover:bg-zgreenhover text-zink font-bold text-sm leading-none transition-colors">
+            Quero ver meus números
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Final CTA ───────── -->
+    <section class="bg-gradient-to-br from-emerald-100 via-emerald-50 to-lime-100 text-center py-24">
+      <div class="max-w-2xl mx-auto px-6">
+        <div class="text-[12px] font-bold uppercase tracking-tight text-emerald-500 mb-3 leading-none">Comece agora</div>
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-tight mb-3">Sua loja merece um catálogo à altura</h2>
+        <p class="text-base text-zmuted leading-snug mb-8">Configure em menos de 5 minutos. Sem cartão de crédito.</p>
+        <a href="/cadastrar-trial" id="cta-final" class="inline-flex h-14 px-8 items-center justify-center gap-2 rounded-2xl bg-zgreen hover:bg-zgreenhover text-zink font-bold text-base leading-none transition-colors">
+          Quero experimentar grátis
+        </a>
+        <div class="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] text-zmuted font-medium leading-none">
+          <span>✓ Sem cartão de crédito</span>
+          <span>✓ Cancele quando quiser</span>
+          <span>✓ Suporte em português</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Footer ───────── -->
+    <footer class="bg-zstorebg py-8">
+      <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-center md:text-left">
+        <a href="https://zapia.app" class="inline-flex items-center gap-2 mx-auto md:mx-0">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-zink shrink-0">
+            <path d="M20.1765 12.5113C19.8261 9.50898 19.3142 7.25784 18.8394 5.65851C18.4501 4.34711 18.2554 3.69141 17.4572 3.0957C16.659 2.5 15.8431 2.5 14.2113 2.5H8.78876C7.15697 2.5 6.34107 2.5 5.54283 3.0957C4.74459 3.69141 4.54994 4.34711 4.16063 5.65851C3.68586 7.25784 3.1739 9.50898 2.82352 12.5113C2.41058 16.0497 2.20411 17.8189 3.39731 19.1594C4.59052 20.5 6.52422 20.5 10.3916 20.5H11.6084" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+            <path d="M8.5 6.5C8.5 8.15685 9.84315 9.5 11.5 9.5C13.1569 9.5 14.5 8.15685 14.5 6.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+            <path d="M14.5 19.5C14.5 19.5 15.5 19.5 16.5 21.5C16.5 21.5 18.6765 16.5 21.5 15.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          </svg>
+          <span class="text-lg font-bold tracking-tight leading-none text-gray-900">Zap.IA</span>
+        </a>
+        <div class="flex flex-wrap justify-center gap-6">
+          <a href="/termos-de-uso" class="text-[13px] font-medium text-zmuted hover:text-zink leading-none">Termos de uso</a>
+          <a href="/privacidade" class="text-[13px] font-medium text-zmuted hover:text-zink leading-none">Privacidade</a>
+          <a href="mailto:contato@zapia.app" class="text-[13px] font-medium text-zmuted hover:text-zink leading-none">Contato</a>
+        </div>
+        <div class="text-xs font-medium text-zmuted leading-none w-full md:w-auto">© 2026 Zapia · Feito com ♥ no Brasil</div>
+      </div>
+    </footer>
+  </body>
+</html>
