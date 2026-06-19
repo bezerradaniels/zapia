@@ -26,6 +26,7 @@ import { formatMoney, toTitleCase } from '@/lib/format'
 import { buildStorePath } from '@/lib/tenant'
 import type { Store } from '@/types/domain'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { track } from '@/features/analytics'
 
 export default function CartPage() {
   const store = useOutletContext<Store>()
@@ -129,6 +130,10 @@ export default function CartPage() {
     clearCoupon()
     setCode('')
     setError(null)
+  }
+
+  const onBeginCheckout = () => {
+    track('begin_checkout', { store_id: store.id, item_count: items.length, value: total })
   }
 
   if (items.length === 0) {
@@ -312,6 +317,7 @@ export default function CartPage() {
               <Link
                 ref={checkoutBtnRef}
                 to={checkoutPath}
+                onClick={onBeginCheckout}
                 className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-[14px] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]"
                 style={{ background: '#34d399' }}
               >
@@ -405,6 +411,7 @@ export default function CartPage() {
         </div>
         <Link
           to={checkoutPath}
+          onClick={onBeginCheckout}
           className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-full px-6 text-[14px] font-bold uppercase tracking-wider text-white transition-all active:scale-[0.98]"
           style={{ background: '#34d399' }}
         >

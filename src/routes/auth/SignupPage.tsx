@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Tick02Icon, Store01Icon, ShoppingCartIcon, Payment01Icon } from '@hugeicons/core-free-icons'
 import { signUpSchema, useSignUp, type SignUpInput } from '@/features/auth'
@@ -47,7 +47,7 @@ export default function SignupPage() {
       email: draft?.email ?? '',
       password: '',
       passwordConfirm: '',
-      accepted: draft?.accepted ?? false,
+      accepted: draft?.accepted ?? true,
     },
   })
 
@@ -77,7 +77,12 @@ export default function SignupPage() {
   const accepted = form.watch('accepted')
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex h-screen w-full flex-col lg:flex-row">
+      {/* Mobile header with logo */}
+      <header className="flex shrink-0 items-center border-b border-slate-300 bg-white px-6 py-4 lg:hidden">
+        <Logo height={32} />
+      </header>
+
       {/* Left Column - Marketing */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-center bg-z-primary px-16">
         <h1 className="text-5xl font-bold text-white mb-4">
@@ -127,10 +132,10 @@ export default function SignupPage() {
       </div>
 
       {/* Right Column - Form */}
-      <div className="flex w-full lg:w-1/2 flex-col justify-center bg-z-bg px-6 py-12 lg:px-16">
+      <div className="flex w-full flex-1 lg:w-1/2 flex-col justify-start lg:justify-center overflow-y-auto bg-z-bg px-6 py-6 lg:py-12 lg:px-16">
         <div className="mx-auto w-full max-w-md">
-          <Logo height={58} className="mb-8" />
-          <h2 className="text-3xl font-bold text-z-text mb-2">Criar sua conta</h2>
+          <Logo height={58} className="mb-8 hidden lg:block" />
+          <h2 className="text-3xl font-bold tracking-tight text-z-text mb-2">Criar sua conta</h2>
           <p className="text-sm text-z-text-muted mb-8">
             Comece gratuitamente hoje mesmo
           </p>
@@ -138,6 +143,8 @@ export default function SignupPage() {
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
             <Field
               label="Nome completo"
+              labelClassName="text-sm"
+              className="border-slate-300 text-sm"
               autoComplete="name"
               placeholder="Seu nome"
               error={form.formState.errors.name?.message}
@@ -145,6 +152,8 @@ export default function SignupPage() {
             />
             <Field
               label="E-mail"
+              labelClassName="text-sm"
+              className="border-slate-300 text-sm"
               type="email"
               autoComplete="email"
               placeholder="seu@email.com"
@@ -153,6 +162,8 @@ export default function SignupPage() {
             />
             <Field
               label="Senha"
+              labelClassName="text-sm"
+              className="border-slate-300 text-sm"
               type="password"
               autoComplete="new-password"
               placeholder="Mínimo 8 caracteres"
@@ -161,6 +172,8 @@ export default function SignupPage() {
             />
             <Field
               label="Confirmar senha"
+              labelClassName="text-sm"
+              className="border-slate-300 text-sm"
               type="password"
               autoComplete="new-password"
               placeholder="Repita sua senha"
@@ -172,16 +185,16 @@ export default function SignupPage() {
               control={form.control}
               name="accepted"
               render={({ field }) => (
-                <label className="mt-2 flex cursor-pointer items-start gap-2.5">
+                <label className="mt-2 flex cursor-pointer items-center gap-2.5">
                   <button
                     type="button"
                     onClick={() => field.onChange(!field.value)}
                     aria-pressed={field.value}
                     className={cn(
-                      'mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-2 transition-colors',
+                      'flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-2 transition-colors',
                       field.value
-                        ? 'border-z-green bg-z-green'
-                        : 'border-z-border bg-white',
+                        ? 'border-[#10b981] bg-[#10b981]'
+                        : 'border-slate-300 bg-white',
                     )}
                   >
                     {field.value && (
@@ -194,7 +207,26 @@ export default function SignupPage() {
                     )}
                   </button>
                   <span className="text-[13px] leading-snug text-z-text-muted">
-                    Li e aceito os Termos de uso e a Política de privacidade
+                    Li e aceito os{' '}
+                    <Link
+                      to={ROUTES.terms}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-medium text-z-text underline hover:no-underline"
+                    >
+                      Termos de uso
+                    </Link>{' '}
+                    e a{' '}
+                    <Link
+                      to={ROUTES.privacy}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-medium text-z-text underline hover:no-underline"
+                    >
+                      Política de privacidade
+                    </Link>
                   </span>
                 </label>
               )}

@@ -30,7 +30,7 @@
           window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' })
           const script = document.createElement('script')
           script.async = true
-          script.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-5FR2J6C7'
+          script.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-TXTFF99H'
           document.head.appendChild(script)
         }
         const schedule = () => {
@@ -54,7 +54,18 @@
     </script>
   </head>
   <body style="font-family: 'DM Sans', sans-serif !important;">
-    <div id="root"></div>
+    <div id="root">
+      <!--
+        Static, JS-free shell so the very first paint isn't a blank white
+        page while the JS bundle downloads/parses/executes. React replaces
+        this the moment it mounts; the <Suspense> fallback in App.tsx
+        mirrors the same markup so there's no flash in between.
+      -->
+      <div class="flex min-h-screen flex-col items-center justify-center gap-3 bg-z-bg">
+        <div class="h-9 w-9 animate-spin rounded-full border-[3px] border-z-border border-t-z-green"></div>
+        <span class="text-sm font-medium text-z-text-muted">Carregando...</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -4,6 +4,7 @@ export type OnboardingSession = {
   storeId: string
   storeSlug: string
   storeName: string
+  startedAt: number
 }
 
 export function saveOnboardingSession(data: OnboardingSession): void {

@@ -14,16 +14,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 84% 5%;
 
-    --primary: 83 78% 56%;            /* #a3e635 */
+    --primary: 171 99% 51%;           /* #07feda */
     --primary-foreground: 222 84% 5%;
 
-    --secondary: 81 90% 89%;          /* #ecfccb lime-100 */
-    --secondary-foreground: 88 61% 20%; /* #365314 lime-900 */
+    --secondary: 171 77% 95%;         /* #e8fcf9 */
+    --secondary-foreground: 171 71% 20%; /* #0f574c */
 
     --muted: 210 40% 96%;             /* #f1f5f9 */
     --muted-foreground: 215 14% 47%;  /* #64748b */
 
-    --accent: 83 78% 56%;             /* #a3e635 */
+    --accent: 171 99% 51%;            /* #07feda */
     --accent-foreground: 222 84% 5%;
 
     --destructive: 0 72% 51%;
@@ -31,14 +31,14 @@
 
     --border: 0 0% 98%;               /* #fafafa */
     --input: 214 32% 91%;             /* #e2e8f0 */
-    --ring: 83 78% 56%;               /* #a3e635 */
+    --ring: 171 99% 51%;              /* #07feda */
 
     --radius: 0.5rem;
 
     /* Per-store catalog theme (overridden at runtime via JS) */
-    --color-primary: #a3e635;
+    --color-primary: #07feda;
     --color-primary-fg: #020617;
-    --color-primary-hover: #84cc16;
+    --color-primary-hover: #0ab89e;
   }
 
   .dark {
@@ -48,7 +48,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 14%;
     --popover-foreground: 210 40% 98%;
-    --primary: 83 78% 56%;
+    --primary: 171 99% 51%;
     --primary-foreground: 222 84% 5%;
     --secondary: 222 47% 20%;
     --secondary-foreground: 210 40% 98%;
@@ -60,7 +60,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 222 47% 22%;
     --input: 222 47% 22%;
-    --ring: 83 78% 56%;
+    --ring: 171 99% 51%;
   }
 }
 

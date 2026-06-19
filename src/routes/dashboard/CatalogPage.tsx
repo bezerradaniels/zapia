@@ -21,6 +21,7 @@ import { DeliveryHoursEditor } from '@/components/forms/DeliveryHoursEditor'
 import { GalleryUploader } from '@/components/forms/GalleryUploader'
 import { Button, Field, Textarea, Label } from '@/components/ui'
 import { ROUTES } from '@/config/routes'
+import { track } from '@/features/analytics'
 import { cn } from '@/lib/utils'
 
 const COLOR_PRESETS = [
@@ -501,7 +502,7 @@ export default function CatalogPage() {
             {/* LOGO, BANNER E CORES */}
             {activeTab === 'aparencia' && (
               <section className="flex flex-col gap-6">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                     <h2 className="text-base font-semibold">Logo do catálogo</h2>
                     <ImageCropUploader
@@ -1239,6 +1240,11 @@ export default function CatalogPage() {
                         className="h-8 rounded-lg px-3 text-xs"
                         onClick={() => {
                           navigator.clipboard.writeText(buildStoreUrl(store.slug))
+                          track('share_link_copied', {
+                            store_id: store.id,
+                            link_type: 'store',
+                            item_id: store.id,
+                          })
                         }}
                       >
                         Copiar link

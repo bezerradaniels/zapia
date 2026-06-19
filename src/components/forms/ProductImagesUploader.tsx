@@ -38,6 +38,8 @@ function guessMimeFromName(name: string): string {
   }
 }
 
+const MAX_OUTPUT_DIM = 1600
+
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
@@ -66,8 +68,16 @@ async function cropToBlob(imageSrc: string, pixelCrop: Area, rotation: number): 
     safeArea / 2 - image.height * 0.5,
   )
 
-  // Step 2: extract crop area, upscaling if needed
-  const scale = pixelCrop.width < 800 ? 800 / pixelCrop.width : 1
+  // Step 2: extract crop area, upscaling small crops and downscaling large
+  // ones (camera photos can be 4000px+ wide, which would produce an oversized
+  // WebP even at high compression) so the output always lands well under the
+  // upload size limit.
+  const scale =
+    pixelCrop.width < 800
+      ? 800 / pixelCrop.width
+      : pixelCrop.width > MAX_OUTPUT_DIM
+        ? MAX_OUTPUT_DIM / pixelCrop.width
+        : 1
   const outCanvas = document.createElement('canvas')
   outCanvas.width = Math.round(pixelCrop.width * scale)
   outCanvas.height = Math.round(pixelCrop.height * scale)
@@ -158,10 +168,6 @@ export function ProductImagesUploader({
       const mime = file.type || guessMimeFromName(file.name)
       if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(mime)) {
         setError('Formato inválido. Use JPG, PNG, WEBP ou GIF.')
-        return
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Imagem muito grande. Máximo 5 MB.')
         return
       }
     }
@@ -322,7 +328,7 @@ export function ProductImagesUploader({
       </ul>
 
       <span className="text-[11px] text-z-text-hint">
-        JPG, PNG, WEBP ou GIF — máximo 5 MB por imagem. A primeira é a capa.
+        JPG, PNG, WEBP ou GIF. A primeira é a capa.
       </span>
 
       <input

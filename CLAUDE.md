@@ -479,7 +479,7 @@ our table stores a copy for display and feature checks).
 
 ### 13.2 Free Trial
 
-- 14 days on all plans (Básico, Pro and Premium).
+- 7 days on all plans (Básico, Pro and Premium).
 - **No credit card required** to start the trial.
 - At the end of the trial, if no payment method was added: the catalog is
   **suspended** (public URL returns a "store unavailable" page) until the
@@ -732,7 +732,7 @@ Shipped in MVP:
 - WhatsApp order flow via `wa.me` (end-customer purchases), with `+55`
   phone number handling.
 - Subscription billing via **Stripe Brasil**: Básico + Pro + Premium plans,
-  14-day trial (no card), Stripe Checkout and Customer Portal, webhook-driven
+  7-day trial (no card), Stripe Checkout and Customer Portal, webhook-driven
   subscription state, NFSe emission via NFE.io / Enotas.
 - Payment methods for owner subscription: credit card, PIX, boleto (all BRL).
 - CPF/CNPJ capture + checksum validation, CEP-based address lookup (ViaCEP),

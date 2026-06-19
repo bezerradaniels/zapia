@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext, useParams } from 'react-router-dom'
 import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
 import { cn } from '@/lib/utils'
@@ -19,6 +19,7 @@ import { discountPercent } from '@/features/products/utils/price'
 import { getTotalVariationStock, getVariationStock } from '@/features/products/utils/variation'
 import { useCartStore, buildCartKey } from '@/features/cart'
 import { buildStoreTitle } from '@/features/catalog'
+import { track } from '@/features/analytics'
 import { formatMoney, toTitleCase } from '@/lib/format'
 import { OptimizedImage } from '@/components/ui/OptimizedImage'
 import { ProductCard } from '@/components/store/ProductCard'
@@ -113,6 +114,11 @@ export default function ProductPage() {
   const homePath = buildStorePath(store.slug)
 
   const p = product.data
+
+  useEffect(() => {
+    if (p) track('view_item', { store_id: p.store_id, item_id: p.id, item_name: p.name })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p?.id])
 
   useDocumentMeta({
     title: p ? `${toTitleCase(p.name)} - ${store.name}` : buildStoreTitle(store),

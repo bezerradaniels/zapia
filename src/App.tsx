@@ -1,6 +1,9 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AppLoadingShell } from '@/components/AppLoadingShell'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { RequireGuest } from '@/components/RequireGuest'
+import { ScrollToTop } from '@/components/ScrollToTop'
 import { ROUTES } from '@/config/routes'
 import { isStoreDomain } from '@/lib/tenant/resolveStore'
 
@@ -121,9 +124,15 @@ function AppRoutes() {
       <Route path={ROUTES.pricing} element={<PricingPage />} />
       <Route path={ROUTES.terms} element={<TermsPage />} />
       <Route path={ROUTES.privacy} element={<PrivacyPage />} />
-      <Route path={ROUTES.trialSignup} element={<AppProviders><TrialSignupPage /></AppProviders>} />
+      <Route
+        path={ROUTES.trialSignup}
+        element={<AppProviders><RequireGuest><TrialSignupPage /></RequireGuest></AppProviders>}
+      />
       <Route path={ROUTES.login} element={<AppProviders><LoginPage /></AppProviders>} />
-      <Route path={ROUTES.signup} element={<AppProviders><SignupPage /></AppProviders>} />
+      <Route
+        path={ROUTES.signup}
+        element={<AppProviders><RequireGuest><SignupPage /></RequireGuest></AppProviders>}
+      />
       <Route path={ROUTES.confirmEmail} element={<AppProviders><ConfirmEmailPage /></AppProviders>} />
       <Route path={ROUTES.forgotPassword} element={<AppProviders><ForgotPasswordPage /></AppProviders>} />
       <Route path={ROUTES.onboarding} element={<AppProviders><OnboardingLayout /></AppProviders>}>
@@ -193,7 +202,8 @@ export function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Suspense fallback={null}>
+        <ScrollToTop />
+        <Suspense fallback={<AppLoadingShell />}>
           <AppRoutes />
         </Suspense>
         <DeferredCookieConsentBanner />

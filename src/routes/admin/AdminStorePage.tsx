@@ -327,7 +327,8 @@ export default function AdminStorePage() {
         {orders.length === 0 ? (
           <p className="text-sm text-gray-600">Nenhum pedido ainda.</p>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] text-sm">
             <thead>
               <tr className="border-b border-gray-200">
                 {['Cliente', 'Telefone', 'Total', 'Status', 'Data'].map((h) => (
@@ -353,6 +354,7 @@ export default function AdminStorePage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </Card>
     </div>

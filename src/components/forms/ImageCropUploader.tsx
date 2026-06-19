@@ -19,6 +19,8 @@ type Props = {
   hint?: string
 }
 
+const MAX_OUTPUT_DIM = 1600
+
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
@@ -46,7 +48,12 @@ async function cropToBlob(imageSrc: string, pixelCrop: Area, rotation: number): 
     safeArea / 2 - image.height * 0.5,
   )
 
-  const scale = pixelCrop.width < 800 ? 800 / pixelCrop.width : 1
+  const scale =
+    pixelCrop.width < 800
+      ? 800 / pixelCrop.width
+      : pixelCrop.width > MAX_OUTPUT_DIM
+        ? MAX_OUTPUT_DIM / pixelCrop.width
+        : 1
   const outCanvas = document.createElement('canvas')
   outCanvas.width = Math.round(pixelCrop.width * scale)
   outCanvas.height = Math.round(pixelCrop.height * scale)

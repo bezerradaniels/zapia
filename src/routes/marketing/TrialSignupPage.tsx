@@ -54,7 +54,7 @@ export default function TrialSignupPage() {
   const accepted = form.watch('accepted')
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-gradient-to-br from-white via-emerald-50 to-violet-50 lg:h-screen lg:overflow-hidden">
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-gradient-to-br from-white via-emerald-50 to-violet-50 lg:h-screen lg:overflow-hidden">
 
       {/* Decorative blobs */}
       <div

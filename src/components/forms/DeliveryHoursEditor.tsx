@@ -47,7 +47,7 @@ export function DeliveryHoursEditor({ value, onChange }: Props) {
               <select
                 value={slot.days}
                 onChange={(e) => update(index, 'days', e.target.value)}
-                className="h-10 flex-1 rounded-lg border border-z-border bg-white px-2.5 text-sm text-z-text outline-none focus:border-z-green"
+                className="h-10 flex-1 rounded-lg border border-slate-300 bg-white px-2.5 text-sm text-z-text outline-none focus:border-z-green"
               >
                 {DAY_OPTIONS.map((d) => (
                   <option key={d.value} value={d.value}>
@@ -59,7 +59,7 @@ export function DeliveryHoursEditor({ value, onChange }: Props) {
               <select
                 value={slot.start}
                 onChange={(e) => update(index, 'start', e.target.value)}
-                className="h-10 w-[84px] rounded-lg border border-z-border bg-white px-2 text-sm text-z-text outline-none focus:border-z-green"
+                className="h-10 w-[84px] rounded-lg border border-slate-300 bg-white px-2 text-sm text-z-text outline-none focus:border-z-green"
               >
                 {TIME_OPTIONS.map((t) => (
                   <option key={t} value={t}>{t}</option>
@@ -71,7 +71,7 @@ export function DeliveryHoursEditor({ value, onChange }: Props) {
               <select
                 value={slot.end}
                 onChange={(e) => update(index, 'end', e.target.value)}
-                className="h-10 w-[84px] rounded-lg border border-z-border bg-white px-2 text-sm text-z-text outline-none focus:border-z-green"
+                className="h-10 w-[84px] rounded-lg border border-slate-300 bg-white px-2 text-sm text-z-text outline-none focus:border-z-green"
               >
                 {TIME_OPTIONS.map((t) => (
                   <option key={t} value={t}>{t}</option>

@@ -10,6 +10,8 @@ import { STATES, toE164BR } from '@/lib/br'
 import { createStore, SlugTakenError, patchStore } from '@/features/catalog'
 import { slugify } from '@/lib/utils/slugify'
 import { ROUTES } from '@/config/routes'
+import { TRIAL_DAYS } from '@/config/plans'
+import { track } from '@/features/analytics'
 import { loadOnboardingSession, saveOnboardingSession } from '../utils/onboardingSession'
 import { saveDraft, loadDraft } from '../utils/onboardingDraft'
 import { useCities } from '../hooks/useCities'
@@ -49,6 +51,11 @@ export function OnboardingStep1() {
     return unsubscribe
   }, [watch])
 
+  useEffect(() => {
+    if (!onboardingSession) track('onboarding_started', { step: 1 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const selectedState = watch('address_state')
   const { data: cityOptions = [], isLoading: loadingCities } = useCities(selectedState || null)
 
@@ -63,7 +70,10 @@ export function OnboardingStep1() {
           }
         : null
 
+      let isNewStore = false
+
       if (!store) {
+        isNewStore = true
         const baseSlug = slugify(values.name)
 
         try {
@@ -97,11 +107,22 @@ export function OnboardingStep1() {
         address_neighborhood: values.address_neighborhood || null,
       })
 
+      if (isNewStore) {
+        track('store_created', { store_id: store.id, store_slug: store.slug })
+        // A `subscriptions` row is auto-created by a DB trigger on store
+        // insert (7-day trial, no card, always on the `pro` plan — see
+        // supabase/migrations/20260618232429_trial_7_days.sql).
+        track('trial_started', { store_id: store.id, plan_tier: 'pro', trial_days: TRIAL_DAYS })
+      }
+
       saveOnboardingSession({
         storeId: store.id,
         storeSlug: store.slug,
         storeName: store.name,
+        startedAt: onboardingSession?.startedAt ?? Date.now(),
       })
+
+      track('onboarding_step_completed', { store_id: store.id, step: 1, step_name: 'dados_da_loja' })
 
       navigate(ROUTES.onboardingStep2)
     } catch (err) {
@@ -120,25 +141,25 @@ export function OnboardingStep1() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
       <div>
-        <h1 className="text-xl font-semibold text-z-text">Dados da sua loja</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-z-text">Dados da sua loja</h1>
         <p className="mt-1 text-sm text-z-text-muted">
           Essas informações identificam sua loja para os clientes.
         </p>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="name">Nome da loja *</Label>
+        <Label htmlFor="name" className="text-sm">Nome da loja *</Label>
         <Input
           id="name"
           placeholder="Ex: Moda da Ana"
-          className={cn(errors.name && 'border-red-400')}
+          className={cn('border-slate-300', errors.name && 'border-red-400')}
           {...register('name')}
         />
         {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="whatsapp_phone">WhatsApp para receber pedidos *</Label>
+        <Label htmlFor="whatsapp_phone" className="text-sm">WhatsApp para receber pedidos *</Label>
         <Controller
           name="whatsapp_phone"
           control={control}
@@ -147,7 +168,7 @@ export function OnboardingStep1() {
               id="whatsapp_phone"
               value={field.value}
               onChange={field.onChange}
-              className={cn(errors.whatsapp_phone && 'border-red-400')}
+              className={cn('border-slate-300', errors.whatsapp_phone && 'border-red-400')}
             />
           )}
         />
@@ -158,7 +179,7 @@ export function OnboardingStep1() {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address_state">Estado *</Label>
+          <Label htmlFor="address_state" className="text-sm">Estado *</Label>
           <Controller
             name="address_state"
             control={control}
@@ -178,7 +199,7 @@ export function OnboardingStep1() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address_city">Cidade *</Label>
+          <Label htmlFor="address_city" className="text-sm">Cidade *</Label>
           <Controller
             name="address_city"
             control={control}
@@ -204,13 +225,14 @@ export function OnboardingStep1() {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address_street">
+          <Label htmlFor="address_street" className="text-sm">
             Endereço{' '}
             <span className="text-z-text-hint text-xs font-normal normal-case">(aparece no rodapé)</span>
           </Label>
           <Input
             id="address_street"
             placeholder="Ex: Rua das Flores, 123"
+            className="border-slate-300"
             {...register('address_street')}
           />
           {errors.address_street && (
@@ -219,13 +241,14 @@ export function OnboardingStep1() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address_neighborhood">
+          <Label htmlFor="address_neighborhood" className="text-sm">
             Bairro{' '}
             <span className="text-z-text-hint text-xs font-normal normal-case">(aparece no rodapé)</span>
           </Label>
           <Input
             id="address_neighborhood"
             placeholder="Ex: Centro"
+            className="border-slate-300"
             {...register('address_neighborhood')}
           />
           {errors.address_neighborhood && (

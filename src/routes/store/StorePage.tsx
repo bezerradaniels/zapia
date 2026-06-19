@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { PackageIcon, SearchIcon, ArrowDownIcon, StarIcon } from '@hugeicons/core-free-icons'
@@ -12,6 +12,7 @@ import { toTitleCase } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { ProductCard } from '@/components/store/ProductCard'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { track } from '@/features/analytics'
 
 const ALL_CATEGORY = '__all__'
 type SortKey = 'recent' | 'price_asc' | 'price_desc' | 'name'
@@ -92,6 +93,20 @@ export default function StorePage() {
     }
     return sorted
   }, [list, search, sort, selectedCategory])
+
+  useEffect(() => {
+    const q = search.trim()
+    if (!q) return
+    const timer = setTimeout(() => {
+      track('search_performed', {
+        store_id: store.id,
+        search_term: q,
+        result_count: filtered.length,
+      })
+    }, 600)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search])
 
   if (products.isLoading) {
     return (

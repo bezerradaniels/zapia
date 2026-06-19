@@ -82,8 +82,8 @@ export default function AdminStoresPage() {
       )}
 
       {!isLoading && !error && (
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <table className="w-full min-w-[860px] text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 {['Loja', 'Proprietário', 'Criada em', 'Plano', 'Status', 'Trial', 'Último pgto.', 'Produtos', 'Vendedores', ''].map((h) => (

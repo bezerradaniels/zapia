@@ -113,14 +113,14 @@ export function Combobox({
         placeholder={loading ? 'Carregando...' : placeholder}
         autoComplete="off"
         className={cn(
-          'h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm outline-none',
+          'h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 text-sm outline-none',
           'placeholder:text-z-text-hint focus:border-z-green',
           'disabled:cursor-not-allowed disabled:opacity-50',
         )}
       />
 
       {open && !loading && (
-        <ul className="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-lg border border-z-border bg-white shadow-xl ring-1 ring-black/5">
+        <ul className="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-lg border border-slate-300 bg-white shadow-xl ring-1 ring-black/5">
           {filtered.length === 0 ? (
             <li className="px-3.5 py-2.5 text-sm text-z-text-hint">{emptyMessage}</li>
           ) : (

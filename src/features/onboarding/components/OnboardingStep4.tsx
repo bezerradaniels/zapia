@@ -9,6 +9,7 @@ import { Button, Label } from '@/components/ui'
 import { ImageCropUploader } from '@/components/forms/ImageCropUploader'
 import { patchStore, catalogKeys } from '@/features/catalog'
 import { ROUTES } from '@/config/routes'
+import { track } from '@/features/analytics'
 import { loadOnboardingSession } from '../utils/onboardingSession'
 import { saveDraft, loadDraft } from '../utils/onboardingDraft'
 import { step4Schema, type Step4Values } from '../schemas'
@@ -74,6 +75,17 @@ export function OnboardingStep4() {
         banner_url: values.banner_url || null,
       })
       await queryClient.invalidateQueries({ queryKey: catalogKeys.all })
+
+      track('onboarding_step_completed', {
+        store_id: session.storeId,
+        step: 4,
+        step_name: 'visual_da_loja',
+      })
+      track('onboarding_completed', {
+        store_id: session.storeId,
+        total_time_seconds: Math.round((Date.now() - (session.startedAt ?? Date.now())) / 1000),
+      })
+
       navigate(ROUTES.onboardComplete)
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Algo deu errado. Tente novamente.'
@@ -86,14 +98,14 @@ export function OnboardingStep4() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6" noValidate>
       <div>
-        <h1 className="text-xl font-semibold text-z-text">Visual da sua loja</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-z-text">Visual da sua loja</h1>
         <p className="mt-1 text-sm text-z-text-muted">
           Personalize as cores e imagens que seus clientes vão ver.
         </p>
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Cor principal do catálogo</Label>
+        <Label className="text-sm">Cor principal do catálogo</Label>
         <div className="flex flex-col gap-3">
           {/* Preset swatches */}
           <div className="flex flex-wrap gap-2">
@@ -136,7 +148,7 @@ export function OnboardingStep4() {
               <div
                 className={cn(
                   'flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed transition-all hover:scale-110',
-                  useCustomColor ? 'border-z-ink ring-2 ring-z-ink ring-offset-2' : 'border-z-border',
+                  useCustomColor ? 'border-z-ink ring-2 ring-z-ink ring-offset-2' : 'border-slate-300',
                 )}
                 style={{ backgroundColor: useCustomColor ? selectedColor : 'transparent' }}
               >
@@ -160,10 +172,10 @@ export function OnboardingStep4() {
               }}
               maxLength={7}
               placeholder="#000000"
-              className="h-9 w-28 rounded-lg border border-z-border px-3 text-sm font-mono text-z-text outline-none focus:border-z-green"
+              className="h-9 w-28 rounded-lg border border-slate-300 px-3 text-sm font-mono text-z-text outline-none focus:border-z-green"
             />
             <div
-              className="h-9 w-9 rounded-full border border-z-border shadow-sm"
+              className="h-9 w-9 rounded-full border border-slate-300 shadow-sm"
               style={{ backgroundColor: selectedColor }}
             />
           </div>
@@ -171,7 +183,7 @@ export function OnboardingStep4() {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>Logo da loja</Label>
+        <Label className="text-sm">Logo da loja</Label>
         <p className="text-xs text-z-text-hint">Proporção 1:1 recomendada. JPG, PNG ou WEBP.</p>
         <Controller
           name="logo_url"
@@ -192,7 +204,7 @@ export function OnboardingStep4() {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>Foto de capa do catálogo</Label>
+        <Label className="text-sm">Foto de capa do catálogo</Label>
         <p className="text-xs text-z-text-hint">Proporção 16:10 recomendada. JPG, PNG ou WEBP.</p>
         <Controller
           name="banner_url"

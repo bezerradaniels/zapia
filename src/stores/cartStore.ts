@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import type { Product, ValidatedCoupon } from '@/types/domain'
 import { effectivePrice } from '@/features/products/utils/price'
 import { getVariationStock } from '@/features/products/utils/variation'
+import { track } from '@/features/analytics'
 
 export type CartItem = {
   product: Product
@@ -64,36 +65,53 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       coupon: null,
-      addItem: (product, selectedVariation = null) =>
+      addItem: (product, selectedVariation = null) => {
+        let added = false
         set((state) => {
           const key = buildCartKey(product.id, selectedVariation)
           const existing = state.items.find((i) => i.cartKey === key)
+          const max = maxAvailableQuantity(product, selectedVariation)
           if (existing) {
+            if (existing.quantity >= max) return state
+            added = true
             return {
               items: state.items.map((i) =>
                 i.cartKey === key
-                  ? {
-                      ...i,
-                      quantity: Math.min(
-                        i.quantity + 1,
-                        maxAvailableQuantity(product, selectedVariation),
-                      ),
-                    }
+                  ? { ...i, quantity: Math.min(i.quantity + 1, max) }
                   : i,
               ),
             }
           }
-          if (maxAvailableQuantity(product, selectedVariation) <= 0) return state
+          if (max <= 0) return state
+          added = true
           return {
             items: [
               ...state.items,
               { product, quantity: 1, selectedVariation, cartKey: key },
             ],
           }
-        }),
+        })
+        if (added) {
+          track('add_to_cart', {
+            store_id: product.store_id,
+            item_id: product.id,
+            item_name: product.name,
+            quantity: 1,
+            price: effectivePrice(product),
+          })
+        }
+      },
       removeItem: (cartKey) =>
         set((state) => {
+          const removed = state.items.find((i) => i.cartKey === cartKey)
           const remaining = state.items.filter((i) => i.cartKey !== cartKey)
+          if (removed) {
+            track('remove_from_cart', {
+              store_id: removed.product.store_id,
+              item_id: removed.product.id,
+              quantity: removed.quantity,
+            })
+          }
           return {
             items: remaining,
             coupon: remaining.length === 0 ? null : state.coupon,
@@ -119,8 +137,15 @@ export const useCartStore = create<CartStore>()(
             coupon: filtered.length === 0 ? null : state.coupon,
           }
         }),
-      applyCoupon: (coupon) => set({ coupon }),
-      clearCoupon: () => set({ coupon: null }),
+      applyCoupon: (coupon) => {
+        track('coupon_applied', { coupon_code: coupon.code, discount_value: coupon.discountInCents })
+        set({ coupon })
+      },
+      clearCoupon: () => {
+        const current = get().coupon
+        if (current) track('coupon_removed', { coupon_code: current.code })
+        set({ coupon: null })
+      },
       subtotalInCents: () =>
         get().items.reduce(
           (sum, i) => sum + effectivePrice(i.product) * i.quantity,

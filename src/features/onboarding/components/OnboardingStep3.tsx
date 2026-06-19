@@ -9,6 +9,7 @@ import { RoundMultiCheck } from '@/components/forms/RoundMultiCheck'
 import { DeliveryHoursEditor } from '@/components/forms/DeliveryHoursEditor'
 import { patchStore } from '@/features/catalog'
 import { ROUTES } from '@/config/routes'
+import { track } from '@/features/analytics'
 import { loadOnboardingSession } from '../utils/onboardingSession'
 import { saveDraft, loadDraft } from '../utils/onboardingDraft'
 import { step3Schema, type Step3Values } from '../schemas'
@@ -66,6 +67,11 @@ export function OnboardingStep3() {
         accepted_shipping_methods: values.accepted_shipping_methods,
         delivery_hours: values.delivery_hours,
       })
+      track('onboarding_step_completed', {
+        store_id: session.storeId,
+        step: 3,
+        step_name: 'pagamento_e_entrega',
+      })
       navigate(ROUTES.onboardingStep4)
     } catch (err) {
       const msg =
@@ -83,7 +89,7 @@ export function OnboardingStep3() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6" noValidate>
       <div>
-        <h1 className="text-xl font-semibold text-z-text">Pagamento e entrega</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-z-text">Pagamento e entrega</h1>
         <p className="mt-1 text-sm text-z-text-muted">
           Informe como seus clientes podem pagar e receber os pedidos.
         </p>
@@ -91,7 +97,7 @@ export function OnboardingStep3() {
 
       {/* Payment methods */}
       <div className="flex flex-col gap-2">
-        <Label>Formas de pagamento aceitas *</Label>
+        <Label className="text-sm">Formas de pagamento aceitas *</Label>
         <Controller
           name="accepted_payment_methods"
           control={control}
@@ -110,7 +116,7 @@ export function OnboardingStep3() {
 
       {/* Shipping methods */}
       <div className="flex flex-col gap-2">
-        <Label>Formas de entrega *</Label>
+        <Label className="text-sm">Formas de entrega *</Label>
         <Controller
           name="accepted_shipping_methods"
           control={control}
@@ -130,7 +136,7 @@ export function OnboardingStep3() {
       {/* Delivery hours */}
       <div className="flex flex-col gap-3">
         <div>
-          <Label>Horários de atendimento</Label>
+          <Label className="text-sm">Horários de atendimento</Label>
           <p className="mt-0.5 text-xs text-z-text-muted">
             Informe os horários em que seus clientes podem fazer pedidos.
           </p>

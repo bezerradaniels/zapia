@@ -20,6 +20,7 @@ import {
 } from '@/features/sellers'
 import { usePlanLimits } from '@/features/billing'
 import { ROUTES } from '@/config/routes'
+import { track } from '@/features/analytics'
 import { cn } from '@/lib/utils'
 import { NewSellerModal } from './NewSellerModal'
 
@@ -71,6 +72,7 @@ function SellerRow({ member, catalogUrl, isSelected, isOwner, onSelect, onRemove
 
   function copyLink() {
     navigator.clipboard.writeText(catalogUrl).then(() => {
+      track('share_link_copied', { link_type: 'seller', item_id: member.user_id })
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     })
@@ -167,6 +169,7 @@ function SellerDetailPanel({ member, catalogUrl, isOwner, onRemove }: DetailPane
 
   function copyLink() {
     navigator.clipboard.writeText(catalogUrl).then(() => {
+      track('share_link_copied', { link_type: 'seller', item_id: member.user_id })
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     })

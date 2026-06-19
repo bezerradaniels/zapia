@@ -14,23 +14,11 @@ import { buildStoreUrl, useActiveStore } from '@/lib/tenant'
 import { clearAllDrafts } from '@/features/onboarding/utils/onboardingDraft'
 import { clearOnboardingSession } from '@/features/onboarding/utils/onboardingSession'
 
-declare global {
-  interface Window {
-    dataLayer?: unknown[]
-  }
-}
-
 export default function OnboardCompletePage() {
   const navigate = useNavigate()
   const { store } = useActiveStore()
 
   useEffect(() => {
-    // Send conversion event to GTM dataLayer
-    if (window.dataLayer) {
-      window.dataLayer.push({
-        event: 'event_onboard_complete',
-      })
-    }
     clearOnboardingSession()
     clearAllDrafts()
   }, [])

@@ -26,13 +26,13 @@ export function RoundMultiCheck({ options, value, onChange }: Props) {
               'flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors',
               checked
                 ? 'border-z-green bg-z-green/5'
-                : 'border-z-border bg-white hover:border-z-ink/20',
+                : 'border-slate-300 bg-white hover:border-z-ink/20',
             )}
           >
             <span
               className={cn(
                 'flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors',
-                checked ? 'border-z-green bg-z-green' : 'border-z-border',
+                checked ? 'border-z-green bg-z-green' : 'border-slate-300',
               )}
             >
               {checked && (

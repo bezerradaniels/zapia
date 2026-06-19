@@ -8,6 +8,7 @@ import { Button, Input, Label } from '@/components/ui'
 import { createBrowserClient } from '@/lib/supabase'
 import { slugify } from '@/lib/utils/slugify'
 import { ROUTES } from '@/config/routes'
+import { track } from '@/features/analytics'
 import { loadOnboardingSession, saveOnboardingSession } from '../utils/onboardingSession'
 import { saveDraft, loadDraft } from '../utils/onboardingDraft'
 import { step2Schema, type Step2Values } from '../schemas'
@@ -107,6 +108,11 @@ export function OnboardingStep2() {
         ...session,
         storeSlug: values.slug,
       })
+      track('onboarding_step_completed', {
+        store_id: session.storeId,
+        step: 2,
+        step_name: 'sobre_o_negocio',
+      })
       navigate(ROUTES.onboardingStep3)
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Algo deu errado. Tente novamente.'
@@ -119,21 +125,21 @@ export function OnboardingStep2() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
       <div>
-        <h1 className="text-xl font-semibold text-z-text">Sobre o seu negócio</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-z-text">Sobre o seu negócio</h1>
         <p className="mt-1 text-sm text-z-text-muted">
           Nos conte mais sobre o que você vende e como quer ser encontrado.
         </p>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="category">Ramo da sua loja *</Label>
+        <Label htmlFor="category" className="text-sm">Ramo da sua loja *</Label>
         <select
           id="category"
           value={selectedCategory}
           onChange={(e) => setValue('category', e.target.value, { shouldValidate: true })}
           className={cn(
             'h-11 w-full rounded-lg border bg-white px-3 text-sm text-z-text outline-none focus:border-z-green',
-            errors.category ? 'border-red-400' : 'border-z-border',
+            errors.category ? 'border-red-400' : 'border-slate-300',
             !selectedCategory && 'text-z-text-hint',
           )}
         >
@@ -148,7 +154,7 @@ export function OnboardingStep2() {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="instagram">@ do Instagram</Label>
+        <Label htmlFor="instagram" className="text-sm">@ do Instagram</Label>
         <div className="relative">
           <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-z-text-hint">
             @
@@ -156,7 +162,7 @@ export function OnboardingStep2() {
           <Input
             id="instagram"
             placeholder="sualoja"
-            className={cn('pl-7', errors.instagram && 'border-red-400')}
+            className={cn('pl-7 border-slate-300', errors.instagram && 'border-red-400')}
             {...register('instagram')}
             onChange={(e) => {
               const raw = e.target.value
@@ -172,14 +178,14 @@ export function OnboardingStep2() {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="slug">Link da sua loja *</Label>
+        <Label htmlFor="slug" className="text-sm">Link da sua loja *</Label>
         <div
           className={cn(
             'flex items-center overflow-hidden rounded-lg border bg-white focus-within:border-z-green',
-            errors.slug ? 'border-red-400' : 'border-z-border',
+            errors.slug ? 'border-red-400' : 'border-slate-300',
           )}
         >
-          <span className="select-none whitespace-nowrap border-r border-z-border bg-z-bg px-3 py-2.5 text-sm text-z-text-hint">
+          <span className="select-none whitespace-nowrap border-r border-slate-300 bg-z-bg px-3 py-2.5 text-sm text-z-text-hint">
             zapia.app/
           </span>
           <input

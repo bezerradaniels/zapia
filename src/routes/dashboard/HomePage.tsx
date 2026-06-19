@@ -161,7 +161,7 @@ export default function HomePage() {
 
       {/* Greeting */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-z-text">
+        <h1 className="text-2xl font-bold tracking-tighter text-z-text">
           {getGreeting()}, {firstName}!
         </h1>
       </div>

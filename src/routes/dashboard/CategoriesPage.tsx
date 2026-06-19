@@ -113,7 +113,7 @@ export default function CategoriesPage() {
             <HugeiconsIcon icon={ArrowLeft02Icon} size={12} />
             Voltar para o catálogo
           </Link>
-          <h1 className="text-[22px] font-bold tracking-tight" style={{ color: '#1a1a1a' }}>
+          <h1 className="text-[22px] font-bold tracking-tighter" style={{ color: '#1a1a1a' }}>
             Categorias
           </h1>
           <p className="mt-1 text-sm text-z-text-muted">

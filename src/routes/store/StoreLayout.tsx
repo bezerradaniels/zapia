@@ -21,6 +21,7 @@ import {
   Clock01Icon,
 } from '@hugeicons/core-free-icons'
 import { toast } from 'sonner'
+import { AppLoadingShell } from '@/components/AppLoadingShell'
 import { buildStorePath, buildStoreUrl, isStoreDomain, useCurrentStore, useActiveStore } from '@/lib/tenant'
 import { OptimizedImage } from '@/components/ui/OptimizedImage'
 import { useCartStore } from '@/features/cart'
@@ -36,6 +37,7 @@ import { fromE164BR } from '@/lib/br'
 import { buildWhatsAppLink } from '@/lib/whatsapp'
 import { OwnerSidebarMenu } from '@/components/layout/OwnerSidebarMenu'
 import { ROUTES } from '@/config/routes'
+import { track } from '@/features/analytics'
 import type { Store, PaymentMethod, ShippingMethod } from '@/types/domain'
 import { OwnerModeContext } from './storeOwnerMode'
 
@@ -122,11 +124,7 @@ export default function StoreLayout() {
   )
 
   if (isLoading || (store && catalogStatus.isLoading)) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-z-bg text-sm text-z-text-muted">
-        Carregando...
-      </div>
-    )
+    return <AppLoadingShell />
   }
 
   if (!store) {
@@ -356,9 +354,11 @@ function ShareButton({ store }: { store: Store }) {
     try {
       if (navigator.share) {
         await navigator.share(data)
+        track('share_link_copied', { store_id: store.id, link_type: 'store', item_id: store.id })
         return
       }
       await navigator.clipboard.writeText(url)
+      track('share_link_copied', { store_id: store.id, link_type: 'store', item_id: store.id })
       toast.success('Link copiado!')
     } catch {
       // user cancelled — silent

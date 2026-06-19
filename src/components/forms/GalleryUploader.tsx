@@ -7,6 +7,7 @@ import { uploadImage, deleteImageByUrl, UploadError } from '@/lib/supabase'
 import { Button } from '@/components/ui'
 
 const MAX_IMAGES = 10
+const MAX_OUTPUT_DIM = 1600
 
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -31,7 +32,12 @@ async function cropToBlob(imageSrc: string, pixelCrop: Area, rotation: number): 
   rotCtx.translate(-safeArea / 2, -safeArea / 2)
   rotCtx.drawImage(image, safeArea / 2 - image.width * 0.5, safeArea / 2 - image.height * 0.5)
 
-  const scale = pixelCrop.width < 800 ? 800 / pixelCrop.width : 1
+  const scale =
+    pixelCrop.width < 800
+      ? 800 / pixelCrop.width
+      : pixelCrop.width > MAX_OUTPUT_DIM
+        ? MAX_OUTPUT_DIM / pixelCrop.width
+        : 1
   const outCanvas = document.createElement('canvas')
   outCanvas.width = Math.round(pixelCrop.width * scale)
   outCanvas.height = Math.round(pixelCrop.height * scale)
@@ -158,16 +164,17 @@ export function GalleryUploader({ storeId, value, onChange }: Props) {
 
         {/* Grid de miniaturas */}
         {value.length > 0 && (
-          <div className="grid grid-cols-6 gap-1">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
             {value.map((url, i) => (
-              <div key={url} className="group relative aspect-square w-32 overflow-hidden rounded-lg border border-z-border bg-z-bg2">
+              <div key={url} className="group relative aspect-square w-full overflow-hidden rounded-lg border border-z-border bg-z-bg2">
                 <img src={url} alt="" className="h-full w-full object-cover" />
                 <button
                   type="button"
                   onClick={() => remove(i)}
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+                  aria-label="Remover foto"
+                  className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100"
                 >
-                  <HugeiconsIcon icon={DeleteIcon} size={14} className="text-white" />
+                  <HugeiconsIcon icon={DeleteIcon} size={14} />
                 </button>
               </div>
             ))}

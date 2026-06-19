@@ -82,10 +82,10 @@ export function Sidebar({ isMobileOpen = false, onClose }: SidebarProps) {
   const signOut = useSignOut()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [collapsedGroups, setCollapsedGroups] = useState<Record<NavGroup['id'], boolean>>({
-    catalog: false,
-    products: false,
-    people: false,
-    admin: false,
+    catalog: true,
+    products: true,
+    people: true,
+    admin: true,
   })
 
   const toggleGroup = (groupId: NavGroup['id']) => {
@@ -167,7 +167,7 @@ export function Sidebar({ isMobileOpen = false, onClose }: SidebarProps) {
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className={cn(
-              'absolute -right-3 top-4 z-50 hidden h-6 w-6 items-center justify-center rounded-full border border-z-border bg-[#e2e8f0] text-z-text-muted transition-transform hover:text-z-text lg:flex',
+              'absolute -right-3 top-4 z-50 hidden h-6 w-6 items-center justify-center rounded-full border border-z-border bg-[#e2e8f0] text-[#166534] transition-transform hover:text-[#166534] lg:flex',
             )}
           >
             <HugeiconsIcon
@@ -188,7 +188,7 @@ export function Sidebar({ isMobileOpen = false, onClose }: SidebarProps) {
                   type="button"
                   onClick={() => toggleGroup(group.id)}
                   className={cn(
-                    'mt-1 flex items-center justify-between rounded-lg px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-z-text-muted transition-colors hover:bg-white/50 hover:text-z-text',
+                    'mt-1 flex items-center justify-between rounded-lg px-3 py-2 text-[14px] font-bold tracking-normal text-z-text transition-colors hover:bg-white/50 hover:text-z-text',
                     isCollapsed && 'lg:hidden',
                   )}
                   aria-expanded={!groupIsCollapsed}
@@ -198,7 +198,7 @@ export function Sidebar({ isMobileOpen = false, onClose }: SidebarProps) {
                     icon={groupIsCollapsed ? ArrowRight01Icon : ArrowLeft01Icon}
                     size={14}
                     className={cn(
-                      'transition-transform',
+                      'text-[#166534] transition-transform',
                       !groupIsCollapsed && '-rotate-90',
                     )}
                   />

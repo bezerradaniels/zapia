@@ -458,7 +458,7 @@ function Hero() {
           <Button
             asChild
             size="lg"
-            className="h-14 rounded-2xl bg-[#a4e636] px-8 text-base font-bold text-[#020617] hover:bg-[#a4e636]/90 shadow-sm transition-all duration-300 hover:scale-[1.02]"
+            className="h-14 rounded-2xl bg-[#07feda] px-8 text-base font-bold text-[#020617] hover:bg-[#07feda]/90 shadow-sm transition-all duration-300 hover:scale-[1.02]"
           >
             <Link id="lp-hero-cta-signup" to={ROUTES.signup}>
               Crie seu catálogo grátis
@@ -486,7 +486,7 @@ const STATS = [
     icon: ShoppingCart01Icon, 
     value: 'Link próprio', 
     label: 'da sua loja online',
-    bg: 'bg-z-secondary',
+    bg: 'bg-violet-500',
   },
   { 
     icon: WhatsappIcon, 
@@ -498,14 +498,14 @@ const STATS = [
     icon: DashboardSquare01Icon, 
     value: 'Dashboard', 
     label: 'tudo em um único lugar',
-    bg: 'bg-z-secondary',
+    bg: 'bg-violet-500',
   },
 ]
 
 function StatsStrip() {
   const { ref, visible } = useReveal()
   return (
-    <section className="bg-z-bg/50 px-6 py-16 sm:py-24" ref={ref}>
+    <section className="bg-z-bg px-6 py-16 sm:py-24" ref={ref}>
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {STATS.map((s, i) => (
@@ -551,7 +551,7 @@ const STEPS = [
 function HowItWorks() {
   const { ref, visible } = useReveal()
   return (
-    <section id="como-funciona" className="bg-z-bg px-6 py-24">
+    <section id="como-funciona" className="bg-white px-6 py-24">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mb-14 text-center" ref={ref}>
@@ -661,7 +661,7 @@ const FEATURES = [
 function Features() {
   const { ref, visible } = useReveal()
   return (
-    <section id="funcionalidades" className="bg-white px-6 py-24">
+    <section id="funcionalidades" className="bg-z-bg px-6 py-24">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mb-14 text-center" ref={ref}>
@@ -705,7 +705,7 @@ function FeaturesGrid() {
       {FEATURES.map((f, i) => (
         <div
           key={f.title}
-          className="group rounded-2xl border border-z-border bg-z-bg p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-z-lg"
+          className="group rounded-2xl border border-z-border bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-z-lg"
           style={revealStyle(visible, i * 80)}
         >
           <div

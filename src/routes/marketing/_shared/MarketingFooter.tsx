@@ -21,7 +21,7 @@ const links: FooterLink[] = [
 
 export function MarketingFooter() {
   return (
-    <footer className="bg-[#e2e8f0] px-8 py-8">
+    <footer className="bg-[#f1f5f9] px-8 py-8">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
         <Logo variant="verde" height={47} />
         <div className="flex flex-wrap gap-6">

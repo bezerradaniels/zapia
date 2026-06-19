@@ -8,15 +8,20 @@ export interface FieldProps extends InputProps {
   error?: string
   hint?: string
   containerClassName?: string
+  labelClassName?: string
 }
 
 export const Field = React.forwardRef<HTMLInputElement, FieldProps>(
-  ({ label, error, hint, containerClassName, id, ...props }, ref) => {
+  ({ label, error, hint, containerClassName, labelClassName, id, ...props }, ref) => {
     const generatedId = React.useId()
     const inputId = id ?? generatedId
     return (
       <div className={cn('flex flex-col gap-1.5', containerClassName)}>
-        {label && <Label htmlFor={inputId}>{label}</Label>}
+        {label && (
+          <Label htmlFor={inputId} className={labelClassName}>
+            {label}
+          </Label>
+        )}
         <Input
           id={inputId}
           ref={ref}
