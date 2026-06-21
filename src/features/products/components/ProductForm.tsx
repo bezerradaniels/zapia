@@ -18,6 +18,7 @@ import {
   Settings01Icon,
 } from '@hugeicons/core-free-icons'
 import confetti from 'canvas-confetti'
+import { toast } from 'sonner'
 import { ROUTES } from '@/config/routes'
 import { productSchema, type ProductInput } from '../schemas'
 import { marginPercent } from '../utils/price'
@@ -31,7 +32,9 @@ import type { VariationType } from '@/types/domain'
 import { cn } from '@/lib/utils'
 import { useCategories, useCreateCategory } from '@/features/categories'
 import { usePlanLimits } from '@/features/billing'
+import { AiGenerateButton } from '@/components/ui'
 import { useProducts } from '../hooks/useProducts'
+import { useGenerateProductDescription } from '../hooks/useGenerateProductDescription'
 
 type Tab = 'info' | 'stock' | 'photos' | 'price'
 
@@ -119,6 +122,8 @@ export function ProductForm({
   const planLimits = usePlanLimits(storeId)
   const allProductsQuery = useProducts(planLimits.canUse('featured') ? storeId : undefined)
   const createCategoryMutation = useCreateCategory()
+  const { generate: generateDescription, isGenerating: isGeneratingDescription } =
+    useGenerateProductDescription()
 
   const defaults = useMemo(
     () => ({
@@ -206,6 +211,28 @@ export function ProductForm({
     await onSubmit(finalValues)
     form.reset(finalValues)
   })
+
+  const handleGenerateDescription = async () => {
+    const productName = form.getValues('name')
+    if (!productName) {
+      toast.error('Informe o nome do produto antes de gerar a descrição.')
+      return
+    }
+    try {
+      const html = await generateDescription({
+        storeId,
+        name: productName,
+        category: form.getValues('category') || undefined,
+        subcategory: form.getValues('subcategory') || undefined,
+        brand: form.getValues('brand') || undefined,
+        condition: form.getValues('condition'),
+        unit: form.getValues('unit') || undefined,
+      })
+      form.setValue('description', html, { shouldDirty: true, shouldValidate: true })
+    } catch {
+      toast.error('Não foi possível gerar a descrição. Tente novamente.')
+    }
+  }
 
   const handlePublish = async () => {
     submitModeRef.current = 'publish'
@@ -371,14 +398,21 @@ export function ProductForm({
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-semibold text-z-text-hint">
-                      Descrição
-                      <HugeiconsIcon
-                        icon={InformationCircleIcon}
-                        size={12}
-                        className="ml-1 inline text-z-text-hint"
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-semibold text-z-text-hint">
+                        Descrição
+                        <HugeiconsIcon
+                          icon={InformationCircleIcon}
+                          size={12}
+                          className="ml-1 inline text-z-text-hint"
+                        />
+                      </label>
+                      <AiGenerateButton
+                        canUse={planLimits.canUse('ai')}
+                        isLoading={isGeneratingDescription}
+                        onClick={handleGenerateDescription}
                       />
-                    </label>
+                    </div>
                     <Controller
                       control={form.control}
                       name="description"

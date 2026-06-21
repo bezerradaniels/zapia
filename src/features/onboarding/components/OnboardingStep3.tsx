@@ -6,13 +6,15 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowRight02Icon } from '@hugeicons/core-free-icons'
 import { Button, Label } from '@/components/ui'
 import { RoundMultiCheck } from '@/components/forms/RoundMultiCheck'
+import { RoundSingleCheck } from '@/components/forms/RoundSingleCheck'
 import { DeliveryHoursEditor } from '@/components/forms/DeliveryHoursEditor'
+import { DeliveryAreaCustomLocations } from '@/components/forms/DeliveryAreaCustomLocations'
 import { patchStore } from '@/features/catalog'
 import { ROUTES } from '@/config/routes'
 import { track } from '@/features/analytics'
 import { loadOnboardingSession } from '../utils/onboardingSession'
 import { saveDraft, loadDraft } from '../utils/onboardingDraft'
-import { step3Schema, type Step3Values } from '../schemas'
+import { step3Schema, type Step1Values, type Step3Values } from '../schemas'
 
 const PAYMENT_OPTIONS = [
   { value: 'pix', label: 'PIX' },
@@ -30,12 +32,21 @@ const SHIPPING_OPTIONS = [
   { value: 'digital', label: 'Entrega digital' },
 ]
 
+const DELIVERY_AREA_OPTIONS = [
+  { value: 'state_only', label: 'Apenas meu estado' },
+  { value: 'brazil', label: 'Brasil inteiro' },
+  { value: 'worldwide', label: 'Mundo inteiro' },
+  { value: 'digital_only', label: 'Apenas digital' },
+  { value: 'custom', label: 'Personalizado' },
+]
+
 export function OnboardingStep3() {
   const navigate = useNavigate()
   const session = loadOnboardingSession()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const draft = loadDraft<Step3Values>(3)
+  const step1Draft = loadDraft<Step1Values>(1)
 
   const {
     control,
@@ -49,8 +60,18 @@ export function OnboardingStep3() {
       accepted_payment_methods: draft?.accepted_payment_methods ?? [],
       accepted_shipping_methods: draft?.accepted_shipping_methods ?? [],
       delivery_hours: draft?.delivery_hours ?? [{ days: 'all', start: '08:00', end: '18:00' }],
+      delivery_area_scope: draft?.delivery_area_scope ?? 'city_only',
+      delivery_area_custom_locations: draft?.delivery_area_custom_locations ?? [],
     },
   })
+
+  const deliveryAreaOptions = [
+    {
+      value: 'city_only',
+      label: step1Draft?.address_city ? `Apenas na cidade (${step1Draft.address_city})` : 'Apenas na cidade',
+    },
+    ...DELIVERY_AREA_OPTIONS,
+  ]
 
   useEffect(() => {
     const { unsubscribe } = watch((values) => saveDraft(3, values))
@@ -66,6 +87,8 @@ export function OnboardingStep3() {
         accepted_payment_methods: values.accepted_payment_methods,
         accepted_shipping_methods: values.accepted_shipping_methods,
         delivery_hours: values.delivery_hours,
+        delivery_area_scope: values.delivery_area_scope,
+        delivery_area_custom_locations: values.delivery_area_custom_locations ?? [],
       })
       track('onboarding_step_completed', {
         store_id: session.storeId,
@@ -148,6 +171,30 @@ export function OnboardingStep3() {
             <DeliveryHoursEditor value={field.value} onChange={field.onChange} />
           )}
         />
+      </div>
+
+      {/* Delivery area */}
+      <div className="flex flex-col gap-2">
+        <Label className="text-sm">Local de entrega *</Label>
+        <Controller
+          name="delivery_area_scope"
+          control={control}
+          render={({ field }) => (
+            <RoundSingleCheck options={deliveryAreaOptions} value={field.value} onChange={field.onChange} />
+          )}
+        />
+        {errors.delivery_area_scope && (
+          <p className="text-xs text-red-500">{errors.delivery_area_scope.message}</p>
+        )}
+        {watch('delivery_area_scope') === 'custom' && (
+          <Controller
+            name="delivery_area_custom_locations"
+            control={control}
+            render={({ field }) => (
+              <DeliveryAreaCustomLocations value={field.value ?? []} onChange={field.onChange} />
+            )}
+          />
+        )}
       </div>
 
       {errors.root && (

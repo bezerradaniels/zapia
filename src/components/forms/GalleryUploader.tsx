@@ -160,7 +160,7 @@ export function GalleryUploader({ storeId, value, onChange }: Props) {
   return (
     <>
       <div className="flex flex-col gap-3">
-        <p className="text-xs text-z-text-hint">As fotos serão exibidas na página "Sobre" do seu catálogo.</p>
+        <p className="text-[14px] text-z-text-hint">As fotos serão exibidas na página "Sobre" do seu catálogo.</p>
 
         {/* Grid de miniaturas */}
         {value.length > 0 && (

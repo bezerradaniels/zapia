@@ -92,3 +92,24 @@ export async function deactivateProducts(ids: string[]): Promise<void> {
     .in('id', ids)
   if (error) throw error
 }
+
+export async function setProductsActive(ids: string[], isActive: boolean): Promise<void> {
+  if (ids.length === 0) return
+  const supabase = createBrowserClient()
+  const { error } = await supabase
+    .from('products')
+    .update({ is_active: isActive })
+    .in('id', ids)
+  if (error) throw error
+}
+
+/** Soft-delete a list of products. */
+export async function deleteProducts(ids: string[]): Promise<void> {
+  if (ids.length === 0) return
+  const supabase = createBrowserClient()
+  const { error } = await supabase
+    .from('products')
+    .update({ deleted_at: new Date().toISOString() })
+    .in('id', ids)
+  if (error) throw error
+}

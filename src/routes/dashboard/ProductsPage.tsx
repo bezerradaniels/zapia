@@ -3,33 +3,76 @@ import { Link } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   PlusSignIcon,
+  ArrowDown01Icon,
   PackageIcon,
   EditIcon,
   DeleteIcon,
+  PauseIcon,
+  PlayIcon,
 } from '@hugeicons/core-free-icons'
 import { useActiveStore } from '@/lib/tenant'
 import {
   NewProductFullModal,
   useCreateProduct,
   useDeleteProduct,
+  useDeleteProducts,
+  useSetProductActive,
+  useSetProductsActive,
   useProducts,
 } from '@/features/products'
 import { usePlanLimits } from '@/features/billing'
 import { formatMoney } from '@/lib/format'
+import { cn } from '@/lib/utils'
 import { ROUTES } from '@/config/routes'
 import { PLANS } from '@/config/plans'
-import { Badge, Button } from '@/components/ui'
+import {
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui'
 
 export default function ProductsPage() {
   const { store } = useActiveStore()
   const products = useProducts(store?.id)
   const create = useCreateProduct(store?.id ?? '')
   const del = useDeleteProduct(store?.id ?? '')
+  const setActive = useSetProductActive(store?.id ?? '')
+  const setManyActive = useSetProductsActive(store?.id ?? '')
+  const delMany = useDeleteProducts(store?.id ?? '')
   const limits = usePlanLimits(store?.id)
   const [newProductOpen, setNewProductOpen] = useState(false)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
   const list = products.data ?? []
   const limit = limits.productLimit
   const atLimit = limit !== null && list.length >= limit
+  const allSelected = list.length > 0 && selected.size === list.length
+
+  function toggleSelected(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    setSelected(allSelected ? new Set() : new Set(list.map((p) => p.id)))
+  }
+
+  function handleBulkActivate(isActive: boolean) {
+    setManyActive.mutate({ ids: Array.from(selected), isActive })
+    setSelected(new Set())
+  }
+
+  function handleBulkDelete() {
+    if (!confirm(`Excluir ${selected.size} produto(s) selecionado(s)?`)) return
+    delMany.mutate(Array.from(selected))
+    setSelected(new Set())
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -51,22 +94,32 @@ export default function ProductsPage() {
 
         {/* Header buttons — hidden on mobile */}
         <div className="hidden items-center gap-2 sm:flex">
-          {!atLimit && (
-            <Button asChild variant="outline" className="hidden lg:inline-flex">
-              <Link to={ROUTES.dashboardProductsBulk}>
-                Adicionar em massa
-              </Link>
-            </Button>
-          )}
           {atLimit ? (
             <Button asChild variant="outline">
               <Link to={ROUTES.dashboardBilling}>Aumentar limite</Link>
             </Button>
           ) : (
-            <Button type="button" onClick={() => setNewProductOpen(true)}>
-              <HugeiconsIcon icon={PlusSignIcon} size={16} />
-              Novo produto
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button">
+                  <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                  Novo produto
+                  <HugeiconsIcon icon={ArrowDown01Icon} size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setNewProductOpen(true)}>
+                  <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                  Novo produto
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to={ROUTES.dashboardProductsBulk}>
+                    <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                    Vários produtos
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </header>
@@ -106,12 +159,67 @@ export default function ProductsPage() {
           </Button>
         </div>
       ) : (
-        <ul className="divide-y divide-z-border overflow-hidden rounded-2xl border border-z-border bg-white">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-z-text-muted">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleSelectAll}
+                className="h-4 w-4 rounded accent-z-green"
+              />
+              Selecionar todos
+            </label>
+
+            {selected.size > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-z-text-muted">
+                  {selected.size} selecionado{selected.size > 1 ? 's' : ''}
+                </span>
+                <button
+                  type="button"
+                  aria-label="Ativar selecionados"
+                  title="Ativar selecionados"
+                  onClick={() => handleBulkActivate(true)}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-emerald-600 hover:bg-emerald-50"
+                >
+                  <HugeiconsIcon icon={PlayIcon} size={14} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Desativar selecionados"
+                  title="Desativar selecionados"
+                  onClick={() => handleBulkActivate(false)}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-amber-600 hover:bg-amber-50"
+                >
+                  <HugeiconsIcon icon={PauseIcon} size={14} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Excluir selecionados"
+                  title="Excluir selecionados"
+                  onClick={handleBulkDelete}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50"
+                >
+                  <HugeiconsIcon icon={DeleteIcon} size={14} />
+                </button>
+              </div>
+            )}
+          </div>
+
           {list.map((product) => (
-            <li
+            <div
               key={product.id}
-              className="flex items-center gap-3 p-3 transition-colors hover:bg-z-bg2/40 sm:gap-4 sm:p-4"
+              className="flex items-start gap-3 rounded-2xl border border-z-border bg-white p-3 sm:gap-4 sm:p-4"
             >
+              <input
+                type="checkbox"
+                checked={selected.has(product.id)}
+                onChange={() => toggleSelected(product.id)}
+                className="mt-1 h-4 w-4 shrink-0 rounded accent-z-green"
+                aria-label={`Selecionar ${product.name}`}
+              />
+
               <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-z-bg2 sm:h-14 sm:w-14">
                 {product.images[0] ? (
                   <img
@@ -154,31 +262,50 @@ export default function ProductsPage() {
                   )}
                   {product.stock !== null && ` · ${product.stock} em estoque`}
                 </p>
-              </div>
 
-              <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-                <Button asChild variant="outline" size="sm">
-                  <Link to={`${ROUTES.dashboardProducts}/${product.id}`}>
+                <div className="mt-2 flex items-center gap-1.5">
+                  <Link
+                    to={`${ROUTES.dashboardProducts}/${product.id}`}
+                    aria-label="Editar produto"
+                    title="Editar produto"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50"
+                  >
                     <HugeiconsIcon icon={EditIcon} size={14} />
-                    <span className="hidden sm:inline">Editar</span>
                   </Link>
-                </Button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm(`Excluir "${product.name}"?`)) {
-                      del.mutate(product.id)
+                  <button
+                    type="button"
+                    aria-label={product.is_active ? 'Desativar produto' : 'Ativar produto'}
+                    title={product.is_active ? 'Desativar produto' : 'Ativar produto'}
+                    onClick={() =>
+                      setActive.mutate({ id: product.id, isActive: !product.is_active })
                     }
-                  }}
-                  className="flex items-center gap-1.5 rounded-lg border border-z-primary/30 bg-z-primary/10 px-2 py-1.5 text-xs font-medium text-z-primary hover:bg-z-primary/15 sm:px-3"
-                >
-                  <HugeiconsIcon icon={DeleteIcon} size={14} />
-                  <span className="hidden sm:inline">Excluir</span>
-                </button>
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-lg',
+                      product.is_active
+                        ? 'text-amber-600 hover:bg-amber-50'
+                        : 'text-emerald-600 hover:bg-emerald-50',
+                    )}
+                  >
+                    <HugeiconsIcon icon={product.is_active ? PauseIcon : PlayIcon} size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Excluir produto"
+                    title="Excluir produto"
+                    onClick={() => {
+                      if (confirm(`Excluir "${product.name}"?`)) {
+                        del.mutate(product.id)
+                      }
+                    }}
+                    className="flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50"
+                  >
+                    <HugeiconsIcon icon={DeleteIcon} size={14} />
+                  </button>
+                </div>
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
       {/* Limite atingido — aviso mobile (bottom bar não leva ao billing) */}

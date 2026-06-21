@@ -1,6 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { track } from '@/features/analytics'
-import { createProduct, deleteProduct, updateProduct } from '../api/mutations'
+import {
+  createProduct,
+  deleteProduct,
+  deleteProducts,
+  setProductsActive,
+  updateProduct,
+} from '../api/mutations'
 import { productsKeys } from '../api/keys'
 import type { ProductInput } from '../schemas'
 
@@ -45,6 +51,52 @@ export function useDeleteProduct(storeId: string) {
     mutationFn: (id: string) => deleteProduct(id),
     onSuccess: (_data, id) => {
       track('product_deleted', { store_id: storeId, product_id: id })
+      qc.invalidateQueries({ queryKey: productsKeys.list(storeId) })
+      qc.invalidateQueries({ queryKey: productsKeys.publicList(storeId) })
+    },
+  })
+}
+
+export function useSetProductActive(storeId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      setProductsActive([id], isActive),
+    onSuccess: (_data, { id, isActive }) => {
+      track('product_bulk_active_toggled', {
+        store_id: storeId,
+        product_ids: [id],
+        is_active: isActive,
+      })
+      qc.invalidateQueries({ queryKey: productsKeys.list(storeId) })
+      qc.invalidateQueries({ queryKey: productsKeys.publicList(storeId) })
+    },
+  })
+}
+
+export function useSetProductsActive(storeId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ ids, isActive }: { ids: string[]; isActive: boolean }) =>
+      setProductsActive(ids, isActive),
+    onSuccess: (_data, { ids, isActive }) => {
+      track('product_bulk_active_toggled', {
+        store_id: storeId,
+        product_ids: ids,
+        is_active: isActive,
+      })
+      qc.invalidateQueries({ queryKey: productsKeys.list(storeId) })
+      qc.invalidateQueries({ queryKey: productsKeys.publicList(storeId) })
+    },
+  })
+}
+
+export function useDeleteProducts(storeId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: string[]) => deleteProducts(ids),
+    onSuccess: (_data, ids) => {
+      track('product_bulk_deleted', { store_id: storeId, product_ids: ids })
       qc.invalidateQueries({ queryKey: productsKeys.list(storeId) })
       qc.invalidateQueries({ queryKey: productsKeys.publicList(storeId) })
     },

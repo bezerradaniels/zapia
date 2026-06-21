@@ -10,6 +10,12 @@ import {
 import { ROUTES } from '@/config/routes'
 import { useActiveStore, buildStoreUrl } from '@/lib/tenant'
 import { cn } from '@/lib/utils'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui'
 
 export function BottomBar() {
   const { store } = useActiveStore()
@@ -45,13 +51,31 @@ export function BottomBar() {
 
       {/* Center add button */}
       <div className="flex flex-1 items-center justify-center">
-        <Link
-          to={`${ROUTES.dashboardProducts}/novo`}
-          aria-label="Adicionar produto"
-          className="flex h-12 w-12 -translate-y-3 items-center justify-center rounded-full bg-z-green text-z-ink shadow-lg transition-transform active:scale-95"
-        >
-          <HugeiconsIcon icon={PlusSignIcon} size={24} />
-        </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              aria-label="Adicionar produto"
+              className="flex h-12 w-12 -translate-y-3 items-center justify-center rounded-full bg-z-green text-z-ink shadow-lg transition-transform active:scale-95"
+            >
+              <HugeiconsIcon icon={PlusSignIcon} size={24} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="center" className="-translate-y-3">
+            <DropdownMenuItem asChild>
+              <Link to={`${ROUTES.dashboardProducts}/novo`}>
+                <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                Novo produto
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to={ROUTES.dashboardProductsBulk}>
+                <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                Vários produtos
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <a

@@ -91,6 +91,8 @@ export async function updateStore(
       accepted_payment_methods: input.accepted_payment_methods ?? [],
       accepted_shipping_methods: input.accepted_shipping_methods ?? [],
       delivery_hours: input.delivery_hours ?? [],
+      delivery_area_scope: input.delivery_area_scope ?? 'city_only',
+      delivery_area_custom_locations: input.delivery_area_custom_locations ?? [],
       custom_links: input.custom_links ?? [],
       gallery_images: (input.gallery_images ?? []) as any,
       social_links,
@@ -98,6 +100,7 @@ export async function updateStore(
       age_restricted: input.age_restricted ?? false,
       show_out_of_stock: input.show_out_of_stock ?? false,
       product_sort: input.product_sort ?? 'recent',
+      home_view: input.home_view ?? 'catalog',
       gtm_id: input.gtm_id?.trim() || null,
       // If slug is provided, we update it and set the timestamp.
       // The UI will handle the business rule (once every 3 months).

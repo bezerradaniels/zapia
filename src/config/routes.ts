@@ -33,7 +33,7 @@ export const ROUTES = {
   dashboardSellers: '/dashboard/vendedores',
   dashboardCoupons: '/dashboard/cupons',
   dashboardCatalog: '/dashboard/catalogo',
-  dashboardCategories: '/dashboard/categorias',
+  dashboardCategories: '/dashboard/catalogo/categorias',
   dashboardBilling: '/dashboard/assinatura',
   dashboardSupport: '/dashboard/suporte',
 
@@ -44,6 +44,7 @@ export const ROUTES = {
 
   // Store (resolved from the first path segment — paths are relative to the store root)
   storeHome: '/',
+  storeCatalog: '/catalogo',
   storeProduct: '/produto/:slug',
   storeCart: '/carrinho',
   storeCheckout: '/checkout',

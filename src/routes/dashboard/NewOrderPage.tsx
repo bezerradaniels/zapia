@@ -13,7 +13,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { useActiveStore } from '@/lib/tenant'
 import { useCustomers } from '@/features/customers'
-import { useMembers } from '@/features/sellers'
+import { useSellerCatalogs } from '@/features/sellers'
 import { useProducts } from '@/features/products'
 import { useCreateManualOrder } from '@/features/orders'
 import { usePlanLimits } from '@/features/billing'
@@ -54,7 +54,7 @@ export default function NewOrderPage() {
   const { store, isLoading } = useActiveStore()
 
   const customers = useCustomers(store?.id)
-  const members = useMembers(store?.id)
+  const sellerCatalogs = useSellerCatalogs(store?.id)
   const products = useProducts(store?.id)
   const limits = usePlanLimits(store?.id)
   const create = useCreateManualOrder(store?.id ?? '')
@@ -72,7 +72,7 @@ export default function NewOrderPage() {
   if (!store) return <Navigate to={ROUTES.onboarding} replace />
 
   const customerList = customers.data ?? []
-  const memberList = (members.data ?? []).filter((m) => m.role === 'seller')
+  const sellerList = (sellerCatalogs.data ?? []).filter((s) => s.linked_user_id)
   const productList = (products.data ?? []).filter((p) => p.is_active)
 
   const selectedCustomer = customerList.find((c) => c.whatsapp_phone === selectedPhone) ?? null
@@ -344,9 +344,9 @@ export default function NewOrderPage() {
                 className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 disabled:bg-z-bg disabled:text-z-text-hint"
               >
                 <option value="">Selecione o vendedor</option>
-                {memberList.map((m) => (
-                  <option key={m.user_id} value={m.user_id}>
-                    {m.name ?? m.email}
+                {sellerList.map((s) => (
+                  <option key={s.id} value={s.linked_user_id as string}>
+                    {s.name}
                   </option>
                 ))}
               </select>

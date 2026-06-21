@@ -45,6 +45,8 @@ export type AnalyticsEventMap = {
   product_updated: { product_id: string }
   product_deleted: { product_id: string }
   product_bulk_created: { product_count: number }
+  product_bulk_active_toggled: { product_ids: string[]; is_active: boolean }
+  product_bulk_deleted: { product_ids: string[] }
 
   // ── Vendedores ──────────────────────────────────────────────────────────
   seller_created: { seller_id: string; has_dashboard_access: boolean }

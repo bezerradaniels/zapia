@@ -11,7 +11,7 @@ import {
   UserIcon,
 } from '@hugeicons/core-free-icons'
 import { Link } from 'react-router-dom'
-import { useMembers } from '@/features/sellers'
+import { useSellerCatalogs } from '@/features/sellers'
 import { useProducts } from '@/features/products'
 import { usePlanLimits } from '@/features/billing'
 import { ROUTES } from '@/config/routes'
@@ -40,7 +40,7 @@ type Props = {
 }
 
 export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }: Props) {
-  const members = useMembers(storeId)
+  const sellerCatalogs = useSellerCatalogs(storeId)
   const products = useProducts(storeId)
   usePlanLimits(storeId)
 
@@ -145,7 +145,7 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
     (c) => c.toLowerCase().includes(categoryInput.toLowerCase()) && !categoryInterests.includes(c),
   )
 
-  const sellers = (members.data ?? []).filter((m) => m.role === 'seller' || m.role === 'owner')
+  const sellers = (sellerCatalogs.data ?? []).filter((s) => s.linked_user_id)
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-0">
@@ -401,8 +401,8 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
                 >
                   <option value="">Selecione o vendedor</option>
                   {sellers.map((s) => (
-                    <option key={s.user_id} value={s.user_id}>
-                      {s.name ?? s.email}
+                    <option key={s.id} value={s.linked_user_id as string}>
+                      {s.name}
                     </option>
                   ))}
                 </select>

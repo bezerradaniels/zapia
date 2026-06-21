@@ -90,6 +90,10 @@ export const updateStoreSchema = z.object({
   accepted_payment_methods: z.array(z.string()).optional(),
   accepted_shipping_methods: z.array(z.string()).optional(),
   delivery_hours: z.array(deliverySlotSchema).optional(),
+  delivery_area_scope: z
+    .enum(['city_only', 'state_only', 'brazil', 'worldwide', 'digital_only', 'custom'])
+    .optional(),
+  delivery_area_custom_locations: z.array(z.string()).optional(),
   custom_links: z.array(z.object({ label: z.string(), url: z.string() })).optional(),
   gallery_images: z.array(z.string()).optional(),
   social_instagram: z.string().optional().or(z.literal('')),
@@ -102,6 +106,7 @@ export const updateStoreSchema = z.object({
   age_restricted: z.boolean().optional(),
   show_out_of_stock: z.boolean().optional(),
   product_sort: z.enum(['recent', 'name_asc', 'name_desc', 'price_asc', 'price_desc']).optional(),
+  home_view: z.enum(['catalog', 'about']).optional(),
   cnpj: z.string().optional().or(z.literal('')),
   gtm_id: z
     .string()

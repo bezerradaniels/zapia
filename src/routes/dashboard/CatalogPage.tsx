@@ -1,37 +1,66 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useParams } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { LockedIcon, StoreLocationIcon, EyeIcon, ShoppingCart01Icon, InstagramIcon, NewTwitterIcon, FacebookIcon, YoutubeIcon, TiktokIcon, Globe02Icon, Settings01Icon, PaintBrush01Icon, ContactIcon, GoogleIcon, FileDownloadIcon, Alert01Icon } from '@hugeicons/core-free-icons'
+import { toast } from 'sonner'
+import { LockedIcon, StoreLocationIcon, EyeIcon, ShoppingCart01Icon, InstagramIcon, NewTwitterIcon, FacebookIcon, YoutubeIcon, TiktokIcon, Globe02Icon, Settings01Icon, PaintBrush01Icon, ContactIcon, GoogleIcon, FileDownloadIcon, Alert01Icon, Add01Icon, Edit02Icon, Delete02Icon, ArrowDown01Icon, ArrowRight02Icon, CheckmarkCircle02Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
 import {
   updateStoreSchema,
   useUpdateStore,
+  useGenerateStoreCopy,
+  useSlugAvailability,
   type UpdateStoreInput,
+  type StoreCopyKind,
 } from '@/features/catalog'
 import { useProducts } from '@/features/products'
-import { useActiveStore, buildStoreUrl } from '@/lib/tenant'
+import {
+  useCategories,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+  type Category,
+} from '@/features/categories'
+import { useActiveStore, buildStoreUrl, ROOT_DOMAIN } from '@/lib/tenant'
 import { usePlanLimits } from '@/features/billing'
 import { useCatalogPdf } from '@/lib/pdf'
 import { fromE164BR } from '@/lib/br'
 import { PhoneInput } from '@/components/forms/PhoneInput'
 import { ImageCropUploader } from '@/components/forms/ImageCropUploader'
 import { RoundMultiCheck } from '@/components/forms/RoundMultiCheck'
+import { RoundSingleCheck } from '@/components/forms/RoundSingleCheck'
+import { DeliveryAreaCustomLocations } from '@/components/forms/DeliveryAreaCustomLocations'
 import { DeliveryHoursEditor } from '@/components/forms/DeliveryHoursEditor'
 import { GalleryUploader } from '@/components/forms/GalleryUploader'
-import { Button, Field, Textarea, Label } from '@/components/ui'
+import { Button, Field, Textarea, Label, AiGenerateButton } from '@/components/ui'
 import { ROUTES } from '@/config/routes'
 import { track } from '@/features/analytics'
 import { cn } from '@/lib/utils'
 
+// Tailwind's full default palette at the 500 shade.
 const COLOR_PRESETS = [
-  '#00a82d',
-  '#25d366',
-  '#9333ea',
-  '#0ea5e9',
-  '#f59e0b',
-  '#ef4444',
-  '#141414',
+  '#64748b', // slate
+  '#6b7280', // gray
+  '#71717a', // zinc
+  '#737373', // neutral
+  '#78716c', // stone
+  '#ef4444', // red
+  '#f97316', // orange
+  '#f59e0b', // amber
+  '#eab308', // yellow
+  '#84cc16', // lime
+  '#22c55e', // green
+  '#10b981', // emerald
+  '#14b8a6', // teal
+  '#06b6d4', // cyan
+  '#0ea5e9', // sky
+  '#3b82f6', // blue
+  '#6366f1', // indigo
+  '#8b5cf6', // violet
+  '#a855f7', // purple
+  '#d946ef', // fuchsia
+  '#ec4899', // pink
+  '#f43f5e', // rose
 ]
 
 type TabId =
@@ -67,127 +96,294 @@ function catalogSectionPath(section: TabId): string {
   return `${ROUTES.dashboardCatalog}/${section}`
 }
 
+/** Most frequent product category, used as real context for AI copy
+ * generation instead of letting the model guess the store's segment. */
+function mostCommonProductCategory(products: { category: string | null }[]): string | undefined {
+  const counts = new Map<string, number>()
+  for (const p of products) {
+    if (!p.category) continue
+    counts.set(p.category, (counts.get(p.category) ?? 0) + 1)
+  }
+  let best: string | undefined
+  let bestCount = 0
+  for (const [category, count] of counts) {
+    if (count > bestCount) {
+      best = category
+      bestCount = count
+    }
+  }
+  return best
+}
+
 /* -------------------------------------------------------------------------- */
 /* CategoriesTab — reads categories derived from product.category field       */
 /* -------------------------------------------------------------------------- */
 
+type CategoryModalState =
+  | { mode: 'create'; parentId: string | null }
+  | { mode: 'edit'; category: Category }
+
 function CategoriesTab({ storeId }: { storeId: string }) {
   const products = useProducts(storeId)
-  const list = products.data ?? []
+  const categoriesQuery = useCategories(storeId)
+  const createCategory = useCreateCategory()
+  const updateCategory = useUpdateCategory(storeId)
+  const deleteCategory = useDeleteCategory(storeId)
 
-  const categoryMap = new Map<string, number>()
-  for (const p of list) {
-    if (!p.category) continue
-    categoryMap.set(p.category, (categoryMap.get(p.category) ?? 0) + 1)
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [modal, setModal] = useState<CategoryModalState | null>(null)
+  const [modalName, setModalName] = useState('')
+  const [modalError, setModalError] = useState<string | null>(null)
+
+  const productList = products.data ?? []
+  const categories = categoriesQuery.data ?? []
+  const topLevel = categories.filter((c) => !c.parent_id)
+  const childrenOf = (parentId: string) => categories.filter((c) => c.parent_id === parentId)
+  const productCountFor = (name: string) =>
+    productList.filter((p) => p.category === name || p.subcategory === name).length
+  const uncategorizedCount = productList.filter((p) => !p.category).length
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   }
-  const categories = Array.from(categoryMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b, 'pt-BR'))
-    .map(([key, count]) => ({
-      key,
-      label: key.charAt(0).toUpperCase() + key.slice(1),
-      count,
-    }))
-  const uncategorized = list.filter((p) => !p.category).length
+
+  const openCreateModal = (parentId: string | null) => {
+    setModal({ mode: 'create', parentId })
+    setModalName('')
+    setModalError(null)
+  }
+
+  const openEditModal = (category: Category) => {
+    setModal({ mode: 'edit', category })
+    setModalName(category.name)
+    setModalError(null)
+  }
+
+  const closeModal = () => {
+    setModal(null)
+    setModalName('')
+    setModalError(null)
+  }
+
+  const isSaving = createCategory.isPending || updateCategory.isPending
+
+  const handleSaveModal = async () => {
+    const name = modalName.trim()
+    if (!name) {
+      setModalError('Informe um nome.')
+      return
+    }
+    try {
+      if (modal?.mode === 'create') {
+        await createCategory.mutateAsync({ store_id: storeId, name, parent_id: modal.parentId })
+        if (modal.parentId) setExpandedIds((prev) => new Set(prev).add(modal.parentId!))
+      } else if (modal?.mode === 'edit') {
+        await updateCategory.mutateAsync({ id: modal.category.id, name })
+      }
+      closeModal()
+    } catch {
+      setModalError('Não foi possível salvar. Tente novamente.')
+    }
+  }
+
+  const handleDelete = async (category: Category) => {
+    const subs = childrenOf(category.id)
+    const message =
+      subs.length > 0
+        ? `Excluir "${category.name}" e suas ${subs.length} subcategoria(s)?`
+        : `Excluir a categoria "${category.name}"?`
+    if (!confirm(message)) return
+    await deleteCategory.mutateAsync(category.id)
+  }
 
   return (
     <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
-      <div className="mb-2 flex items-center gap-2">
-        <HugeiconsIcon icon={LockedIcon} size={20} className="text-z-text-muted" />
-        <h2 className="text-base font-semibold">Crie e gerencie as categorias do seu catálogo</h2>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <HugeiconsIcon icon={LockedIcon} size={20} className="text-z-text-muted" />
+          <h2 className="text-lg font-semibold">Categorias do catálogo</h2>
+        </div>
+        <Button type="button" size="sm" onClick={() => openCreateModal(null)}>
+          <HugeiconsIcon icon={Add01Icon} size={14} />
+          Nova categoria
+        </Button>
       </div>
 
-      <div className="flex flex-col gap-6 ml-7">
-        <p className="text-sm text-z-text-muted -mt-2">
-          Defina categorias para facilitar a pesquisa de produtos no seu catálogo
+      <div className="flex flex-col gap-4 ml-7">
+        <p className="-mt-2 text-sm text-z-text-muted">
+          Organize seus produtos em categorias e subcategorias. Elas aparecem na tela inicial do
+          catálogo, em ordem alfabética, e seus clientes podem filtrar os produtos usando elas.
         </p>
 
-        {/* Stats cards */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-3 rounded-xl bg-z-green p-5 text-z-ink">
-            <span className="text-2xl font-bold">{categories.length}</span>
-            <span className="text-sm font-medium opacity-90">Categorias</span>
-            <Link
-              to={ROUTES.dashboardCategories}
-              className="flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-3 py-1.5 text-xs font-semibold hover:bg-white/25 transition-colors w-fit"
-            >
-              Gerenciar →
-            </Link>
-          </div>
-          <div className="flex flex-col gap-3 rounded-xl border border-z-border bg-z-bg p-5">
-            <span className="text-2xl font-bold text-z-text">{list.length}</span>
-            <span className="text-sm font-medium text-z-text-muted">Produtos</span>
-            <Link
-              to={ROUTES.dashboardProducts}
-              className="flex items-center gap-1.5 rounded-full border border-z-border bg-white px-3 py-1.5 text-xs font-semibold text-z-text-muted hover:bg-z-bg2 transition-colors w-fit"
-            >
-              Ver todos →
-            </Link>
-          </div>
-        </div>
-
-        {/* Info note */}
-        <div className="flex items-start gap-3 rounded-xl border border-[#FDE047] bg-[#FEF9C3] p-4 text-sm text-[#854D0E]">
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white">
-            <span className="text-lg">💡</span>
-          </div>
-          <p>
-            <strong>Importante:</strong> As categorias são exibidas na tela inicial do seu catálogo, em ordem alfabética, e seus clientes poderão filtrar os produtos usando elas.
-          </p>
-        </div>
-
-        {/* Category list */}
-        {products.isLoading ? (
+        {categoriesQuery.isLoading ? (
           <p className="text-sm text-z-text-muted">Carregando categorias...</p>
-        ) : categories.length === 0 ? (
+        ) : topLevel.length === 0 ? (
           <div className="rounded-xl border border-dashed border-z-border p-6 text-center">
             <p className="text-sm font-medium text-z-text">Nenhuma categoria cadastrada</p>
             <p className="mt-1 text-xs text-z-text-hint">
-              Adicione categorias aos seus produtos para que elas apareçam aqui e no catálogo.
+              Crie categorias para organizar seus produtos e facilitar a busca no catálogo.
             </p>
-            <Link
-              to={ROUTES.dashboardCategories}
-              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-z-green px-4 py-2 text-xs font-bold text-z-ink hover:opacity-90 transition-opacity"
-            >
-              Adicionar categorias
-            </Link>
+            <Button type="button" size="sm" className="mt-3" onClick={() => openCreateModal(null)}>
+              <HugeiconsIcon icon={Add01Icon} size={14} />
+              Adicionar categoria
+            </Button>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-semibold text-z-text">Categorias cadastradas</h3>
-            <div className="flex flex-col gap-2">
-              {categories.map((c) => (
-                <div
-                  key={c.key}
-                  className="flex items-center justify-between rounded-xl border border-z-border bg-z-bg px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="font-medium text-z-text">{c.label}</span>
-                    <span className="rounded-full bg-z-border px-2 py-0.5 text-xs text-z-text-muted">
-                      {c.count} {c.count === 1 ? 'produto' : 'produtos'}
-                    </span>
+            {topLevel.map((cat) => {
+              const subs = childrenOf(cat.id)
+              const isExpanded = expandedIds.has(cat.id)
+              const count = productCountFor(cat.name)
+
+              return (
+                <div key={cat.id} className="rounded-xl border border-z-border bg-z-bg">
+                  <div className="flex items-center gap-2 px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(cat.id)}
+                      disabled={subs.length === 0}
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-bg2 disabled:opacity-30"
+                    >
+                      <HugeiconsIcon icon={isExpanded ? ArrowDown01Icon : ArrowRight02Icon} size={14} />
+                    </button>
+
+                    <span className="flex-1 font-medium text-z-text">{cat.name}</span>
+
+                    {count > 0 && (
+                      <span className="rounded-full bg-z-border px-2 py-0.5 text-[11px] text-z-text-muted">
+                        {count} {count === 1 ? 'produto' : 'produtos'}
+                      </span>
+                    )}
+                    {subs.length > 0 && (
+                      <span className="rounded-full bg-z-border px-2 py-0.5 text-[11px] text-z-text-muted">
+                        {subs.length} {subs.length === 1 ? 'sub' : 'subs'}
+                      </span>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => openCreateModal(cat.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-bg2"
+                      aria-label="Adicionar subcategoria"
+                      title="Adicionar subcategoria"
+                    >
+                      <HugeiconsIcon icon={Add01Icon} size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(cat)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-bg2"
+                      aria-label="Editar categoria"
+                    >
+                      <HugeiconsIcon icon={Edit02Icon} size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(cat)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-primary/10 hover:text-z-primary"
+                      aria-label="Excluir categoria"
+                    >
+                      <HugeiconsIcon icon={Delete02Icon} size={14} />
+                    </button>
                   </div>
-                  <Link
-                    to={ROUTES.dashboardProducts}
-                    className="text-xs font-medium text-[#10b981] hover:underline"
-                  >
-                    Ver produtos →
-                  </Link>
+
+                  {isExpanded && subs.length > 0 && (
+                    <div className="flex flex-col gap-1.5 border-t border-z-border bg-white px-4 py-3">
+                      {subs.map((sub) => {
+                        const subCount = productCountFor(sub.name)
+                        return (
+                          <div
+                            key={sub.id}
+                            className="flex items-center gap-2 rounded-lg border border-z-border bg-z-bg px-3 py-2"
+                          >
+                            <span className="text-z-text-hint">└</span>
+                            <span className="flex-1 text-sm text-z-text">{sub.name}</span>
+                            {subCount > 0 && (
+                              <span className="rounded-full bg-z-border px-2 py-0.5 text-[11px] text-z-text-muted">
+                                {subCount} {subCount === 1 ? 'produto' : 'produtos'}
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => openEditModal(sub)}
+                              className="flex h-7 w-7 items-center justify-center rounded-md text-z-text-muted hover:bg-z-bg2"
+                              aria-label="Editar subcategoria"
+                            >
+                              <HugeiconsIcon icon={Edit02Icon} size={12} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(sub)}
+                              className="flex h-7 w-7 items-center justify-center rounded-md text-z-text-muted hover:bg-z-primary/10 hover:text-z-primary"
+                              aria-label="Excluir subcategoria"
+                            >
+                              <HugeiconsIcon icon={Delete02Icon} size={12} />
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
-              ))}
-              {uncategorized > 0 && (
-                <div className="flex items-center justify-between rounded-xl border border-dashed border-z-border px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-z-text-muted">Sem categoria</span>
-                    <span className="rounded-full bg-z-border px-2 py-0.5 text-xs text-z-text-hint">
-                      {uncategorized} {uncategorized === 1 ? 'produto' : 'produtos'}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
+              )
+            })}
+
+            {uncategorizedCount > 0 && (
+              <div className="flex items-center justify-between rounded-xl border border-dashed border-z-border px-4 py-3">
+                <span className="text-sm text-z-text-muted">Sem categoria</span>
+                <span className="rounded-full bg-z-border px-2 py-0.5 text-xs text-z-text-hint">
+                  {uncategorizedCount} {uncategorizedCount === 1 ? 'produto' : 'produtos'}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+          <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="text-base font-semibold">
+              {modal.mode === 'edit'
+                ? 'Editar categoria'
+                : modal.parentId
+                  ? 'Nova subcategoria'
+                  : 'Nova categoria'}
+            </h3>
+            <Field
+              label="Nome"
+              placeholder="Ex.: Bebidas"
+              value={modalName}
+              onChange={(e) => {
+                setModalName(e.target.value)
+                setModalError(null)
+              }}
+              maxLength={60}
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleSaveModal()
+                }
+              }}
+            />
+            {modalError && <p className="text-xs text-destructive">{modalError}</p>}
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="ghost" onClick={closeModal} disabled={isSaving}>
+                Cancelar
+              </Button>
+              <Button type="button" onClick={handleSaveModal} disabled={isSaving}>
+                {isSaving ? 'Salvando...' : 'Salvar'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
@@ -202,8 +398,13 @@ export default function CatalogPage() {
   const canTheme = limits.canUse('theme')
   const canPdf = limits.canUse('pdf')
   const canGallery = limits.canUse('gallery')
+  const canAi = limits.canUse('ai')
   const products = useProducts(store?.id)
   const { download: downloadPdf, isGenerating: isGeneratingPdf } = useCatalogPdf()
+  const { generate: generateStoreCopy } = useGenerateStoreCopy()
+  const [generatingKind, setGeneratingKind] = useState<StoreCopyKind | null>(null)
+  const [colorModalOpen, setColorModalOpen] = useState(false)
+  const [colorDraft, setColorDraft] = useState('#000000')
   const activeTab = isTabId(section) ? section : 'gerais'
 
   const form = useForm<UpdateStoreInput>({
@@ -234,6 +435,8 @@ export default function CatalogPage() {
       accepted_payment_methods: ['cash', 'pix', 'credit_card', 'debit_card'],
       accepted_shipping_methods: ['delivery', 'pickup_in_store'],
       delivery_hours: [],
+      delivery_area_scope: 'city_only',
+      delivery_area_custom_locations: [],
       custom_links: [],
       gallery_images: [],
       social_instagram: '',
@@ -246,10 +449,13 @@ export default function CatalogPage() {
       age_restricted: false,
       show_out_of_stock: false,
       product_sort: 'recent',
+      home_view: 'catalog',
       cnpj: '',
       gtm_id: '',
     },
   })
+
+  const slugAvailability = useSlugAvailability(form.watch('slug') ?? '', store?.slug ?? '')
 
   useEffect(() => {
     if (!store) return
@@ -279,6 +485,8 @@ export default function CatalogPage() {
       accepted_payment_methods: store.accepted_payment_methods ?? ['cash', 'pix', 'credit_card', 'debit_card'],
       accepted_shipping_methods: store.accepted_shipping_methods ?? ['delivery', 'pickup_in_store'],
       delivery_hours: store.delivery_hours ?? [],
+      delivery_area_scope: store.delivery_area_scope ?? 'city_only',
+      delivery_area_custom_locations: store.delivery_area_custom_locations ?? [],
       custom_links: (store.custom_links ?? []) as { label: string; url: string }[],
       gallery_images: (store.gallery_images ?? []) as string[],
       social_instagram: store.social_links?.instagram ?? '',
@@ -291,6 +499,7 @@ export default function CatalogPage() {
       age_restricted: store.age_restricted ?? false,
       show_out_of_stock: store.show_out_of_stock ?? false,
       product_sort: store.product_sort ?? 'recent',
+      home_view: store.home_view ?? 'catalog',
       cnpj: store.cnpj ?? '',
       gtm_id: store.gtm_id ?? '',
     })
@@ -299,6 +508,11 @@ export default function CatalogPage() {
   if (!store) {
     return <p className="text-sm text-z-text-muted">Carregando...</p>
   }
+
+  const slugLocked = !!(
+    store.slug_last_updated_at &&
+    new Date().getTime() - new Date(store.slug_last_updated_at).getTime() < 90 * 24 * 60 * 60 * 1000
+  )
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
@@ -314,6 +528,28 @@ export default function CatalogPage() {
       })
     }
   })
+
+  const handleGenerateCopy = async (kind: StoreCopyKind) => {
+    setGeneratingKind(kind)
+    try {
+      const text = await generateStoreCopy({
+        storeId: store.id,
+        kind,
+        name: form.getValues('name') || store.name,
+        category: mostCommonProductCategory(products.data ?? []),
+        slogan: form.getValues('slogan') || undefined,
+        aboutUs: form.getValues('about_us') || undefined,
+      })
+      form.setValue(kind === 'slogan' ? 'slogan' : 'about_us', text, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+    } catch {
+      toast.error('Não foi possível gerar o texto. Tente novamente.')
+    } finally {
+      setGeneratingKind(null)
+    }
+  }
 
   const logoPreview = form.watch('logo_url')
   const primaryColor = form.watch('primary_color')
@@ -393,7 +629,14 @@ export default function CatalogPage() {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <span className="text-sm font-medium text-z-text">Slogan da loja</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-z-text">Slogan da loja</span>
+                      <AiGenerateButton
+                        canUse={canAi}
+                        isLoading={generatingKind === 'slogan'}
+                        onClick={() => handleGenerateCopy('slogan')}
+                      />
+                    </div>
                     <Field
                       placeholder="Produtos que encantam, feitos para você!"
                       error={form.formState.errors.slogan?.message}
@@ -402,7 +645,14 @@ export default function CatalogPage() {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="sobre">Sobre nós</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="sobre">Sobre nós</Label>
+                      <AiGenerateButton
+                        canUse={canAi}
+                        isLoading={generatingKind === 'about'}
+                        onClick={() => handleGenerateCopy('about')}
+                      />
+                    </div>
                     <Textarea
                       id="sobre"
                       placeholder="Conte um pouco sobre a sua loja..."
@@ -465,7 +715,7 @@ export default function CatalogPage() {
                       <span className="text-sm font-medium">Habilitar a exibição de produtos fora de estoque</span>
                       <div className="relative inline-flex items-center">
                         <input type="checkbox" className="peer sr-only" {...form.register('show_out_of_stock')} />
-                        <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-z-green peer-checked:after:translate-x-full peer-focus:outline-none"></div>
+                        <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                       </div>
                     </label>
                   </div>
@@ -496,6 +746,39 @@ export default function CatalogPage() {
                     </div>
                   </div>
                 </section>
+
+                <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <HugeiconsIcon icon={StoreLocationIcon} size={20} className="text-z-text-muted" />
+                      <h2 className="text-base font-semibold">Página inicial do catálogo</h2>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 ml-7">
+                    <p className="text-sm text-z-text-muted">
+                      Escolha o que seus clientes verão ao abrir o link da sua loja. A outra opção
+                      continua disponível em sua própria página.
+                    </p>
+
+                    <div className="max-w-md">
+                      <RoundSingleCheck
+                        options={[
+                          { value: 'catalog', label: 'Catálogo' },
+                          { value: 'about', label: 'Sobre' },
+                        ]}
+                        value={form.watch('home_view') ?? 'catalog'}
+                        onChange={(next) =>
+                          form.setValue(
+                            'home_view',
+                            next as UpdateStoreInput['home_view'],
+                            { shouldDirty: true },
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                </section>
               </div>
             )}
 
@@ -503,8 +786,8 @@ export default function CatalogPage() {
             {activeTab === 'aparencia' && (
               <section className="flex flex-col gap-6">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
-                    <h2 className="text-base font-semibold">Logo do catálogo</h2>
+                  <div className="flex flex-col gap-1 rounded-2xl border border-z-border bg-white p-6">
+                    <h2 className="text-lg font-semibold">Logo do catálogo</h2>
                     <ImageCropUploader
                       bucket="store-logos"
                       storeId={store.id}
@@ -526,8 +809,8 @@ export default function CatalogPage() {
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
-                    <h2 className="text-base font-semibold">Banner do catálogo</h2>
+                  <div className="flex flex-col gap-1 rounded-2xl border border-z-border bg-white p-6">
+                    <h2 className="text-lg font-semibold">Banner do catálogo</h2>
                     <ImageCropUploader
                       bucket="store-logos"
                       storeId={store.id}
@@ -552,7 +835,7 @@ export default function CatalogPage() {
 
                 <div className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-base font-semibold">Cor do tema do catálogo</h2>
+                    <h2 className="text-lg font-semibold">Cor do tema do catálogo</h2>
                     {!canTheme && (
                       <Link
                         to={ROUTES.dashboardBilling}
@@ -566,81 +849,118 @@ export default function CatalogPage() {
 
                   <fieldset
                     disabled={!canTheme}
-                    className={cn('flex flex-col gap-3', !canTheme && 'opacity-60')}
+                    className={cn('flex flex-col gap-4', !canTheme && 'opacity-60')}
                   >
-                    {/* Preset swatches */}
-                    <div className="flex flex-wrap gap-2">
-                      {COLOR_PRESETS.map((c) => (
-                        <button
-                          key={c}
-                          type="button"
-                          onClick={() => form.setValue('primary_color', c, { shouldDirty: true, shouldValidate: true })}
-                          aria-label={`Cor ${c}`}
-                          className={cn(
-                            'relative h-9 w-9 rounded-full transition-transform hover:scale-110 disabled:cursor-not-allowed disabled:hover:scale-100',
-                            isPresetColor(primaryColor ?? '') && primaryColor?.toLowerCase() === c.toLowerCase()
-                              ? 'ring-2 ring-z-ink ring-offset-2'
-                              : '',
-                          )}
-                          style={{ background: c }}
-                        >
-                          {isPresetColor(primaryColor ?? '') && primaryColor?.toLowerCase() === c.toLowerCase() && (
-                            <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">✓</span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Custom color row */}
-                    <div className="flex items-center gap-2">
-                      <label className="relative cursor-pointer" title="Escolher cor personalizada">
-                        <input
-                          type="color"
-                          value={primaryColor ?? '#000000'}
-                          onChange={(e) => form.setValue('primary_color', e.target.value, { shouldDirty: true, shouldValidate: true })}
-                          className="sr-only"
-                          disabled={!canTheme}
-                        />
-                        <div
-                          className={cn(
-                            'flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed transition-all hover:scale-110',
-                            !isPresetColor(primaryColor ?? '') ? 'ring-2 ring-z-ink ring-offset-2 border-z-ink' : 'border-z-border',
-                          )}
-                          style={{ backgroundColor: !isPresetColor(primaryColor ?? '') ? (primaryColor ?? 'transparent') : 'transparent' }}
-                        >
-                          {isPresetColor(primaryColor ?? '') && (
-                            <span className="text-lg leading-none text-z-text-hint">+</span>
-                          )}
-                          {!isPresetColor(primaryColor ?? '') && (
-                            <span className="text-white text-xs font-bold">✓</span>
-                          )}
-                        </div>
-                      </label>
-                      <input
-                        type="text"
-                        value={(primaryColor ?? '').toUpperCase()}
-                        onChange={(e) => {
-                          const v = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`
-                          if (/^#[0-9a-fA-F]{6}$/.test(v)) {
-                            form.setValue('primary_color', v, { shouldDirty: true, shouldValidate: true })
-                          }
-                        }}
-                        maxLength={7}
-                        placeholder="#000000"
-                        disabled={!canTheme}
-                        className="h-9 w-28 rounded-lg border border-z-border px-3 text-sm font-mono text-z-text outline-none focus:border-z-green disabled:cursor-not-allowed disabled:opacity-60"
-                      />
+                    {/* Current color */}
+                    <div className="flex items-center gap-3">
                       <div
-                        className="h-9 w-9 rounded-full border border-z-border shadow-sm"
+                        className="h-12 w-12 shrink-0 rounded-full border border-z-border shadow-sm"
                         style={{ backgroundColor: primaryColor ?? '#000000' }}
                       />
+                      <div className="flex flex-col">
+                        <span className="text-xs text-z-text-hint">Cor atual</span>
+                        <span className="text-sm font-mono font-medium text-z-text">
+                          {(primaryColor ?? '').toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm font-medium text-z-text">Escolher nova cor:</span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {COLOR_PRESETS.map((c) => (
+                          <button
+                            key={c}
+                            type="button"
+                            onClick={() => form.setValue('primary_color', c, { shouldDirty: true, shouldValidate: true })}
+                            aria-label={`Cor ${c}`}
+                            className={cn(
+                              'relative h-[18px] w-[18px] rounded-full transition-transform hover:scale-110 disabled:cursor-not-allowed disabled:hover:scale-100',
+                              isPresetColor(primaryColor ?? '') && primaryColor?.toLowerCase() === c.toLowerCase()
+                                ? 'ring-2 ring-z-ink ring-offset-2'
+                                : '',
+                            )}
+                            style={{ background: c }}
+                          >
+                            {isPresetColor(primaryColor ?? '') && primaryColor?.toLowerCase() === c.toLowerCase() && (
+                              <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-white">✓</span>
+                            )}
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setColorDraft(primaryColor ?? '#000000')
+                            setColorModalOpen(true)
+                          }}
+                          disabled={!canTheme}
+                          className="flex h-9 items-center gap-1.5 rounded-full border border-z-border px-3 text-xs font-medium text-z-text transition-colors hover:bg-z-bg2 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          <HugeiconsIcon icon={PaintBrush01Icon} size={14} />
+                          Cor personalizada
+                        </button>
+                      </div>
                     </div>
                   </fieldset>
                 </div>
+
+                {colorModalOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+                    <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-white p-6 shadow-2xl">
+                      <h3 className="text-base font-semibold">Cor personalizada</h3>
+
+                      <div className="flex items-center gap-3">
+                        <label className="cursor-pointer" title="Escolher no seletor de cores">
+                          <input
+                            type="color"
+                            value={/^#[0-9a-fA-F]{6}$/.test(colorDraft) ? colorDraft : '#000000'}
+                            onChange={(e) => setColorDraft(e.target.value)}
+                            className="sr-only"
+                          />
+                          <div
+                            className="h-12 w-12 rounded-full border border-z-border shadow-sm"
+                            style={{
+                              backgroundColor: /^#[0-9a-fA-F]{6}$/.test(colorDraft) ? colorDraft : 'transparent',
+                            }}
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          value={colorDraft.toUpperCase()}
+                          onChange={(e) => {
+                            const v = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`
+                            setColorDraft(v)
+                          }}
+                          maxLength={7}
+                          placeholder="#000000"
+                          className="h-11 flex-1 rounded-lg border border-z-border px-3 text-sm font-mono text-z-text outline-none focus:border-z-green"
+                        />
+                      </div>
+
+                      <div className="flex justify-end gap-2">
+                        <Button type="button" variant="ghost" onClick={() => setColorModalOpen(false)}>
+                          Cancelar
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            if (/^#[0-9a-fA-F]{6}$/.test(colorDraft)) {
+                              form.setValue('primary_color', colorDraft, { shouldDirty: true, shouldValidate: true })
+                              setColorModalOpen(false)
+                            }
+                          }}
+                          disabled={!/^#[0-9a-fA-F]{6}$/.test(colorDraft)}
+                        >
+                          Confirmar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {/* Galeria de fotos */}
-                <div className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
+                <div className="flex flex-col gap-1 rounded-2xl border border-z-border bg-white p-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-base font-semibold">Galeria de fotos</h2>
+                    <h2 className="text-lg font-semibold">Galeria de fotos</h2>
                     {!canGallery && (
                       <Link
                         to={ROUTES.dashboardBilling}
@@ -869,7 +1189,7 @@ export default function CatalogPage() {
                       <span className="font-medium text-z-text">Ativar o carrinho</span>
                       <div className="relative inline-flex items-center">
                         <input type="checkbox" className="peer sr-only" {...form.register('cart_enabled')} />
-                        <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-z-green peer-checked:after:translate-x-full peer-focus:outline-none"></div>
+                        <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                       </div>
                     </label>
 
@@ -894,21 +1214,21 @@ export default function CatalogPage() {
                         <span className="font-medium text-z-text">Solicitar forma de entrega</span>
                         <div className="relative inline-flex items-center">
                           <input type="checkbox" className="peer sr-only" {...form.register('require_shipping_choice')} />
-                          <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-z-green peer-checked:after:translate-x-full peer-focus:outline-none"></div>
+                          <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                         </div>
                       </label>
                       <label className="flex items-center justify-between rounded-xl border border-z-border p-4 cursor-pointer bg-z-bg transition-colors hover:bg-z-bg2">
                         <span className="font-medium text-z-text">Solicitar o CPF ou CNPJ do cliente</span>
                         <div className="relative inline-flex items-center">
                           <input type="checkbox" className="peer sr-only" {...form.register('require_cpf')} />
-                          <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-z-green peer-checked:after:translate-x-full peer-focus:outline-none"></div>
+                          <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                         </div>
                       </label>
                       <label className="flex items-center justify-between rounded-xl border border-z-border p-4 cursor-pointer bg-z-bg transition-colors hover:bg-z-bg2">
                         <span className="font-medium text-z-text">Solicitar forma de pagamento</span>
                         <div className="relative inline-flex items-center">
                           <input type="checkbox" className="peer sr-only" {...form.register('require_payment_choice')} />
-                          <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-z-green peer-checked:after:translate-x-full peer-focus:outline-none"></div>
+                          <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                         </div>
                       </label>
                     </div>
@@ -968,7 +1288,7 @@ export default function CatalogPage() {
                       <span className="font-medium text-z-text">Ativar o botão do WhatsApp</span>
                       <div className="relative inline-flex items-center">
                         <input type="checkbox" className="peer sr-only" {...form.register('whatsapp_button_enabled')} />
-                        <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-z-green peer-checked:after:translate-x-full peer-focus:outline-none"></div>
+                        <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                       </div>
                     </label>
 
@@ -1061,6 +1381,49 @@ export default function CatalogPage() {
                       value={form.watch('delivery_hours') ?? []}
                       onChange={(next) => form.setValue('delivery_hours', next, { shouldDirty: true })}
                     />
+                  </div>
+
+                  <hr className="border-z-border" />
+
+                  <div className="flex flex-col gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-z-text">Local de entrega</p>
+                      <p className="mt-0.5 text-xs text-z-text-muted">
+                        Escolha a área para onde você entrega os pedidos da sua loja.
+                      </p>
+                    </div>
+                    <RoundSingleCheck
+                      options={[
+                        {
+                          value: 'city_only',
+                          label: form.watch('address_city')
+                            ? `Apenas na cidade (${form.watch('address_city')})`
+                            : 'Apenas na cidade',
+                        },
+                        { value: 'state_only', label: 'Apenas meu estado' },
+                        { value: 'brazil', label: 'Brasil inteiro' },
+                        { value: 'worldwide', label: 'Mundo inteiro' },
+                        { value: 'digital_only', label: 'Apenas digital' },
+                        { value: 'custom', label: 'Personalizado' },
+                      ]}
+                      value={form.watch('delivery_area_scope') ?? 'city_only'}
+                      onChange={(next) =>
+                        form.setValue(
+                          'delivery_area_scope',
+                          next as UpdateStoreInput['delivery_area_scope'],
+                          { shouldDirty: true },
+                        )
+                      }
+                    />
+
+                    {form.watch('delivery_area_scope') === 'custom' && (
+                      <DeliveryAreaCustomLocations
+                        value={form.watch('delivery_area_custom_locations') ?? []}
+                        onChange={(next) =>
+                          form.setValue('delivery_area_custom_locations', next, { shouldDirty: true })
+                        }
+                      />
+                    )}
                   </div>
                 </div>
               </section>
@@ -1229,15 +1592,15 @@ export default function CatalogPage() {
                       Este é o link que você deve compartilhar com seus clientes para que eles acessem seu catálogo online.
                     </p>
 
-                    <div className="flex items-center gap-2 rounded-xl border border-z-border bg-z-bg p-4">
-                      <div className="flex-1 truncate font-medium text-z-text">
+                    <div className="flex h-11 items-center gap-2 rounded-lg border border-z-border bg-z-bg px-3.5">
+                      <div className="flex-1 truncate text-sm font-medium text-z-text">
                         {buildStoreUrl(store.slug).replace(/^https?:\/\//, '')}
                       </div>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="h-8 rounded-lg px-3 text-xs"
+                        className="h-8 shrink-0 rounded-lg px-3 text-xs"
                         onClick={() => {
                           navigator.clipboard.writeText(buildStoreUrl(store.slug))
                           track('share_link_copied', {
@@ -1255,28 +1618,43 @@ export default function CatalogPage() {
 
                     <div className="flex flex-col gap-1.5">
                       <label className="text-sm font-medium text-z-text">Alterar URL da loja</label>
-                      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
-                        <span className="shrink-0 text-sm text-z-text-hint">zapia.app/</span>
+                      <div className="flex items-center gap-2">
                         <input
                           className={cn(
-                            "h-11 w-full flex-1 rounded-lg border border-z-border bg-white px-3.5 text-sm transition-colors placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20",
-                            (store.slug_last_updated_at && (new Date().getTime() - new Date(store.slug_last_updated_at).getTime()) < 90 * 24 * 60 * 60 * 1000) && "opacity-50 cursor-not-allowed bg-z-bg"
+                            "h-12 w-40 min-w-0 rounded-lg border bg-white px-3.5 text-sm transition-colors placeholder:text-z-text-hint focus:outline-none focus:ring-2",
+                            form.formState.errors.slug || slugAvailability === 'taken'
+                              ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
+                              : slugAvailability === 'available'
+                                ? 'border-[#10b981] focus:border-[#10b981] focus:ring-[#10b981]/20'
+                                : 'border-z-border focus:border-z-green focus:ring-z-green/20',
+                            slugLocked && "opacity-50 cursor-not-allowed bg-z-bg"
                           )}
                           placeholder="seu-endereco"
-                          disabled={!!(store.slug_last_updated_at && (new Date().getTime() - new Date(store.slug_last_updated_at).getTime()) < 90 * 24 * 60 * 60 * 1000)}
+                          disabled={slugLocked}
                           {...form.register('slug')}
                         />
+                        <span className="shrink-0 text-sm text-z-text-hint">.{ROOT_DOMAIN}</span>
                       </div>
-                      {form.formState.errors.slug && (
+                      {form.formState.errors.slug ? (
                         <span className="text-xs text-destructive">{form.formState.errors.slug.message}</span>
-                      )}
-                      
-                      {store.slug_last_updated_at && (new Date().getTime() - new Date(store.slug_last_updated_at).getTime()) < 90 * 24 * 60 * 60 * 1000 ? (
+                      ) : slugAvailability === 'taken' ? (
+                        <span className="flex items-center gap-1 text-xs font-medium text-red-500">
+                          <HugeiconsIcon icon={Cancel01Icon} size={13} />
+                          Nome indisponível
+                        </span>
+                      ) : slugAvailability === 'available' ? (
+                        <span className="flex items-center gap-1 text-xs font-medium text-[#10b981]">
+                          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={13} />
+                          Nome disponível
+                        </span>
+                      ) : null}
+
+                      {slugLocked ? (
                         <div className="flex items-center gap-2 text-xs text-amber-600 font-medium bg-amber-50 p-2 rounded-lg mt-1 border border-amber-100">
                           <HugeiconsIcon icon={Alert01Icon} size={14} />
                           <span>
                             Você alterou sua URL recentemente. Uma nova alteração será permitida em{' '}
-                            {new Date(new Date(store.slug_last_updated_at).getTime() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')}.
+                            {new Date(new Date(store.slug_last_updated_at!).getTime() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')}.
                           </span>
                         </div>
                       ) : (

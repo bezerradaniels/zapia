@@ -159,7 +159,7 @@ export function ImageCropUploader({
   return (
     <>
       <div className="flex flex-col gap-2">
-        <span className="text-[11px] font-semibold text-z-text-hint">
+        <span className="text-[13px] font-semibold text-z-text-hint">
           {label}
         </span>
 
@@ -186,7 +186,7 @@ export function ImageCropUploader({
               <button
                 type="button"
                 onClick={remove}
-                className="flex items-center gap-1.5 rounded-lg border border-z-primary/30 bg-z-primary/10 px-3 py-1.5 text-xs font-medium text-z-primary hover:bg-z-primary/15"
+                className="flex items-center gap-1.5 rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
               >
                 <HugeiconsIcon icon={DeleteIcon} size={13} />
                 Remover
@@ -197,14 +197,15 @@ export function ImageCropUploader({
           <button
             type="button"
             onClick={pick}
-            className="flex w-fit items-center gap-2 rounded-lg border border-dashed border-z-green bg-z-green/5 px-4 py-2 text-xs font-medium text-[#10b981] transition-colors hover:bg-z-green/10"
+            style={{ backgroundColor: '#10b981' }}
+            className="flex w-fit items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium text-white transition-opacity hover:opacity-85"
           >
             <HugeiconsIcon icon={ImageIcon} size={15} />
             Clique para enviar
           </button>
         )}
 
-        {hint && <span className="text-[11px] text-z-text-hint">{hint}</span>}
+        {hint && <span className="text-[13px] text-z-text-hint">{hint}</span>}
         {error && <p className="text-xs text-destructive">{error}</p>}
 
         <input

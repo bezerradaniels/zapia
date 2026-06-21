@@ -831,9 +831,12 @@ export type Database = {
           currency: string
           custom_links: Json
           deleted_at: string | null
+          delivery_area_custom_locations: string[]
+          delivery_area_scope: Database["public"]["Enums"]["delivery_area_scope"]
           delivery_hours: Json
           gallery_images: Json
           gtm_id: string | null
+          home_view: Database["public"]["Enums"]["store_home_view"]
           id: string
           instagram: string | null
           locale: string
@@ -878,9 +881,12 @@ export type Database = {
           currency?: string
           custom_links?: Json
           deleted_at?: string | null
+          delivery_area_custom_locations?: string[]
+          delivery_area_scope?: Database["public"]["Enums"]["delivery_area_scope"]
           delivery_hours?: Json
           gallery_images?: Json
           gtm_id?: string | null
+          home_view?: Database["public"]["Enums"]["store_home_view"]
           id?: string
           instagram?: string | null
           locale?: string
@@ -925,9 +931,12 @@ export type Database = {
           currency?: string
           custom_links?: Json
           deleted_at?: string | null
+          delivery_area_custom_locations?: string[]
+          delivery_area_scope?: Database["public"]["Enums"]["delivery_area_scope"]
           delivery_hours?: Json
           gallery_images?: Json
           gtm_id?: string | null
+          home_view?: Database["public"]["Enums"]["store_home_view"]
           id?: string
           instagram?: string | null
           locale?: string
@@ -1075,6 +1084,13 @@ export type Database = {
     }
     Enums: {
       coupon_discount_type: "percent" | "fixed"
+      delivery_area_scope:
+        | "city_only"
+        | "state_only"
+        | "brazil"
+        | "worldwide"
+        | "digital_only"
+        | "custom"
       notification_type:
         | "order_new"
         | "payment_failed"
@@ -1102,6 +1118,7 @@ export type Database = {
         | "pickup_in_store"
         | "room_service"
         | "digital"
+      store_home_view: "catalog" | "about"
       store_role: "owner" | "seller"
       subscription_status:
         | "none"
@@ -1241,6 +1258,14 @@ export const Constants = {
   public: {
     Enums: {
       coupon_discount_type: ["percent", "fixed"],
+      delivery_area_scope: [
+        "city_only",
+        "state_only",
+        "brazil",
+        "worldwide",
+        "digital_only",
+        "custom",
+      ],
       notification_type: [
         "order_new",
         "payment_failed",
@@ -1272,6 +1297,7 @@ export const Constants = {
         "room_service",
         "digital",
       ],
+      store_home_view: ["catalog", "about"],
       store_role: ["owner", "seller"],
       subscription_status: [
         "none",

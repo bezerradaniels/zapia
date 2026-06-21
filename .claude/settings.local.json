@@ -12,7 +12,8 @@
       "Read(//Users/danibezerra/Library/Caches/ms-playwright/**)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "mcp__claude_ai_Supabase__get_logs"
+      "mcp__claude_ai_Supabase__get_logs",
+      "mcp__claude_ai_Supabase__generate_typescript_types"
     ]
   }
 }

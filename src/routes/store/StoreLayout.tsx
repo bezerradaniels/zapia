@@ -41,7 +41,7 @@ import { track } from '@/features/analytics'
 import type { Store, PaymentMethod, ShippingMethod } from '@/types/domain'
 import { OwnerModeContext } from './storeOwnerMode'
 
-const SHOW_HERO_PATHS = new Set(['/'])
+const CATALOG_HERO_PATHS = new Set(['/', '/catalogo'])
 
 function GtmScript({ gtmId }: { gtmId: string }) {
   useEffect(() => {
@@ -157,7 +157,9 @@ export default function StoreLayout() {
   const storeRoute = isStoreDomain()
     ? location.pathname
     : location.pathname.replace(buildStorePath(store.slug), '') || '/'
-  const showHero = SHOW_HERO_PATHS.has(storeRoute)
+  const showHero =
+    CATALOG_HERO_PATHS.has(storeRoute) &&
+    (storeRoute !== '/' || store.home_view !== 'about')
   const hideFloatingCartRoutes = new Set(['/carrinho', '/checkout'])
   const showFloatingCart = cartCount > 0 && !hideFloatingCartRoutes.has(storeRoute)
 

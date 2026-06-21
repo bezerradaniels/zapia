@@ -37,7 +37,16 @@ export async function generateContent(
 
   const body: Record<string, unknown> = {
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: { temperature, maxOutputTokens, responseMimeType },
+    generationConfig: {
+      temperature,
+      maxOutputTokens,
+      responseMimeType,
+      // gemini-2.5-flash spends part of maxOutputTokens on internal "thinking"
+      // before writing the final answer — for short copywriting tasks this
+      // can consume the whole budget and truncate the response to nothing.
+      // We don't need reasoning here, so disable it.
+      thinkingConfig: { thinkingBudget: 0 },
+    },
   }
 
   if (systemInstruction) {

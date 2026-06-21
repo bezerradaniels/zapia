@@ -1,4 +1,4 @@
-const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN ?? 'zapia.app'
+export const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN ?? 'zapia.app'
 
 const RESERVED_SUBDOMAINS = new Set(['www', 'app', 'staging', 'admin', 'api', 'mail'])
 

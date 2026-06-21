@@ -25,6 +25,16 @@ export type ProductSortOrder =
   | 'price_asc'
   | 'price_desc'
 
+export type DeliveryAreaScope =
+  | 'city_only'
+  | 'state_only'
+  | 'brazil'
+  | 'worldwide'
+  | 'digital_only'
+  | 'custom'
+
+export type StoreHomeView = 'catalog' | 'about'
+
 export type DeliverySlot = {
   days: string
   start: string
@@ -66,11 +76,14 @@ export type Store = {
   currency: string
   show_out_of_stock: boolean
   product_sort: ProductSortOrder
+  home_view: StoreHomeView
   cart_enabled: boolean
   whatsapp_button_enabled: boolean
   accepted_payment_methods: PaymentMethod[]
   accepted_shipping_methods: ShippingMethod[]
   delivery_hours: DeliverySlot[]
+  delivery_area_scope: DeliveryAreaScope
+  delivery_area_custom_locations: string[]
   // Address
   address_cep: string | null
   address_street: string | null

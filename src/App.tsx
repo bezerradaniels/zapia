@@ -35,6 +35,7 @@ const NewProductPage = lazy(() => import('@/routes/dashboard/NewProductPage'))
 const EditProductPage = lazy(() => import('@/routes/dashboard/EditProductPage'))
 const BulkAddProductsPage = lazy(() => import('@/routes/dashboard/BulkAddProductsPage'))
 const StoreLayout = lazy(() => import('@/routes/store/StoreLayout'))
+const StoreHomePage = lazy(() => import('@/routes/store/StoreHomePage'))
 const StorePage = lazy(() => import('@/routes/store/StorePage'))
 const ProductPage = lazy(() => import('@/routes/store/ProductPage'))
 const CartPage = lazy(() => import('@/routes/store/CartPage'))
@@ -43,7 +44,6 @@ const OrderConfirmationPage = lazy(() => import('@/routes/store/OrderConfirmatio
 const StoreAboutPage = lazy(() => import('@/routes/store/StoreAboutPage'))
 const CouponRedirectPage = lazy(() => import('@/routes/store/CouponRedirectPage'))
 const CatalogPage = lazy(() => import('@/routes/dashboard/CatalogPage'))
-const CategoriesPage = lazy(() => import('@/routes/dashboard/CategoriesPage'))
 const CustomersPage = lazy(() => import('@/routes/dashboard/CustomersPage'))
 const NewCustomerPage = lazy(() => import('@/routes/dashboard/NewCustomerPage'))
 const EditCustomerPage = lazy(() => import('@/routes/dashboard/EditCustomerPage'))
@@ -102,7 +102,8 @@ function StoreRoutes() {
   return (
     <Routes>
       <Route path="/" element={<AppProviders><StoreLayout /></AppProviders>}>
-        <Route index element={<StorePage />} />
+        <Route index element={<StoreHomePage />} />
+        <Route path="catalogo" element={<StorePage />} />
         <Route path="produto/:slug" element={<ProductPage />} />
         <Route path="carrinho" element={<CartPage />} />
         <Route path="checkout" element={<CheckoutPage />} />
@@ -163,7 +164,7 @@ function AppRoutes() {
         <Route path="pedidos/novo" element={<NewOrderPage />} />
         <Route path="catalogo" element={<CatalogPage />} />
         <Route path="catalogo/:section" element={<CatalogPage />} />
-        <Route path="categorias" element={<CategoriesPage />} />
+        <Route path="categorias" element={<Navigate to="/dashboard/catalogo/categorias" replace />} />
         <Route path="clientes" element={<CustomersPage />} />
         <Route path="clientes/novo" element={<NewCustomerPage />} />
         <Route path="clientes/:id" element={<EditCustomerPage />} />
@@ -178,7 +179,8 @@ function AppRoutes() {
       </Route>
 
       <Route path=":storeSlug" element={<AppProviders><StoreLayout /></AppProviders>}>
-        <Route index element={<StorePage />} />
+        <Route index element={<StoreHomePage />} />
+        <Route path="catalogo" element={<StorePage />} />
         <Route path="produto/:slug" element={<ProductPage />} />
         <Route path="carrinho" element={<CartPage />} />
         <Route path="checkout" element={<CheckoutPage />} />

@@ -4,6 +4,9 @@ export {
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
+  useSetProductActive,
+  useSetProductsActive,
+  useDeleteProducts,
 } from './hooks/useProductMutations'
 export { productSchema } from './schemas'
 export type { ProductInput } from './schemas'

@@ -3,6 +3,7 @@ import { Link, useOutletContext } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   ArrowLeft02Icon,
+  ArrowRight02Icon,
   WhatsappIcon,
   StoreLocationIcon,
   InstagramIcon,
@@ -17,6 +18,7 @@ import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 export default function StoreAboutPage() {
   const store = useOutletContext<Store>()
   const homePath = buildStorePath(store.slug)
+  const catalogPath = buildStorePath(store.slug, 'catalogo')
   const [galleryActive, setGalleryActive] = useState(0)
 
   useDocumentMeta({ title: `Sobre - ${store.name} - Catálogo por Zapia` })
@@ -91,6 +93,15 @@ export default function StoreAboutPage() {
                   ].filter(Boolean).join(' · ')}
                 </p>
               )}
+
+              <Link
+                to={catalogPath}
+                className="mt-4 flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ background: 'var(--store-primary)' }}
+              >
+                Ir para o catálogo
+                <HugeiconsIcon icon={ArrowRight02Icon} size={14} />
+              </Link>
             </div>
           </div>
         </section>

@@ -44,6 +44,15 @@ export const step3Schema = z.object({
     .array(z.string())
     .min(1, 'Selecione ao menos uma forma de entrega'),
   delivery_hours: z.array(deliverySlotSchema),
+  delivery_area_scope: z.enum([
+    'city_only',
+    'state_only',
+    'brazil',
+    'worldwide',
+    'digital_only',
+    'custom',
+  ]),
+  delivery_area_custom_locations: z.array(z.string()).optional(),
 })
 
 export const step4Schema = z.object({

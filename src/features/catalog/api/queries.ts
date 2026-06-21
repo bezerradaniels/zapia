@@ -7,10 +7,11 @@ import type { Store } from '@/types/domain'
 // GRANT in that migration — `anon` cannot SELECT('*') on stores anymore.
 const PUBLIC_STORE_COLUMNS =
   'id, slug, name, slogan, logo_url, banner_url, gallery_images, primary_color, ' +
-  'category, about_us, age_restricted, cart_enabled, currency, locale, product_sort, ' +
+  'category, about_us, age_restricted, cart_enabled, currency, locale, product_sort, home_view, ' +
   'show_out_of_stock, require_cpf, require_payment_choice, require_shipping_choice, ' +
   'accepted_payment_methods, accepted_shipping_methods, payment_instructions_title, ' +
-  'payment_instructions_message, delivery_hours, whatsapp_phone, whatsapp_button_enabled, ' +
+  'payment_instructions_message, delivery_hours, delivery_area_scope, delivery_area_custom_locations, ' +
+  'whatsapp_phone, whatsapp_button_enabled, ' +
   'contact_phone, contact_email, instagram, social_links, custom_links, gtm_id, ' +
   'address_cep, address_street, address_number, address_complement, address_neighborhood, ' +
   'address_city, address_state, slug_last_updated_at, created_at, updated_at, deleted_at'
@@ -44,4 +45,17 @@ export async function getStoreBySlug(slug: string): Promise<Store | null> {
 
   if (error) throw error
   return (data as unknown as Store | null) ?? null
+}
+
+export async function isSlugAvailable(slug: string): Promise<boolean> {
+  const supabase = createBrowserClient()
+  const { data, error } = await supabase
+    .from('stores')
+    .select('id')
+    .eq('slug', slug)
+    .is('deleted_at', null)
+    .maybeSingle()
+
+  if (error) throw error
+  return !data
 }

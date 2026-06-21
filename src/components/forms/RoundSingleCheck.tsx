@@ -4,24 +4,22 @@ type Option = { value: string; label: string }
 
 type Props = {
   options: Option[]
-  value: string[]
-  onChange: (value: string[]) => void
+  value: string
+  onChange: (value: string) => void
 }
 
-export function RoundMultiCheck({ options, value, onChange }: Props) {
-  const toggle = (v: string) => {
-    onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])
-  }
-
+/** Same visual language as RoundMultiCheck, but enforces a single selection
+ * (radio behavior) instead of a checklist. */
+export function RoundSingleCheck({ options, value, onChange }: Props) {
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
       {options.map((opt) => {
-        const checked = value.includes(opt.value)
+        const checked = value === opt.value
         return (
           <button
             key={opt.value}
             type="button"
-            onClick={() => toggle(opt.value)}
+            onClick={() => onChange(opt.value)}
             className={cn(
               'flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors',
               checked
@@ -32,20 +30,10 @@ export function RoundMultiCheck({ options, value, onChange }: Props) {
             <span
               className={cn(
                 'flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors',
-                checked ? 'border-[#11b981] bg-[#11b981]' : 'border-slate-300',
+                checked ? 'border-[#11b981]' : 'border-slate-300',
               )}
             >
-              {checked && (
-                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                  <path
-                    d="M1 4L3.5 6.5L9 1.5"
-                    stroke="white"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              )}
+              {checked && <span className="h-2.5 w-2.5 rounded-full bg-[#11b981]" />}
             </span>
             <span className={cn('text-sm font-medium', checked ? 'text-[#11b981]' : 'text-z-text')}>
               {opt.label}

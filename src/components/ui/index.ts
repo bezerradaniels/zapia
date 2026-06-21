@@ -14,4 +14,11 @@ export {
 export { Badge, type BadgeProps } from './Badge'
 export { Logo } from './Logo'
 export { Combobox, type ComboboxOption } from './Combobox'
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from './DropdownMenu'
 export { BillingToggle } from './BillingToggle'
+export { AiGenerateButton } from './AiGenerateButton'
