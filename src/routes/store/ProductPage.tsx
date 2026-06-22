@@ -9,6 +9,8 @@ import {
   PlusSignIcon,
   MinusSignIcon,
   CheckmarkCircle01Icon,
+  ShoppingBagAddIcon,
+  WhatsappIcon,
 } from '@hugeicons/core-free-icons'
 import type { Product, Store, VariationOption } from '@/types/domain'
 // Direct file imports (not the '@/features/products' barrel) so this
@@ -23,6 +25,7 @@ import { track } from '@/features/analytics'
 import { formatMoney, toTitleCase } from '@/lib/format'
 import { OptimizedImage } from '@/components/ui/OptimizedImage'
 import { ProductCard } from '@/components/store/ProductCard'
+import { buildWhatsAppLink } from '@/lib/whatsapp'
 import { buildStorePath } from '@/lib/tenant'
 import { sanitizeRichText } from '@/lib/sanitize/sanitizeHtml'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
@@ -271,6 +274,15 @@ export default function ProductPage() {
     )
   }
 
+  const handleWhatsApp = () => {
+    if (!store.whatsapp_phone) return
+    const variationSuffix = selectedVariation ? ` (${selectedVariation})` : ''
+    const message = `Olá! Tenho interesse no produto *${p.name}${variationSuffix}* (${formatMoney(
+      finalPrice,
+    )}).`
+    window.open(buildWhatsAppLink(store.whatsapp_phone, message), '_blank')
+  }
+
   const productFacts: Array<{ label: string; value: string }> = [
     p.brand && { label: 'Marca', value: p.brand },
     p.category && { label: 'Categoria', value: p.category },
@@ -310,7 +322,7 @@ export default function ProductPage() {
         {/* Info */}
         <div className="flex flex-col gap-6">
           <div>
-            <h1 className="text-[30px] font-bold leading-tight tracking-tight text-z-ink sm:text-[34px]">
+            <h1 className="text-[26px] font-bold leading-[1.1] tracking-tighter text-z-ink sm:text-[30px]">
               {toTitleCase(p.name)}
             </h1>
           </div>
@@ -325,8 +337,30 @@ export default function ProductPage() {
               </span>
             )}
             <div className="flex items-center gap-2">
-              <span className="text-[32px] font-bold leading-none tracking-tight text-z-ink sm:text-[38px]">
-                {finalPrice === 0 ? 'Valor a combinar' : formatMoney(finalPrice)}
+              <span className="text-[28px] font-bold leading-none tracking-tight text-z-ink sm:text-[34px]">
+                {finalPrice === 0 ? (
+                  'Valor a combinar'
+                ) : (
+                  (() => {
+                    const [intPart, decPart] = formatMoney(finalPrice)
+                      .replace(/^R\$[\s ]+/, '')
+                      .split(',')
+                    return (
+                      <>
+                        <span className="text-[17px] sm:text-[20px]">R$&nbsp;</span>
+                        {intPart}
+                        {decPart && (
+                          <>
+                            ,
+                            <span className="align-super text-[14px] sm:text-[17px]">
+                              {decPart}
+                            </span>
+                          </>
+                        )}
+                      </>
+                    )
+                  })()
+                )}
               </span>
               {hasPromo && (
                 <span className="rounded-lg bg-[#e8f8ef] px-2.5 py-1 text-[13px] font-bold text-[#02a650]">
@@ -336,6 +370,7 @@ export default function ProductPage() {
             </div>
             {p.installment_count != null && p.installment_total_in_cents != null && (
               <span className="text-[14px] text-z-text-muted">
+                em até{' '}
                 <span className="font-semibold text-[#02a650]">{p.installment_count}x </span>
                 <span className="font-semibold text-z-ink">
                   {formatMoney(Math.ceil(p.installment_total_in_cents / p.installment_count))}
@@ -364,19 +399,9 @@ export default function ProductPage() {
 
           {/* Quantity + primary CTA */}
           <div className="flex flex-col gap-4">
-            <span className="text-[14px] font-bold text-z-ink sm:hidden">
-              Quantidade
-            </span>
             <div className="flex items-center gap-3">
-              <div className="hidden shrink-0 items-center gap-4 sm:flex">
+              <div className="flex shrink-0 items-center gap-3 sm:gap-4">
                 <span className="text-[14px] font-bold text-z-ink">Quantidade</span>
-                <QuantityStepper
-                  qty={displayedQty}
-                  max={stock ?? undefined}
-                  onChange={(next) => (cartItem ? updateQty(cartKey, next) : setQty(next))}
-                />
-              </div>
-              <div className="sm:hidden">
                 <QuantityStepper
                   qty={displayedQty}
                   max={stock ?? undefined}
@@ -388,9 +413,10 @@ export default function ProductPage() {
                 type="button"
                 onClick={handleAdd}
                 disabled={stock === 0 || mustPickVariation}
-                className="flex h-9 min-w-0 flex-1 items-center justify-center rounded-lg px-4 text-[12px] font-bold uppercase tracking-wide text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 sm:px-6 sm:text-[14px] sm:tracking-wider"
+                className="flex h-10 min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-4 text-[12px] font-bold uppercase tracking-wide text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 sm:px-6 sm:text-[14px] sm:tracking-wider"
                 style={{ background: 'var(--store-primary)' }}
               >
+                <HugeiconsIcon icon={ShoppingBagAddIcon} size={18} />
                 Adicionar
               </button>
             </div>
@@ -403,17 +429,33 @@ export default function ProductPage() {
               </p>
             )}
 
+            {store.whatsapp_phone && (
+              <button
+                type="button"
+                onClick={handleWhatsApp}
+                disabled={mustPickVariation || stock === 0}
+                className={cn(
+                  'flex h-12 items-center justify-center gap-2 rounded-lg border text-[14px] font-bold uppercase tracking-wider transition-colors',
+                  mustPickVariation || stock === 0
+                    ? 'cursor-not-allowed border-z-border text-z-text-hint'
+                    : 'border-[#25d366] text-[#25d366] hover:bg-[#25d366]/10',
+                )}
+              >
+                <HugeiconsIcon icon={WhatsappIcon} size={20} />
+                Pedir via WhatsApp
+              </button>
+            )}
           </div>
 
           {/* Additional details if any */}
           {properties.length > 0 && (
             <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-z-border pt-6">
               {properties.map((prop) => (
-                <div key={prop.label} className="flex flex-col">
+                <div key={prop.label} className="flex items-baseline gap-2">
                   <dt className="text-[11px] font-bold uppercase tracking-wider text-z-text-hint">
                     {prop.label}
                   </dt>
-                  <dd className="mt-1 text-[15px] font-medium text-z-ink">
+                  <dd className="text-[15px] font-medium text-z-ink">
                     {prop.value}
                   </dd>
                 </div>
@@ -423,10 +465,11 @@ export default function ProductPage() {
         </div>
       </div>
 
+      <ProductFacts facts={productFacts} className="mt-6 lg:hidden" />
+
       {/* Description card */}
       {p.description && (
         <div className="mt-6 rounded-2xl border bg-white p-5 shadow-sm sm:p-6" style={{ borderColor: '#cbd5e1' }}>
-          <ProductFacts facts={productFacts} className="mb-5 lg:hidden" />
           <h2 className="mb-3 text-[15px] font-bold text-z-ink">
             Descrição
           </h2>
@@ -446,7 +489,7 @@ export default function ProductPage() {
       {related.length > 0 && (
         <section className="mt-12">
           <h2 className="mb-4 text-base font-bold">Você também pode gostar</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-[4px] sm:grid-cols-3 sm:gap-[6px] lg:grid-cols-4">
             {related.map((r) => (
               <ProductCard
                 key={r.id}
@@ -486,13 +529,13 @@ function ProductFacts({
   if (facts.length === 0) return null
 
   return (
-    <dl className={cn('grid grid-cols-2 gap-x-8 gap-y-5', className)}>
+    <dl className={cn('grid grid-cols-2 gap-x-8 gap-y-2', className)}>
       {facts.map((fact) => (
         <div key={fact.label} className="min-w-0">
           <dt className="text-[14px] font-semibold text-z-text-muted">
             {fact.label}
           </dt>
-          <dd className="mt-1 truncate text-[16px] font-bold text-z-text">
+          <dd className="mt-0 truncate text-[16px] font-bold text-z-text">
             {fact.value}
           </dd>
         </div>
@@ -801,7 +844,7 @@ function QuantityStepper({
 }) {
   return (
     <div
-      className="inline-flex h-9 shrink-0 items-stretch overflow-hidden rounded-lg border bg-white"
+      className="inline-flex h-10 shrink-0 items-stretch overflow-hidden rounded-lg border bg-white"
       style={{ borderColor: '#cbd5e1' }}
     >
       <button

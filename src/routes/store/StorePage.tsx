@@ -139,7 +139,7 @@ export default function StorePage() {
             <HugeiconsIcon icon={StarIcon} size={16} className="text-amber-500" />
             <h2 className="text-sm font-bold uppercase tracking-wider text-z-text">Em Destaque</h2>
           </div>
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-[6px] sm:gap-[12px] lg:grid-cols-4">
             {featuredProducts.map((p) => (
               <ProductCard
                 key={p.id}
@@ -202,7 +202,7 @@ export default function StorePage() {
           Nenhum produto encontrado.
         </p>
       ) : (
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-[6px] sm:gap-[12px] lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((p) => (
             <ProductCard
               key={p.id}

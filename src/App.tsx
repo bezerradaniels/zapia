@@ -121,15 +121,18 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path={ROUTES.home} element={<LandingPage />} />
-      <Route path={ROUTES.pricing} element={<PricingPage />} />
-      <Route path={ROUTES.terms} element={<TermsPage />} />
-      <Route path={ROUTES.privacy} element={<PrivacyPage />} />
+      <Route path={ROUTES.home} element={<AppProviders><LandingPage /></AppProviders>} />
+      <Route path={ROUTES.pricing} element={<AppProviders><PricingPage /></AppProviders>} />
+      <Route path={ROUTES.terms} element={<AppProviders><TermsPage /></AppProviders>} />
+      <Route path={ROUTES.privacy} element={<AppProviders><PrivacyPage /></AppProviders>} />
       <Route
         path={ROUTES.trialSignup}
         element={<AppProviders><RequireGuest><TrialSignupPage /></RequireGuest></AppProviders>}
       />
-      <Route path={ROUTES.login} element={<AppProviders><LoginPage /></AppProviders>} />
+      <Route
+        path={ROUTES.login}
+        element={<AppProviders><RequireGuest><LoginPage /></RequireGuest></AppProviders>}
+      />
       <Route
         path={ROUTES.signup}
         element={<AppProviders><RequireGuest><SignupPage /></RequireGuest></AppProviders>}

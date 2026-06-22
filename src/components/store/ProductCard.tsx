@@ -81,11 +81,11 @@ export function ProductCard({
         </div>
 
         <div className="mt-3 px-3">
-          <h3 className="line-clamp-2 min-h-[1.5em] text-[16px] font-extrabold leading-tight tracking-tight text-z-ink">
+          <h3 className="line-clamp-2 min-h-[1.5em] text-[12px] font-extrabold leading-tight tracking-tight text-z-ink">
             {toTitleCase(p.name)}
           </h3>
 
-          <div className="mt-1 flex flex-col gap-0.5">
+          <div className="mt-[22px] flex flex-col gap-0.5">
             {hasPromo && (
               <span className="text-[12px] text-z-text-hint line-through">
                 {formatMoney(p.price_in_cents)}

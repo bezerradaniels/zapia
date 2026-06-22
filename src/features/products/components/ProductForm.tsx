@@ -208,8 +208,19 @@ export function ProductForm({
     const finalValues = isEditing
       ? values
       : { ...values, is_active: submitModeRef.current === 'publish' }
-    await onSubmit(finalValues)
-    form.reset(finalValues)
+    try {
+      await onSubmit(finalValues)
+      form.reset(finalValues)
+      toast.success(
+        isEditing
+          ? 'Produto atualizado com sucesso.'
+          : submitModeRef.current === 'draft'
+            ? 'Rascunho salvo com sucesso.'
+            : 'Produto publicado com sucesso.',
+      )
+    } catch {
+      toast.error('Não foi possível salvar o produto. Tente novamente.')
+    }
   })
 
   const handleGenerateDescription = async () => {
@@ -247,8 +258,13 @@ export function ProductForm({
   const handleDraftAndNavigate = async () => {
     submitModeRef.current = 'draft'
     await form.handleSubmit(async (values) => {
-      await onSubmit({ ...values, is_active: false })
-      navigate(ROUTES.dashboard)
+      try {
+        await onSubmit({ ...values, is_active: false })
+        toast.success('Rascunho salvo com sucesso.')
+        navigate(ROUTES.dashboard)
+      } catch {
+        toast.error('Não foi possível salvar o rascunho. Tente novamente.')
+      }
     })()
     setHomeModalOpen(false)
   }
@@ -1018,7 +1034,7 @@ export function ProductForm({
                     />
                   </label>
                   <MoneyInput
-                    valueInCents={initialValues?.price_in_cents ?? null}
+                    valueInCents={priceCents}
                     placeholder="R$ 0,00"
                     className={cn(
                       'h-12 max-w-sm rounded-lg border bg-white px-3.5 text-base placeholder:text-z-text-hint focus:outline-none focus:ring-2',
@@ -1051,7 +1067,7 @@ export function ProductForm({
                       />
                     </label>
                     <MoneyInput
-                      valueInCents={initialValues?.cost_in_cents ?? null}
+                      valueInCents={costCents}
                       allowEmpty
                       placeholder="R$ 0,00"
                       className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
@@ -1087,7 +1103,7 @@ export function ProductForm({
                     Preço promocional
                   </label>
                   <MoneyInput
-                    valueInCents={initialValues?.promo_price_in_cents ?? null}
+                    valueInCents={promoCents}
                     allowEmpty
                     placeholder="Em branco = sem promoção"
                     className="h-11 max-w-sm rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"

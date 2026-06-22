@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Logo } from '@/components/ui/Logo'
 import { ROUTES } from '@/config/routes'
+import { useSession } from '@/features/auth'
 
 const links = [
   { id: 'how', label: 'Como funciona', href: '#como-funciona', htmlId: 'lp-nav-link-como-funciona' },
@@ -11,6 +12,9 @@ const links = [
 ]
 
 export function MarketingNavbar() {
+  const { session, isLoading } = useSession()
+  const isAuthenticated = !isLoading && session !== null
+
   return (
     <nav className="sticky top-0 z-40 border-b border-z-border bg-white/95 backdrop-blur-md">
       <div className="mx-auto flex h-12 max-w-6xl items-center justify-between px-6 py-3 md:h-20">
@@ -44,24 +48,40 @@ export function MarketingNavbar() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            id="lp-nav-btn-login"
-            asChild
-            variant="ghost"
-            size="sm"
-            className="border border-[#f8fafc] bg-[#f1f5f9] font-semibold text-[#020617] hover:bg-[#e2e8f0]"
-          >
-            <Link to={ROUTES.login}>Login</Link>
-          </Button>
-          <Button
-            id="lp-nav-btn-signup"
-            asChild
-            variant="ghost"
-            size="sm"
-            className="hidden bg-green-100 font-semibold text-green-800 hover:bg-green-200 md:inline-flex"
-          >
-            <Link to={ROUTES.signup}>Teste grátis</Link>
-          </Button>
+          {isLoading ? (
+            <div className="h-9 w-[88px] rounded-md" aria-hidden="true" />
+          ) : isAuthenticated ? (
+            <Button
+              id="lp-nav-btn-dashboard"
+              asChild
+              variant="ghost"
+              size="sm"
+              className="border border-[#f8fafc] bg-[#f1f5f9] font-semibold text-[#020617] hover:bg-[#e2e8f0]"
+            >
+              <Link to={ROUTES.dashboard}>Painel</Link>
+            </Button>
+          ) : (
+            <Button
+              id="lp-nav-btn-login"
+              asChild
+              variant="ghost"
+              size="sm"
+              className="border border-[#f8fafc] bg-[#f1f5f9] font-semibold text-[#020617] hover:bg-[#e2e8f0]"
+            >
+              <Link to={ROUTES.login}>Login</Link>
+            </Button>
+          )}
+          {!isAuthenticated && (
+            <Button
+              id="lp-nav-btn-signup"
+              asChild
+              variant="ghost"
+              size="sm"
+              className="hidden bg-green-100 font-semibold text-green-800 hover:bg-green-200 md:inline-flex"
+            >
+              <Link to={ROUTES.signup}>Teste grátis</Link>
+            </Button>
+          )}
         </div>
       </div>
     </nav>
