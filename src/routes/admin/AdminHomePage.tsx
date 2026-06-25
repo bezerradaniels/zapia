@@ -70,7 +70,7 @@ export default function AdminHomePage() {
     )
   }
 
-  const totalSubscribed = stats.paying_customers + stats.trial_customers
+  const totalSubscribed = stats.free_customers + stats.paying_customers
 
   return (
     <div className="space-y-8">
@@ -96,12 +96,12 @@ export default function AdminHomePage() {
         <SectionTitle>Assinaturas</SectionTitle>
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs text-gray-500">Pagantes (ativos)</p>
-            <p className="mt-1 text-3xl font-bold text-emerald-700">{stats.paying_customers}</p>
+            <p className="text-xs text-gray-500">Gratuitos</p>
+            <p className="mt-1 text-3xl font-bold text-emerald-700">{stats.free_customers}</p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <p className="text-xs text-gray-500">Em trial</p>
-            <p className="mt-1 text-3xl font-bold text-amber-700">{stats.trial_customers}</p>
+            <p className="text-xs text-gray-500">Pagantes (ativos)</p>
+            <p className="mt-1 text-3xl font-bold text-emerald-700">{stats.paying_customers}</p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
             <p className="text-xs text-gray-500">Total com plano</p>

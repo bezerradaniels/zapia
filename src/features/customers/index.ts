@@ -1,5 +1,5 @@
 export { useCustomers } from './hooks/useCustomers'
-export { useCustomer } from './hooks/useCustomer'
+export { useCustomer, useCustomerOrders } from './hooks/useCustomer'
 export { useCreateCustomer, useUpdateCustomer, useDeleteCustomer, useDeleteAllCustomers } from './hooks/useCustomerMutations'
 export { deleteCustomer, deleteAllCustomers } from './api/mutations'
 export type { Customer, CustomerSocialLink } from './types'

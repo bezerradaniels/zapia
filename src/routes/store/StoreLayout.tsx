@@ -166,7 +166,7 @@ export default function StoreLayout() {
   return (
     <OwnerModeContext.Provider value={{ isOwner, ownerMode }}>
       <div
-        className="flex min-h-screen flex-col bg-z-bg"
+        className="flex min-h-screen flex-col bg-z-store-bg"
         style={
           {
             ['--store-primary' as string]: store.primary_color,
@@ -729,7 +729,7 @@ function OwnerFloatingBar({
         title={isLojista ? 'Acessar como visitante' : 'Acessar como lojista'}
         className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold shadow-lg transition-all duration-200 hover:opacity-90 active:scale-95 ${
           isLojista
-            ? 'bg-z-green text-z-ink ring-2 ring-z-green/30'
+            ? 'bg-slate-100 text-z-ink ring-2 ring-slate-200'
             : 'bg-white text-z-text ring-1 ring-z-border'
         }`}
       >

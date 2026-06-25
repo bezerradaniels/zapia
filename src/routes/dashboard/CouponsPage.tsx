@@ -335,7 +335,7 @@ function CouponFormDialog({
 
   return (
     <div
-      className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 px-0 py-0 sm:items-center sm:px-4"
+      className="fixed inset-0 z-40 flex items-end justify-center bg-slate-50/80 px-0 py-0 sm:items-center sm:px-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}

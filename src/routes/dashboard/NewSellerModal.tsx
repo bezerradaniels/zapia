@@ -130,7 +130,7 @@ function ProductPicker({ storeId, selected, onChange }: ProductPickerProps) {
                   <HugeiconsIcon icon={Cancel01Icon} size={12} className="shrink-0 text-z-primary" />
                 )}
                 {!selected.includes(p.id) && (
-                  <HugeiconsIcon icon={Add01Icon} size={12} className="shrink-0 text-[#10b981]" />
+                  <HugeiconsIcon icon={Add01Icon} size={12} className="shrink-0 text-[#0bfeda]" />
                 )}
               </button>
             </li>
@@ -216,7 +216,7 @@ function NewSellerModalContent({ onClose, storeId, storeSlug }: Omit<Props, 'ope
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/80 p-4 backdrop-blur-sm">
       <div className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-z-pop">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-z-border px-6 py-4">

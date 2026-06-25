@@ -48,7 +48,6 @@ campo no Data Layer (facilita não se perder).
 - [ ] `search_term`
 - [ ] `result_count`
 - [ ] `plan_tier`
-- [ ] `trial_days`
 
 ## 2. Tag de configuração do GA4 (uma única vez)
 
@@ -134,7 +133,7 @@ todas, para segmentar relatórios por loja.
 ### Faturamento
 
 - [ ] `pricing_page_viewed` — (sem parâmetros)
-- [ ] `trial_started` — plan_tier, trial_days
+- [ ] `free_plan_started` — plan_tier
 - [ ] `subscription_started` — plan_tier
 
 ## 4. Marcar conversões no GA4
@@ -142,7 +141,7 @@ todas, para segmentar relatórios por loja.
 GA4 → Administrador → Eventos → marcar como conversão pelo menos:
 
 - [ ] `sign_up`
-- [ ] `trial_started`
+- [ ] `free_plan_started`
 - [ ] `subscription_started`
 - [ ] `order_submitted`
 - [ ] `onboarding_completed`

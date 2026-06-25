@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useParams } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from 'sonner'
-import { LockedIcon, StoreLocationIcon, EyeIcon, ShoppingCart01Icon, InstagramIcon, NewTwitterIcon, FacebookIcon, YoutubeIcon, TiktokIcon, Globe02Icon, Settings01Icon, PaintBrush01Icon, ContactIcon, GoogleIcon, FileDownloadIcon, Alert01Icon, Add01Icon, Edit02Icon, Delete02Icon, ArrowDown01Icon, ArrowRight02Icon, CheckmarkCircle02Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
+import { LockedIcon, StoreLocationIcon, EyeIcon, ShoppingCart01Icon, InstagramIcon, NewTwitterIcon, FacebookIcon, YoutubeIcon, TiktokIcon, Globe02Icon, Settings01Icon, PaintBrush01Icon, ContactIcon, GoogleIcon, FileDownloadIcon, Alert01Icon, Add01Icon, Edit02Icon, Delete02Icon, ArrowDown01Icon, ArrowRight02Icon, CheckmarkCircle02Icon, Cancel01Icon, CreditCardIcon, ArrowLeft01Icon } from '@hugeicons/core-free-icons'
 import {
   updateStoreSchema,
   useUpdateStore,
@@ -32,36 +32,13 @@ import { RoundSingleCheck } from '@/components/forms/RoundSingleCheck'
 import { DeliveryAreaCustomLocations } from '@/components/forms/DeliveryAreaCustomLocations'
 import { DeliveryHoursEditor } from '@/components/forms/DeliveryHoursEditor'
 import { GalleryUploader } from '@/components/forms/GalleryUploader'
-import { Button, Field, Textarea, Label, AiGenerateButton } from '@/components/ui'
+import { Button, Combobox, Field, Textarea, Label, AiGenerateButton } from '@/components/ui'
 import { ROUTES } from '@/config/routes'
 import { track } from '@/features/analytics'
 import { cn } from '@/lib/utils'
-
-// Tailwind's full default palette at the 500 shade.
-const COLOR_PRESETS = [
-  '#64748b', // slate
-  '#6b7280', // gray
-  '#71717a', // zinc
-  '#737373', // neutral
-  '#78716c', // stone
-  '#ef4444', // red
-  '#f97316', // orange
-  '#f59e0b', // amber
-  '#eab308', // yellow
-  '#84cc16', // lime
-  '#22c55e', // green
-  '#10b981', // emerald
-  '#14b8a6', // teal
-  '#06b6d4', // cyan
-  '#0ea5e9', // sky
-  '#3b82f6', // blue
-  '#6366f1', // indigo
-  '#8b5cf6', // violet
-  '#a855f7', // purple
-  '#d946ef', // fuchsia
-  '#ec4899', // pink
-  '#f43f5e', // rose
-]
+import { COLOR_PRESETS } from '@/config/colorPresets'
+import { STATES } from '@/lib/br'
+import { useCities } from '@/features/onboarding/hooks/useCities'
 
 type TabId =
   | 'gerais'
@@ -87,6 +64,28 @@ const TABS: { id: TabId; label: string; icon?: typeof Settings01Icon }[] = [
 ]
 
 const TAB_IDS = new Set<TabId>(TABS.map((tab) => tab.id))
+const STATE_OPTIONS = STATES.map((state) => ({ value: state.uf, label: state.name }))
+const PAYMENT_OPTIONS = [
+  { value: 'pix', label: 'PIX' },
+  { value: 'cash', label: 'Dinheiro' },
+  { value: 'credit_card', label: 'Cartão' },
+  { value: 'debit_card', label: 'Débito' },
+  { value: 'bank_transfer', label: 'Transferência' },
+  { value: 'boleto', label: 'Boleto' },
+  { value: 'payment_link', label: 'Link de pagamento' },
+]
+const SHIPPING_OPTIONS = [
+  { value: 'delivery', label: 'Domicílio' },
+  { value: 'pickup_in_store', label: 'Retirada na loja' },
+  { value: 'digital', label: 'Digital' },
+]
+
+function labelsFor(values: string[] | undefined, options: { value: string; label: string }[]): string {
+  const labels = (values ?? [])
+    .map((value) => options.find((option) => option.value === value)?.label)
+    .filter(Boolean)
+  return labels.length > 0 ? labels.join(' · ') : 'Não configurado'
+}
 
 function isTabId(value: string | undefined): value is TabId {
   return !!value && TAB_IDS.has(value as TabId)
@@ -346,7 +345,7 @@ function CategoriesTab({ storeId }: { storeId: string }) {
       </div>
 
       {modal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/80 p-4 backdrop-blur-sm">
           <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-white p-6 shadow-2xl">
             <h3 className="text-base font-semibold">
               {modal.mode === 'edit'
@@ -390,6 +389,92 @@ function CategoriesTab({ storeId }: { storeId: string }) {
 
 /* -------------------------------------------------------------------------- */
 
+function MobileCatalogCard({
+  icon,
+  title,
+  subtitle,
+  open,
+  onToggle,
+  children,
+}: {
+  icon: typeof Settings01Icon
+  title: string
+  subtitle: string
+  open: boolean
+  onToggle: () => void
+  children: ReactNode
+}) {
+  return (
+    <section className="rounded-[22px] border border-z-border bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+      <button type="button" onClick={onToggle} className="flex w-full items-center gap-4 text-left">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f4efe7] text-z-text">
+          <HugeiconsIcon icon={icon} size={25} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-xl font-extrabold leading-tight text-z-text">{title}</span>
+          <span className="block truncate text-base font-medium leading-tight text-z-text-hint">
+            {subtitle}
+          </span>
+        </span>
+        <HugeiconsIcon
+          icon={open ? ArrowDown01Icon : ArrowRight02Icon}
+          size={22}
+          className={cn('shrink-0 text-z-text-hint transition-transform', open && 'rotate-180')}
+        />
+      </button>
+      {open && <div className="mt-5 flex flex-col gap-4 border-t border-z-border pt-5">{children}</div>}
+    </section>
+  )
+}
+
+function InfoValue({ label, value, swatch }: { label: string; value: string; swatch?: string }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-base font-extrabold text-z-text-muted">{label}</span>
+      <div className="flex min-h-12 items-center gap-3 rounded-xl border border-z-border bg-z-bg2 px-4 text-base font-extrabold text-z-text">
+        {swatch && <span className="h-5 w-5 shrink-0 rounded-full" style={{ backgroundColor: swatch }} />}
+        <span className="min-w-0 truncate">{value}</span>
+      </div>
+    </div>
+  )
+}
+
+function BottomSheet({
+  title,
+  open,
+  onClose,
+  children,
+}: {
+  title: string
+  open: boolean
+  onClose: () => void
+  children: ReactNode
+}) {
+  if (!open) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-end bg-slate-50/80 backdrop-blur-[1px] lg:hidden">
+      <button type="button" aria-label="Fechar" className="absolute inset-0" onClick={onClose} />
+      <div className="relative max-h-[88dvh] w-full overflow-y-auto rounded-t-[28px] bg-white px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4 shadow-2xl">
+        <div className="mx-auto mb-5 h-1.5 w-16 rounded-full bg-z-border" />
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-2xl font-extrabold text-z-text">{title}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-z-text-muted hover:bg-z-bg2"
+            aria-label="Fechar"
+          >
+            <HugeiconsIcon icon={Cancel01Icon} size={20} />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+
 export default function CatalogPage() {
   const { section } = useParams<{ section?: string }>()
   const { store } = useActiveStore()
@@ -400,11 +485,17 @@ export default function CatalogPage() {
   const canGallery = limits.canUse('gallery')
   const canAi = limits.canUse('ai')
   const products = useProducts(store?.id)
+  const categoriesQuery = useCategories(store?.id)
+  const createCategory = useCreateCategory()
   const { download: downloadPdf, isGenerating: isGeneratingPdf } = useCatalogPdf()
   const { generate: generateStoreCopy } = useGenerateStoreCopy()
   const [generatingKind, setGeneratingKind] = useState<StoreCopyKind | null>(null)
-  const [colorModalOpen, setColorModalOpen] = useState(false)
-  const [colorDraft, setColorDraft] = useState('#000000')
+  const [mobileOpenCard, setMobileOpenCard] = useState<'gerais' | 'visual' | 'contato' | 'pagamento' | 'categorias'>('gerais')
+  const [visualModalOpen, setVisualModalOpen] = useState(false)
+  const [paymentDeliveryModalOpen, setPaymentDeliveryModalOpen] = useState(false)
+  const [mobileCategoryModalOpen, setMobileCategoryModalOpen] = useState(false)
+  const [mobileCategoryName, setMobileCategoryName] = useState('')
+  const [mobileSubcategoryName, setMobileSubcategoryName] = useState('')
   const activeTab = isTabId(section) ? section : 'gerais'
 
   const form = useForm<UpdateStoreInput>({
@@ -456,6 +547,8 @@ export default function CatalogPage() {
   })
 
   const slugAvailability = useSlugAvailability(form.watch('slug') ?? '', store?.slug ?? '')
+  const selectedState = form.watch('address_state')
+  const { data: cityOptions = [], isLoading: loadingCities } = useCities(selectedState || null)
 
   useEffect(() => {
     if (!store) return
@@ -554,10 +647,232 @@ export default function CatalogPage() {
   const logoPreview = form.watch('logo_url')
   const primaryColor = form.watch('primary_color')
   const isPresetColor = (c: string) => COLOR_PRESETS.some((p) => p.toLowerCase() === c?.toLowerCase())
+  const categories = categoriesQuery.data ?? []
+  const topLevelCategories = categories.filter((category) => !category.parent_id)
+  const subcategories = categories.filter((category) => category.parent_id)
+  const categoryPreview = topLevelCategories.map((category) => category.name).slice(0, 3).join(', ')
+  const subcategoryPreview = subcategories.map((category) => category.name).slice(0, 3).join(', ')
+  const deliveryAreaLabel =
+    form.watch('delivery_area_scope') === 'city_only'
+      ? form.watch('address_city')
+        ? `Apenas na cidade (${form.watch('address_city')})`
+        : 'Apenas na cidade'
+      : {
+          state_only: 'Apenas meu estado',
+          brazil: 'Brasil inteiro',
+          worldwide: 'Mundo inteiro',
+          digital_only: 'Apenas digital',
+          custom: 'Personalizado',
+        }[form.watch('delivery_area_scope') ?? 'city_only'] ?? 'Apenas na cidade'
+
+  const handleCreateMobileCategory = async () => {
+    const categoryName = mobileCategoryName.trim()
+    const subcategoryName = mobileSubcategoryName.trim()
+    if (!categoryName) return
+
+    try {
+      const category = await createCategory.mutateAsync({
+        store_id: store.id,
+        name: categoryName,
+        parent_id: null,
+      })
+      if (subcategoryName) {
+        await createCategory.mutateAsync({
+          store_id: store.id,
+          name: subcategoryName,
+          parent_id: category.id,
+        })
+      }
+      setMobileCategoryName('')
+      setMobileSubcategoryName('')
+      setMobileCategoryModalOpen(false)
+    } catch {
+      toast.error('Não foi possível salvar a categoria. Tente novamente.')
+    }
+  }
 
   return (
     <div className="flex w-full flex-col gap-6 lg:max-w-6xl">
-      <div className="flex flex-col gap-5 lg:flex-row lg:gap-6">
+      <form id="catalog-mobile-form" onSubmit={onSubmit} className="flex flex-col gap-4 lg:hidden">
+        <div className="mb-3 flex items-center gap-4">
+          <Link
+            to={ROUTES.dashboardMore}
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-z-border bg-white text-z-text shadow-sm"
+            aria-label="Voltar"
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
+          </Link>
+          <h1 className="min-w-0 text-[28px] font-extrabold leading-tight text-z-text">
+            Personalizar catálogo
+          </h1>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            navigator.clipboard.writeText(buildStoreUrl(store.slug))
+            track('share_link_copied', {
+              store_id: store.id,
+              link_type: 'store',
+              item_id: store.id,
+            })
+          }}
+          className="flex items-center gap-3 rounded-[22px] bg-z-ink px-5 py-4 text-left text-white"
+        >
+          <HugeiconsIcon icon={Globe02Icon} size={22} className="shrink-0 text-z-green" />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-lg font-extrabold leading-tight">
+              {buildStoreUrl(store.slug).replace(/^https?:\/\//, '')}
+            </span>
+            <span className="block text-sm font-medium text-white/55">Toque para copiar o link</span>
+          </span>
+        </button>
+
+        <MobileCatalogCard
+          icon={Settings01Icon}
+          title="Informações gerais"
+          subtitle="Nome, slogan, sobre"
+          open={mobileOpenCard === 'gerais'}
+          onToggle={() => setMobileOpenCard(mobileOpenCard === 'gerais' ? 'visual' : 'gerais')}
+        >
+          <Field label="Nome da loja" error={form.formState.errors.name?.message} {...form.register('name')} />
+          <Field label="Slogan" error={form.formState.errors.slogan?.message} {...form.register('slogan')} />
+          <div className="flex flex-col gap-1.5">
+            <Label>Sobre</Label>
+            <Textarea
+              placeholder="Conte um pouco sobre a sua loja..."
+              className="min-h-[92px]"
+              {...form.register('about_us')}
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <Label>Estado</Label>
+              <Controller
+                name="address_state"
+                control={form.control}
+                render={({ field }) => (
+                  <Combobox
+                    options={STATE_OPTIONS}
+                    value={field.value ?? ''}
+                    onChange={(value) => {
+                      field.onChange(value)
+                      form.setValue('address_city', '', { shouldDirty: true })
+                    }}
+                    placeholder="Digite para buscar..."
+                    emptyMessage="Estado não encontrado"
+                  />
+                )}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>Cidade</Label>
+              <Controller
+                name="address_city"
+                control={form.control}
+                render={({ field }) => (
+                  <Combobox
+                    options={cityOptions}
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    disabled={!selectedState}
+                    loading={loadingCities}
+                    placeholder={!selectedState ? 'Selecione o estado' : 'Digite para buscar...'}
+                    emptyMessage="Cidade não encontrada"
+                  />
+                )}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-[minmax(0,1fr)_96px] gap-3">
+            <Field label="Endereço" error={form.formState.errors.address_street?.message} {...form.register('address_street')} />
+            <Field label="Número" error={form.formState.errors.address_number?.message} {...form.register('address_number')} />
+          </div>
+        </MobileCatalogCard>
+
+        <MobileCatalogCard
+          icon={PaintBrush01Icon}
+          title="Logo, banner e cores"
+          subtitle="Identidade visual"
+          open={mobileOpenCard === 'visual'}
+          onToggle={() => setMobileOpenCard(mobileOpenCard === 'visual' ? 'gerais' : 'visual')}
+        >
+          <InfoValue label="Cor primária" value={`Cor selecionada (${primaryColor})`} swatch={primaryColor} />
+          <div className="grid grid-cols-2 gap-3">
+            <button type="button" onClick={() => setVisualModalOpen(true)} className="h-11 rounded-xl border border-z-border bg-z-bg2 text-sm font-semibold text-z-text">
+              Adicionar logo
+            </button>
+            <button type="button" onClick={() => setVisualModalOpen(true)} className="h-11 rounded-xl border border-z-border bg-z-bg2 text-sm font-semibold text-z-text">
+              Adicionar banner
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={() => setVisualModalOpen(true)}
+            className="h-11 rounded-xl bg-z-ink px-4 text-sm font-extrabold text-white"
+          >
+            Editar identidade visual
+          </button>
+        </MobileCatalogCard>
+
+        <MobileCatalogCard
+          icon={ContactIcon}
+          title="WhatsApp e contatos"
+          subtitle="Onde os pedidos chegam"
+          open={mobileOpenCard === 'contato'}
+          onToggle={() => setMobileOpenCard(mobileOpenCard === 'contato' ? 'gerais' : 'contato')}
+        >
+          <div className="flex flex-col gap-1.5">
+            <Label>WhatsApp de pedidos</Label>
+            <PhoneInput
+              className="h-12 w-full rounded-xl border border-z-border bg-z-bg2 px-4 text-base font-semibold"
+              value={form.watch('whatsapp_phone') ?? ''}
+              onChange={(masked) => form.setValue('whatsapp_phone', masked, { shouldDirty: true, shouldValidate: true })}
+            />
+          </div>
+          <Field label="E-mail de contato" type="email" {...form.register('contact_email')} />
+        </MobileCatalogCard>
+
+        <MobileCatalogCard
+          icon={CreditCardIcon}
+          title="Pagamento e entrega"
+          subtitle="Métodos aceitos"
+          open={mobileOpenCard === 'pagamento'}
+          onToggle={() => setMobileOpenCard(mobileOpenCard === 'pagamento' ? 'gerais' : 'pagamento')}
+        >
+          <InfoValue label="Pagamento" value={labelsFor(form.watch('accepted_payment_methods'), PAYMENT_OPTIONS)} />
+          <InfoValue label="Entrega" value={labelsFor(form.watch('accepted_shipping_methods'), SHIPPING_OPTIONS)} />
+          <InfoValue label="Região de entrega" value={deliveryAreaLabel} />
+          <InfoValue label="Horário de funcionamento" value={(form.watch('delivery_hours') ?? []).length > 0 ? `${(form.watch('delivery_hours') ?? []).length} faixa(s) configurada(s)` : 'Não configurado'} />
+          <button
+            type="button"
+            onClick={() => setPaymentDeliveryModalOpen(true)}
+            className="h-11 rounded-xl bg-z-ink px-4 text-sm font-extrabold text-white"
+          >
+            Editar pagamento e entrega
+          </button>
+        </MobileCatalogCard>
+
+        <MobileCatalogCard
+          icon={LockedIcon}
+          title="Categorias"
+          subtitle={`${topLevelCategories.length} categorias ativas`}
+          open={mobileOpenCard === 'categorias'}
+          onToggle={() => setMobileOpenCard(mobileOpenCard === 'categorias' ? 'gerais' : 'categorias')}
+        >
+          <InfoValue label="Categorias" value={categoryPreview || 'Nenhuma categoria cadastrada'} />
+          <InfoValue label="Subcategorias" value={subcategoryPreview || 'Nenhuma subcategoria cadastrada'} />
+          <button
+            type="button"
+            onClick={() => setMobileCategoryModalOpen(true)}
+            className="h-11 rounded-xl bg-z-ink px-4 text-sm font-extrabold text-white"
+          >
+            Adicionar categoria
+          </button>
+        </MobileCatalogCard>
+      </form>
+
+      <div className="hidden flex-col gap-5 lg:flex lg:flex-row lg:gap-6">
         {/* Tabs — single row on mobile, vertical sidebar on desktop */}
         <nav className="grid w-full grid-cols-3 gap-1 sticky top-14 z-10 self-start rounded-2xl border border-z-border bg-white/70 p-1.5 shadow-sm backdrop-blur-md lg:static lg:flex lg:w-48 lg:shrink-0 lg:flex-col lg:gap-1 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none sm:grid-cols-5 lg:grid-cols-1">
           {TABS.map((tab) => (
@@ -598,7 +913,7 @@ export default function CatalogPage() {
                         onClick={() =>
                           downloadPdf(store, products.data ?? [], buildStoreUrl(store.slug))
                         }
-                        className="flex items-center gap-2 rounded-lg border border-z-border bg-white px-4 py-2 text-sm font-medium text-z-text transition-colors hover:border-z-green hover:text-[#10b981] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-lg border border-z-border bg-white px-4 py-2 text-sm font-medium text-z-text transition-colors hover:border-z-green hover:text-[#0bfeda] disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <HugeiconsIcon icon={FileDownloadIcon} size={16} />
                         {isGeneratingPdf ? 'Gerando...' : 'Baixar PDF'}
@@ -682,7 +997,7 @@ export default function CatalogPage() {
                           value="true"
                           checked={form.watch('age_restricted') === true}
                           onChange={() => form.setValue('age_restricted', true, { shouldDirty: true })}
-                          className="text-[#10b981] focus:ring-z-green h-4 w-4" 
+                          className="text-[#0bfeda] focus:ring-z-green h-4 w-4" 
                         />
                         <span className="text-sm">Sim</span>
                       </label>
@@ -692,7 +1007,7 @@ export default function CatalogPage() {
                           value="false"
                           checked={form.watch('age_restricted') === false}
                           onChange={() => form.setValue('age_restricted', false, { shouldDirty: true })}
-                          className="text-[#10b981] focus:ring-z-green h-4 w-4" 
+                          className="text-[#0bfeda] focus:ring-z-green h-4 w-4" 
                         />
                         <span className="text-sm">Não</span>
                       </label>
@@ -839,7 +1154,7 @@ export default function CatalogPage() {
                     {!canTheme && (
                       <Link
                         to={ROUTES.dashboardBilling}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#10b981] hover:underline"
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0bfeda] hover:underline"
                       >
                         <HugeiconsIcon icon={LockedIcon} size={11} />
                         Disponível no Pro
@@ -887,76 +1202,11 @@ export default function CatalogPage() {
                             )}
                           </button>
                         ))}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setColorDraft(primaryColor ?? '#000000')
-                            setColorModalOpen(true)
-                          }}
-                          disabled={!canTheme}
-                          className="flex h-9 items-center gap-1.5 rounded-full border border-z-border px-3 text-xs font-medium text-z-text transition-colors hover:bg-z-bg2 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          <HugeiconsIcon icon={PaintBrush01Icon} size={14} />
-                          Cor personalizada
-                        </button>
                       </div>
                     </div>
                   </fieldset>
                 </div>
 
-                {colorModalOpen && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-                    <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-white p-6 shadow-2xl">
-                      <h3 className="text-base font-semibold">Cor personalizada</h3>
-
-                      <div className="flex items-center gap-3">
-                        <label className="cursor-pointer" title="Escolher no seletor de cores">
-                          <input
-                            type="color"
-                            value={/^#[0-9a-fA-F]{6}$/.test(colorDraft) ? colorDraft : '#000000'}
-                            onChange={(e) => setColorDraft(e.target.value)}
-                            className="sr-only"
-                          />
-                          <div
-                            className="h-12 w-12 rounded-full border border-z-border shadow-sm"
-                            style={{
-                              backgroundColor: /^#[0-9a-fA-F]{6}$/.test(colorDraft) ? colorDraft : 'transparent',
-                            }}
-                          />
-                        </label>
-                        <input
-                          type="text"
-                          value={colorDraft.toUpperCase()}
-                          onChange={(e) => {
-                            const v = e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`
-                            setColorDraft(v)
-                          }}
-                          maxLength={7}
-                          placeholder="#000000"
-                          className="h-11 flex-1 rounded-lg border border-z-border px-3 text-sm font-mono text-z-text outline-none focus:border-z-green"
-                        />
-                      </div>
-
-                      <div className="flex justify-end gap-2">
-                        <Button type="button" variant="ghost" onClick={() => setColorModalOpen(false)}>
-                          Cancelar
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            if (/^#[0-9a-fA-F]{6}$/.test(colorDraft)) {
-                              form.setValue('primary_color', colorDraft, { shouldDirty: true, shouldValidate: true })
-                              setColorModalOpen(false)
-                            }
-                          }}
-                          disabled={!/^#[0-9a-fA-F]{6}$/.test(colorDraft)}
-                        >
-                          Confirmar
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
                 {/* Galeria de fotos */}
                 <div className="flex flex-col gap-1 rounded-2xl border border-z-border bg-white p-6">
                   <div className="flex items-center justify-between">
@@ -1570,7 +1820,7 @@ export default function CatalogPage() {
                       const links = form.getValues('custom_links') ?? []
                       form.setValue('custom_links', [...links, { label: '', url: '' }], { shouldDirty: true })
                     }}
-                    className="flex w-fit items-center gap-1.5 text-sm font-medium text-[#10b981] hover:underline"
+                    className="flex w-fit items-center gap-1.5 text-sm font-medium text-[#0bfeda] hover:underline"
                   >
                     + Adicionar link
                   </button>
@@ -1643,7 +1893,7 @@ export default function CatalogPage() {
                           Nome indisponível
                         </span>
                       ) : slugAvailability === 'available' ? (
-                        <span className="flex items-center gap-1 text-xs font-medium text-[#10b981]">
+                        <span className="flex items-center gap-1 text-xs font-medium text-[#0bfeda]">
                           <HugeiconsIcon icon={CheckmarkCircle02Icon} size={13} />
                           Nome disponível
                         </span>
@@ -1702,7 +1952,7 @@ export default function CatalogPage() {
                           href="https://tagmanager.google.com"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#10b981] hover:underline"
+                          className="text-[#0bfeda] hover:underline"
                         >
                           Google Tag Manager
                         </a>
@@ -1733,8 +1983,174 @@ export default function CatalogPage() {
         </main>
       </div>
 
+      <BottomSheet title="Logo, banner e cores" open={visualModalOpen} onClose={() => setVisualModalOpen(false)}>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label>Cor primária</Label>
+            <div className="grid grid-cols-10 gap-1.5">
+              {COLOR_PRESETS.map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => form.setValue('primary_color', preset, { shouldDirty: true, shouldValidate: true })}
+                  className={cn(
+                    'h-7 w-7 rounded-full transition-transform active:scale-95',
+                    primaryColor?.toLowerCase() === preset.toLowerCase() && 'ring-2 ring-z-ink ring-offset-1',
+                  )}
+                  style={{ backgroundColor: preset }}
+                  aria-label={`Selecionar cor ${preset}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label>Logo</Label>
+            <ImageCropUploader
+              bucket="store-logos"
+              storeId={store.id}
+              label="Adicionar logo"
+              aspect={1}
+              value={form.watch('logo_url') || null}
+              onChange={(url) => form.setValue('logo_url', url ?? '', { shouldDirty: true, shouldValidate: true })}
+              hint="JPG, PNG ou WEBP."
+              compact
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label>Banner</Label>
+            <ImageCropUploader
+              bucket="store-logos"
+              storeId={store.id}
+              label="Adicionar banner"
+              aspect={16 / 10}
+              value={form.watch('banner_url') || null}
+              onChange={(url) => form.setValue('banner_url', url ?? '', { shouldDirty: true, shouldValidate: true })}
+              hint="Proporção 16:10 recomendada."
+              compact
+            />
+          </div>
+
+          <Button type="button" fullWidth className="h-11" onClick={() => setVisualModalOpen(false)}>
+            Concluir
+          </Button>
+        </div>
+      </BottomSheet>
+
+      <BottomSheet title="Pagamento e entrega" open={paymentDeliveryModalOpen} onClose={() => setPaymentDeliveryModalOpen(false)}>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <Label>Pagamento</Label>
+            <RoundMultiCheck
+              options={[
+                { value: 'pix', label: 'PIX' },
+                { value: 'cash', label: 'Dinheiro' },
+                { value: 'credit_card', label: 'Cartão de crédito' },
+                { value: 'debit_card', label: 'Cartão de débito' },
+                { value: 'bank_transfer', label: 'Transferência' },
+                { value: 'boleto', label: 'Boleto' },
+                { value: 'payment_link', label: 'Link de pagamento' },
+              ]}
+              value={form.watch('accepted_payment_methods') ?? []}
+              onChange={(next) => form.setValue('accepted_payment_methods', next, { shouldDirty: true })}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>Entrega</Label>
+            <RoundMultiCheck
+              options={[
+                { value: 'delivery', label: 'Entrega em domicílio' },
+                { value: 'pickup_in_store', label: 'Retirada na loja' },
+                { value: 'digital', label: 'Entrega digital' },
+              ]}
+              value={form.watch('accepted_shipping_methods') ?? []}
+              onChange={(next) => form.setValue('accepted_shipping_methods', next, { shouldDirty: true })}
+            />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Label>Região de entrega</Label>
+            <RoundSingleCheck
+              options={[
+                {
+                  value: 'city_only',
+                  label: form.watch('address_city')
+                    ? `Apenas na cidade (${form.watch('address_city')})`
+                    : 'Apenas na cidade',
+                },
+                { value: 'state_only', label: 'Apenas meu estado' },
+                { value: 'brazil', label: 'Brasil inteiro' },
+                { value: 'worldwide', label: 'Mundo inteiro' },
+                { value: 'digital_only', label: 'Apenas digital' },
+                { value: 'custom', label: 'Personalizado' },
+              ]}
+              value={form.watch('delivery_area_scope') ?? 'city_only'}
+              onChange={(next) =>
+                form.setValue('delivery_area_scope', next as UpdateStoreInput['delivery_area_scope'], {
+                  shouldDirty: true,
+                })
+              }
+            />
+            {form.watch('delivery_area_scope') === 'custom' && (
+              <DeliveryAreaCustomLocations
+                value={form.watch('delivery_area_custom_locations') ?? []}
+                onChange={(next) => form.setValue('delivery_area_custom_locations', next, { shouldDirty: true })}
+              />
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Label>Horário de funcionamento</Label>
+            <DeliveryHoursEditor
+              value={form.watch('delivery_hours') ?? []}
+              onChange={(next) => form.setValue('delivery_hours', next, { shouldDirty: true })}
+            />
+          </div>
+
+          <Button type="button" fullWidth onClick={() => setPaymentDeliveryModalOpen(false)}>
+            Concluir
+          </Button>
+        </div>
+      </BottomSheet>
+
+      <BottomSheet title="Nova categoria" open={mobileCategoryModalOpen} onClose={() => setMobileCategoryModalOpen(false)}>
+        <div className="flex flex-col gap-4">
+          <Field
+            label="Categoria"
+            placeholder="Ex.: Vestidos"
+            value={mobileCategoryName}
+            onChange={(event) => setMobileCategoryName(event.target.value)}
+          />
+          <Field
+            label="Subcategoria"
+            placeholder="Ex.: Longos"
+            value={mobileSubcategoryName}
+            onChange={(event) => setMobileSubcategoryName(event.target.value)}
+          />
+          <Button
+            type="button"
+            fullWidth
+            disabled={!mobileCategoryName.trim() || createCategory.isPending}
+            onClick={handleCreateMobileCategory}
+          >
+            {createCategory.isPending ? 'Salvando...' : 'Adicionar'}
+          </Button>
+        </div>
+      </BottomSheet>
+
+      {form.formState.isDirty && (
+        <div className="sticky bottom-16 z-40 flex items-center justify-between gap-3 rounded-2xl border border-z-border bg-white/95 px-4 py-3 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
+          <span className="text-sm font-medium text-z-text-muted">Alterações não salvas.</span>
+          <Button type="submit" form="catalog-mobile-form" disabled={updateStore.isPending} className="rounded-full px-6">
+            {updateStore.isPending ? 'Salvando...' : 'Salvar'}
+          </Button>
+        </div>
+      )}
+
       {activeTab !== 'categorias' && (form.formState.isDirty || updateStore.isPending) && (
-        <div className="sticky bottom-16 z-40 mt-2 flex items-center justify-between gap-4 rounded-2xl border border-z-border bg-white/90 px-5 py-3 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:bottom-0">
+        <div className="sticky bottom-16 z-40 mt-2 hidden items-center justify-between gap-4 rounded-2xl border border-z-border bg-white/90 px-5 py-3 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:bottom-0 lg:flex">
           <span className="text-sm text-z-text-muted">Você tem alterações não salvas.</span>
           <Button
             type="submit"

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, Navigate, useNavigate, useOutletContext } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowLeft02Icon, WhatsappIcon } from '@hugeicons/core-free-icons'
+import { ArrowLeft02Icon, WhatsappIcon, Alert02Icon } from '@hugeicons/core-free-icons'
 import type { Store } from '@/types/domain'
 import { useCartStore } from '@/features/cart'
 // Direct file import (not the '@/features/products' barrel) so this
@@ -17,6 +17,7 @@ import { PhoneInput } from '@/components/forms/PhoneInput'
 import { Input } from '@/components/ui'
 import { buildStorePath } from '@/lib/tenant'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+import { EmptyState } from '@/components/feedback'
 
 export default function CheckoutPage() {
   const store = useOutletContext<Store>()
@@ -52,14 +53,21 @@ export default function CheckoutPage() {
 
   if (!store.whatsapp_phone) {
     return (
-      <div className="flex flex-col items-center gap-3 px-5 py-16 text-center">
-        <h1 className="text-lg font-bold tracking-tight">Loja indisponível</h1>
-        <p className="text-sm text-z-text-muted">
-          Esta loja ainda não configurou o WhatsApp para receber pedidos.
-        </p>
-        <Link to={homePath} className="text-sm font-medium text-[#10b981] hover:underline">
-          Voltar ao catálogo
-        </Link>
+      <div className="px-5 py-16">
+        <EmptyState
+          icon={Alert02Icon}
+          title="Loja indisponível"
+          description="Esta loja ainda não configurou o WhatsApp para receber pedidos."
+          action={
+            <Link
+              to={homePath}
+              className="text-sm font-semibold hover:underline"
+              style={{ color: 'var(--store-primary)' }}
+            >
+              Voltar ao catálogo
+            </Link>
+          }
+        />
       </div>
     )
   }
@@ -142,7 +150,7 @@ export default function CheckoutPage() {
               <div className="flex flex-col gap-1.5">
                 <label className="flex items-center gap-1.5 text-sm font-medium text-z-text" htmlFor="checkout-name">
                   Nome completo
-                  <span className="rounded-full bg-[#e8f8ef] px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
                     Obrigatório
                   </span>
                 </label>
@@ -163,7 +171,7 @@ export default function CheckoutPage() {
               <div className="flex flex-col gap-1">
                 <label className="flex items-center gap-1.5 text-sm font-medium text-z-text" htmlFor="checkout-phone">
                   WhatsApp
-                  <span className="rounded-full bg-[#e8f8ef] px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
                     Obrigatório
                   </span>
                 </label>
@@ -190,7 +198,7 @@ export default function CheckoutPage() {
           <div className="rounded-2xl border bg-white p-5" style={{ borderColor: '#cbd5e1' }}>
             <div className="mb-3 flex items-center gap-1.5 text-[15px] font-bold">
               Confirmar forma de entrega
-              <span className="rounded-full bg-[#e8f8ef] px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
                 Obrigatório
               </span>
             </div>

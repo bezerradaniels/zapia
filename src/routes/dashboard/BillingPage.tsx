@@ -15,14 +15,13 @@ import {
   useStartCheckout,
   useOpenPortal,
   useDowngradeCheck,
-  trialDaysLeft,
   DowngradeProductSelector,
 } from '@/features/billing'
 import { useProducts } from '@/features/products'
 import { useActiveStore } from '@/lib/tenant'
 import { formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { PLANS, TRIAL_DAYS } from '@/config/plans'
+import { PLANS } from '@/config/plans'
 import { track } from '@/features/analytics'
 import type { PlanId, SubscriptionStatus } from '@/types/domain'
 
@@ -103,12 +102,6 @@ export default function BillingPage() {
   const sub = subscription.data
   const status = sub?.status ?? 'none'
   const statusUi = STATUS_TONE[status]
-  const days = trialDaysLeft(
-    sub
-      ? { status: sub.status, trial_ends_at: sub.trial_ends_at }
-      : null,
-  )
-  const isTrial = status === 'trialing'
   const planList = plans.data ?? []
   const currentPlanId = sub?.plan_id ?? null
 
@@ -182,12 +175,7 @@ export default function BillingPage() {
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Badge tone={statusUi.tone}>{statusUi.label}</Badge>
-            {isTrial && days !== null && (
-              <span className="text-sm text-z-text-muted">
-                Termina em <strong className="text-z-text">{days} dia{days === 1 ? '' : 's'}</strong>
-              </span>
-            )}
-            {!isTrial && sub?.current_period_end && (
+            {sub?.current_period_end && (
               <span className="text-sm text-z-text-muted">
                 {sub.cancel_at_period_end ? 'Encerra em' : 'Próxima cobrança em'}{' '}
                 <strong className="text-z-text">
@@ -198,16 +186,14 @@ export default function BillingPage() {
           </div>
           <div className="text-lg font-semibold">
             Plano atual:{' '}
-            <span className="text-[#10b981]">
+            <span className="text-[#0bfeda]">
               {planList.find((p) => p.id === currentPlanId) ? PLANS[currentPlanId!].name : '—'}
             </span>
           </div>
           <div className="text-sm text-z-text-muted">
-            {isTrial
-              ? 'Adicione um método de pagamento para continuar após o trial.'
-              : status === 'active'
-                ? 'Sua assinatura está em dia.'
-                : 'Reative sua assinatura para voltar a publicar o catálogo.'}
+            {status === 'active'
+              ? 'Sua assinatura está em dia.'
+              : 'Reative sua assinatura para voltar a publicar o catálogo.'}
           </div>
         </div>
         {sub?.stripe_customer_id ? (
@@ -258,7 +244,7 @@ export default function BillingPage() {
                       Plano {PLANS[plan.id].name}
                     </h2>
                     {billingPeriod === 'annual' && (
-                      <span className="rounded-full bg-z-green/10 px-2 py-0.5 text-[11px] font-bold text-[#10b981]">
+                      <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[11px] font-bold text-[#0bfeda]">
                         -{Math.round((PLANS[plan.id].priceInCents * 12 - PLANS[plan.id].priceInCentsAnnual) / (PLANS[plan.id].priceInCents * 12) * 100)}%
                       </span>
                     )}
@@ -275,12 +261,9 @@ export default function BillingPage() {
                       : formatMoney(PLANS[plan.id].priceInCents)}
                   </span>
                   <span className="text-sm text-z-text-muted">/mês</span>
-                  <p className="mt-1 text-xs text-z-text-hint">
-                    + {TRIAL_DAYS} dias grátis
-                  </p>
                   {billingPeriod === 'annual' && (
                     <>
-                      <p className="mt-0.5 text-xs font-semibold text-[#10b981]">
+                      <p className="mt-0.5 text-xs font-semibold text-[#0bfeda]">
                         Economize {formatMoney(PLANS[plan.id].priceInCents * 12 - PLANS[plan.id].priceInCentsAnnual)}
                       </p>
                       <p className="mt-1 text-xs font-medium text-black">
@@ -303,7 +286,7 @@ export default function BillingPage() {
                       <HugeiconsIcon
                         icon={Tick02Icon}
                         size={14}
-                        className="mt-0.5 shrink-0 text-[#10b981]"
+                        className="mt-0.5 shrink-0 text-[#0bfeda]"
                       />
                       {f}
                     </li>
@@ -357,7 +340,7 @@ export default function BillingPage() {
                       href={inv.hosted_invoice_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs font-medium text-[#10b981] hover:underline"
+                      className="text-xs font-medium text-[#0bfeda] hover:underline"
                     >
                       Stripe
                     </a>
@@ -367,7 +350,7 @@ export default function BillingPage() {
                       href={inv.nfse_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-medium text-[#10b981] hover:underline"
+                      className="inline-flex items-center gap-1 text-xs font-medium text-[#0bfeda] hover:underline"
                     >
                       NFSe
                       <HugeiconsIcon icon={ArrowRightIcon} size={11} />

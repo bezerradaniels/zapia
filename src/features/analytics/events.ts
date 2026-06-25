@@ -100,7 +100,7 @@ export type AnalyticsEventMap = {
 
   // ── Faturamento (assinatura do lojista) ─────────────────────────────────────
   pricing_page_viewed: Record<string, never>
-  trial_started: { plan_tier: string; trial_days: number }
+  free_plan_started: { plan_tier: string }
   subscription_started: { plan_tier: string }
 }
 

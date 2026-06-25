@@ -24,6 +24,8 @@ import { buildStoreTitle } from '@/features/catalog'
 import { track } from '@/features/analytics'
 import { formatMoney, toTitleCase } from '@/lib/format'
 import { OptimizedImage } from '@/components/ui/OptimizedImage'
+import { Skeleton } from '@/components/ui'
+import { EmptyState } from '@/components/feedback'
 import { ProductCard } from '@/components/store/ProductCard'
 import { buildWhatsAppLink } from '@/lib/whatsapp'
 import { buildStorePath } from '@/lib/tenant'
@@ -180,18 +182,32 @@ export default function ProductPage() {
 
   if (product.isLoading) {
     return (
-      <div className="px-5 py-12 text-center text-sm text-z-text-muted">
-        Carregando...
+      <div className="mx-auto w-full max-w-[800px] px-3 py-4 sm:px-6 sm:py-6">
+        <Skeleton className="aspect-square w-full rounded-2xl" />
+        <div className="mt-4 flex flex-col gap-2">
+          <Skeleton className="h-4 w-1/3 rounded-md" />
+          <Skeleton className="h-6 w-2/3 rounded-md" />
+          <Skeleton className="h-8 w-1/2 rounded-md" />
+        </div>
       </div>
     )
   }
   if (!p || p.store_id !== store.id) {
     return (
-      <div className="flex flex-col gap-3 px-5 py-12 text-center">
-        <p className="text-sm text-z-text-muted">Produto não encontrado.</p>
-        <Link to={homePath} className="text-sm font-medium text-[#10b981] underline">
-          Voltar ao catálogo
-        </Link>
+      <div className="px-5 py-12">
+        <EmptyState
+          icon={PackageIcon}
+          title="Produto não encontrado"
+          action={
+            <Link
+              to={homePath}
+              className="text-sm font-semibold hover:underline"
+              style={{ color: 'var(--store-primary)' }}
+            >
+              Voltar ao catálogo
+            </Link>
+          }
+        />
       </div>
     )
   }
@@ -363,7 +379,7 @@ export default function ProductPage() {
                 )}
               </span>
               {hasPromo && (
-                <span className="rounded-lg bg-[#e8f8ef] px-2.5 py-1 text-[13px] font-bold text-[#02a650]">
+                <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[13px] font-bold text-[#02a650]">
                   {discount}% OFF
                 </span>
               )}
@@ -438,7 +454,7 @@ export default function ProductPage() {
                   'flex h-12 items-center justify-center gap-2 rounded-lg border text-[14px] font-bold uppercase tracking-wider transition-colors',
                   mustPickVariation || stock === 0
                     ? 'cursor-not-allowed border-z-border text-z-text-hint'
-                    : 'border-[#25d366] text-[#25d366] hover:bg-[#25d366]/10',
+                    : 'border-slate-400 text-slate-400 hover:bg-slate-100',
                 )}
               >
                 <HugeiconsIcon icon={WhatsappIcon} size={20} />

@@ -6,7 +6,6 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { Tick02Icon, Store01Icon, ShoppingCartIcon, Payment01Icon } from '@hugeicons/core-free-icons'
 import { signUpSchema, useSignUp, type SignUpInput } from '@/features/auth'
 import { ROUTES } from '@/config/routes'
-import { TRIAL_DAYS } from '@/config/plans'
 import { Button, Field, Logo } from '@/components/ui'
 import { cn } from '@/lib/utils'
 
@@ -89,7 +88,7 @@ export default function SignupPage() {
           Crie sua loja online em minutos
         </h1>
         <p className="text-xl text-white mb-12">
-          {TRIAL_DAYS} dias grátis, sem cartão de crédito
+          Comece gratuitamente, sem cartão de crédito
         </p>
 
         <div className="space-y-6">

@@ -3,9 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
 import {
   SearchIcon,
-  ArrowUpRight01Icon,
   ArrowDown01Icon,
-  Menu01Icon,
   User02Icon,
   Logout01Icon,
   Cancel01Icon,
@@ -13,16 +11,15 @@ import {
   UserGroupIcon,
   InvoiceIcon,
 } from '@hugeicons/core-free-icons'
-import { useSession, useSignOut } from '@/features/auth'
-import { useActiveStore, buildStoreUrl } from '@/lib/tenant'
+import { useSignOut } from '@/features/auth'
+import { useActiveStore } from '@/lib/tenant'
 import { NotificationsBell } from '@/features/notifications'
 import { ROUTES } from '@/config/routes'
 import { useProducts } from '@/features/products'
 import { useCustomers } from '@/features/customers'
 import { useOrders } from '@/features/orders'
-import { useSubscription } from '@/features/billing'
+import { usePlanLimits } from '@/features/billing'
 import { formatMoney } from '@/lib/format'
-import { Badge } from '@/components/ui'
 
 function initialsFrom(name?: string | null): string {
   if (!name) return 'Z'
@@ -31,13 +28,8 @@ function initialsFrom(name?: string | null): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
-interface TopbarProps {
-  onMenuToggle?: () => void
-}
-
-export function Topbar({ onMenuToggle }: TopbarProps) {
+export function Topbar() {
   const navigate = useNavigate()
-  const { user } = useSession()
   const { store } = useActiveStore()
   const signOut = useSignOut()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
@@ -47,12 +39,16 @@ export function Topbar({ onMenuToggle }: TopbarProps) {
   const products = useProducts(store?.id)
   const customers = useCustomers(store?.id)
   const orders = useOrders(store?.id)
-  const subscription = useSubscription(store?.id)
+  const limits = usePlanLimits(store?.id)
 
-  const name = (user?.user_metadata?.name as string | undefined) ?? user?.email
-  const initials = initialsFrom(name)
+  const storeInitials = initialsFrom(store?.name)
   const query = search.trim().toLowerCase()
-  const isTrialing = subscription.data?.status === 'trialing'
+  const isTrialing = limits.subscription?.status === 'trialing'
+  const planLabel = isTrialing
+    ? `Trial · ${limits.plan?.name ?? 'Pro'}`
+    : limits.plan?.name
+      ? `Plano ${limits.plan.name}`
+      : 'Sua loja'
 
   const searchResults = useMemo(() => {
     if (!query) return []
@@ -130,94 +126,70 @@ export function Topbar({ onMenuToggle }: TopbarProps) {
 
   return (
     <>
-    <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-4 border-b border-z-border bg-white px-4 lg:px-6">
-      <div className="flex items-center gap-3">
-        {/* Hamburger — mobile only */}
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b border-z-border bg-slate-100 px-4 lg:bg-slate-100 lg:px-6">
+      {/* Store identity — avatar + name + plan (opens user menu) */}
+      <div className="relative flex min-w-0 items-center gap-3">
         <button
           type="button"
-          onClick={onMenuToggle}
-          aria-label="Abrir menu"
-          className="flex h-9 w-9 items-center justify-center rounded-full text-z-text-muted transition-colors hover:bg-z-bg2 lg:hidden"
+          onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+          aria-label="Menu da conta"
+          className="flex items-center gap-3"
         >
-          <HugeiconsIcon icon={Menu01Icon} size={20} />
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-z-ink text-[13px] font-extrabold tracking-tight text-[#10b981]">
+            {storeInitials}
+          </span>
+          <span className="flex min-w-0 flex-col text-left leading-tight">
+            <span className="truncate text-[15px] font-extrabold tracking-tight text-z-text">
+              {store?.name ?? 'Sua loja'}
+            </span>
+            <span className="truncate text-[11px] font-medium text-z-text-hint">
+              {planLabel}
+            </span>
+          </span>
+          <HugeiconsIcon
+            icon={ArrowDown01Icon}
+            size={14}
+            className="hidden text-z-text-hint lg:block"
+          />
         </button>
 
-        <div className="flex items-center gap-3 text-sm text-z-text-muted">
-          <span className="font-medium text-z-text">{store?.name ?? 'Sua loja'}</span>
-          {isTrialing && <Badge tone="lilac">Trial</Badge>}
-          {store && (
-            <>
-              <span className="hidden text-z-text-hint sm:inline">·</span>
-              <a
-                href={buildStoreUrl(store.slug)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden items-center gap-1 font-medium text-z-primary hover:underline sm:inline-flex"
+        {/* User dropdown menu */}
+        {isUserMenuOpen && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setIsUserMenuOpen(false)} />
+            <div className="absolute left-0 top-full z-20 mt-2 w-56 rounded-xl border border-z-border bg-white py-1 shadow-z-lg">
+              <Link
+                to={ROUTES.dashboardProfile}
+                onClick={() => setIsUserMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm text-z-text hover:bg-z-bg"
               >
-                Ver catálogo
-                <HugeiconsIcon icon={ArrowUpRight01Icon} size={12} />
-              </a>
-            </>
-          )}
-        </div>
+                <HugeiconsIcon icon={User02Icon} size={16} />
+                Meu perfil
+              </Link>
+              <button
+                onClick={handleSignOut}
+                disabled={signOut.isPending}
+                className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-z-text hover:bg-z-bg disabled:opacity-50"
+              >
+                <HugeiconsIcon icon={Logout01Icon} size={16} />
+                {signOut.isPending ? 'Saindo...' : 'Sair'}
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
-      <div className="flex items-center gap-2 lg:gap-4">
+      <div className="flex items-center gap-2">
         <button
           type="button"
           aria-label="Buscar"
           onClick={() => setIsSearchOpen(true)}
-          className="hidden h-9 w-9 items-center justify-center rounded-full text-z-text-muted transition-colors hover:bg-z-bg2 sm:flex"
+          className="flex h-10 w-10 items-center justify-center rounded-[13px] border border-z-border bg-white text-z-text-muted transition-colors hover:bg-z-bg2"
         >
-          <HugeiconsIcon icon={SearchIcon} size={18} />
+          <HugeiconsIcon icon={SearchIcon} size={19} />
         </button>
 
         <NotificationsBell storeId={store?.id} />
-
-        {/* User profile section */}
-        <div className="relative">
-          <button
-            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className="flex items-center gap-2 rounded-full py-1 pl-2 pr-1 transition-colors hover:bg-z-bg2 lg:gap-2.5"
-          >
-            <HugeiconsIcon
-              icon={ArrowDown01Icon}
-              size={14}
-              className="hidden text-z-text-hint lg:block"
-            />
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-z-ink text-[11px] font-semibold text-white">
-              {initials}
-            </div>
-          </button>
-
-          {/* User dropdown menu */}
-          {isUserMenuOpen && (
-            <>
-              <div
-                className="fixed inset-0 z-10"
-                onClick={() => setIsUserMenuOpen(false)}
-              />
-              <div className="absolute right-0 top-full z-20 mt-2 w-56 rounded-xl border border-z-border bg-white shadow-z-lg py-1">
-                <Link
-                  to={ROUTES.dashboardProfile}
-                  onClick={() => setIsUserMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-z-text hover:bg-z-bg"
-                >
-                  <HugeiconsIcon icon={User02Icon} size={16} />
-                  Meu perfil
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  disabled={signOut.isPending}
-                  className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-z-text hover:bg-z-bg disabled:opacity-50"
-                >
-                  <HugeiconsIcon icon={Logout01Icon} size={16} />
-                  {signOut.isPending ? 'Saindo...' : 'Sair'}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
       </div>
     </header>
     {isSearchOpen && (

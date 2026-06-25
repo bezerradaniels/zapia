@@ -47,7 +47,6 @@ Deno.serve(async (req) => {
     }
 
     const safeName = escapeHtml(name)
-    const safeEmail = escapeHtml(email)
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -63,11 +62,7 @@ Deno.serve(async (req) => {
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
             <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #34d399;">
               <h2 style="color: #111827; margin-top: 0; font-size: 24px;">Novo cadastro no Zapia</h2>
-              <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">Um novo usuário acabou de se cadastrar na plataforma.</p>
-              <div style="background-color: #f3f4f6; padding: 20px; border-radius: 6px; margin: 25px 0;">
-                <p style="margin: 0 0 12px 0; color: #374151; font-size: 15px;"><strong>Nome:</strong> ${safeName}</p>
-                <p style="margin: 0; color: #374151; font-size: 15px;"><strong>E-mail:</strong> ${safeEmail}</p>
-              </div>
+              <p style="color: #4b5563; font-size: 16px; line-height: 1.5;"><strong>${safeName}</strong> acabou de se cadastrar na plataforma.</p>
               <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
               <p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">
                 Este é um e-mail automático do sistema Zapia. Não responda.

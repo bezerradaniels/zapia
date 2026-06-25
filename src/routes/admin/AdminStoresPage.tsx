@@ -6,7 +6,7 @@ import type { AdminStoreRow } from '@/features/admin'
 import { ROUTES } from '@/config/routes'
 
 const PLAN_LABELS: Record<string, string> = {
-  basico: 'Básico',
+  basico: 'Gratuito',
   pro: 'Pro',
   premium: 'Premium',
 }

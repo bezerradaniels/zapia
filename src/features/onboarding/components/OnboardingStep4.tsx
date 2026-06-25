@@ -14,20 +14,10 @@ import { loadOnboardingSession } from '../utils/onboardingSession'
 import { saveDraft, loadDraft } from '../utils/onboardingDraft'
 import { step4Schema, type Step4Values } from '../schemas'
 import { cn } from '@/lib/utils'
-
-const COLOR_PRESETS = [
-  { label: 'Verde', value: '#34d399' },
-  { label: 'Esmeralda', value: '#10b981' },
-  { label: 'Azul', value: '#2563eb' },
-  { label: 'Roxo', value: '#7c3aed' },
-  { label: 'Rosa', value: '#db2777' },
-  { label: 'Laranja', value: '#ea580c' },
-  { label: 'Vermelho', value: '#dc2626' },
-  { label: 'Preto', value: '#111827' },
-]
+import { COLOR_PRESETS } from '@/config/colorPresets'
 
 function isPresetColor(color: string | undefined): boolean {
-  return COLOR_PRESETS.some((preset) => preset.value === color)
+  return COLOR_PRESETS.includes(color as (typeof COLOR_PRESETS)[number])
 }
 
 export function OnboardingStep4() {
@@ -65,6 +55,8 @@ export function OnboardingStep4() {
 
   const selectedColor = watch('primary_color')
   const activeColor = selectedColor
+  const logoUrl = watch('logo_url')
+  const bannerUrl = watch('banner_url')
 
   const onSubmit = async (values: Step4Values) => {
     setIsSubmitting(true)
@@ -104,6 +96,41 @@ export function OnboardingStep4() {
         </p>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <Label className="text-sm">Prévia da vitrine</Label>
+        <div className="overflow-hidden rounded-2xl border border-z-border">
+          <div
+            className="relative flex h-20 items-end bg-cover bg-center"
+            style={{
+              backgroundColor: activeColor,
+              backgroundImage: bannerUrl ? `url(${bannerUrl})` : undefined,
+            }}
+          >
+            <div className="absolute inset-0 bg-black/10" />
+          </div>
+          <div className="flex items-center gap-3 bg-white p-3">
+            <div className="-mt-8 flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border-2 border-white bg-z-bg shadow-sm">
+              {logoUrl ? (
+                <img src={logoUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <HugeiconsIcon icon={Store01Icon} size={18} className="text-z-text-hint" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-bold text-z-text">
+                {session.storeName || 'Sua loja'}
+              </p>
+              <span
+                className="mt-1 inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold text-white"
+                style={{ backgroundColor: activeColor }}
+              >
+                Ver catálogo
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="flex flex-col gap-2">
         <Label className="text-sm">Cor principal do catálogo</Label>
         <div className="flex flex-col gap-3">
@@ -111,22 +138,22 @@ export function OnboardingStep4() {
           <div className="flex flex-wrap gap-2">
             {COLOR_PRESETS.map((preset) => (
               <button
-                key={preset.value}
+                key={preset}
                 type="button"
-                title={preset.label}
+                title={preset}
                 onClick={() => {
-                  setValue('primary_color', preset.value, { shouldValidate: true })
+                  setValue('primary_color', preset, { shouldValidate: true })
                   setUseCustomColor(false)
                 }}
                 className={cn(
                   'relative h-9 w-9 rounded-full transition-transform hover:scale-110',
-                  !useCustomColor && selectedColor === preset.value
+                  !useCustomColor && selectedColor === preset
                     ? 'ring-2 ring-z-ink ring-offset-2'
                     : '',
                 )}
-                style={{ backgroundColor: preset.value }}
+                style={{ backgroundColor: preset }}
               >
-                {!useCustomColor && selectedColor === preset.value && (
+                {!useCustomColor && selectedColor === preset && (
                   <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-bold">✓</span>
                 )}
               </button>
@@ -230,22 +257,10 @@ export function OnboardingStep4() {
         </p>
       )}
 
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          onClick={() => navigate(ROUTES.onboardingStep3)}
-          disabled={isSubmitting}
-          className="flex-1"
-        >
-          ← Voltar
-        </Button>
-        <Button type="submit" size="lg" disabled={isSubmitting} className="flex-[2]">
-          {isSubmitting ? 'Finalizando...' : 'Começar a vender'}
-          {!isSubmitting && <HugeiconsIcon icon={Store01Icon} size={20} />}
-        </Button>
-      </div>
+      <Button type="submit" size="lg" fullWidth disabled={isSubmitting}>
+        {isSubmitting ? 'Finalizando...' : 'Publicar minha loja'}
+        {!isSubmitting && <HugeiconsIcon icon={Store01Icon} size={20} />}
+      </Button>
     </form>
   )
 }

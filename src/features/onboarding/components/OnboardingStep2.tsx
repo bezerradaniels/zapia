@@ -2,8 +2,22 @@ import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowRight02Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
+import {
+  ArrowRight02Icon,
+  TShirtIcon,
+  Dumbbell01Icon,
+  SparklesIcon,
+  Moon02Icon,
+  SmartPhone01Icon,
+  RestaurantIcon,
+  Bone01Icon,
+  Home01Icon,
+  FootballIcon,
+  BabyBottleIcon,
+  ToolsIcon,
+  MoreHorizontalIcon,
+} from '@hugeicons/core-free-icons'
 import { Button, Input, Label } from '@/components/ui'
 import { createBrowserClient } from '@/lib/supabase'
 import { slugify } from '@/lib/utils/slugify'
@@ -14,19 +28,19 @@ import { saveDraft, loadDraft } from '../utils/onboardingDraft'
 import { step2Schema, type Step2Values } from '../schemas'
 import { cn } from '@/lib/utils'
 
-const STORE_CATEGORIES = [
-  { value: 'moda', label: 'Moda e Acessórios' },
-  { value: 'suplementos', label: 'Suplementos' },
-  { value: 'beleza', label: 'Beleza e Cosméticos' },
-  { value: 'sexshop', label: 'Sex Shop' },
-  { value: 'eletronicos', label: 'Eletrônicos' },
-  { value: 'alimentos', label: 'Alimentos' },
-  { value: 'pet', label: 'Pet Shop' },
-  { value: 'casa', label: 'Casa e Decoração' },
-  { value: 'esportes', label: 'Esportes' },
-  { value: 'infantil', label: 'Infantil' },
-  { value: 'servicos', label: 'Serviços' },
-  { value: 'outro', label: 'Outro' },
+const STORE_CATEGORIES: { value: string; label: string; icon: IconSvgElement }[] = [
+  { value: 'moda', label: 'Moda e Acessórios', icon: TShirtIcon },
+  { value: 'suplementos', label: 'Suplementos', icon: Dumbbell01Icon },
+  { value: 'beleza', label: 'Beleza e Cosméticos', icon: SparklesIcon },
+  { value: 'sexshop', label: 'Sex Shop', icon: Moon02Icon },
+  { value: 'eletronicos', label: 'Eletrônicos', icon: SmartPhone01Icon },
+  { value: 'alimentos', label: 'Alimentos', icon: RestaurantIcon },
+  { value: 'pet', label: 'Pet Shop', icon: Bone01Icon },
+  { value: 'casa', label: 'Casa e Decoração', icon: Home01Icon },
+  { value: 'esportes', label: 'Esportes', icon: FootballIcon },
+  { value: 'infantil', label: 'Infantil', icon: BabyBottleIcon },
+  { value: 'servicos', label: 'Serviços', icon: ToolsIcon },
+  { value: 'outro', label: 'Outro', icon: MoreHorizontalIcon },
 ]
 
 export function OnboardingStep2() {
@@ -132,22 +146,26 @@ export function OnboardingStep2() {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="category" className="text-sm">Ramo da sua loja *</Label>
-        <select
-          id="category"
-          value={selectedCategory}
-          onChange={(e) => setValue('category', e.target.value, { shouldValidate: true })}
-          className={cn(
-            'h-11 w-full rounded-lg border bg-white px-3 text-sm text-z-text outline-none focus:border-z-green',
-            errors.category ? 'border-red-400' : 'border-slate-300',
-            !selectedCategory && 'text-z-text-hint',
-          )}
-        >
-          <option value="" disabled>Selecione o ramo da sua loja</option>
+        <Label className="text-sm">Ramo da sua loja *</Label>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {STORE_CATEGORIES.map((cat) => (
-            <option key={cat.value} value={cat.value}>{cat.label}</option>
+            <button
+              key={cat.value}
+              type="button"
+              onClick={() => setValue('category', cat.value, { shouldValidate: true })}
+              aria-pressed={selectedCategory === cat.value}
+              className={cn(
+                'flex min-h-[76px] flex-col items-center justify-center gap-1.5 rounded-xl border px-1.5 py-2.5 text-center text-[11px] font-medium leading-tight transition-colors',
+                selectedCategory === cat.value
+                  ? 'border-z-green bg-z-green/10 text-[#0f574c]'
+                  : 'border-slate-300 bg-white text-z-text-muted hover:border-z-green/50',
+              )}
+            >
+              <HugeiconsIcon icon={cat.icon} size={20} />
+              <span>{cat.label}</span>
+            </button>
           ))}
-        </select>
+        </div>
         {errors.category && (
           <p className="text-xs text-red-500">{errors.category.message}</p>
         )}
@@ -225,22 +243,10 @@ export function OnboardingStep2() {
         </p>
       )}
 
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          onClick={() => navigate(ROUTES.onboardingStep1)}
-          disabled={isSubmitting}
-          className="flex-1"
-        >
-          ← Voltar
-        </Button>
-        <Button type="submit" size="lg" disabled={isSubmitting} className="flex-[2]">
-          {isSubmitting ? 'Salvando...' : 'Próxima etapa'}
-          {!isSubmitting && <HugeiconsIcon icon={ArrowRight02Icon} size={20} />}
-        </Button>
-      </div>
+      <Button type="submit" size="lg" fullWidth disabled={isSubmitting}>
+        {isSubmitting ? 'Salvando...' : 'Continuar'}
+        {!isSubmitting && <HugeiconsIcon icon={ArrowRight02Icon} size={20} />}
+      </Button>
     </form>
   )
 }

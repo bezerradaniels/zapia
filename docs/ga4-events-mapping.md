@@ -133,7 +133,7 @@ funcionarem sem configuração extra.
 | Evento | Parâmetros | Status | Onde |
 |---|---|---|---|
 | `pricing_page_viewed` | — | ✅ | `PricingPage` (marketing) |
-| `trial_started` | `plan_tier`, `trial_days` | ✅ | `OnboardingStep1`, junto com `store_created` — o trial de 7 dias (plano `pro`, sem cartão) é criado por trigger no banco no insert da loja (`supabase/migrations/20260618232429_trial_7_days.sql`); o evento é disparado no cliente no mesmo instante por ser o sinal de conversão mais próximo disponível |
+| `free_plan_started` | `plan_tier` | ✅ | `OnboardingStep1`, junto com `store_created` — o plano gratuito (plano `basico`, 10 produtos, sem cartão) é criado por trigger no banco no insert da loja (`supabase/migrations/20260625182002_free_plan_no_trial.sql`); o evento é disparado no cliente no mesmo instante por ser o sinal de conversão mais próximo disponível |
 | `subscription_started` | `plan_tier` | ✅ | `BillingPage`, ao retornar do Stripe Checkout com `?checkout=success`. O plano é lido de `sessionStorage` (gravado por `useStartCheckout` antes do redirect, já que a `success_url` do Stripe não carrega o plano). **O estado real da assinatura continua vindo exclusivamente do webhook do Stripe** (`stripe-webhook`) — este evento é só telemetria de funil, nunca fonte de verdade de billing (ver `CLAUDE.md` §13) |
 
 ## Adicionando um novo evento

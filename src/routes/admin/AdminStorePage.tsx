@@ -7,7 +7,7 @@ import { ROUTES } from '@/config/routes'
 import { buildStoreUrl } from '@/lib/tenant/resolveStore'
 import type { PlanId } from '@/types/domain'
 
-const PLAN_LABELS: Record<string, string> = { basico: 'Básico', pro: 'Pro', premium: 'Premium' }
+const PLAN_LABELS: Record<string, string> = { basico: 'Gratuito', pro: 'Pro', premium: 'Premium' }
 
 const STATUS_STYLES: Record<string, string> = {
   active:   'bg-emerald-50 text-emerald-700 border-emerald-100',

@@ -124,7 +124,7 @@ export function Sidebar({ isMobileOpen = false, onClose }: SidebarProps) {
       {/* Mobile overlay backdrop */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-50/80 lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />

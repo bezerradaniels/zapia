@@ -26,7 +26,7 @@ export default function DashboardLayout() {
   // 1. Initial auth check - only block the whole screen here
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-z-bg text-sm text-z-text-muted">
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 text-sm text-z-text-muted">
         Carregando...
       </div>
     )
@@ -39,13 +39,13 @@ export default function DashboardLayout() {
 
   // 3. Keep layout visible while myStores loads
   return (
-    <div className="flex min-h-screen bg-z-bg">
+    <div className="flex min-h-screen bg-slate-100">
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar onMenuToggle={() => setIsMobileSidebarOpen((v) => !v)} />
+        <Topbar />
         <main className="flex-1 px-4 py-4 pb-24 lg:px-6 lg:py-6 lg:pb-6">
           {myStores.isLoading ? (
             <div className="flex h-64 items-center justify-center text-sm text-z-text-muted">

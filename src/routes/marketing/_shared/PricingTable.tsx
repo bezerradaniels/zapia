@@ -6,7 +6,7 @@ import StarIcon from '@hugeicons/core-free-icons/StarIcon'
 import { BillingToggle } from '@/components/ui/BillingToggle'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
-import { PLANS, TRIAL_DAYS } from '@/config/plans'
+import { PLANS } from '@/config/plans'
 import { formatMoney } from '@/lib/format/money'
 import { ROUTES } from '@/config/routes'
 
@@ -108,9 +108,6 @@ export function PricingTable() {
               </span>
               <span className="ml-1 text-sm text-z-text-muted">/mês</span>
             </div>
-            <p className="mt-1 text-xs text-z-text-hint">
-              + {TRIAL_DAYS} dias grátis
-            </p>
             {period === 'annual' && (
               <>
                 <p className="mt-0.5 text-xs font-semibold text-[#10b981]">

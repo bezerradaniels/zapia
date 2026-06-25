@@ -11,7 +11,6 @@ import {
 } from '@hugeicons/core-free-icons'
 import { signUpSchema, useSignUp, type SignUpInput } from '@/features/auth'
 import { ROUTES } from '@/config/routes'
-import { TRIAL_DAYS } from '@/config/plans'
 import { Button, Field, Logo } from '@/components/ui'
 import { cn } from '@/lib/utils'
 
@@ -79,7 +78,7 @@ export default function TrialSignupPage() {
           <div className="flex-1">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-z-green/20 bg-z-green/8 px-3.5 py-1.5">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-z-green" />
-              <span className="text-xs font-semibold text-z-text">{TRIAL_DAYS} dias grátis · Sem cartão de crédito</span>
+              <span className="text-xs font-semibold text-z-text">Gratuito · Sem cartão de crédito</span>
             </div>
 
             <h1 className="text-[2rem] font-extrabold leading-[1.1] tracking-tighter text-z-text lg:text-[2.5rem]">
@@ -234,7 +233,7 @@ export default function TrialSignupPage() {
                   'Criando sua conta...'
                 ) : (
                   <>
-                    Começar {TRIAL_DAYS} dias grátis
+                    Começar gratuitamente
                     <HugeiconsIcon icon={ArrowRight02Icon} size={18} />
                   </>
                 )}

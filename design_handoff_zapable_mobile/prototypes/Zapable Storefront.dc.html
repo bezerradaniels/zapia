@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  .zsc { -ms-overflow-style: none; scrollbar-width: none; }
+  @keyframes zfade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes zslidein { from { transform: translateX(16px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+  @keyframes zslideup { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes zpop { 0% { transform: scale(.6); opacity: 0 } 60% { transform: scale(1.1) } 100% { transform: scale(1); opacity: 1 } }
+  @keyframes zcartpop { 0% { transform: scale(1) } 40% { transform: scale(1.25) } 100% { transform: scale(1) } }
+  @keyframes ztoast { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes zshimmer { from { background-position: 200% 0 } to { background-position: -200% 0 } }
+  .zskel { background: linear-gradient(90deg, #ece7df 25%, #f4f0e9 50%, #ece7df 75%); background-size: 200% 100%; animation: zshimmer 1.25s ease-in-out infinite; }
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#e7e2da;padding:28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#141414;-webkit-font-smoothing:antialiased">
+
+  <div style="position:relative;width:392px;height:844px;background:#0e0e0e;border-radius:52px;padding:11px;box-shadow:0 50px 90px -28px rgba(20,20,20,.5),0 0 0 1.5px rgba(0,0,0,.35)">
+    <div style="position:relative;width:100%;height:100%;background:#e9f3ea;border-radius:42px;overflow:hidden;display:flex;flex-direction:column">
+
+      <!-- Status bar -->
+      <div style="height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:relative;z-index:30;background:{{ theme }}">
+        <span style="font-size:14px;font-weight:700;letter-spacing:-.02em;color:#fff">9:41</span>
+        <div style="position:absolute;left:50%;top:9px;transform:translateX(-50%);width:104px;height:28px;background:#0e0e0e;border-radius:16px"></div>
+        <div style="display:flex;gap:6px;align-items:center;font-family:'Material Symbols Rounded';font-size:17px;color:#fff">
+          <span>signal_cellular_alt</span><span>wifi</span><span>battery_full</span>
+        </div>
+      </div>
+
+      <div style="position:relative;flex:1;display:flex;flex-direction:column;min-height:0">
+
+        <!-- ============ HOME / CATÁLOGO ============ -->
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;min-height:0;flex:1">
+          <!-- Store header -->
+          <div style="flex-shrink:0;background:{{ theme }};padding:10px 18px 14px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:11px;min-width:0">
+                <div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;letter-spacing:-.04em;flex-shrink:0">{{ storeInitials }}</div>
+                <span style="font-size:17px;font-weight:800;color:#fff;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ storeName }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                <div onClick="{{ goAbout }}" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:19px;color:#fff">info</span></div>
+                <div onClick="{{ onShare }}" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:18px;color:#fff">ios_share</span></div>
+                <div onClick="{{ goCart }}" style="position:relative;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <span style="font-family:'Material Symbols Rounded';font-size:19px;color:#fff">shopping_bag</span>
+                  <sc-if value="{{ cartCount }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:#ff3b30;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;border:1.5px solid {{ theme }}">{{ cartCount }}</span></sc-if>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scroll body -->
+          <div class="zsc" style="flex:1;overflow-y:auto;overflow-x:hidden">
+
+            <!-- SKELETON -->
+            <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:zfade .2s ease">
+              <div style="padding:14px 18px 0"><div class="zskel" style="height:130px;border-radius:18px"></div></div>
+              <div style="padding:14px 18px 0"><div class="zskel" style="height:46px;border-radius:14px"></div></div>
+              <div style="display:flex;gap:8px;padding:14px 18px 4px">
+                <div class="zskel" style="width:56px;height:34px;border-radius:999px"></div>
+                <div class="zskel" style="width:78px;height:34px;border-radius:999px"></div>
+                <div class="zskel" style="width:70px;height:34px;border-radius:999px"></div>
+                <div class="zskel" style="width:88px;height:34px;border-radius:999px"></div>
+              </div>
+              <div style="padding:16px 0 4px">
+                <div class="zskel" style="height:13px;width:110px;border-radius:6px;margin:0 18px 12px"></div>
+                <div style="display:flex;gap:12px;padding:0 18px;overflow:hidden">
+                  <div style="flex-shrink:0;width:165px"><div class="zskel" style="height:165px;border-radius:18px"></div><div class="zskel" style="height:12px;width:80%;border-radius:5px;margin-top:11px"></div><div class="zskel" style="height:14px;width:50%;border-radius:5px;margin-top:8px"></div></div>
+                  <div style="flex-shrink:0;width:165px"><div class="zskel" style="height:165px;border-radius:18px"></div><div class="zskel" style="height:12px;width:80%;border-radius:5px;margin-top:11px"></div><div class="zskel" style="height:14px;width:50%;border-radius:5px;margin-top:8px"></div></div>
+                </div>
+              </div>
+              <div style="padding:18px">
+                <div class="zskel" style="height:13px;width:140px;border-radius:6px;margin-bottom:14px"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                  <sc-for list="{{ skeletonCards }}" as="sk" hint-placeholder-count="4">
+                  <div><div class="zskel" style="height:150px;border-radius:18px"></div><div class="zskel" style="height:12px;width:85%;border-radius:5px;margin-top:11px"></div><div class="zskel" style="height:14px;width:45%;border-radius:5px;margin-top:8px"></div></div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            </sc-if>
+
+            <!-- LOADED -->
+            <sc-if value="{{ loaded }}" hint-placeholder-val="{{ false }}">
+            <div>
+            <!-- Hero -->
+            <div style="padding:14px 18px 4px">
+              <div style="position:relative;border-radius:18px;overflow:hidden;height:130px;background:linear-gradient(135deg,{{ theme }},{{ themeDark }});display:flex;align-items:flex-end;padding:16px">
+                <div style="position:absolute;inset:0;opacity:.1;background-image:radial-gradient(circle at 2px 2px,#fff 1px,transparent 0);background-size:22px 22px"></div>
+                <div style="position:absolute;top:-30px;right:-20px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1)"></div>
+                <div style="position:relative">
+                  <div style="font-size:19px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.1">Moda autoral<br>feita à mão 🧵</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,.85);margin-top:5px;font-weight:500">Frete grátis acima de R$ 250</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Search -->
+            <div style="padding:14px 18px 0">
+              <div onClick="{{ openSearch }}" style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:0 14px;height:46px;cursor:pointer">
+                <span style="font-family:'Material Symbols Rounded';font-size:21px;color:#a8a298">search</span>
+                <span style="font-size:14px;color:#9a948a;flex:1">{{ searchPlaceholder }}</span>
+                <sc-if value="{{ hasSearch }}" hint-placeholder-val="{{ false }}"><span onClick="{{ clearSearch }}" style="font-family:'Material Symbols Rounded';font-size:20px;color:#9a948a">close</span></sc-if>
+              </div>
+            </div>
+
+            <!-- Category chips -->
+            <div class="zsc" style="display:flex;gap:8px;overflow-x:auto;padding:14px 18px 4px">
+              <sc-for list="{{ categories }}" as="c" hint-placeholder-count="6">
+              <div onClick="{{ c.onClick }}" style="flex-shrink:0;font-size:13px;font-weight:700;padding:8px 15px;border-radius:999px;cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};border:1px solid {{ c.border }}">{{ c.label }}</div>
+              </sc-for>
+            </div>
+
+            <!-- Featured (only when no search/filter) -->
+            <sc-if value="{{ showFeatured }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:16px 0 4px">
+              <div style="display:flex;align-items:center;gap:7px;padding:0 18px 11px">
+                <span style="font-family:'Material Symbols Rounded';font-size:19px;color:#f5a623;font-variation-settings:'FILL' 1">star</span>
+                <span style="font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#3a352e">Em destaque</span>
+              </div>
+              <div class="zsc" style="display:flex;gap:12px;overflow-x:auto;padding:0 18px 6px">
+                <sc-for list="{{ featured }}" as="p" hint-placeholder-count="3">
+                <div onClick="{{ p.open }}" style="flex-shrink:0;width:165px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;overflow:hidden;cursor:pointer">
+                  <div style="position:relative;height:165px;background:{{ p.thumb }};display:flex;align-items:center;justify-content:center">
+                    <span style="font-family:'Material Symbols Rounded';font-size:40px;color:rgba(0,0,0,.14)">{{ p.icon }}</span>
+                    <sc-if value="{{ p.hasPromo }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:9px;left:9px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:#ff3b30;color:#fff">{{ p.discount }}</span></sc-if>
+                  </div>
+                  <div style="padding:11px 12px 13px">
+                    <div style="font-size:13px;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+                    <div style="display:flex;align-items:baseline;gap:6px;margin-top:7px">
+                      <span style="font-size:15px;font-weight:800;color:{{ theme }};letter-spacing:-.02em">{{ p.priceFmt }}</span>
+                      <sc-if value="{{ p.hasPromo }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px;color:#b3ada3;text-decoration:line-through">{{ p.oldFmt }}</span></sc-if>
+                    </div>
+                  </div>
+                </div>
+                </sc-for>
+              </div>
+            </div>
+            </sc-if>
+
+            <!-- Grid -->
+            <div style="padding:18px 18px 24px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+                <span style="font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#3a352e">{{ gridTitle }}</span>
+                <div onClick="{{ openSort }}" style="display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;color:#7c766c;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:17px">swap_vert</span>{{ sortLabel }}</div>
+              </div>
+              <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                <sc-for list="{{ grid }}" as="p" hint-placeholder-count="6">
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;overflow:hidden">
+                  <div onClick="{{ p.open }}" style="position:relative;height:150px;background:{{ p.thumb }};display:flex;align-items:center;justify-content:center;cursor:pointer">
+                    <span style="font-family:'Material Symbols Rounded';font-size:38px;color:rgba(0,0,0,.14)">{{ p.icon }}</span>
+                    <sc-if value="{{ p.hasPromo }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:9px;left:9px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:#ff3b30;color:#fff">{{ p.discount }}</span></sc-if>
+                    <sc-if value="{{ p.soldOut }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#5a5a5a">Esgotado</span></sc-if>
+                  </div>
+                  <div style="padding:11px 12px 12px">
+                    <div onClick="{{ p.open }}" style="font-size:13px;font-weight:600;line-height:1.25;height:33px;overflow:hidden;cursor:pointer">{{ p.name }}</div>
+                    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:8px">
+                      <div>
+                        <sc-if value="{{ p.hasPromo }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px;color:#b3ada3;text-decoration:line-through;line-height:1">{{ p.oldFmt }}</div></sc-if>
+                        <div style="font-size:15px;font-weight:800;color:{{ theme }};letter-spacing:-.02em;margin-top:2px">{{ p.priceFmt }}</div>
+                      </div>
+                      <div onClick="{{ p.add }}" style="width:34px;height:34px;border-radius:11px;background:{{ p.addBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0"><span style="font-family:'Material Symbols Rounded';font-size:20px;color:#fff">{{ p.addIcon }}</span></div>
+                    </div>
+                  </div>
+                </div>
+                </sc-for>
+              </div>
+              </sc-if>
+              <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 20px">
+                <span style="font-family:'Material Symbols Rounded';font-size:42px;color:#cbc6ba">search_off</span>
+                <div style="font-size:14px;font-weight:700;margin-top:12px">Nenhum produto encontrado</div>
+                <div style="font-size:12.5px;color:#9a948a;margin-top:3px">Tente outra busca ou categoria</div>
+              </div>
+              </sc-if>
+            </div>
+            </div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ SOBRE A LOJA ============ -->
+        <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;min-height:0;flex:1;animation:zslidein .26s ease">
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;padding:10px 16px 12px">
+            <div onClick="{{ backToHome }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">arrow_back</span></div>
+            <div style="flex:1;font-size:18px;font-weight:800;letter-spacing:-.02em">Sobre a loja</div>
+            <div onClick="{{ onShare }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:20px">ios_share</span></div>
+          </div>
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 24px">
+            <!-- Identity card -->
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:20px;overflow:hidden;margin-bottom:14px">
+              <div style="height:104px;background:linear-gradient(135deg,{{ theme }},{{ themeDark }});position:relative">
+                <div style="position:absolute;inset:0;opacity:.1;background-image:radial-gradient(circle at 2px 2px,#fff 1px,transparent 0);background-size:22px 22px"></div>
+              </div>
+              <div style="position:relative;padding:0 18px 18px">
+                <div style="position:absolute;top:-38px;left:18px;width:74px;height:74px;border-radius:20px;background:#fff;box-shadow:0 0 0 4px #fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:{{ theme }};letter-spacing:-.04em">{{ storeInitials }}</div>
+                <div style="padding-top:46px">
+                  <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:0">{{ storeName }}</h1>
+                  <p style="font-size:13.5px;color:#7c766c;margin:5px 0 0">{{ about.slogan }}</p>
+                  <div style="display:flex;align-items:flex-start;gap:7px;margin-top:11px"><span style="font-family:'Material Symbols Rounded';font-size:17px;color:#9a948a;margin-top:1px">location_on</span><span style="font-size:12.5px;color:#7c766c;line-height:1.4">{{ about.address }}</span></div>
+                  <div onClick="{{ backToHome }}" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:16px;height:46px;border-radius:14px;background:{{ theme }};color:#fff;font-size:14px;font-weight:700;cursor:pointer">Ir para o catálogo<span style="font-family:'Material Symbols Rounded';font-size:18px">arrow_forward</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contato -->
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:15px;margin-bottom:14px">
+              <div style="font-size:14px;font-weight:800;margin-bottom:12px">Contato</div>
+              <div style="display:flex;gap:9px">
+                <div onClick="{{ onWhats }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;height:46px;border-radius:13px;background:#25d366;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:19px">chat</span>WhatsApp</div>
+                <div onClick="{{ onInstagram }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;height:46px;border-radius:13px;background:linear-gradient(120deg,#f58529,#dd2a7b 55%,#8134af);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:19px">photo_camera</span>Instagram</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:11px;margin-top:14px">
+                <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Material Symbols Rounded';font-size:19px;color:#9a948a">call</span><span style="font-size:13px;color:#5a5a5a;font-weight:600">{{ about.phone }}</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Material Symbols Rounded';font-size:19px;color:#9a948a">alternate_email</span><span style="font-size:13px;color:#5a5a5a;font-weight:600">{{ about.instagram }}</span></div>
+              </div>
+            </div>
+
+            <!-- Galeria -->
+            <div style="font-size:14px;font-weight:800;margin:0 2px 11px">Galeria da loja</div>
+            <div class="zsc" style="display:flex;gap:10px;overflow-x:auto;margin:0 -18px 16px;padding:0 18px">
+              <sc-for list="{{ about.gallery }}" as="g" hint-placeholder-count="4">
+              <div style="flex-shrink:0;width:150px;height:170px;border-radius:16px;background:{{ g.thumb }};display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-size:34px;color:rgba(0,0,0,.13)">{{ g.icon }}</span></div>
+              </sc-for>
+            </div>
+
+            <!-- Sobre -->
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:16px;margin-bottom:14px">
+              <div style="font-size:14px;font-weight:800;margin-bottom:9px">Nossa história</div>
+              <p style="font-size:13.5px;color:#5a5a5a;line-height:1.6;margin:0">{{ about.story }}</p>
+            </div>
+
+            <!-- Horários -->
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:16px">
+              <div style="font-size:14px;font-weight:800;margin-bottom:12px">Horário de atendimento</div>
+              <sc-for list="{{ about.hours }}" as="h" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0"><span style="font-size:13px;color:#5a5a5a;font-weight:600">{{ h.day }}</span><span style="font-size:13px;color:#141414;font-weight:700">{{ h.time }}</span></div>
+              </sc-for>
+            </div>
+
+            <div style="text-align:center;font-size:11px;color:#b3ada3;margin-top:20px">Catálogo por <span style="font-weight:700;color:#00a82d">Zapable</span></div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ PRODUTO ============ -->
+        <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;min-height:0;flex:1;animation:zslidein .26s ease">
+          <div class="zsc" style="flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:96px">
+            <!-- Gallery -->
+            <div style="position:relative;height:344px;background:{{ sel.thumb }};display:flex;align-items:center;justify-content:center">
+              <span style="font-family:'Material Symbols Rounded';font-size:84px;color:rgba(0,0,0,.13)">{{ sel.icon }}</span>
+              <div onClick="{{ closeProduct }}" style="position:absolute;top:12px;left:16px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)"><span style="font-family:'Material Symbols Rounded';font-size:23px;color:#141414">arrow_back</span></div>
+              <div onClick="{{ goCart }}" style="position:absolute;top:12px;right:16px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)">
+                <span style="font-family:'Material Symbols Rounded';font-size:21px;color:#141414">shopping_bag</span>
+                <sc-if value="{{ cartCount }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:#ff3b30;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff">{{ cartCount }}</span></sc-if>
+              </div>
+              <sc-if value="{{ sel.hasPromo }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;bottom:14px;left:16px;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;background:#ff3b30;color:#fff">{{ sel.discount }} OFF</span></sc-if>
+              <div style="position:absolute;bottom:14px;right:16px;display:flex;gap:5px">
+                <span style="width:7px;height:7px;border-radius:50%;background:#fff"></span>
+                <span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.5)"></span>
+                <span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.5)"></span>
+              </div>
+            </div>
+
+            <div style="padding:18px">
+              <div style="font-size:12px;font-weight:700;color:{{ theme }};text-transform:uppercase;letter-spacing:.05em">{{ sel.cat }}</div>
+              <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin:6px 0 12px">{{ sel.name }}</h1>
+              <div style="display:flex;align-items:baseline;gap:9px">
+                <span style="font-size:26px;font-weight:800;color:{{ theme }};letter-spacing:-.03em">{{ sel.priceFmt }}</span>
+                <sc-if value="{{ sel.hasPromo }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;color:#b3ada3;text-decoration:line-through">{{ sel.oldFmt }}</span></sc-if>
+              </div>
+              <div style="font-size:12.5px;color:#7c766c;margin-top:6px">{{ sel.installmentPrefix }}<span style="color:{{ theme }};font-weight:700">sem juros</span></div>
+
+              <!-- Variations -->
+              <sc-if value="{{ sel.hasVariations }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:22px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:10px">{{ sel.variationLabel }}: <span style="color:{{ theme }}">{{ selectedVariation }}</span></div>
+                <div style="display:flex;flex-wrap:wrap;gap:9px">
+                  <sc-for list="{{ variations }}" as="vr" hint-placeholder-count="4">
+                  <div onClick="{{ vr.onClick }}" style="min-width:48px;height:48px;padding:0 14px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;cursor:pointer;background:{{ vr.bg }};color:{{ vr.fg }};border:1.5px solid {{ vr.border }}">{{ vr.label }}</div>
+                  </sc-for>
+                </div>
+              </div>
+              </sc-if>
+
+              <!-- Description -->
+              <div style="margin-top:24px">
+                <div style="font-size:13px;font-weight:700;margin-bottom:8px">Descrição</div>
+                <p style="font-size:13.5px;color:#5a5a5a;line-height:1.6;margin:0">{{ sel.desc }}</p>
+              </div>
+
+              <!-- Trust badges -->
+              <div style="display:flex;gap:9px;margin-top:22px">
+                <sc-for list="{{ trustBadges }}" as="t" hint-placeholder-count="3">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:13px 6px">
+                  <span style="font-family:'Material Symbols Rounded';font-size:22px;color:{{ theme }}">{{ t.icon }}</span>
+                  <span style="font-size:10px;font-weight:600;color:#5a5a5a;text-align:center;line-height:1.2">{{ t.label }}</span>
+                </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sticky add bar -->
+          <div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:12px;padding:12px 18px 26px;background:#fff;border-top:1px solid rgba(0,0,0,.07)">
+            <div style="display:flex;align-items:center;gap:2px;background:#f4f1ec;border-radius:13px;padding:5px">
+              <div onClick="{{ decQty }}" style="width:34px;height:34px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:19px">remove</span></div>
+              <span style="width:30px;text-align:center;font-size:15px;font-weight:800">{{ productQty }}</span>
+              <div onClick="{{ incQty }}" style="width:34px;height:34px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:19px">add</span></div>
+            </div>
+            <div onClick="{{ addFromDetail }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:15px;background:{{ theme }};color:#fff;font-size:15px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:21px">add_shopping_cart</span>Adicionar · {{ detailTotal }}</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ CARRINHO ============ -->
+        <sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;min-height:0;flex:1;animation:zslidein .26s ease">
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;padding:10px 16px 12px">
+            <div onClick="{{ backToHome }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">arrow_back</span></div>
+            <div style="flex:1;font-size:18px;font-weight:800;letter-spacing:-.02em">Carrinho</div>
+            <span style="font-size:12.5px;font-weight:600;color:#9a948a">{{ cartItemsLabel }}</span>
+          </div>
+
+          <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px">
+            <div style="width:84px;height:84px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;margin-bottom:18px"><span style="font-family:'Material Symbols Rounded';font-size:40px;color:#cbc6ba">shopping_bag</span></div>
+            <div style="font-size:17px;font-weight:800">Seu carrinho está vazio</div>
+            <div style="font-size:13px;color:#9a948a;margin-top:5px;line-height:1.4">Adicione produtos do catálogo para continuar.</div>
+            <div onClick="{{ backToHome }}" style="margin-top:22px;height:48px;padding:0 26px;border-radius:14px;background:{{ theme }};color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;cursor:pointer">Explorar catálogo</div>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ true }}">
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 18px">
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ cartItems }}" as="it" hint-placeholder-count="2">
+              <div style="display:flex;gap:12px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:11px">
+                <div style="width:74px;height:74px;border-radius:13px;flex-shrink:0;background:{{ it.thumb }};display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-size:30px;color:rgba(0,0,0,.14)">{{ it.icon }}</span></div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+                    <div style="font-size:13.5px;font-weight:700;line-height:1.25">{{ it.name }}</div>
+                    <span onClick="{{ it.remove }}" style="font-family:'Material Symbols Rounded';font-size:19px;color:#c2bcae;cursor:pointer;flex-shrink:0">delete</span>
+                  </div>
+                  <sc-if value="{{ it.variation }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#9a948a;margin-top:2px">{{ it.variation }}</div></sc-if>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px">
+                    <span style="font-size:15px;font-weight:800;color:{{ theme }};letter-spacing:-.02em">{{ it.lineFmt }}</span>
+                    <div style="display:flex;align-items:center;gap:2px;background:#f4f1ec;border-radius:10px;padding:4px">
+                      <div onClick="{{ it.dec }}" style="width:28px;height:28px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:17px">remove</span></div>
+                      <span style="width:24px;text-align:center;font-size:13.5px;font-weight:800">{{ it.qty }}</span>
+                      <div onClick="{{ it.inc }}" style="width:28px;height:28px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:17px">add</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </sc-for>
+            </div>
+
+            <!-- Coupon -->
+            <div style="display:flex;gap:9px;margin-top:16px">
+              <div style="flex:1;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:0 13px;height:46px">
+                <span style="font-family:'Material Symbols Rounded';font-size:19px;color:#a8a298">sell</span>
+                <input value="{{ coupon }}" oninput="{{ onCoupon }}" placeholder="Cupom de desconto" style="border:none;outline:none;background:transparent;font-size:13.5px;width:100%;font-family:inherit;text-transform:uppercase;color:#141414" />
+              </div>
+              <div onClick="{{ applyCoupon }}" style="display:flex;align-items:center;padding:0 18px;border-radius:13px;background:#141414;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Aplicar</div>
+            </div>
+            <sc-if value="{{ couponApplied }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:7px;margin-top:10px;padding:10px 13px;border-radius:11px;background:rgba(0,168,45,.08)"><span style="font-family:'Material Symbols Rounded';font-size:18px;color:#00a82d;font-variation-settings:'FILL' 1">check_circle</span><span style="font-size:12.5px;font-weight:700;color:#00772a">Cupom {{ couponCode }} aplicado · {{ discountFmt }}</span></div>
+            </sc-if>
+
+            <!-- Summary -->
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:15px;margin-top:16px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;color:#7c766c;margin-bottom:9px"><span>Subtotal</span><span style="font-weight:600;color:#141414">{{ subtotalFmt }}</span></div>
+              <sc-if value="{{ couponApplied }}" hint-placeholder-val="{{ false }}"><div style="display:flex;justify-content:space-between;font-size:13px;color:#00a82d;margin-bottom:9px"><span>Desconto</span><span style="font-weight:700">−{{ discountFmt }}</span></div></sc-if>
+              <div style="display:flex;justify-content:space-between;font-size:13px;color:#7c766c;margin-bottom:11px"><span>Frete</span><span style="font-weight:600;color:#141414">a combinar</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid rgba(0,0,0,.07);padding-top:12px"><span style="font-size:15px;font-weight:800">Total</span><span style="font-size:21px;font-weight:800;color:{{ theme }};letter-spacing:-.02em">{{ totalFmt }}</span></div>
+            </div>
+          </div>
+          <div style="flex-shrink:0;padding:12px 18px 26px;background:#fff;border-top:1px solid rgba(0,0,0,.07)">
+            <div onClick="{{ goCheckout }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:54px;border-radius:16px;background:{{ theme }};color:#fff;font-size:15px;font-weight:700;cursor:pointer">Finalizar pedido<span style="font-family:'Material Symbols Rounded';font-size:21px">arrow_forward</span></div>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- ============ CHECKOUT ============ -->
+        <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;min-height:0;flex:1;animation:zslidein .26s ease">
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;padding:10px 16px 12px">
+            <div onClick="{{ goCart }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">arrow_back</span></div>
+            <div style="flex:1;font-size:18px;font-weight:800;letter-spacing:-.02em">Finalizar pedido</div>
+          </div>
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 18px">
+            <!-- order summary collapsed -->
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:14px 15px;margin-bottom:16px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;font-weight:700;color:#7c766c;text-transform:uppercase;letter-spacing:.05em">Resumo · {{ cartItemsLabel }}</span><span style="font-size:16px;font-weight:800;color:{{ theme }}">{{ totalFmt }}</span></div>
+              <sc-for list="{{ cartItems }}" as="it" hint-placeholder-count="2">
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#5a5a5a;padding:3px 0"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">{{ it.qty }}× {{ it.name }}</span><span style="font-weight:600">{{ it.lineFmt }}</span></div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">Nome completo</div>
+            <input value="{{ coName }}" oninput="{{ onCoName }}" placeholder="Seu nome" style="width:100%;background:#fff;border:1.5px solid {{ coNameBorder }};border-radius:14px;padding:15px;font-size:15px;font-weight:600;font-family:inherit;outline:none;color:#141414;margin-bottom:14px" />
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">WhatsApp</div>
+            <div style="display:flex;align-items:center;background:#fff;border:1.5px solid {{ coPhoneBorder }};border-radius:14px;padding:0 15px;margin-bottom:18px">
+              <span style="font-size:15px;font-weight:700;color:#5a5a5a;padding-right:11px;border-right:1px solid rgba(0,0,0,.08)">+55</span>
+              <input value="{{ coPhone }}" oninput="{{ onCoPhone }}" inputmode="tel" placeholder="(11) 90000-0000" style="flex:1;border:none;outline:none;background:transparent;font-size:15px;font-weight:600;font-family:inherit;padding:15px 0 15px 11px;color:#141414;min-width:0" />
+            </div>
+
+            <div onClick="{{ toggleDelivery }}" style="display:flex;gap:12px;background:#fff;border:1.5px solid {{ deliveryBorder }};border-radius:15px;padding:14px;cursor:pointer;margin-bottom:14px">
+              <span style="font-family:'Material Symbols Rounded';font-size:23px;color:{{ deliveryCheckColor }};font-variation-settings:'FILL' {{ deliveryFill }};flex-shrink:0">{{ deliveryCheck }}</span>
+              <div style="flex:1">
+                <div style="font-size:13.5px;font-weight:700">Combinar entrega pelo WhatsApp</div>
+                <div style="font-size:11.5px;color:#7c766c;line-height:1.45;margin-top:3px">Você abrirá o WhatsApp com o pedido preenchido para combinar frete, prazo e pagamento com a loja.</div>
+              </div>
+            </div>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">Observação <span style="color:#b3ada3;font-weight:500">(opcional)</span></div>
+            <textarea oninput="{{ onCoNotes }}" placeholder="Algum detalhe especial para o pedido?" style="width:100%;background:#fff;border:1.5px solid rgba(0,0,0,.08);border-radius:14px;padding:14px;font-size:13.5px;color:#5a5a5a;line-height:1.5;min-height:80px;font-family:inherit;outline:none;resize:none">{{ coNotes }}</textarea>
+          </div>
+          <div style="flex-shrink:0;padding:12px 18px 26px;background:#fff;border-top:1px solid rgba(0,0,0,.07)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:#9a948a">Total do pedido</span><span style="font-size:18px;font-weight:800;letter-spacing:-.02em">{{ totalFmt }}</span></div>
+            <div onClick="{{ confirmOrder }}" style="display:flex;align-items:center;justify-content:center;gap:9px;height:54px;border-radius:16px;background:{{ checkoutCtaBg }};color:#fff;font-size:15px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">chat</span>Confirmar pelo WhatsApp</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ PEDIDO CONFIRMADO ============ -->
+        <sc-if value="{{ isConfirmed }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;min-height:0;flex:1;animation:zfade .3s ease">
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:0 20px 18px">
+            <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:46px">
+              <div style="width:92px;height:92px;border-radius:50%;background:rgba(37,211,102,.14);display:flex;align-items:center;justify-content:center;margin-bottom:20px;animation:zpop .5s cubic-bezier(.22,1,.36,1)">
+                <span style="font-family:'Material Symbols Rounded';font-size:50px;color:#25d366;font-variation-settings:'FILL' 1">check_circle</span>
+              </div>
+              <h1 style="font-size:24px;font-weight:800;letter-spacing:-.03em;margin:0 0 8px">Pedido enviado! 🎉</h1>
+              <p style="font-size:14px;color:#7c766c;line-height:1.5;margin:0 0 4px;max-width:290px">Abrimos o WhatsApp da {{ storeName }} com seu pedido. Envie a mensagem para confirmar.</p>
+              <div style="font-size:13px;font-weight:700;color:{{ theme }};margin-top:6px">Pedido {{ orderCode }}</div>
+            </div>
+
+            <div onClick="{{ reopenWhats }}" style="display:flex;align-items:center;justify-content:center;gap:9px;height:54px;border-radius:16px;background:#25d366;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin:26px 0 16px"><span style="font-family:'Material Symbols Rounded';font-size:22px">chat</span>Abrir WhatsApp novamente</div>
+
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:6px 15px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)"><span style="font-size:12.5px;color:#7c766c">Cliente</span><span style="font-size:13px;font-weight:700">{{ coName }}</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)"><span style="font-size:12.5px;color:#7c766c">Itens</span><span style="font-size:13px;font-weight:700">{{ confirmedItemsLabel }}</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0"><span style="font-size:12.5px;color:#7c766c">Total</span><span style="font-size:16px;font-weight:800;color:{{ theme }}">{{ confirmedTotalFmt }}</span></div>
+            </div>
+
+            <div onClick="{{ backToHome }}" style="display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;height:50px;border-radius:15px;background:#fff;border:1px solid rgba(0,0,0,.1);color:#141414;font-size:14px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:20px">storefront</span>Continuar comprando</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ FLOATING CART (home only) ============ -->
+        <sc-if value="{{ showFloatingCart }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ goCart }}" style="position:absolute;left:18px;right:18px;bottom:24px;z-index:25;display:flex;align-items:center;gap:12px;height:56px;padding:0 8px 0 18px;border-radius:17px;background:{{ theme }};box-shadow:0 12px 28px -8px rgba(0,0,0,.4);cursor:pointer;animation:zfade .25s ease">
+          <span style="font-family:'Material Symbols Rounded';font-size:23px;color:#fff;font-variation-settings:'FILL' 1">shopping_bag</span>
+          <div style="flex:1;color:#fff"><div style="font-size:11px;opacity:.85;line-height:1">{{ cartItemsLabel }}</div><div style="font-size:15px;font-weight:800;letter-spacing:-.02em;line-height:1.25">{{ totalFmt }}</div></div>
+          <div style="display:flex;align-items:center;gap:5px;height:42px;padding:0 16px;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-size:13.5px;font-weight:700">Ver carrinho<span style="font-family:'Material Symbols Rounded';font-size:18px">arrow_forward</span></div>
+        </div>
+        </sc-if>
+
+        <!-- ============ SEARCH SHEET ============ -->
+        <sc-if value="{{ showSearchSheet }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(20,20,20,.42);z-index:40;animation:zfade .2s ease"></div>
+        <div style="position:absolute;left:0;right:0;top:0;z-index:41;background:#e9f3ea;padding:46px 18px 18px;animation:zfade .2s ease;display:flex;flex-direction:column;max-height:100%">
+          <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid {{ theme }};border-radius:14px;padding:0 14px;height:48px;flex-shrink:0">
+            <span style="font-family:'Material Symbols Rounded';font-size:21px;color:{{ theme }}">search</span>
+            <input value="{{ search }}" oninput="{{ onSearch }}" autofocus placeholder="Buscar produtos..." style="border:none;outline:none;background:transparent;font-size:15px;width:100%;font-family:inherit;color:#141414" />
+            <span onClick="{{ closeSheet }}" style="font-size:13px;font-weight:700;color:{{ theme }};cursor:pointer;white-space:nowrap">OK</span>
+          </div>
+          <sc-if value="{{ hasSearch }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:11.5px;font-weight:700;color:#9a948a;text-transform:uppercase;letter-spacing:.05em;margin:18px 2px 10px">{{ searchResultLabel }}</div>
+          <div class="zsc" style="overflow-y:auto;display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ searchResults }}" as="p" hint-placeholder-count="3">
+            <div onClick="{{ p.open }}" style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:9px;cursor:pointer">
+              <div style="width:50px;height:50px;border-radius:11px;flex-shrink:0;background:{{ p.thumb }};display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-size:22px;color:rgba(0,0,0,.14)">{{ p.icon }}</span></div>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div><div style="font-size:13px;font-weight:800;color:{{ theme }};margin-top:3px">{{ p.priceFmt }}</div></div>
+            </div>
+            </sc-for>
+          </div>
+          </sc-if>
+          <sc-if value="{{ noSearch }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:11.5px;font-weight:700;color:#9a948a;text-transform:uppercase;letter-spacing:.05em;margin:18px 2px 10px">Buscas populares</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ popularSearches }}" as="t" hint-placeholder-count="4">
+            <div onClick="{{ t.onClick }}" style="font-size:13px;font-weight:600;padding:9px 14px;border-radius:999px;background:#fff;border:1px solid rgba(0,0,0,.1);color:#5a5a5a;cursor:pointer">{{ t.label }}</div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- ============ SORT SHEET ============ -->
+        <sc-if value="{{ showSortSheet }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(20,20,20,.42);z-index:40;animation:zfade .2s ease"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;z-index:41;background:#e9f3ea;border-radius:26px 26px 0 0;padding:10px 20px 30px;animation:zslideup .28s cubic-bezier(.22,1,.36,1)">
+          <div style="width:40px;height:5px;border-radius:999px;background:#d8d2c6;margin:0 auto 16px"></div>
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:14px">Ordenar por</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ sortOptions }}" as="so" hint-placeholder-count="4">
+            <div onClick="{{ so.onClick }}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 15px;border-radius:14px;background:#fff;border:1.5px solid {{ so.border }};cursor:pointer">
+              <span style="font-size:14px;font-weight:600">{{ so.label }}</span>
+              <sc-if value="{{ so.active }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:22px;color:{{ theme }};font-variation-settings:'FILL' 1">check_circle</span></sc-if>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ TOAST ============ -->
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:50%;bottom:96px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:9px;background:#141414;color:#f9f6f2;padding:12px 18px;border-radius:14px;box-shadow:0 12px 30px -8px rgba(0,0,0,.5);animation:ztoast .3s ease;white-space:nowrap">
+          <span style="font-family:'Material Symbols Rounded';font-size:19px;color:#95e030;font-variation-settings:'FILL' 1">check_circle</span>
+          <span style="font-size:13px;font-weight:600">{{ toast }}</span>
+        </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:900},&quot;storeColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#00a82d&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;storeName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Ateliê Lola&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;storeSlogan&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Moda autoral feita à mão&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;forceLoading&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props)
+    this.state = {
+      loading: true,
+      screen: 'home',
+      category: '__all__',
+      sort: 'recent',
+      search: '',
+      sheet: null,
+      selId: null,
+      selVariation: null,
+      productQty: 1,
+      cart: [],
+      coupon: '',
+      appliedCoupon: null,
+      coName: '', coPhone: '', coNotes: '', deliveryConfirmed: false,
+      orderCode: null, confirmedSnapshot: null,
+      toast: null,
+    }
+    this.products = [
+      { id: 'p1', name: 'Vestido Midi Linho', cat: 'Vestidos', price: 18990, promo: 15990, icon: 'checkroom', thumb: 'linear-gradient(135deg,#f3ece0,#e9dcc8)', featured: true, stock: 12, variations: { label: 'Tamanho', options: ['P', 'M', 'G'] }, desc: 'Vestido midi em linho leve, ideal para o verão. Modelagem soltinha com bolsos laterais e botões frontais.' },
+      { id: 'p2', name: 'Bolsa Tiracolo Couro', cat: 'Bolsas', price: 24900, promo: null, icon: 'work', thumb: 'linear-gradient(135deg,#ece4d8,#d8c4a8)', featured: true, stock: 3, variations: null, desc: 'Bolsa tiracolo em couro legítimo com alça ajustável e fecho magnético. Cabe o essencial do dia a dia.' },
+      { id: 'p3', name: 'Brinco Argola Dourado', cat: 'Acessórios', price: 5990, promo: null, icon: 'diamond', thumb: 'linear-gradient(135deg,#f5eede,#ecdcc0)', featured: false, stock: 0, variations: null, desc: 'Argola média folheada a ouro 18k, antialérgica. Leve e confortável para usar o dia todo.' },
+      { id: 'p4', name: 'Camisa Alfaiataria', cat: 'Camisas', price: 15900, promo: null, icon: 'apparel', thumb: 'linear-gradient(135deg,#eef0ec,#dde2d8)', featured: false, stock: 8, variations: { label: 'Tamanho', options: ['P', 'M', 'G', 'GG'] }, desc: 'Camisa de alfaiataria em viscose com caimento impecável. Vai do trabalho ao happy hour.' },
+      { id: 'p5', name: 'Sandália Trançada', cat: 'Calçados', price: 12990, promo: null, icon: 'footprint', thumb: 'linear-gradient(135deg,#f3ebdd,#e6d3b8)', featured: false, stock: 21, variations: { label: 'Numeração', options: ['35', '36', '37', '38', '39', '40'] }, desc: 'Sandália rasteira trançada à mão, super confortável. Solado antiderrapante.' },
+      { id: 'p6', name: 'Calça Pantalona', cat: 'Calças', price: 19900, promo: 16900, icon: 'apparel', thumb: 'linear-gradient(135deg,#ede7da,#d9cdb4)', featured: false, stock: 6, variations: { label: 'Tamanho', options: ['36', '38', '40', '42'] }, desc: 'Pantalona de cintura alta com cós elástico nas costas. Tecido fluido que valoriza a silhueta.' },
+      { id: 'p7', name: 'Lenço de Seda Estampado', cat: 'Acessórios', price: 7900, promo: null, icon: 'dry_cleaning', thumb: 'linear-gradient(135deg,#f6ecdf,#ecd9c4)', featured: false, stock: 15, variations: null, desc: 'Lenço de seda com estampa exclusiva. Use no pescoço, na bolsa ou no cabelo.' },
+      { id: 'p8', name: 'Óculos Retrô', cat: 'Acessórios', price: 8990, promo: null, icon: 'eyeglasses', thumb: 'linear-gradient(135deg,#ece8e0,#d6cdbb)', featured: true, stock: 9, variations: null, desc: 'Óculos de sol retrô com proteção UV400 e armação acetato. Vem com estojo.' },
+    ]
+    this.CATS = [
+      { key: '__all__', label: 'Tudo' },
+      { key: 'Vestidos', label: 'Vestidos' },
+      { key: 'Bolsas', label: 'Bolsas' },
+      { key: 'Acessórios', label: 'Acessórios' },
+      { key: 'Camisas', label: 'Camisas' },
+      { key: 'Calçados', label: 'Calçados' },
+      { key: 'Calças', label: 'Calças' },
+    ]
+    this.SORTS = [
+      { key: 'recent', label: 'Mais recentes' },
+      { key: 'price_asc', label: 'Menor preço' },
+      { key: 'price_desc', label: 'Maior preço' },
+      { key: 'name', label: 'Nome (A → Z)' },
+    ]
+    this.POPULAR = ['Vestido', 'Bolsa', 'Brinco', 'Sandália']
+    this.COUPONS = { LOLA10: 0.1, BEMVINDA: 0.15 }
+  }
+
+  componentDidMount() {
+    this._load = setTimeout(() => this.setState({ loading: false }), 1500)
+  }
+  componentWillUnmount() { clearTimeout(this._load); clearTimeout(this._t) }
+  refresh() {
+    this.setState({ loading: true })
+    clearTimeout(this._load)
+    this._load = setTimeout(() => this.setState({ loading: false }), 1200)
+  }
+  money(c) { return 'R$ ' + (c / 100).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') }
+  eff(p) { return p.promo ?? p.price }
+  toast(m) { this.setState({ toast: m }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2000) }
+  go(screen) { this.setState({ screen, sheet: null }) }
+
+  cartKey(id, v) { return id + (v ? '::' + v : '') }
+  addToCart(p, variation, qty) {
+    const key = this.cartKey(p.id, variation)
+    this.setState((s) => {
+      const ex = s.cart.find((i) => i.key === key)
+      let cart
+      if (ex) cart = s.cart.map((i) => (i.key === key ? { ...i, qty: i.qty + qty } : i))
+      else cart = [...s.cart, { key, id: p.id, variation: variation || null, qty }]
+      return { cart }
+    })
+    this.toast('Adicionado ao carrinho')
+  }
+  setQty(key, d) {
+    this.setState((s) => {
+      let cart = s.cart.map((i) => (i.key === key ? { ...i, qty: i.qty + d } : i)).filter((i) => i.qty > 0)
+      return { cart }
+    })
+  }
+  removeItem(key) { this.setState((s) => ({ cart: s.cart.filter((i) => i.key !== key) })) }
+
+  subtotal() { return this.state.cart.reduce((sum, i) => { const p = this.products.find((x) => x.id === i.id); return sum + this.eff(p) * i.qty }, 0) }
+  discount() { const c = this.state.appliedCoupon; return c ? Math.round(this.subtotal() * c.rate) : 0 }
+  total() { return this.subtotal() - this.discount() }
+  cartCount() { return this.state.cart.reduce((s, i) => s + i.qty, 0) }
+
+  openProduct(p) { this.setState({ screen: 'product', selId: p.id, selVariation: p.variations ? p.variations.options[0] : null, productQty: 1, sheet: null }) }
+
+  renderVals() {
+    const st = this.state
+    const theme = this.props.storeColor ?? '#00a82d'
+    const storeName = this.props.storeName ?? 'Ateliê Lola'
+    const themeDark = this.shade(theme, -28)
+    const storeInitials = storeName.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase()
+
+    const decorate = (p) => {
+      const e = this.eff(p)
+      const hasPromo = !!p.promo
+      return {
+        ...p, priceFmt: this.money(e), oldFmt: this.money(p.price), hasPromo,
+        discount: hasPromo ? '-' + Math.round((1 - p.promo / p.price) * 100) + '%' : '',
+        soldOut: p.stock === 0,
+        open: () => this.openProduct(p),
+        add: (ev) => { if (ev) ev.stopPropagation(); if (p.stock === 0) { this.toast('Produto esgotado'); return } if (p.variations) { this.openProduct(p) } else { this.addToCart(p, null, 1) } },
+        addBg: p.stock === 0 ? '#cbc6ba' : theme,
+        addIcon: p.stock === 0 ? 'block' : 'add',
+      }
+    }
+
+    const featured = this.products.filter((p) => p.featured).map(decorate)
+
+    // category + search + sort for grid
+    const q = st.search.trim().toLowerCase()
+    let list = this.products.slice()
+    if (st.category !== '__all__') list = list.filter((p) => p.cat === st.category)
+    if (q) list = list.filter((p) => p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q))
+    switch (st.sort) {
+      case 'price_asc': list.sort((a, b) => this.eff(a) - this.eff(b)); break
+      case 'price_desc': list.sort((a, b) => this.eff(b) - this.eff(a)); break
+      case 'name': list.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')); break
+    }
+    const grid = list.map(decorate)
+
+    const categories = this.CATS.map((c) => {
+      const on = st.category === c.key
+      return { ...c, onClick: () => this.setState({ category: c.key }), bg: on ? theme : '#fff', fg: on ? '#fff' : '#5a5a5a', border: on ? theme : 'rgba(0,0,0,.1)' }
+    })
+
+    const sortLabel = this.SORTS.find((s) => s.key === st.sort).label
+    const sortOptions = this.SORTS.map((s) => ({ label: s.label, active: st.sort === s.key, border: st.sort === s.key ? theme : 'rgba(0,0,0,.07)', onClick: () => this.setState({ sort: s.key, sheet: null }) }))
+
+    // selected product
+    const selP = this.products.find((p) => p.id === st.selId)
+    let sel = {}, variations = []
+    if (selP) {
+      const d = decorate(selP)
+      sel = { ...d, hasVariations: !!selP.variations, variationLabel: selP.variations ? selP.variations.label : '', installmentPrefix: 'em até 3x de ' + this.money(Math.round(this.eff(selP) / 3)) + ' ' }
+      if (selP.variations) variations = selP.variations.options.map((o) => ({ label: o, onClick: () => this.setState({ selVariation: o }), bg: st.selVariation === o ? theme : '#fff', fg: st.selVariation === o ? '#fff' : '#141414', border: st.selVariation === o ? theme : 'rgba(0,0,0,.12)' }))
+    }
+    const detailTotalCents = selP ? this.eff(selP) * st.productQty : 0
+
+    // cart items
+    const cartItems = st.cart.map((i) => {
+      const p = this.products.find((x) => x.id === i.id)
+      return { ...i, name: p.name, icon: p.icon, thumb: p.thumb, lineFmt: this.money(this.eff(p) * i.qty), variation: i.variation, inc: () => this.setQty(i.key, 1), dec: () => this.setQty(i.key, -1), remove: () => this.removeItem(i.key) }
+    })
+
+    const sub = this.subtotal(), disc = this.discount(), tot = this.total()
+    const cc = this.cartCount()
+    const cartItemsLabel = cc + (cc === 1 ? ' item' : ' itens')
+
+    // search results in sheet
+    const searchResults = q ? grid.slice(0, 6) : []
+    const popularSearches = this.POPULAR.map((t) => ({ label: t, onClick: () => this.setState({ search: t }) }))
+
+    // checkout validation
+    const phoneDigits = st.coPhone.replace(/\D/g, '')
+    const coValid = st.coName.trim().length >= 2 && phoneDigits.length >= 10 && st.deliveryConfirmed
+
+    const trustBadges = [
+      { icon: 'verified_user', label: 'Compra segura' },
+      { icon: 'local_shipping', label: 'Envio rápido' },
+      { icon: 'autorenew', label: 'Troca fácil' },
+    ]
+
+    const loading = this.state.loading || (this.props.forceLoading ?? false)
+    const skeletonCards = [0, 1, 2, 3]
+    const about = {
+      slogan: this.props.storeSlogan ?? 'Moda autoral feita à mão',
+      address: 'Rua das Flores, 123 · Centro · São Paulo, SP',
+      phone: '+55 11 98842-0000',
+      instagram: '@' + (storeName.toLowerCase().replace(/[^a-z0-9]/g, '')),
+      story: 'O ' + storeName + ' nasceu em 2021 do desejo de unir moda consciente e peças únicas. Cada item é escolhido (ou costurado!) à mão, em pequenos lotes, pensando no caimento e no conforto de quem veste. Atendemos por aqui e pelo WhatsApp, com carinho de quem trata cada pedido como especial.',
+      gallery: [
+        { icon: 'storefront', thumb: 'linear-gradient(135deg,#f3ece0,#e9dcc8)' },
+        { icon: 'checkroom', thumb: 'linear-gradient(135deg,#ece4d8,#d8c4a8)' },
+        { icon: 'photo_camera', thumb: 'linear-gradient(135deg,#f5eede,#ecdcc0)' },
+        { icon: 'local_florist', thumb: 'linear-gradient(135deg,#eef0ec,#dde2d8)' },
+      ],
+      hours: [
+        { day: 'Segunda a Sexta', time: '09:00 – 18:00' },
+        { day: 'Sábado', time: '09:00 – 13:00' },
+        { day: 'Domingo', time: 'Fechado' },
+      ],
+    }
+
+    return {
+      theme, themeDark, storeName, storeInitials,
+      isHome: st.screen === 'home', isProduct: st.screen === 'product', isCart: st.screen === 'cart', isCheckout: st.screen === 'checkout', isConfirmed: st.screen === 'confirmed', isAbout: st.screen === 'about',
+      loading, loaded: !loading, skeletonCards, about,
+      goAbout: () => this.go('about'),
+      onWhats: () => this.toast('Abrindo WhatsApp da loja'),
+      onInstagram: () => this.toast('Abrindo Instagram'),
+      cartCount: cc > 0 ? cc : 0,
+      goCart: () => this.go('cart'), backToHome: () => this.go('home'), goCheckout: () => this.go('checkout'), closeProduct: () => this.go('home'),
+      onShare: () => this.toast('Link da loja copiado'),
+      // search
+      openSearch: () => this.setState({ sheet: 'search' }), openSort: () => this.setState({ sheet: 'sort' }), closeSheet: () => this.setState({ sheet: null }),
+      search: st.search, onSearch: (e) => this.setState({ search: e.target.value }), clearSearch: (e) => { if (e) e.stopPropagation(); this.setState({ search: '' }) },
+      hasSearch: q.length > 0, noSearch: q.length === 0,
+      searchPlaceholder: q ? st.search : 'Buscar produtos...',
+      searchResults, searchResultLabel: grid.length + (grid.length === 1 ? ' resultado' : ' resultados'), popularSearches,
+      showSearchSheet: st.sheet === 'search', showSortSheet: st.sheet === 'sort',
+      // catalog
+      categories, sortLabel, sortOptions,
+      showFeatured: st.category === '__all__' && !q, featured,
+      gridTitle: q ? 'Resultados' : st.category === '__all__' ? 'Todos os produtos' : st.category,
+      grid, hasResults: grid.length > 0, noResults: grid.length === 0,
+      // product
+      sel, variations, selectedVariation: st.selVariation, productQty: st.productQty,
+      incQty: () => this.setState((s) => ({ productQty: s.productQty + 1 })),
+      decQty: () => this.setState((s) => ({ productQty: Math.max(1, s.productQty - 1) })),
+      detailTotal: this.money(detailTotalCents),
+      addFromDetail: () => { if (selP.stock === 0) { this.toast('Produto esgotado'); return } this.addToCart(selP, st.selVariation, st.productQty); this.go('cart') },
+      trustBadges,
+      // cart
+      cartItems, cartEmpty: st.cart.length === 0, cartHasItems: st.cart.length > 0, cartItemsLabel,
+      subtotalFmt: this.money(sub), discountFmt: this.money(disc), totalFmt: this.money(tot),
+      coupon: st.coupon, onCoupon: (e) => this.setState({ coupon: e.target.value }),
+      applyCoupon: () => { const code = st.coupon.trim().toUpperCase(); if (this.COUPONS[code]) { this.setState({ appliedCoupon: { code, rate: this.COUPONS[code] } }); this.toast('Cupom aplicado!') } else { this.toast('Cupom inválido') } },
+      couponApplied: !!st.appliedCoupon, couponCode: st.appliedCoupon ? st.appliedCoupon.code : '',
+      showFloatingCart: st.screen === 'home' && cc > 0,
+      // checkout
+      coName: st.coName, onCoName: (e) => this.setState({ coName: e.target.value }),
+      coPhone: st.coPhone, onCoPhone: (e) => this.setState({ coPhone: e.target.value }),
+      coNotes: st.coNotes, onCoNotes: (e) => this.setState({ coNotes: e.target.value }),
+      coNameBorder: st.coName.trim().length >= 2 ? theme : 'rgba(0,0,0,.08)',
+      coPhoneBorder: phoneDigits.length >= 10 ? theme : 'rgba(0,0,0,.08)',
+      toggleDelivery: () => this.setState((s) => ({ deliveryConfirmed: !s.deliveryConfirmed })),
+      deliveryBorder: st.deliveryConfirmed ? theme : 'rgba(0,0,0,.08)',
+      deliveryCheck: st.deliveryConfirmed ? 'check_circle' : 'radio_button_unchecked',
+      deliveryCheckColor: st.deliveryConfirmed ? theme : '#cbc6ba', deliveryFill: st.deliveryConfirmed ? 1 : 0,
+      checkoutCtaBg: coValid ? '#25d366' : '#bcd6c5',
+      confirmOrder: () => {
+        if (!coValid) { this.toast('Preencha nome, WhatsApp e confirme a entrega'); return }
+        const code = '#' + Math.random().toString(36).slice(2, 7).toUpperCase()
+        this.setState({ screen: 'confirmed', orderCode: code, confirmedSnapshot: { count: cc, total: tot }, cart: [], appliedCoupon: null, coupon: '' })
+        this.toast('Abrindo WhatsApp…')
+      },
+      // confirmed
+      orderCode: st.orderCode,
+      confirmedItemsLabel: st.confirmedSnapshot ? (st.confirmedSnapshot.count + (st.confirmedSnapshot.count === 1 ? ' item' : ' itens')) : '',
+      confirmedTotalFmt: st.confirmedSnapshot ? this.money(st.confirmedSnapshot.total) : '',
+      reopenWhats: () => this.toast('Abrindo WhatsApp…'),
+      toast: st.toast,
+    }
+  }
+
+  shade(hex, percent) {
+    const n = parseInt(hex.replace('#', ''), 16)
+    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255
+    const f = percent / 100
+    r = Math.max(0, Math.min(255, Math.round(r + r * f)))
+    g = Math.max(0, Math.min(255, Math.round(g + g * f)))
+    b = Math.max(0, Math.min(255, Math.round(b + b * f)))
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
+  }
+}
+</script>
+</body>
+</html>

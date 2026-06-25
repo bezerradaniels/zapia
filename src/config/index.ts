@@ -1,2 +1,2 @@
-export { PLANS, TRIAL_DAYS } from './plans'
+export { PLANS } from './plans'
 export { ROUTES } from './routes'

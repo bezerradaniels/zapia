@@ -9,21 +9,16 @@ import {
   ArrowRightIcon,
   Add01Icon,
   Share01Icon,
-  ArrowUpRight01Icon,
   ShoppingBag03Icon,
 } from '@hugeicons/core-free-icons'
 import { useActiveStore } from '@/lib/tenant'
 import { useOrders } from '@/features/orders'
 import { useProducts } from '@/features/products'
-import { useSubscription, trialDaysLeft } from '@/features/billing'
-import { useCategories } from '@/features/categories'
-import { useCoupons } from '@/features/coupons'
+import { useCustomers } from '@/features/customers'
 import { useSession } from '@/features/auth'
-import { SetupChecklist, buildChecklistState } from '@/features/onboarding'
 import { formatMoney } from '@/lib/format'
-import { buildStoreUrl } from '@/lib/tenant'
 import { ROUTES } from '@/config/routes'
-import { Badge, Button } from '@/components/ui'
+import { Badge, Button, Skeleton } from '@/components/ui'
 import type { Order } from '@/types/domain'
 import { cn } from '@/lib/utils'
 
@@ -43,9 +38,9 @@ function getGreeting(): string {
 function WelcomeModal({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate()
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/80 p-4">
       <div className="w-full max-w-md rounded-2xl border border-z-border bg-white p-8 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-z-green/10 text-[#10b981]">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-[#0bfeda]">
           <HugeiconsIcon icon={ShoppingBag03Icon} size={30} />
         </div>
         <h2 className="text-xl font-bold">Sua loja está pronta!</h2>
@@ -108,9 +103,7 @@ export default function HomePage() {
   const { session } = useSession()
   const orders = useOrders(store?.id)
   const products = useProducts(store?.id)
-  const subscription = useSubscription(store?.id)
-  const categories = useCategories(store?.id)
-  const coupons = useCoupons(store?.id)
+  const customers = useCustomers(store?.id)
   const [searchParams, setSearchParams] = useSearchParams()
   const [showWelcome, setShowWelcome] = useState(searchParams.get('welcome') === '1')
 
@@ -125,12 +118,6 @@ export default function HomePage() {
     store?.name?.split(' ')[0] ??
     'você'
 
-  const sub = subscription.data
-  const trialDays =
-    sub && sub.status === 'trialing'
-      ? trialDaysLeft({ status: sub.status, trial_ends_at: sub.trial_ends_at })
-      : null
-
   const list = orders.data ?? []
   const todayStart = startOfTodaySP().getTime()
   const monthStart = startOfMonthSP().getTime()
@@ -141,19 +128,9 @@ export default function HomePage() {
   const monthRevenue = monthOrders.reduce((sum, o) => sum + o.total_in_cents, 0)
   const pendingCount = list.filter((o) => o.status === 'pending').length
   const activeProducts = (products.data ?? []).filter((p) => p.is_active).length
+  const customerCount = (customers.data ?? []).length
 
   const recent = list.slice(0, 5)
-
-  const checklistState = buildChecklistState({
-    hasProducts: (products.data ?? []).length > 0,
-    logoUrl: store?.logo_url,
-    bannerUrl: store?.banner_url,
-    primaryColor: store?.primary_color,
-    addressCity: store?.address_city,
-    hasCategories: (categories.data ?? []).length > 0,
-    hasCoupons: (coupons.data ?? []).length > 0,
-  })
-  const checklistLoading = products.isLoading || categories.isLoading || coupons.isLoading
 
   return (
     <div className="flex flex-col gap-5">
@@ -166,67 +143,29 @@ export default function HomePage() {
         </h1>
       </div>
 
-      {/* Trial banner */}
-      {trialDays !== null && (
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0 flex-1 text-xs leading-relaxed text-z-text-muted sm:text-sm">
-            {trialDays > 0 ? (
-              <>
-                Seu período de trial termina em{' '}
-                <strong className="text-z-text">
-                  {trialDays} dia{trialDays === 1 ? '' : 's'}
-                </strong>
-                . Continue aproveitando todos os recursos.
-              </>
-            ) : (
-              <>Seu período de trial terminou. Assine para continuar.</>
-            )}
-          </div>
-          <Button
-            size="sm"
-            className="h-9 shrink-0 border border-z-green bg-z-green/10 px-3 text-xs text-[#10b981] sm:px-4 sm:text-[13px]"
-            asChild
-          >
-            <Link to={ROUTES.dashboardBilling}>
-              <HugeiconsIcon icon={CreditCardIcon} size={15} />
-              Assinar agora
-            </Link>
-          </Button>
-        </div>
-      )}
-
-      <SetupChecklist state={checklistState} loading={checklistLoading} />
-
-      {/* Quick actions */}
-      <div className="grid grid-cols-4 gap-2 sm:gap-3">
+      {/* Quick actions — white cards with mint icon (handoff) */}
+      <div className="grid grid-cols-3 gap-2.5">
         {[
           { label: 'Novo produto',   icon: Add01Icon,     href: '/dashboard/produtos/novo' },
           { label: 'Ver pedidos',    icon: InvoiceIcon,   href: ROUTES.dashboardOrders },
-          { label: 'Personalizar',   icon: Share01Icon,   href: ROUTES.dashboardCatalog },
-          { label: 'Ver catálogo',   icon: ArrowUpRight01Icon, href: store?.slug ? buildStoreUrl(store.slug) : '#', external: true },
-        ].map((action) =>
-          action.external ? (
-            <a
-              key={action.label}
-              href={action.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex aspect-square flex-col items-center justify-center gap-1.5 rounded-lg bg-z-green px-2 py-2 text-center text-[10px] font-semibold leading-tight text-z-ink transition-opacity hover:opacity-85 sm:aspect-auto sm:min-h-14 sm:flex-row sm:gap-2 sm:px-3 sm:py-3 sm:text-sm"
-            >
-              <HugeiconsIcon icon={action.icon} size={18} className="shrink-0 sm:size-4" />
-              <span className="min-w-0">{action.label}</span>
-            </a>
-          ) : (
-            <Link
-              key={action.label}
-              to={action.href}
-              className="flex aspect-square flex-col items-center justify-center gap-1.5 rounded-lg bg-z-green px-2 py-2 text-center text-[10px] font-semibold leading-tight text-z-ink transition-opacity hover:opacity-85 sm:aspect-auto sm:min-h-14 sm:flex-row sm:gap-2 sm:px-3 sm:py-3 sm:text-sm"
-            >
-              <HugeiconsIcon icon={action.icon} size={18} className="shrink-0 sm:size-4" />
-              <span className="min-w-0">{action.label}</span>
+          { label: 'Personalizar catálogo',   icon: Share01Icon,   href: ROUTES.dashboardCatalog },
+        ].map((action) => {
+          const inner = (
+            <>
+              <div className="flex h-[62px] w-full items-center justify-center rounded-2xl border border-z-border bg-slate-900 text-[#0bfeda] transition-colors group-hover:border-[#10b981]/40">
+                <HugeiconsIcon icon={action.icon} size={24} />
+              </div>
+              <span className="text-center text-[10.5px] font-semibold leading-tight text-z-text-muted">
+                {action.label}
+              </span>
+            </>
+          )
+          return (
+            <Link key={action.label} to={action.href} className="group flex flex-col items-center gap-1.5">
+              {inner}
             </Link>
-          ),
-        )}
+          )
+        })}
       </div>
 
       {/* Stats */}
@@ -235,29 +174,26 @@ export default function HomePage() {
           label="Pedidos hoje"
           value={todayOrders.length.toString()}
           sub={pendingCount > 0 ? `${pendingCount} pendente${pendingCount === 1 ? '' : 's'}` : 'Tudo em dia'}
+          subPositive={pendingCount > 0}
           icon={InvoiceIcon}
-          variant="green"
         />
         <StatCard
           label="Receita do mês"
           value={formatMoney(monthRevenue)}
           sub="Exclui cancelados"
           icon={CreditCardIcon}
-          variant="dark"
         />
         <StatCard
           label="Produtos ativos"
           value={activeProducts.toString()}
           sub={`${(products.data ?? []).length} no total`}
           icon={PackageIcon}
-          variant="sand"
         />
         <StatCard
-          label="Pedidos no mês"
-          value={monthOrders.length.toString()}
-          sub="Acumulado"
+          label="Clientes"
+          value={customerCount.toString()}
+          sub="Cadastrados"
           icon={UserGroupIcon}
-          variant="sand"
         />
       </section>
 
@@ -285,7 +221,7 @@ export default function HomePage() {
           {orders.isLoading ? (
             <div className="flex flex-col gap-2">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-10 rounded-xl bg-z-bg2" />
+                <Skeleton key={i} className="h-10 rounded-xl" />
               ))}
             </div>
           ) : recent.length === 0 ? (
@@ -294,7 +230,7 @@ export default function HomePage() {
               <p className="text-sm text-z-text-muted">Nenhum pedido ainda.</p>
               <Link
                 to={ROUTES.dashboardCatalog}
-                className="text-xs font-medium text-[#0ea5e9] hover:underline"
+                className="text-xs font-medium text-[#0bfeda] hover:underline"
               >
                 Compartilhar catálogo →
               </Link>
@@ -329,55 +265,36 @@ export default function HomePage() {
   )
 }
 
-const STAT_VARIANTS = {
-  green: {
-    wrap: 'bg-white border border-z-border text-z-text',
-    label: 'text-z-text-muted',
-    sub: 'text-z-text-muted',
-    icon: 'bg-z-green text-z-ink',
-  },
-  dark: {
-    wrap: 'bg-white border border-z-border text-z-text',
-    label: 'text-z-text-muted',
-    sub: 'text-z-text-muted',
-    icon: 'bg-z-green text-z-ink',
-  },
-  sand: {
-    wrap: 'bg-white border border-z-border text-z-text',
-    label: 'text-z-text-muted',
-    sub: 'text-z-text-muted',
-    icon: 'bg-z-green text-z-ink',
-  },
-}
-
 function StatCard({
   label,
   value,
   sub,
+  subPositive,
   icon,
-  variant,
 }: {
   label: string
   value: string
   sub?: string
+  subPositive?: boolean
   icon: IconSvgElement
-  variant: keyof typeof STAT_VARIANTS
 }) {
-  const v = STAT_VARIANTS[variant]
   return (
-    <div className={cn('flex flex-col justify-between gap-3 rounded-2xl p-4 sm:p-5', v.wrap)}>
-      <div className="flex items-start justify-between gap-2">
-        <span className={cn('text-xs font-medium', v.label)}>{label}</span>
-        <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-xl', v.icon)}>
-          <HugeiconsIcon icon={icon} size={16} />
-        </div>
+    <div className="rounded-[18px] border border-z-border bg-white p-4">
+      <div className="mb-3.5 flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-z-text-muted">{label}</span>
+        <HugeiconsIcon icon={icon} size={18} className="shrink-0 text-z-text-hint" />
       </div>
-      <div>
-        <div className="text-2xl font-bold leading-none tracking-tighter sm:text-[28px]">
-          {value}
+      <div className="text-[26px] font-bold leading-none tracking-tighter">{value}</div>
+      {sub && (
+        <div
+          className={cn(
+            'mt-1.5 text-[11px] font-semibold',
+            subPositive ? 'text-[#0bfeda]' : 'text-z-text-muted',
+          )}
+        >
+          {sub}
         </div>
-        {sub && <div className={cn('mt-1.5 text-xs', v.sub)}>{sub}</div>}
-      </div>
+      )}
     </div>
   )
 }
@@ -413,14 +330,14 @@ function WeeklyBars({ orders }: { orders: Order[] }) {
           <div
               className={cn(
               'w-full rounded-t-lg',
-              i === counts.length - 1 ? 'bg-[#0ea5e9]' : 'bg-z-bg2',
+              i === counts.length - 1 ? 'bg-[#10b981]' : 'bg-z-sand-deep',
             )}
             style={{ height: `${(v / max) * 88 + 4}px` }}
             title={`${v} pedido${v === 1 ? '' : 's'}`}
           />
           <span className={cn(
             'text-[10px]',
-            i === counts.length - 1 ? 'font-semibold text-[#0ea5e9]' : 'text-z-text-hint',
+            i === counts.length - 1 ? 'font-semibold text-[#0bfeda]' : 'text-z-text-hint',
           )}>
             {labels[i]}
           </span>

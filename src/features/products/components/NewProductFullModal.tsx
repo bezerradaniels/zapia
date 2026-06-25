@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -13,11 +13,7 @@ import {
   ViewIcon,
   Edit01Icon,
   Store01Icon,
-  ShoppingCart01Icon,
 } from '@hugeicons/core-free-icons'
-import { MercadoLibreSearch } from './MercadoLibreSearch/MercadoLibreSearch'
-import { ProductRichTextEditor } from './ProductRichTextEditor'
-import type { MlImportPayload } from '../types'
 import { ProductImagesUploader } from '@/components/forms/ProductImagesUploader'
 import { MoneyInput } from '@/components/forms/MoneyInput'
 import { formatMoney } from '@/lib/format'
@@ -29,19 +25,19 @@ import { buildStorePath } from '@/lib/tenant'
 
 function FieldLabel({ children }: { children: ReactNode }) {
   return (
-    <label className="text-base font-semibold text-[#40558a]">
+    <label className="text-base font-semibold text-z-text">
       {children}
       <HugeiconsIcon
         icon={InformationCircleIcon}
         size={14}
-        className="ml-1 inline text-[#6f7da4]"
+        className="ml-1 inline text-z-text-hint"
       />
     </label>
   )
 }
 
 function SectionDivider() {
-  return <div className="h-px bg-[#d8dfef]" />
+  return <div className="h-px bg-z-border" />
 }
 
 function CreateCategoryDialog({
@@ -124,7 +120,7 @@ const DEFAULT_VALUES: ProductInput = {
   cost_in_cents: null,
   price_in_cents: 0,
   promo_price_in_cents: null,
-  installment_count: null,
+  installment_count: 12,
   installment_total_in_cents: null,
   is_active: true,
   is_featured: false,
@@ -154,7 +150,6 @@ export function NewProductFullModal({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [createdProductId, setCreatedProductId] = useState<string | null>(null)
-  const [mlSearchOpen, setMlSearchOpen] = useState(false)
 
   const form = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
@@ -169,6 +164,7 @@ export function NewProductFullModal({
   const installmentCount = form.watch('installment_count') ?? null
   const installmentTotal = form.watch('installment_total_in_cents') ?? null
   const selectedCategory = form.watch('category')
+  const selectedSubcategory = form.watch('subcategory')
   const selectedCategoryObj = categories.find((category) => category.name === selectedCategory)
   const availableSubcategories = categories.filter(
     (category) => category.parent_id === selectedCategoryObj?.id,
@@ -203,17 +199,6 @@ export function NewProductFullModal({
     setNewSubcategoryOpen(false)
   }
 
-  function handleMlImport(payload: MlImportPayload) {
-    form.setValue('name', payload.name, { shouldDirty: true, shouldValidate: true })
-    if (payload.brand) form.setValue('brand', payload.brand, { shouldDirty: true })
-    if (payload.description) form.setValue('description', payload.description, { shouldDirty: true })
-    if (payload.images.length > 0) form.setValue('images', payload.images, { shouldDirty: true })
-    if (payload.barcode) form.setValue('barcode', payload.barcode, { shouldDirty: true })
-    if (payload.barcode_type) form.setValue('barcode_type', payload.barcode_type, { shouldDirty: true })
-    if (payload.brand) form.setValue('has_no_brand', false, { shouldDirty: true })
-    setMlSearchOpen(false)
-  }
-
   const submit = form.handleSubmit(async (values) => {
     setIsSubmitting(true)
     setSubmitError(null)
@@ -233,37 +218,39 @@ export function NewProductFullModal({
     }
   })
 
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [])
+
   return (
-    <div>
-    {mlSearchOpen && (
-      <MercadoLibreSearch
-        storeId={storeId}
-        onImport={handleMlImport}
-        onClose={() => setMlSearchOpen(false)}
-      />
-    )}
-    <div className="fixed inset-0 z-[70] flex flex-col bg-[#f8fafc]">
-      <div className="relative border-b border-z-border bg-white px-4 py-4">
-        <div className="mx-auto max-w-[728px] text-center">
-          <h2 className="text-xl font-bold tracking-tight text-[#263d6b]">
-            Novo Produto
+    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center">
+    <button
+      type="button"
+      className="absolute inset-0 bg-[rgba(20,20,20,.42)] backdrop-blur-[1px]"
+      onClick={onClose}
+      aria-label="Fechar novo produto"
+    />
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="new-product-title"
+      className="relative z-10 flex max-h-[88dvh] w-full max-w-[760px] flex-col overflow-hidden rounded-t-[28px] bg-z-bg shadow-2xl sm:max-h-[90vh] sm:rounded-[28px]"
+    >
+      <div className="relative border-b border-z-border bg-z-bg px-5 pb-4 pt-3">
+        <div className="mx-auto mb-5 h-[5px] w-16 rounded-full bg-z-border" />
+        <div className="max-w-[728px]">
+          <h2 id="new-product-title" className="text-[28px] font-extrabold tracking-tight text-z-text">
+            Novo produto
           </h2>
-          <p className="mt-1 text-sm font-medium text-[#40558a]">
-            Comece com as informações básicas
-          </p>
-          <button
-            type="button"
-            onClick={() => setMlSearchOpen(true)}
-            className="mx-auto mt-3 inline-flex items-center gap-2 rounded-lg border border-[#e2c94a] bg-[#fffbeb] px-3.5 py-2 text-xs font-semibold text-[#b45309] shadow-sm transition-colors hover:bg-[#fef3c7]"
-          >
-            <HugeiconsIcon icon={ShoppingCart01Icon} size={14} />
-            Importar do Mercado Livre
-          </button>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full text-z-text-muted transition-colors hover:bg-z-bg2 hover:text-z-text"
+          className="absolute right-4 top-7 flex h-10 w-10 items-center justify-center rounded-full text-z-text-muted transition-colors hover:bg-white hover:text-z-text"
           aria-label="Fechar"
         >
           <HugeiconsIcon icon={Cancel01Icon} size={20} />
@@ -271,32 +258,32 @@ export function NewProductFullModal({
       </div>
 
       <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-8 pb-32">
-          <div className="mx-auto flex w-full max-w-[728px] flex-col gap-8">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 pb-28">
+          <div className="mx-auto flex w-full max-w-[728px] flex-col gap-7">
             <section className="flex flex-col gap-4">
-              <h3 className="text-lg font-bold text-[#263d6b]">Título e descrição</h3>
+              <h3 className="text-lg font-bold text-z-text">Título e descrição</h3>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-base font-semibold text-[#40558a]">
+                <label className="text-base font-semibold text-z-text">
                   Título
                   <HugeiconsIcon
                     icon={InformationCircleIcon}
                     size={14}
-                    className="ml-1 inline text-[#6f7da4]"
+                    className="ml-1 inline text-z-text-hint"
                   />
                 </label>
                 <input
                   maxLength={120}
-                  placeholder="Ex: Figurinha"
+                  placeholder="Ex: Vestido Prada"
                   className={cn(
-                    'h-12 rounded-lg border bg-white px-4 text-base text-[#263d6b] placeholder:text-[#8a96ba] focus:outline-none focus:ring-2',
+                    'h-12 rounded-lg border bg-white px-4 text-base text-z-text placeholder:text-z-text-hint focus:outline-none focus:ring-2',
                     form.formState.errors.name
                       ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                      : 'border-[#cfd8eb] focus:border-[#40558a] focus:ring-[#40558a]/15',
+                      : 'border-z-border focus:border-z-green focus:ring-z-green/30',
                   )}
                   {...form.register('name')}
                 />
-                <span className="text-sm font-medium text-[#7482aa]">
+                <span className="text-sm font-medium text-z-text-muted">
                   {remainingNameChars} caracteres restantes
                 </span>
                 {form.formState.errors.name && (
@@ -307,24 +294,24 @@ export function NewProductFullModal({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-base font-semibold text-[#40558a]">
+                <label className="text-base font-semibold text-z-text">
                   Descrição
                   <HugeiconsIcon
                     icon={InformationCircleIcon}
                     size={14}
-                    className="ml-1 inline text-[#6f7da4]"
+                    className="ml-1 inline text-z-text-hint"
                   />
                 </label>
-                <Controller
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <ProductRichTextEditor
-                      value={field.value ?? ''}
-                      onChange={field.onChange}
-                      placeholder="Conte algo sobre o produto..."
-                    />
+                <textarea
+                  rows={6}
+                  placeholder="Conte algo sobre o produto..."
+                  className={cn(
+                    'min-h-[150px] resize-none rounded-lg border bg-white px-4 py-3 text-base text-z-text placeholder:text-z-text-hint focus:outline-none focus:ring-2',
+                    form.formState.errors.description
+                      ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
+                      : 'border-z-border focus:border-z-green focus:ring-z-green/30',
                   )}
+                  {...form.register('description')}
                 />
                 {form.formState.errors.description && (
                   <span className="text-xs text-destructive">
@@ -337,7 +324,7 @@ export function NewProductFullModal({
             <SectionDivider />
 
             <section className="flex flex-col gap-4">
-              <h3 className="text-lg font-bold text-[#263d6b]">Fotos</h3>
+              <h3 className="text-lg font-bold text-z-text">Fotos</h3>
               <div className="rounded-2xl border-2 border-dashed border-emerald-100 bg-white p-4">
                 <ProductImagesUploader
                   storeId={storeId}
@@ -361,158 +348,153 @@ export function NewProductFullModal({
             <SectionDivider />
 
             <section className="flex flex-col gap-4">
-              <h3 className="text-lg font-bold text-[#263d6b]">Preço</h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="flex flex-col gap-1.5">
-                  <FieldLabel>Preço</FieldLabel>
-                  <MoneyInput
-                    valueInCents={null}
-                    placeholder="R$ 0,00"
-                    className={cn(
-                      'h-12 rounded-lg border bg-white px-4 text-base text-[#263d6b] placeholder:text-[#8a96ba] focus:outline-none focus:ring-2',
-                      form.formState.errors.price_in_cents
-                        ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                        : 'border-[#cfd8eb] focus:border-[#40558a] focus:ring-[#40558a]/15',
-                    )}
-                    onChange={(cents) =>
-                      form.setValue('price_in_cents', cents ?? 0, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      })
-                    }
-                  />
-                  {form.formState.errors.price_in_cents && (
-                    <span className="text-xs text-destructive">
-                      {form.formState.errors.price_in_cents.message}
-                    </span>
+              <h3 className="text-lg font-bold text-z-text">Preço</h3>
+              <div className="flex flex-col gap-1.5">
+                <FieldLabel>Preço</FieldLabel>
+                <MoneyInput
+                  valueInCents={null}
+                  placeholder="R$ 0,00"
+                  className={cn(
+                    'h-12 rounded-lg border bg-white px-4 text-base text-z-text placeholder:text-z-text-hint focus:outline-none focus:ring-2',
+                    form.formState.errors.price_in_cents
+                      ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
+                      : 'border-z-border focus:border-z-green focus:ring-z-green/30',
                   )}
-                </div>
+                  onChange={(cents) =>
+                    form.setValue('price_in_cents', cents ?? 0, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
+                />
+                {form.formState.errors.price_in_cents && (
+                  <span className="text-xs text-destructive">
+                    {form.formState.errors.price_in_cents.message}
+                  </span>
+                )}
+              </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <FieldLabel>Preço promocional</FieldLabel>
-                  <MoneyInput
-                    valueInCents={null}
-                    allowEmpty
-                    placeholder="Opcional"
-                    className={cn(
-                      'h-12 rounded-lg border bg-white px-4 text-base text-[#263d6b] placeholder:text-[#8a96ba] focus:outline-none focus:ring-2',
-                      form.formState.errors.promo_price_in_cents
-                        ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                        : 'border-[#cfd8eb] focus:border-[#40558a] focus:ring-[#40558a]/15',
-                    )}
-                    onChange={(cents) =>
-                      form.setValue('promo_price_in_cents', cents, {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      })
-                    }
-                  />
-                  {form.formState.errors.promo_price_in_cents && (
-                    <span className="text-xs text-destructive">
-                      {form.formState.errors.promo_price_in_cents.message}
-                    </span>
+              <div className="flex flex-col gap-1.5">
+                <FieldLabel>Estoque</FieldLabel>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  className={cn(
+                    'h-12 rounded-lg border bg-white px-4 text-base text-z-text placeholder:text-z-text-hint focus:outline-none focus:ring-2',
+                    form.formState.errors.stock
+                      ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
+                      : 'border-z-border focus:border-z-green focus:ring-z-green/30',
                   )}
-                </div>
+                  {...form.register('stock', {
+                    setValueAs: (value) =>
+                      value === '' || value === null || value === undefined
+                        ? null
+                        : Number(value),
+                  })}
+                />
+                <span className="text-xs text-z-text-hint">
+                  Se deixar zero, o estoque não será mostrado na página do produto.
+                </span>
+                {form.formState.errors.stock && (
+                  <span className="text-xs text-destructive">
+                    {form.formState.errors.stock.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <FieldLabel>Preço promocional</FieldLabel>
+                <MoneyInput
+                  valueInCents={null}
+                  allowEmpty
+                  placeholder="Opcional"
+                  className={cn(
+                    'h-12 rounded-lg border bg-white px-4 text-base text-z-text placeholder:text-z-text-hint focus:outline-none focus:ring-2',
+                    form.formState.errors.promo_price_in_cents
+                      ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
+                      : 'border-z-border focus:border-z-green focus:ring-z-green/30',
+                  )}
+                  onChange={(cents) =>
+                    form.setValue('promo_price_in_cents', cents, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
+                />
+                {form.formState.errors.promo_price_in_cents && (
+                  <span className="text-xs text-destructive">
+                    {form.formState.errors.promo_price_in_cents.message}
+                  </span>
+                )}
               </div>
 
               {/* Parcelamento */}
-              <div className="flex flex-col gap-3 rounded-xl border border-[#cfd8eb] bg-[#f8fafc] p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-[#263d6b]">Parcelamento</p>
-                    <p className="text-xs text-[#8a96ba]">
-                      Exibe opção de parcelamento no catálogo
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (installmentCount != null) {
-                        form.setValue('installment_count', null, { shouldDirty: true })
-                        form.setValue('installment_total_in_cents', null, { shouldDirty: true })
-                      } else {
-                        form.setValue('installment_count', 2, { shouldDirty: true })
-                        form.setValue('installment_total_in_cents', promoCents ?? priceCents ?? null, { shouldDirty: true })
+              <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[11px] font-semibold text-z-text-hint">
+                      Valor parcelado
+                    </span>
+                    <MoneyInput
+                      valueInCents={installmentTotal}
+                      allowEmpty
+                      placeholder="R$ 0,00"
+                      className="h-12 w-full rounded-lg border border-z-border bg-white px-4 text-base text-z-text placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/30"
+                      onChange={(cents) =>
+                        form.setValue('installment_total_in_cents', cents, { shouldDirty: true })
                       }
-                    }}
-                    className="shrink-0"
-                  >
-                    <HugeiconsIcon
-                      icon={installmentCount != null ? ToggleOnIcon : ToggleOffIcon}
-                      size={28}
-                      className={installmentCount != null ? 'text-[#40558a]' : 'text-[#8a96ba]'}
                     />
-                  </button>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[11px] font-semibold text-z-text-hint">
+                      Quantidade de parcelas
+                    </span>
+                    <select
+                      value={installmentCount ?? 12}
+                      onChange={(e) =>
+                        form.setValue('installment_count', Number(e.target.value), { shouldDirty: true })
+                      }
+                      className="h-12 w-full rounded-lg border border-z-border bg-white px-4 text-base text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/30"
+                    >
+                      {Array.from({ length: 23 }, (_, i) => i + 2).map((n) => (
+                        <option key={n} value={n}>{n}x</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
-                {installmentCount != null && (
-                  <div className="flex flex-col gap-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex flex-col gap-1.5">
-                        <span className="text-[11px] font-semibold text-[#8a96ba]">
-                          Valor parcelado
+                {priceCents > 0 && installmentCount != null && installmentTotal != null && (
+                  <div className="rounded-xl border border-z-border bg-white p-4">
+                    <p className="mb-2 text-[10px] font-semibold text-z-text-hint">
+                      Preview no catálogo
+                    </p>
+                    <div className="flex flex-col gap-0.5">
+                      {promoCents != null && promoCents < priceCents && (
+                        <span className="text-sm text-z-text-hint line-through">
+                          {formatMoney(priceCents)}
                         </span>
-                        <MoneyInput
-                          valueInCents={installmentTotal}
-                          allowEmpty
-                          placeholder="R$ 0,00"
-                          className="h-11 w-full rounded-lg border border-[#cfd8eb] bg-white px-4 text-sm text-[#263d6b] placeholder:text-[#8a96ba] focus:border-[#40558a] focus:outline-none focus:ring-2 focus:ring-[#40558a]/15"
-                          onChange={(cents) =>
-                            form.setValue('installment_total_in_cents', cents, { shouldDirty: true })
-                          }
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1.5">
-                        <span className="text-[11px] font-semibold text-[#8a96ba]">
-                          Em até
+                      )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold text-z-text">
+                          {formatMoney(promoCents ?? priceCents)}
                         </span>
-                        <select
-                          value={installmentCount ?? 2}
-                          onChange={(e) =>
-                            form.setValue('installment_count', Number(e.target.value), { shouldDirty: true })
-                          }
-                          className="h-11 w-full rounded-lg border border-[#cfd8eb] bg-white px-3 text-sm text-[#263d6b] focus:border-[#40558a] focus:outline-none focus:ring-2 focus:ring-[#40558a]/15"
-                        >
-                          {Array.from({ length: 23 }, (_, i) => i + 2).map((n) => (
-                            <option key={n} value={n}>{n}x</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {priceCents > 0 && installmentCount != null && installmentTotal != null && (
-                      <div className="rounded-xl border border-[#cfd8eb] bg-white p-4">
-                        <p className="mb-2 text-[10px] font-semibold text-[#8a96ba]">
-                          Preview no catálogo
-                        </p>
-                        <div className="flex flex-col gap-0.5">
-                          {promoCents != null && promoCents < priceCents && (
-                            <span className="text-sm text-[#8a96ba] line-through">
-                              {formatMoney(priceCents)}
-                            </span>
-                          )}
-                          <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-[#263d6b]">
-                              {formatMoney(promoCents ?? priceCents)}
-                            </span>
-                            {promoCents != null && promoCents < priceCents && (
-                              <span className="rounded-full bg-[#e6f7ef] px-2 py-0.5 text-[11px] font-bold text-[#02a650]">
-                                {Math.round((1 - promoCents / priceCents) * 100)}% OFF
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-sm text-[#8a96ba]">
-                            ou{' '}
-                            <strong className="font-semibold text-[#263d6b]">
-                              {installmentCount}x de {formatMoney(Math.ceil(installmentTotal / installmentCount))}
-                            </strong>
-                            {installmentTotal <= (promoCents ?? priceCents) && (
-                              <span className="font-semibold text-[#02a650]"> sem juros</span>
-                            )}
+                        {promoCents != null && promoCents < priceCents && (
+                          <span className="rounded-full bg-[#e6f7ef] px-2 py-0.5 text-[11px] font-bold text-[#02a650]">
+                            {Math.round((1 - promoCents / priceCents) * 100)}% OFF
                           </span>
-                        </div>
+                        )}
                       </div>
-                    )}
+                      <span className="text-sm text-z-text-hint">
+                        ou{' '}
+                        <strong className="font-semibold text-z-text">
+                          {installmentCount}x de {formatMoney(Math.ceil(installmentTotal / installmentCount))}
+                        </strong>
+                        {installmentTotal <= (promoCents ?? priceCents) && (
+                          <span className="font-semibold text-[#02a650]"> sem juros</span>
+                        )}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -521,12 +503,12 @@ export function NewProductFullModal({
             <SectionDivider />
 
             <section className="flex flex-col gap-4">
-              <h3 className="text-lg font-bold text-[#263d6b]">Categoria</h3>
+              <h3 className="text-lg font-bold text-z-text">Categoria</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <FieldLabel>Categoria</FieldLabel>
                   <select
-                    className="h-12 rounded-lg border border-[#cfd8eb] bg-white px-4 text-base text-[#263d6b] focus:border-[#40558a] focus:outline-none focus:ring-2 focus:ring-[#40558a]/15"
+                    className="h-12 rounded-lg border border-z-border bg-white px-4 text-base text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/30"
                     value={selectedCategory ?? ''}
                     onChange={(event) => {
                       if (event.target.value === '__ADD_CATEGORY__') {
@@ -556,9 +538,9 @@ export function NewProductFullModal({
                 <div className="flex flex-col gap-1.5">
                   <FieldLabel>Subcategoria</FieldLabel>
                   <select
-                    className="h-12 rounded-lg border border-[#cfd8eb] bg-white px-4 text-base text-[#263d6b] focus:border-[#40558a] focus:outline-none focus:ring-2 focus:ring-[#40558a]/15 disabled:bg-z-bg disabled:text-z-text-hint"
+                    className="h-12 rounded-lg border border-z-border bg-white px-4 text-base text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/30 disabled:bg-z-bg disabled:text-z-text-hint"
                     disabled={!selectedCategory}
-                    value={form.watch('subcategory') ?? ''}
+                    value={selectedSubcategory ?? ''}
                     onChange={(event) => {
                       if (event.target.value === '__ADD_SUBCATEGORY__') {
                         setNewSubcategoryOpen(true)
@@ -570,12 +552,12 @@ export function NewProductFullModal({
                     }}
                   >
                     <option value="">Selecione uma subcategoria</option>
-                    {form.watch('subcategory') &&
+                    {selectedSubcategory &&
                       !availableSubcategories.some(
-                        (subcategory) => subcategory.name === form.watch('subcategory'),
+                        (subcategory) => subcategory.name === selectedSubcategory,
                       ) && (
-                        <option value={form.watch('subcategory')}>
-                          {form.watch('subcategory')}
+                        <option value={selectedSubcategory}>
+                          {selectedSubcategory}
                         </option>
                       )}
                     {availableSubcategories.map((subcategory) => (
@@ -594,7 +576,7 @@ export function NewProductFullModal({
             <SectionDivider />
 
             <section className="flex flex-col gap-4">
-              <h3 className="text-lg font-bold text-[#263d6b]">
+              <h3 className="text-lg font-bold text-z-text">
                 Códigos de identificação
               </h3>
               <div className="max-w-sm">
@@ -604,14 +586,14 @@ export function NewProductFullModal({
                     placeholder="Seu código interno (SKU)"
                     disabled={autoSku}
                     value={autoSku ? '' : undefined}
-                    className="h-12 rounded-lg border border-[#cfd8eb] bg-white px-4 text-base text-[#263d6b] placeholder:text-[#8a96ba] focus:border-[#40558a] focus:outline-none focus:ring-2 focus:ring-[#40558a]/15 disabled:bg-z-bg disabled:text-z-text-hint"
+                    className="h-12 rounded-lg border border-z-border bg-white px-4 text-base text-z-text placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/30 disabled:bg-z-bg disabled:text-z-text-hint"
                     {...(autoSku ? {} : form.register('sku'))}
                   />
                   <Controller
                     control={form.control}
                     name="auto_sku"
                     render={({ field }) => (
-                      <label className="mt-1 flex cursor-pointer items-center gap-2 text-sm font-medium text-[#263d6b]">
+                      <label className="mt-1 flex cursor-pointer items-center gap-2 text-sm font-medium text-z-text">
                         <button
                           type="button"
                           onClick={() => field.onChange(!field.value)}
@@ -633,7 +615,7 @@ export function NewProductFullModal({
           </div>
         </div>
 
-        <div className="border-t border-z-border bg-white px-4 py-3 shadow-[0_-8px_30px_rgba(15,23,42,0.08)]">
+        <div className="border-t border-z-border bg-white px-5 py-4 shadow-[0_-8px_30px_rgba(15,23,42,0.08)]">
           <div className="mx-auto flex max-w-[728px] flex-col items-center gap-3">
             {submitError && (
               <p className="w-full rounded-lg bg-red-50 px-4 py-3 text-center text-sm text-red-600">
@@ -643,7 +625,7 @@ export function NewProductFullModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center gap-2 rounded-full bg-[#10b981] px-7 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#0ea371] disabled:opacity-60"
+              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-[18px] bg-[#10b981] px-7 text-base font-extrabold text-white shadow-sm transition hover:bg-[#0ea371] disabled:opacity-60"
             >
               {isSubmitting && (
                 <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -651,7 +633,7 @@ export function NewProductFullModal({
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                 </svg>
               )}
-              {isSubmitting ? 'Cadastrando...' : 'Cadastrar'}
+              {isSubmitting ? 'Adicionando...' : 'Adicionar produto'}
             </button>
           </div>
         </div>
@@ -664,8 +646,8 @@ export function NewProductFullModal({
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e6f7ef]">
                 <HugeiconsIcon icon={CheckmarkCircle01Icon} size={26} className="text-[#10b981]" />
               </div>
-              <h3 className="text-lg font-bold text-[#263d6b]">Produto cadastrado!</h3>
-              <p className="text-sm text-[#8a96ba]">O que deseja fazer agora?</p>
+              <h3 className="text-lg font-bold text-z-text">Produto cadastrado!</h3>
+              <p className="text-sm text-z-text-hint">O que deseja fazer agora?</p>
             </div>
             <div className="flex flex-col gap-2">
               <button
@@ -674,12 +656,12 @@ export function NewProductFullModal({
                   onClose()
                   navigate(`${ROUTES.dashboardProducts}/${createdProductId}`)
                 }}
-                className="flex items-center gap-3 rounded-xl border border-[#cfd8eb] bg-white px-4 py-3 text-left text-sm font-medium text-[#263d6b] transition-colors hover:border-[#40558a] hover:bg-[#f0f4ff]"
+                className="flex items-center gap-3 rounded-xl border border-z-border bg-white px-4 py-3 text-left text-sm font-medium text-z-text transition-colors hover:border-z-green hover:bg-z-sand"
               >
-                <HugeiconsIcon icon={ViewIcon} size={18} className="shrink-0 text-[#40558a]" />
+                <HugeiconsIcon icon={ViewIcon} size={18} className="shrink-0 text-[#10b981]" />
                 <div>
                   <p className="font-semibold">Ver produto</p>
-                  <p className="text-xs font-normal text-[#8a96ba]">Confira como ficou o cadastro</p>
+                  <p className="text-xs font-normal text-z-text-hint">Confira como ficou o cadastro</p>
                 </div>
               </button>
               <button
@@ -688,12 +670,12 @@ export function NewProductFullModal({
                   onClose()
                   navigate(`${ROUTES.dashboardProducts}/${createdProductId}?tab=info`)
                 }}
-                className="flex items-center gap-3 rounded-xl border border-[#cfd8eb] bg-white px-4 py-3 text-left text-sm font-medium text-[#263d6b] transition-colors hover:border-[#40558a] hover:bg-[#f0f4ff]"
+                className="flex items-center gap-3 rounded-xl border border-z-border bg-white px-4 py-3 text-left text-sm font-medium text-z-text transition-colors hover:border-z-green hover:bg-z-sand"
               >
-                <HugeiconsIcon icon={Edit01Icon} size={18} className="shrink-0 text-[#40558a]" />
+                <HugeiconsIcon icon={Edit01Icon} size={18} className="shrink-0 text-[#10b981]" />
                 <div>
                   <p className="font-semibold">Adicionar detalhes</p>
-                  <p className="text-xs font-normal text-[#8a96ba]">Descrição, fotos, variações e mais</p>
+                  <p className="text-xs font-normal text-z-text-hint">Descrição, fotos, variações e mais</p>
                 </div>
               </button>
               <button
@@ -702,12 +684,12 @@ export function NewProductFullModal({
                   onClose()
                   window.open(buildStorePath(storeSlug), '_blank')
                 }}
-                className="flex items-center gap-3 rounded-xl border border-[#cfd8eb] bg-white px-4 py-3 text-left text-sm font-medium text-[#263d6b] transition-colors hover:border-[#40558a] hover:bg-[#f0f4ff]"
+                className="flex items-center gap-3 rounded-xl border border-z-border bg-white px-4 py-3 text-left text-sm font-medium text-z-text transition-colors hover:border-z-green hover:bg-z-sand"
               >
-                <HugeiconsIcon icon={Store01Icon} size={18} className="shrink-0 text-[#40558a]" />
+                <HugeiconsIcon icon={Store01Icon} size={18} className="shrink-0 text-[#10b981]" />
                 <div>
                   <p className="font-semibold">Ir para o catálogo</p>
-                  <p className="text-xs font-normal text-[#8a96ba]">Veja seu produto publicado</p>
+                  <p className="text-xs font-normal text-z-text-hint">Veja seu produto publicado</p>
                 </div>
               </button>
             </div>

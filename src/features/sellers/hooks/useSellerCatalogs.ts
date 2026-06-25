@@ -27,6 +27,23 @@ export function useSellerCatalogs(storeId: string | undefined) {
   })
 }
 
+export function useSellerCatalog(id: string | undefined) {
+  return useQuery({
+    queryKey: sellerCatalogKeys.detail(id ?? ''),
+    queryFn: async () => {
+      const supabase = createBrowserClient()
+      const { data, error } = await supabase
+        .from('seller_catalogs')
+        .select('*')
+        .eq('id', id as string)
+        .single()
+      if (error) throw error
+      return data as SellerCatalog
+    },
+    enabled: !!id,
+  })
+}
+
 export function useCreateSellerCatalog(storeId: string) {
   const qc = useQueryClient()
   return useMutation({

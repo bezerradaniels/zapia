@@ -29,7 +29,7 @@ export default function PricingPage() {
               Planos e preços
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-base text-z-text-muted">
-              Todos os planos incluem 7 dias grátis, sem cartão de crédito.
+              Comece gratuitamente com o plano básico, sem cartão de crédito.
               Cancele quando quiser.
             </p>
           </div>

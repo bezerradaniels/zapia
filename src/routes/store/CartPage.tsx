@@ -27,6 +27,7 @@ import { buildStorePath } from '@/lib/tenant'
 import type { Store } from '@/types/domain'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { track } from '@/features/analytics'
+import { EmptyState } from '@/components/feedback'
 
 export default function CartPage() {
   const store = useOutletContext<Store>()
@@ -138,14 +139,20 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 px-5 py-20 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-z-bg2 text-z-text-hint">
-          <HugeiconsIcon icon={ShoppingCartIcon} size={28} />
-        </div>
-        <h1 className="text-[14px] font-bold tracking-tight">Seu carrinho está vazio</h1>
-        <Link to={homePath} className="text-sm font-medium text-[#10b981] hover:underline">
-          Voltar ao catálogo
-        </Link>
+      <div className="px-5 py-20">
+        <EmptyState
+          icon={ShoppingCartIcon}
+          title="Seu carrinho está vazio"
+          action={
+            <Link
+              to={homePath}
+              className="text-sm font-semibold hover:underline"
+              style={{ color: 'var(--store-primary)' }}
+            >
+              Voltar ao catálogo
+            </Link>
+          }
+        />
       </div>
     )
   }

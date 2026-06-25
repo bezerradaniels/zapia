@@ -47,14 +47,14 @@ export default function SupportPage() {
             rel="noopener noreferrer"
             className="group flex flex-col gap-3 rounded-2xl border border-z-border bg-white p-6 transition-shadow hover:shadow-z"
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-z-bg2 text-[#10b981]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-[#0bfeda]">
               <HugeiconsIcon icon={c.icon} size={22} />
             </div>
             <div>
               <div className="text-base font-semibold">{c.label}</div>
               <div className="text-sm text-z-text-muted">{c.value}</div>
             </div>
-            <span className="inline-flex items-center gap-1 text-sm font-medium text-[#10b981]">
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-[#0bfeda]">
               Abrir <HugeiconsIcon icon={ArrowRightIcon} size={14} />
             </span>
           </a>

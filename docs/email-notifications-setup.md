@@ -20,7 +20,22 @@ You will receive emails at `daniel.ddsb@gmail.com` for the following events:
 
 - Called automatically after successful signup via `src/features/auth/api/mutations.ts`
 - Sends email with user's name and email
+- Fires at account creation, **before** the store/WhatsApp/slug exist yet
 - Already configured to send to `daniel.ddsb@gmail.com`
+
+### 1b. Store Created Notification
+
+**File:** `supabase/functions/store-created-notification/index.ts`
+
+- Called automatically right after the `stores` row is inserted, via
+  `createStore()` in `src/features/catalog/api/mutations.ts`
+- This is the point where name, e-mail, WhatsApp, store name, and the
+  public catalog URL are all available together — the signup notification
+  above can't include them since the store doesn't exist yet at that step
+- Sends an email with: owner name, e-mail, WhatsApp (with a "Conversar no
+  WhatsApp" button linking to `wa.me`), store name, and the store's public
+  link
+- Sends to `daniel.ddsb@gmail.com` (same `ADMIN_EMAIL` env var)
 
 ### 2. Billing Notification (New)
 
@@ -59,6 +74,7 @@ Deploy the new edge functions to Supabase:
 ```bash
 supabase functions deploy billing-notification
 supabase functions deploy check-trial-completions
+supabase functions deploy store-created-notification
 ```
 
 ### Step 2: Set Environment Variables (Supabase function secrets)
@@ -205,10 +221,12 @@ The TypeScript errors about `Deno` are expected - these are Deno edge functions.
 ### Created
 - `supabase/functions/billing-notification/index.ts` - Main billing notification handler
 - `supabase/functions/check-trial-completions/index.ts` - Trial completion checker
+- `supabase/functions/store-created-notification/index.ts` - Sends full owner+store details (incl. WhatsApp button) when a store is created
 - `supabase/migrations/20260529180000_trial_completion_notification.sql` - (Placeholder, using edge function approach)
 
 ### Modified
 - `supabase/functions/stripe-webhook/index.ts` - Added billing notification calls
+- `src/features/catalog/api/mutations.ts` - `createStore()` now calls `store-created-notification` after insert succeeds
 
 ### Existing (No Changes Needed)
 - `supabase/functions/signup-notification/index.ts` - Already working

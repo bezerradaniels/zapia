@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  .zsc { -ms-overflow-style: none; scrollbar-width: none; }
+  @keyframes zfade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes zslideup { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes zslidein { from { transform: translateX(14px); opacity: .4 } to { transform: translateX(0); opacity: 1 } }
+  @keyframes ztoast { from { opacity: 0 } to { opacity: 1 } }
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#e7e2da;padding:28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#141414;-webkit-font-smoothing:antialiased">
+
+  <div style="position:relative;width:392px;height:844px;background:#0e0e0e;border-radius:52px;padding:11px;box-shadow:0 50px 90px -28px rgba(20,20,20,.5),0 0 0 1.5px rgba(0,0,0,.35)">
+    <div style="position:relative;width:100%;height:100%;background:#f9f6f2;border-radius:42px;overflow:hidden;display:flex;flex-direction:column">
+
+      <!-- Status bar -->
+      <div style="height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:relative;z-index:5">
+        <span style="font-size:14px;font-weight:700;letter-spacing:-.02em">9:41</span>
+        <div style="position:absolute;left:50%;top:9px;transform:translateX(-50%);width:104px;height:28px;background:#0e0e0e;border-radius:16px"></div>
+        <div style="display:flex;gap:6px;align-items:center;font-family:'Material Symbols Rounded';font-size:17px;color:#141414">
+          <span>signal_cellular_alt</span><span>wifi</span><span>battery_full</span>
+        </div>
+      </div>
+
+      <!-- Stage -->
+      <div style="position:relative;flex:1;display:flex;flex-direction:column;min-height:0">
+
+        <!-- App bar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 18px 12px;flex-shrink:0">
+          <div style="display:flex;gap:11px;align-items:center">
+            <div style="width:36px;height:36px;border-radius:12px;background:#141414;color:#95e030;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;letter-spacing:-.03em">AL</div>
+            <div>
+              <div style="font-size:14px;font-weight:800;line-height:1.05;letter-spacing:-.02em">Ateliê Lola</div>
+              <div style="font-size:11px;color:#888;line-height:1.2">Plano {{ plan }}</div>
+            </div>
+          </div>
+          <div onClick="{{ onBell }}" style="position:relative;width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer">
+            <span style="font-family:'Material Symbols Rounded';font-size:21px;color:#141414">notifications</span>
+            <span style="position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:#00a82d;border:2px solid #fff"></span>
+          </div>
+        </div>
+
+        <!-- Scroll content -->
+        <div class="zsc" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0 18px 96px">
+
+          <!-- ============ INÍCIO ============ -->
+          <sc-if value="{{ isInicio }}" hint-placeholder-val="{{ true }}">
+          <div style="animation:zfade .25s ease">
+            <h1 style="font-size:25px;font-weight:800;letter-spacing:-.03em;margin:2px 0 16px">{{ greeting }}, {{ firstName }} 👋</h1>
+
+            <sc-if value="{{ showTrial }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:12px;background:#141414;border-radius:18px;padding:14px 16px;margin-bottom:16px">
+              <div style="width:38px;height:38px;border-radius:11px;background:rgba(149,224,48,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <span style="font-family:'Material Symbols Rounded';font-size:21px;color:#95e030">bolt</span>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:700;color:#f9f6f2;line-height:1.2">Trial termina em {{ trialDays }} dias</div>
+                <div style="font-size:11.5px;color:#aaa;line-height:1.3;margin-top:2px">Assine para manter o catálogo no ar.</div>
+              </div>
+              <div onClick="{{ goBilling }}" style="background:#95e030;color:#1a3d00;font-size:12px;font-weight:700;padding:8px 13px;border-radius:10px;cursor:pointer;flex-shrink:0">Assinar</div>
+            </div>
+            </sc-if>
+
+            <!-- Quick actions -->
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:18px">
+              <sc-for list="{{ quickActions }}" as="qa" hint-placeholder-count="4">
+              <div onClick="{{ qa.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer">
+                <div style="width:100%;height:62px;border-radius:16px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center">
+                  <span style="font-family:'Material Symbols Rounded';font-size:24px;color:#00a82d">{{ qa.icon }}</span>
+                </div>
+                <span style="font-size:10.5px;font-weight:600;color:#5a5a5a;text-align:center;line-height:1.15">{{ qa.label }}</span>
+              </div>
+              </sc-for>
+            </div>
+
+            <!-- KPIs -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px">
+              <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:15px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                  <span style="font-size:12px;font-weight:600;color:#888">{{ k.label }}</span>
+                  <span style="font-family:'Material Symbols Rounded';font-size:18px;color:#c2bcae">{{ k.icon }}</span>
+                </div>
+                <div style="font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1">{{ k.value }}</div>
+                <div style="font-size:11px;color:{{ k.subColor }};margin-top:6px;font-weight:600">{{ k.sub }}</div>
+              </div>
+              </sc-for>
+            </div>
+
+            <!-- Chart -->
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:16px 16px 14px;margin-bottom:18px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+                <span style="font-size:13px;font-weight:700">Pedidos · 7 dias</span>
+                <span style="font-size:11px;color:#888">19 no total</span>
+              </div>
+              <div style="display:flex;align-items:flex-end;gap:8px;height:104px">
+                <sc-for list="{{ bars }}" as="b" hint-placeholder-count="7">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end">
+                  <div style="width:100%;border-radius:7px 7px 4px 4px;height:{{ b.h }}px;background:{{ b.color }}"></div>
+                  <span style="font-size:10px;font-weight:600;color:{{ b.labelColor }}">{{ b.label }}</span>
+                </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- Recent orders -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <span style="font-size:15px;font-weight:800;letter-spacing:-.02em">Últimos pedidos</span>
+              <span onClick="{{ goPedidos }}" style="font-size:12px;font-weight:600;color:#00a82d;cursor:pointer">Ver todos</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ recentOrders }}" as="o" hint-placeholder-count="4">
+              <div onClick="{{ o.open }}" style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:12px 14px;cursor:pointer">
+                <div style="width:40px;height:40px;border-radius:12px;background:#f4eee5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#5a5a5a;flex-shrink:0">{{ o.initials }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13.5px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.name }}</div>
+                  <div style="font-size:11.5px;color:#888;margin-top:1px">{{ o.code }} · {{ o.when }}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+                  <span style="font-size:13.5px;font-weight:800;letter-spacing:-.02em">{{ o.totalFmt }}</span>
+                  <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:{{ o.bg }};color:{{ o.fg }}">{{ o.statusLabel }}</span>
+                </div>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+
+          <!-- ============ PEDIDOS ============ -->
+          <sc-if value="{{ isPedidos }}" hint-placeholder-val="{{ true }}">
+          <div style="animation:zfade .25s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:2px 0 14px">
+              <h1 style="font-size:25px;font-weight:800;letter-spacing:-.03em;margin:0">Pedidos</h1>
+              <div onClick="{{ openNovoPedido }}" style="display:flex;align-items:center;gap:5px;background:#00a82d;color:#fff;font-size:13px;font-weight:700;padding:9px 14px;border-radius:12px;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:18px">add</span>Novo</div>
+            </div>
+            <div style="display:flex;gap:9px;margin-bottom:14px">
+              <div style="flex:1;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:13px;padding:0 13px;height:44px">
+                <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#aaa">search</span>
+                <input value="{{ search }}" oninput="{{ onSearch }}" placeholder="Buscar pedido ou cliente" style="border:none;outline:none;background:transparent;font-size:13.5px;width:100%;font-family:inherit;color:#141414" />
+              </div>
+              <div onClick="{{ openFilter }}" style="width:44px;height:44px;border-radius:13px;background:#141414;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                <span style="font-family:'Material Symbols Rounded';font-size:21px;color:#f9f6f2">tune</span>
+              </div>
+            </div>
+            <div class="zsc" style="display:flex;gap:8px;overflow-x:auto;margin:0 -18px 14px;padding:0 18px">
+              <sc-for list="{{ orderFilters }}" as="f" hint-placeholder-count="4">
+              <div onClick="{{ f.onClick }}" style="flex-shrink:0;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer;background:{{ f.bg }};color:{{ f.fg }};border:1px solid {{ f.border }}">{{ f.label }}</div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ filteredOrders }}" as="o" hint-placeholder-count="5">
+              <div onClick="{{ o.open }}" style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:14px 15px;cursor:pointer;animation:zfade .2s ease">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div style="display:flex;align-items:center;gap:9px">
+                    <span style="font-size:14px;font-weight:800;letter-spacing:-.02em">{{ o.name }}</span>
+                  </div>
+                  <span style="font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:999px;background:{{ o.bg }};color:{{ o.fg }}">{{ o.statusLabel }}</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:12px;color:#888">{{ o.code }} · {{ o.itemsLabel }} · {{ o.when }}</span>
+                  <span style="font-size:15px;font-weight:800;letter-spacing:-.02em">{{ o.totalFmt }}</span>
+                </div>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+
+          <!-- ============ PRODUTOS ============ -->
+          <sc-if value="{{ isProdutos }}" hint-placeholder-val="{{ true }}">
+          <div style="animation:zfade .25s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:2px 0 14px">
+              <h1 style="font-size:25px;font-weight:800;letter-spacing:-.03em;margin:0">Produtos</h1>
+              <div onClick="{{ openNovo }}" style="display:flex;align-items:center;gap:5px;background:#00a82d;color:#fff;font-size:13px;font-weight:700;padding:9px 14px;border-radius:12px;cursor:pointer">
+                <span style="font-family:'Material Symbols Rounded';font-size:18px">add</span>Novo
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:13px;padding:0 13px;height:44px;margin-bottom:14px">
+              <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#aaa">search</span>
+              <input value="{{ search }}" oninput="{{ onSearch }}" placeholder="Buscar por nome ou SKU" style="border:none;outline:none;background:transparent;font-size:13.5px;width:100%;font-family:inherit;color:#141414" />
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ filteredProducts }}" as="p" hint-placeholder-count="6">
+              <div onClick="{{ p.open }}" style="display:flex;gap:13px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:11px;cursor:pointer;animation:zfade .2s ease">
+                <div style="width:64px;height:64px;border-radius:13px;flex-shrink:0;background:repeating-linear-gradient(45deg,#f4eee5,#f4eee5 7px,#efe7da 7px,#efe7da 14px);display:flex;align-items:center;justify-content:center">
+                  <span style="font-family:'Material Symbols Rounded';font-size:24px;color:#c2bcae">{{ p.icon }}</span>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">
+                  <div style="font-size:14px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+                  <div style="font-size:11.5px;color:#888;margin-top:2px">{{ p.cat }}</div>
+                  <div style="display:flex;align-items:center;gap:9px;margin-top:7px">
+                    <span style="font-size:15px;font-weight:800;color:#00a82d;letter-spacing:-.02em">{{ p.priceFmt }}</span>
+                    <span style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:{{ p.stockBg }};color:{{ p.stockFg }}">{{ p.stockLabel }}</span>
+                  </div>
+                </div>
+                <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#cbc6ba;align-self:center">chevron_right</span>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+
+          <!-- ============ CLIENTES ============ -->
+          <sc-if value="{{ isClientes }}" hint-placeholder-val="{{ true }}">
+          <div style="animation:zfade .25s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:2px 0 14px">
+              <h1 style="font-size:25px;font-weight:800;letter-spacing:-.03em;margin:0">Clientes</h1>
+              <div onClick="{{ openNovoCliente }}" style="display:flex;align-items:center;gap:5px;background:#00a82d;color:#fff;font-size:13px;font-weight:700;padding:9px 14px;border-radius:12px;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:18px">person_add</span>Novo</div>
+            </div>
+            <div class="zsc" style="display:flex;gap:9px;overflow-x:auto;margin:0 -18px 16px;padding:0 18px">
+              <sc-for list="{{ customerFilters }}" as="cf" hint-placeholder-count="3">
+              <div style="flex-shrink:0;width:150px;background:{{ cf.bg }};border-radius:16px;padding:13px 14px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                  <span style="font-family:'Material Symbols Rounded';font-size:20px;color:{{ cf.icColor }}">{{ cf.icon }}</span>
+                  <span style="font-size:20px;font-weight:800;letter-spacing:-.03em;color:{{ cf.icColor }}">{{ cf.count }}</span>
+                </div>
+                <div style="font-size:11.5px;font-weight:600;color:{{ cf.fg }};line-height:1.25">{{ cf.label }}</div>
+              </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ customers }}" as="c" hint-placeholder-count="6">
+              <div onClick="{{ c.open }}" style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:12px 14px;cursor:pointer">
+                <div style="width:42px;height:42px;border-radius:50%;background:{{ c.avBg }};color:{{ c.avFg }};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0">{{ c.initials }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <span style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</span>
+                    <sc-if value="{{ c.vip }}" hint-placeholder-val="{{ true }}"><span style="font-size:9px;font-weight:800;letter-spacing:.04em;padding:2px 6px;border-radius:999px;background:#fad0f6;color:#6b006b">VIP</span></sc-if>
+                  </div>
+                  <div style="font-size:11.5px;color:#888;margin-top:2px">{{ c.ordersLabel }} · {{ c.spentFmt }}</div>
+                </div>
+                <div onClick="{{ c.whats }}" style="width:38px;height:38px;border-radius:11px;background:#00a82d;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <span style="font-family:'Material Symbols Rounded';font-size:19px;color:#fff">chat</span>
+                </div>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+
+          <!-- ============ MAIS ============ -->
+          <sc-if value="{{ isMais }}" hint-placeholder-val="{{ true }}">
+          <div style="animation:zfade .25s ease">
+            <h1 style="font-size:25px;font-weight:800;letter-spacing:-.03em;margin:2px 0 16px">Mais</h1>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;overflow:hidden">
+              <sc-for list="{{ moreItems }}" as="m" hint-placeholder-count="5">
+              <div onClick="{{ m.onClick }}" style="display:flex;align-items:center;gap:13px;padding:15px 16px;cursor:pointer;border-bottom:1px solid {{ m.border }}">
+                <div style="width:38px;height:38px;border-radius:11px;background:#f4eee5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#141414">{{ m.icon }}</span>
+                </div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:14px;font-weight:700">{{ m.label }}</div>
+                  <div style="font-size:11.5px;color:#888;margin-top:1px">{{ m.desc }}</div>
+                </div>
+                <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#cbc6ba">chevron_right</span>
+              </div>
+              </sc-for>
+            </div>
+            <div onClick="{{ onLogout }}" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:14px;border-radius:16px;border:1px solid rgba(0,0,0,.08);color:#8b0000;font-size:13.5px;font-weight:700;cursor:pointer">
+              <span style="font-family:'Material Symbols Rounded';font-size:19px">logout</span>Sair da conta
+            </div>
+            <div style="text-align:center;font-size:11px;color:#aaa;margin-top:18px">Zapable · v2.0 · feito no Brasil 🇧🇷</div>
+          </div>
+          </sc-if>
+
+        </div>
+
+        <!-- Bottom nav -->
+        <div style="flex-shrink:0;display:flex;background:#fbf9f5;border-top:1px solid rgba(0,0,0,.07);padding:8px 6px 24px">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+          <div onClick="{{ t.go }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0">
+            <span style="font-family:'Material Symbols Rounded';font-size:25px;line-height:1;color:{{ t.color }};font-variation-settings:'FILL' {{ t.fill }}">{{ t.icon }}</span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:.005em;color:{{ t.color }}">{{ t.label }}</span>
+          </div>
+          </sc-for>
+        </div>
+
+        <!-- ============ OVERLAY: ORDER ============ -->
+        <sc-if value="{{ showOrder }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:#f9f6f2;z-index:20;display:flex;flex-direction:column;animation:zslidein .26s ease">
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 12px;flex-shrink:0">
+            <div onClick="{{ closeOverlay }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">arrow_back</span></div>
+            <div style="flex:1">
+              <div style="font-size:16px;font-weight:800;letter-spacing:-.02em">Pedido {{ selOrder.code }}</div>
+              <div style="font-size:11.5px;color:#888">{{ selOrder.when }}</div>
+            </div>
+            <span style="font-size:11px;font-weight:700;padding:5px 11px;border-radius:999px;background:{{ selOrder.bg }};color:{{ selOrder.fg }}">{{ selOrder.statusLabel }}</span>
+          </div>
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 18px">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:15px;margin-bottom:13px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:46px;height:46px;border-radius:14px;background:#f4eee5;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#5a5a5a">{{ selOrder.initials }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:15px;font-weight:700">{{ selOrder.name }}</div>
+                  <div style="font-size:12px;color:#888;margin-top:1px">{{ selOrder.phone }}</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:9px;margin-top:13px">
+                <div onClick="{{ onWhats }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;height:42px;border-radius:12px;background:#00a82d;color:#fff;font-size:13px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:18px">chat</span>WhatsApp</div>
+                <div onClick="{{ onCall }}" style="width:42px;height:42px;border-radius:12px;background:#f4eee5;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:19px;color:#141414">call</span></div>
+              </div>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin:0 4px 9px">Itens</div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:6px 15px;margin-bottom:13px">
+              <sc-for list="{{ selOrder.items }}" as="it" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid {{ it.border }}">
+                <div style="display:flex;align-items:center;gap:11px;min-width:0">
+                  <span style="font-size:12px;font-weight:700;color:#888;width:22px">{{ it.qty }}×</span>
+                  <span style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.name }}</span>
+                </div>
+                <span style="font-size:13.5px;font-weight:700;flex-shrink:0">{{ it.priceFmt }}</span>
+              </div>
+              </sc-for>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0 4px">
+                <span style="font-size:12px;color:#888">Frete</span>
+                <span style="font-size:12.5px;color:#5a5a5a;font-weight:600">a combinar</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0 13px;border-top:1px solid rgba(0,0,0,.06);margin-top:6px">
+                <span style="font-size:14px;font-weight:800">Total</span>
+                <span style="font-size:19px;font-weight:800;color:#00a82d;letter-spacing:-.02em">{{ selOrder.totalFmt }}</span>
+              </div>
+            </div>
+            <sc-if value="{{ selOrder.note }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff8e6;border:1px solid #f6e6b8;border-radius:14px;padding:12px 14px;margin-bottom:13px">
+              <div style="font-size:11px;font-weight:700;color:#7a5800;margin-bottom:3px">Observação do cliente</div>
+              <div style="font-size:13px;color:#5a4a1f;line-height:1.4">{{ selOrder.note }}</div>
+            </div>
+            </sc-if>
+          </div>
+          <div style="flex-shrink:0;padding:12px 18px 26px;border-top:1px solid rgba(0,0,0,.06);background:#f9f6f2">
+            <div onClick="{{ openStatus }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:15px;background:#141414;color:#f9f6f2;font-size:14px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:20px;color:#95e030">cached</span>Mudar status do pedido</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ OVERLAY: NOVO PEDIDO ============ -->
+        <sc-if value="{{ showNovoPedido }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:#f9f6f2;z-index:20;display:flex;flex-direction:column;animation:zslidein .26s ease">
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 12px;flex-shrink:0">
+            <div onClick="{{ closeOverlay }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">close</span></div>
+            <div style="flex:1;font-size:16px;font-weight:800;letter-spacing:-.02em">Novo pedido</div>
+          </div>
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 18px">
+            <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Cliente</div>
+            <div onClick="{{ onPickCustomer }}" style="display:flex;align-items:center;gap:11px;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:13px 14px;cursor:pointer;margin-bottom:16px">
+              <div style="width:38px;height:38px;border-radius:11px;background:{{ npCustBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-family:'Material Symbols Rounded';font-size:20px;color:{{ npCustFg }}">{{ npCustIcon }}</span></div>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700;color:{{ npCustTitleColor }}">{{ npCustName }}</div><div style="font-size:11px;color:#888;margin-top:1px">{{ npCustSub }}</div></div>
+              <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#cbc6ba">expand_more</span>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:0 2px 9px">
+              <span style="font-size:11.5px;font-weight:700;color:#888">Itens do pedido</span>
+              <span onClick="{{ onAddItem }}" style="display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;color:#00a82d;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:16px">add</span>Adicionar item</span>
+            </div>
+
+            <sc-if value="{{ npHasItems }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:16px;padding:5px 14px;margin-bottom:14px">
+              <sc-for list="{{ npItems }}" as="it" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid {{ it.border }}">
+                <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.name }}</div><div style="font-size:11.5px;color:#00a82d;font-weight:700;margin-top:2px">{{ it.priceFmt }}</div></div>
+                <div style="display:flex;align-items:center;gap:10px;background:#f4eee5;border-radius:10px;padding:5px 6px">
+                  <div onClick="{{ it.dec }}" style="width:26px;height:26px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:17px">remove</span></div>
+                  <span style="font-size:13.5px;font-weight:800;min-width:14px;text-align:center">{{ it.qty }}</span>
+                  <div onClick="{{ it.inc }}" style="width:26px;height:26px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:17px">add</span></div>
+                </div>
+              </div>
+              </sc-for>
+            </div>
+            </sc-if>
+            <sc-if value="{{ npEmpty }}" hint-placeholder-val="{{ true }}">
+            <div onClick="{{ onAddItem }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#fff;border:1.5px dashed #d8d2c6;border-radius:16px;padding:28px 16px;margin-bottom:14px;cursor:pointer">
+              <span style="font-family:'Material Symbols Rounded';font-size:30px;color:#c2bcae">add_shopping_cart</span>
+              <span style="font-size:12.5px;font-weight:600;color:#9a948a">Toque para adicionar produtos</span>
+            </div>
+            </sc-if>
+
+            <div style="font-size:11.5px;font-weight:700;color:#888;margin:4px 2px 7px">Observação</div>
+            <textarea oninput="{{ onNpNote }}" placeholder="Ex.: embrulhar para presente, entregar após 14h..." style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:13px;color:#5a5a5a;line-height:1.5;min-height:74px;font-family:inherit;outline:none;resize:none;margin-bottom:14px">{{ npNote }}</textarea>
+
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:16px;padding:6px 15px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0"><span style="font-size:12.5px;color:#888">Subtotal · {{ npCountLabel }}</span><span style="font-size:13.5px;font-weight:700">{{ npSubtotal }}</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0 13px;border-top:1px solid rgba(0,0,0,.06)"><span style="font-size:14px;font-weight:800">Total</span><span style="font-size:19px;font-weight:800;color:#00a82d;letter-spacing:-.02em">{{ npSubtotal }}</span></div>
+            </div>
+          </div>
+          <div style="flex-shrink:0;padding:12px 18px 26px;border-top:1px solid rgba(0,0,0,.06);background:#f9f6f2">
+            <div onClick="{{ onCreateOrder }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:15px;background:{{ npCtaBg }};color:#fff;font-size:14px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:20px">check</span>Criar pedido</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ OVERLAY: PRODUCT ============ -->
+        <sc-if value="{{ showProduct }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:#f9f6f2;z-index:20;display:flex;flex-direction:column;animation:zslidein .26s ease">
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 12px;flex-shrink:0">
+            <div onClick="{{ closeOverlay }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">arrow_back</span></div>
+            <div style="flex:1;font-size:16px;font-weight:800;letter-spacing:-.02em">Editar produto</div>
+            <div onClick="{{ onSaveToast }}" style="font-size:13px;font-weight:700;color:#00a82d;cursor:pointer;padding:8px">Salvar</div>
+          </div>
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 18px">
+            <div style="display:flex;gap:6px;margin-bottom:18px;background:#efe9df;border-radius:13px;padding:4px">
+              <sc-for list="{{ prodTabs }}" as="pt" hint-placeholder-count="4">
+              <div onClick="{{ pt.onClick }}" style="flex:1;text-align:center;font-size:12px;font-weight:700;padding:8px 0;border-radius:10px;cursor:pointer;background:{{ pt.bg }};color:{{ pt.fg }};box-shadow:{{ pt.shadow }}">{{ pt.label }}</div>
+              </sc-for>
+            </div>
+
+            <!-- TAB: GERAL -->
+            <sc-if value="{{ tabGeral }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:zfade .18s ease">
+              <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Fotos do produto</div>
+              <div class="zsc" style="display:flex;gap:9px;overflow-x:auto;margin:0 -18px 4px;padding:0 18px">
+                <div onClick="{{ onPhotoToast }}" style="flex-shrink:0;width:82px;height:82px;border-radius:14px;border:1.5px dashed #00a82d;background:#f0f8f1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer">
+                  <span style="font-family:'Material Symbols Rounded';font-size:22px;color:#00a82d">add_a_photo</span>
+                  <span style="font-size:9.5px;font-weight:700;color:#00a82d">Adicionar</span>
+                </div>
+                <sc-for list="{{ editPhotos }}" as="ph" hint-placeholder-count="2">
+                <div style="flex-shrink:0;position:relative;width:82px;height:82px;border-radius:14px;background:repeating-linear-gradient(45deg,#f4eee5,#f4eee5 7px,#efe7da 7px,#efe7da 14px);display:flex;align-items:center;justify-content:center">
+                  <span style="font-family:'Material Symbols Rounded';font-size:24px;color:#c2bcae">{{ ph.icon }}</span>
+                  <sc-if value="{{ ph.cover }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:5px;left:5px;font-size:8.5px;font-weight:800;letter-spacing:.03em;padding:2px 6px;border-radius:999px;background:#141414;color:#95e030">CAPA</span></sc-if>
+                </div>
+                </sc-for>
+              </div>
+              <div style="font-size:10.5px;color:#aaa;margin:0 2px 16px">Arraste para reordenar · 1ª foto é a capa</div>
+
+              <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Nome do produto</div>
+              <input value="{{ ep.name }}" oninput="{{ onEditName }}" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:600;font-family:inherit;outline:none;color:#141414;margin-bottom:14px" />
+
+              <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Categoria</div>
+              <div onClick="{{ onCatToast }}" style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:14px">{{ ep.cat }}<span style="font-family:'Material Symbols Rounded';font-size:20px;color:#cbc6ba">expand_more</span></div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;margin:0 2px 7px">
+                <span style="font-size:11.5px;font-weight:700;color:#888">Descrição</span>
+                <span onClick="{{ onAiToast }}" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#7a3fa0;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:15px">auto_awesome</span>Gerar com IA</span>
+              </div>
+              <textarea oninput="{{ onEditDesc }}" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:13px;color:#5a5a5a;line-height:1.5;min-height:96px;font-family:inherit;outline:none;resize:none">{{ ep.desc }}</textarea>
+            </div>
+            </sc-if>
+
+            <!-- TAB: ESTOQUE -->
+            <sc-if value="{{ tabEstoque }}" hint-placeholder-val="{{ false }}">
+            <div style="animation:zfade .18s ease">
+              <div style="display:flex;gap:11px;margin-bottom:14px">
+                <div style="flex:1">
+                  <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Estoque disponível</div>
+                  <input value="{{ ep.stock }}" oninput="{{ onEditStock }}" inputmode="numeric" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:700;font-family:inherit;outline:none;color:#141414" />
+                </div>
+                <div style="flex:1">
+                  <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Alerta mínimo</div>
+                  <input value="{{ ep.minStock }}" oninput="{{ onEditMin }}" inputmode="numeric" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:700;font-family:inherit;outline:none;color:#141414" />
+                </div>
+              </div>
+              <div style="font-size:10.5px;color:#aaa;margin:0 2px 16px">Você recebe um aviso quando o estoque chega no mínimo.</div>
+
+              <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">SKU interno</div>
+              <div style="display:flex;gap:9px;margin-bottom:14px">
+                <input value="{{ ep.sku }}" oninput="{{ onEditSku }}" style="flex:1;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:600;font-family:inherit;outline:none;color:#141414" />
+                <div onClick="{{ onGenSku }}" style="flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 15px;border-radius:13px;background:#f4eee5;font-size:12.5px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:18px">autorenew</span>Gerar</div>
+              </div>
+
+              <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Código de barras (EAN/GTIN)</div>
+              <input value="{{ ep.barcode }}" oninput="{{ onEditBarcode }}" placeholder="789..." inputmode="numeric" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:600;font-family:inherit;outline:none;color:#141414;margin-bottom:16px" />
+
+              <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:14px 15px;display:flex;align-items:center;justify-content:space-between">
+                <div><div style="font-size:13.5px;font-weight:700">Produto com variações</div><div style="font-size:11px;color:#888;margin-top:1px">Tamanho, cor, etc.</div></div>
+                <div onClick="{{ onToggleVar }}" style="width:46px;height:27px;border-radius:999px;background:{{ varTrackBg }};position:relative;cursor:pointer;transition:background .18s">
+                  <span style="position:absolute;top:3px;left:{{ varKnobLeft }};width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .18s"></span>
+                </div>
+              </div>
+            </div>
+            </sc-if>
+
+            <!-- TAB: PREÇO -->
+            <sc-if value="{{ tabPreco }}" hint-placeholder-val="{{ false }}">
+            <div style="animation:zfade .18s ease">
+              <div style="display:flex;gap:11px;margin-bottom:14px">
+                <div style="flex:1">
+                  <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Preço de venda</div>
+                  <input value="{{ ep.priceStr }}" oninput="{{ onEditPrice }}" inputmode="decimal" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:700;color:#00a82d;font-family:inherit;outline:none" />
+                </div>
+                <div style="flex:1">
+                  <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Preço de custo</div>
+                  <input value="{{ ep.cost }}" oninput="{{ onEditCost }}" placeholder="R$ 0,00" inputmode="decimal" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:700;font-family:inherit;outline:none;color:#141414" />
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;background:#f0f8f1;border-radius:13px;padding:14px 15px;margin-bottom:18px">
+                <span style="font-size:13px;font-weight:700;color:#00772a">Margem de lucro</span>
+                <span style="font-size:18px;font-weight:800;color:#00772a;letter-spacing:-.02em">{{ margemStr }}</span>
+              </div>
+
+              <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:14px 15px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-family:'Material Symbols Rounded';font-size:20px;color:#141414">credit_card</span><span style="font-size:13.5px;font-weight:700">Mostrar parcelamento</span></div>
+                  <div onClick="{{ onToggleParcel }}" style="width:46px;height:27px;border-radius:999px;background:{{ parcelTrackBg }};position:relative;cursor:pointer;transition:background .18s">
+                    <span style="position:absolute;top:3px;left:{{ parcelKnobLeft }};width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .18s"></span>
+                  </div>
+                </div>
+                <sc-if value="{{ parcelOn }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:14px;animation:zfade .2s ease">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px"><span style="font-size:11.5px;font-weight:700;color:#888">Máximo de parcelas</span><span style="font-size:13px;font-weight:800">{{ parcelN }}x</span></div>
+                  <input type="range" min="1" max="12" step="1" value="{{ parcelN }}" oninput="{{ onParcelN }}" style="width:100%;accent-color:#00a82d" />
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin:6px 0 13px"><span style="font-size:10.5px;color:#aaa">1x</span><span style="font-size:10.5px;color:#aaa">12x</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                    <span style="font-size:13px;font-weight:600">Cobrar juros?</span>
+                    <div style="display:flex;background:#f4eee5;border-radius:10px;padding:3px">
+                      <div onClick="{{ onJurosNo }}" style="font-size:12px;font-weight:700;padding:6px 13px;border-radius:8px;cursor:pointer;background:{{ semJurosBg }};color:{{ semJurosFg }}">Sem juros</div>
+                      <div onClick="{{ onJurosYes }}" style="font-size:12px;font-weight:700;padding:6px 13px;border-radius:8px;cursor:pointer;background:{{ comJurosBg }};color:{{ comJurosFg }}">Com juros</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:9px;background:#f0f8f1;border-radius:11px;padding:11px 13px"><span style="font-family:'Material Symbols Rounded';font-size:19px;color:#00a82d">visibility</span><span style="font-size:12.5px;font-weight:700;color:#00772a">{{ editParcelPreview }}</span></div>
+                </div>
+                </sc-if>
+              </div>
+            </div>
+            </sc-if>
+
+            <!-- TAB: FOTOS -->
+            <sc-if value="{{ tabFotos }}" hint-placeholder-val="{{ false }}">
+            <div style="animation:zfade .18s ease">
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+                <div onClick="{{ onPhotoToast }}" style="aspect-ratio:1;border-radius:14px;border:1.5px dashed #00a82d;background:#f0f8f1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer">
+                  <span style="font-family:'Material Symbols Rounded';font-size:24px;color:#00a82d">add_a_photo</span>
+                  <span style="font-size:9.5px;font-weight:700;color:#00a82d">Adicionar</span>
+                </div>
+                <sc-for list="{{ editPhotos }}" as="ph" hint-placeholder-count="2">
+                <div style="position:relative;aspect-ratio:1;border-radius:14px;background:repeating-linear-gradient(45deg,#f4eee5,#f4eee5 8px,#efe7da 8px,#efe7da 16px);display:flex;align-items:center;justify-content:center">
+                  <span style="font-family:'Material Symbols Rounded';font-size:26px;color:#c2bcae">{{ ph.icon }}</span>
+                  <sc-if value="{{ ph.cover }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:6px;left:6px;font-size:8.5px;font-weight:800;letter-spacing:.03em;padding:2px 6px;border-radius:999px;background:#141414;color:#95e030">CAPA</span></sc-if>
+                </div>
+                </sc-for>
+              </div>
+              <div style="font-size:10.5px;color:#aaa;margin:0 2px">Toque e segure para arrastar e reordenar · até 8 fotos · a primeira é a capa do catálogo.</div>
+            </div>
+            </sc-if>
+          </div>
+          <div style="flex-shrink:0;padding:12px 18px 26px;border-top:1px solid rgba(0,0,0,.06)">
+            <div onClick="{{ onCatalogToast }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:15px;background:#00a82d;color:#fff;font-size:14px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:20px">open_in_new</span>Ver no meu catálogo</div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ OVERLAY: CUSTOMER ============ -->
+        <sc-if value="{{ showCustomer }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:#f9f6f2;z-index:20;display:flex;flex-direction:column;animation:zslidein .26s ease">
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 12px;flex-shrink:0">
+            <div onClick="{{ closeOverlay }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">arrow_back</span></div>
+            <div style="flex:1;font-size:16px;font-weight:800;letter-spacing:-.02em">{{ custTitle }}</div>
+            <sc-if value="{{ custEditMode }}" hint-placeholder-val="{{ false }}"><div onClick="{{ onCustSave }}" style="font-size:13px;font-weight:700;color:#00a82d;cursor:pointer;padding:8px">Salvar</div></sc-if>
+            <sc-if value="{{ custView }}" hint-placeholder-val="{{ false }}"><div onClick="{{ onCustEdit }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:20px">edit</span></div></sc-if>
+          </div>
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 18px">
+
+            <!-- VIEW MODE -->
+            <sc-if value="{{ custView }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:zfade .18s ease">
+              <div style="display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:18px">
+                <div style="width:74px;height:74px;border-radius:50%;background:{{ selCustomer.avBg }};color:{{ selCustomer.avFg }};display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700">{{ selCustomer.initials }}</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
+                  <span style="font-size:19px;font-weight:800;letter-spacing:-.02em">{{ selCustomer.name }}</span>
+                  <sc-if value="{{ selCustomer.vip }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;font-weight:800;letter-spacing:.04em;padding:3px 8px;border-radius:999px;background:#fad0f6;color:#6b006b">VIP</span></sc-if>
+                </div>
+                <div style="font-size:12.5px;color:#888;margin-top:3px">Cliente desde {{ selCustomer.since }}</div>
+              </div>
+              <div style="display:flex;gap:9px;margin-bottom:16px">
+                <div onClick="{{ onWhats }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;height:46px;border-radius:13px;background:#00a82d;color:#fff;font-size:13px;font-weight:700;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:19px">chat</span>WhatsApp</div>
+                <div onClick="{{ onCall }}" style="width:46px;height:46px;border-radius:13px;background:#f4eee5;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:20px">call</span></div>
+                <div onClick="{{ onMailToast }}" style="width:46px;height:46px;border-radius:13px;background:#f4eee5;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:20px">mail</span></div>
+              </div>
+              <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:4px 15px;margin-bottom:16px">
+                <div style="display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05)"><span style="font-family:'Material Symbols Rounded';font-size:19px;color:#888">chat</span><span style="font-size:13.5px;font-weight:600">{{ cd.whatsapp }}</span></div>
+                <div style="display:flex;align-items:center;gap:11px;padding:12px 0"><span style="font-family:'Material Symbols Rounded';font-size:19px;color:#888">mail</span><span style="font-size:13.5px;font-weight:600">{{ cd.email }}</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:16px">
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:15px">
+                  <div style="font-size:24px;font-weight:800;letter-spacing:-.03em">{{ selCustomer.orders }}</div>
+                  <div style="font-size:11.5px;color:#888;margin-top:3px;font-weight:600">pedidos</div>
+                </div>
+                <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:15px">
+                  <div style="font-size:24px;font-weight:800;letter-spacing:-.03em;color:#00a82d">{{ selCustomer.spentFmt }}</div>
+                  <div style="font-size:11.5px;color:#888;margin-top:3px;font-weight:600">total gasto</div>
+                </div>
+              </div>
+              <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin:0 4px 9px">Etiquetas</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+                <sc-for list="{{ selCustomer.tags }}" as="tg" hint-placeholder-count="2">
+                <span style="font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;background:#f4eee5;color:#5a5a5a">{{ tg }}</span>
+                </sc-for>
+              </div>
+              <div style="background:#faf3ff;border:1px solid #e7d3f5;border-radius:16px;padding:14px 15px">
+                <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><span style="font-family:'Material Symbols Rounded';font-size:18px;color:#7a3fa0">auto_awesome</span><span style="font-size:12px;font-weight:700;color:#7a3fa0">Perfil gerado por IA</span></div>
+                <div style="font-size:13px;color:#5a4a66;line-height:1.5">{{ selCustomer.ai }}</div>
+              </div>
+            </div>
+            </sc-if>
+
+            <!-- EDIT MODE -->
+            <sc-if value="{{ custEditMode }}" hint-placeholder-val="{{ false }}">
+            <div style="animation:zfade .18s ease">
+              <div style="display:flex;justify-content:center;margin-bottom:20px">
+                <div onClick="{{ onPhotoToast }}" style="position:relative;width:80px;height:80px;border-radius:50%;background:#f4eee5;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <span style="font-family:'Material Symbols Rounded';font-size:30px;color:#b5afa2">person</span>
+                  <span style="position:absolute;bottom:-2px;right:-2px;width:28px;height:28px;border-radius:50%;background:#00a82d;border:2.5px solid #f9f6f2;display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-size:15px;color:#fff">add_a_photo</span></span>
+                </div>
+              </div>
+              <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Nome *</div>
+              <input value="{{ cd.name }}" oninput="{{ onCdName }}" placeholder="Nome do cliente" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:600;font-family:inherit;outline:none;color:#141414;margin-bottom:14px" />
+              <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">WhatsApp *</div>
+              <input value="{{ cd.whatsapp }}" oninput="{{ onCdWhats }}" placeholder="+55 11 90000-0000" inputmode="tel" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:600;font-family:inherit;outline:none;color:#141414;margin-bottom:14px" />
+              <div style="display:flex;gap:11px;margin-bottom:14px">
+                <div style="flex:1.4"><div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">E-mail</div><input value="{{ cd.email }}" oninput="{{ onCdEmail }}" placeholder="email@exemplo.com" inputmode="email" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:600;font-family:inherit;outline:none;color:#141414" /></div>
+                <div style="flex:1"><div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Aniversário</div><input value="{{ cd.birthday }}" oninput="{{ onCdBirthday }}" placeholder="DD/MM" inputmode="numeric" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:600;font-family:inherit;outline:none;color:#141414" /></div>
+              </div>
+              <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Vendedor responsável</div>
+              <div onClick="{{ onSellerToast }}" style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:14px">{{ cd.seller }}<span style="font-family:'Material Symbols Rounded';font-size:20px;color:#cbc6ba">expand_more</span></div>
+              <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Etiquetas</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+                <sc-for list="{{ custTags }}" as="tg" hint-placeholder-count="2">
+                <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:6px 10px 6px 12px;border-radius:999px;background:#f4eee5;color:#5a5a5a">{{ tg }}<span style="font-family:'Material Symbols Rounded';font-size:15px;color:#a59f90">close</span></span>
+                </sc-for>
+                <span onClick="{{ onAddTagToast }}" style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px dashed #c2bcae;color:#00a82d;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:15px">add</span>Etiqueta</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin:0 2px 7px">
+                <span style="font-size:11.5px;font-weight:700;color:#888">Observações</span>
+                <span onClick="{{ onAiProfileToast }}" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#7a3fa0;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:15px">auto_awesome</span>Gerar perfil</span>
+              </div>
+              <textarea oninput="{{ onCdNotes }}" placeholder="Preferências, histórico, observações..." style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:14px;font-size:13px;color:#5a5a5a;line-height:1.5;min-height:90px;font-family:inherit;outline:none;resize:none;margin-bottom:16px">{{ cd.notes }}</textarea>
+              <div onClick="{{ onCustSave }}" style="display:flex;align-items:center;justify-content:center;height:50px;border-radius:15px;background:#00a82d;color:#fff;font-size:14px;font-weight:700;cursor:pointer">{{ custSaveLabel }}</div>
+            </div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ OVERLAY: CATÁLOGO ============ -->
+        <sc-if value="{{ showCatalogo }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:#f9f6f2;z-index:20;display:flex;flex-direction:column;animation:zslidein .26s ease">
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 12px;flex-shrink:0">
+            <div onClick="{{ backToMais }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">arrow_back</span></div>
+            <div style="flex:1;font-size:16px;font-weight:800;letter-spacing:-.02em">Personalizar catálogo</div>
+          </div>
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 24px">
+            <div onClick="{{ onShare }}" style="display:flex;align-items:center;gap:12px;background:#141414;border-radius:16px;padding:14px 15px;margin-bottom:16px;cursor:pointer">
+              <span style="font-family:'Material Symbols Rounded';font-size:22px;color:#95e030">link</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:#f9f6f2">atelielola.zapable.com.br</div><div style="font-size:11px;color:#999">Toque para copiar o link</div></div>
+              <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#95e030">content_copy</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ catSections }}" as="s" hint-placeholder-count="6">
+              <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;overflow:hidden">
+                <div onClick="{{ s.toggle }}" style="display:flex;align-items:center;gap:13px;padding:15px 16px;cursor:pointer">
+                  <div style="width:36px;height:36px;border-radius:10px;background:#f4eee5;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-family:'Material Symbols Rounded';font-size:19px;color:#141414">{{ s.icon }}</span></div>
+                  <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700">{{ s.label }}</div><div style="font-size:11px;color:#888;margin-top:1px">{{ s.desc }}</div></div>
+                  <span style="font-family:'Material Symbols Rounded';font-size:22px;color:#cbc6ba;transform:{{ s.chevron }}">expand_more</span>
+                </div>
+                <sc-if value="{{ s.open }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:0 16px 16px;animation:zfade .2s ease">
+                  <div style="height:1px;background:rgba(0,0,0,.06);margin-bottom:14px"></div>
+                  <sc-for list="{{ s.fields }}" as="fld" hint-placeholder-count="2">
+                  <div style="margin-bottom:13px">
+                    <div style="font-size:11.5px;font-weight:700;color:#888;margin-bottom:6px">{{ fld.label }}</div>
+                    <div style="background:#f9f6f2;border:1px solid rgba(0,0,0,.07);border-radius:11px;padding:12px 13px;font-size:13.5px;font-weight:600;color:#141414">{{ fld.value }}</div>
+                  </div>
+                  </sc-for>
+                </div>
+                </sc-if>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ OVERLAY: BILLING ============ -->
+        <sc-if value="{{ showBilling }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:#f9f6f2;z-index:20;display:flex;flex-direction:column;animation:zslidein .26s ease">
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 12px;flex-shrink:0">
+            <div onClick="{{ backToMais }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">arrow_back</span></div>
+            <div style="flex:1;font-size:16px;font-weight:800;letter-spacing:-.02em">Assinatura</div>
+          </div>
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 24px">
+            <div style="background:#141414;border-radius:20px;padding:20px;margin-bottom:16px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                <div><div style="font-size:11.5px;color:#999;font-weight:600">Plano atual</div><div style="font-size:23px;font-weight:800;color:#f9f6f2;letter-spacing:-.02em">Pro</div></div>
+                <span style="font-size:10.5px;font-weight:800;padding:5px 11px;border-radius:999px;background:#fad0f6;color:#6b006b">TRIAL · {{ trialDays }} dias</span>
+              </div>
+              <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px"><span style="font-size:30px;font-weight:800;color:#95e030;letter-spacing:-.03em">R$ 79</span><span style="font-size:13px;color:#999">/mês</span></div>
+              <div style="font-size:12px;color:#999">Renova em 7 dias · cancele quando quiser</div>
+            </div>
+            <div onClick="{{ onPortalToast }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:15px;background:#00a82d;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:20px"><span style="font-family:'Material Symbols Rounded';font-size:20px">credit_card</span>Gerenciar assinatura</div>
+            <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin:0 4px 11px">Mudar de plano</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px">
+              <sc-for list="{{ plans }}" as="pl" hint-placeholder-count="3">
+              <div onClick="{{ pl.onClick }}" style="display:flex;align-items:center;gap:13px;background:#fff;border:1.5px solid {{ pl.border }};border-radius:16px;padding:15px;cursor:pointer">
+                <div style="flex:1"><div style="font-size:14.5px;font-weight:800">{{ pl.name }}</div><div style="font-size:11.5px;color:#888;margin-top:2px">{{ pl.desc }}</div></div>
+                <div style="text-align:right"><div style="font-size:16px;font-weight:800;color:#00a82d">{{ pl.price }}</div><sc-if value="{{ pl.current }}" hint-placeholder-val="{{ false }}"><div style="font-size:10px;font-weight:800;color:#00a82d;margin-top:2px">ATUAL</div></sc-if></div>
+              </div>
+              </sc-for>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin:0 4px 11px">Faturas</div>
+            <div style="background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:4px 15px">
+              <sc-for list="{{ invoices }}" as="inv" hint-placeholder-count="3">
+              <div onClick="{{ onInvoiceToast }}" style="display:flex;align-items:center;justify-content:between;gap:12px;padding:13px 0;border-bottom:1px solid {{ inv.border }};cursor:pointer">
+                <div style="flex:1"><div style="font-size:13px;font-weight:700">{{ inv.date }}</div><div style="font-size:11px;color:#888">{{ inv.id }}</div></div>
+                <span style="font-size:13px;font-weight:700">{{ inv.amount }}</span>
+                <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#00a82d">download</span>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ OVERLAY: GENERIC (vendedores/suporte/config) ============ -->
+        <sc-if value="{{ showGeneric }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:#f9f6f2;z-index:20;display:flex;flex-direction:column;animation:zslidein .26s ease">
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 12px;flex-shrink:0">
+            <div onClick="{{ backToMais }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:22px">arrow_back</span></div>
+            <div style="flex:1;font-size:16px;font-weight:800;letter-spacing:-.02em">{{ genericTitle }}</div>
+          </div>
+          <div class="zsc" style="flex:1;overflow-y:auto;padding:4px 18px 24px">
+            <sc-for list="{{ genericRows }}" as="g" hint-placeholder-count="3">
+            <div style="margin-bottom:10px">
+              <sc-if value="{{ g.isHeader }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin:14px 4px 4px">{{ g.label }}</div>
+              </sc-if>
+              <sc-if value="{{ g.isCard }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ g.onClick }}" style="display:flex;align-items:center;gap:13px;background:#fff;border:1px solid {{ g.cardBorder }};border-radius:15px;padding:14px 15px;cursor:pointer">
+                <sc-if value="{{ g.icon }}" hint-placeholder-val="{{ false }}"><div style="width:38px;height:38px;border-radius:11px;background:{{ g.iconBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-family:'Material Symbols Rounded';font-size:20px;color:{{ g.iconColor }}">{{ g.icon }}</span></div></sc-if>
+                <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700;color:{{ g.titleColor }}">{{ g.title }}</div><sc-if value="{{ g.sub }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:#888;margin-top:1px">{{ g.sub }}</div></sc-if></div>
+                <sc-if value="{{ g.right }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:{{ g.rightBg }};color:{{ g.rightFg }}">{{ g.right }}</span></sc-if>
+              </div>
+              </sc-if>
+            </div>
+            </sc-for>
+            <sc-if value="{{ showInviteBtn }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onInviteToast }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:15px;background:#00a82d;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:14px"><span style="font-family:'Material Symbols Rounded';font-size:20px">person_add</span>Convidar vendedor</div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ SHEET BACKDROP ============ -->
+        <sc-if value="{{ showSheet }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(20,20,20,.42);z-index:40;animation:zfade .2s ease"></div>
+        <div class="zsc" style="position:absolute;left:0;right:0;bottom:0;z-index:41;background:#f9f6f2;border-radius:26px 26px 0 0;padding:10px 20px 30px;animation:zslideup .28s cubic-bezier(.22,1,.36,1);max-height:82%;overflow-y:auto">
+          <div style="width:40px;height:5px;border-radius:999px;background:#d8d2c6;margin:0 auto 16px;position:sticky;top:0"></div>
+
+          <sc-if value="{{ isFilterSheet }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:14px">Filtrar pedidos</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ filterOptions }}" as="fo" hint-placeholder-count="4">
+            <div onClick="{{ fo.onClick }}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 15px;border-radius:14px;background:#fff;border:1.5px solid {{ fo.border }};cursor:pointer">
+              <span style="font-size:14px;font-weight:600">{{ fo.label }}</span>
+              <span style="font-family:'Material Symbols Rounded';font-size:22px;color:{{ fo.checkColor }};font-variation-settings:'FILL' 1">{{ fo.check }}</span>
+            </div>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ isStatusSheet }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:14px">Atualizar status</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ statusOptions }}" as="so" hint-placeholder-count="4">
+            <div onClick="{{ so.onClick }}" style="display:flex;align-items:center;gap:12px;padding:14px 15px;border-radius:14px;background:#fff;border:1.5px solid {{ so.border }};cursor:pointer">
+              <span style="width:11px;height:11px;border-radius:50%;background:{{ so.dot }}"></span>
+              <span style="font-size:14px;font-weight:700;flex:1">{{ so.label }}</span>
+              <sc-if value="{{ so.active }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:22px;color:#00a82d;font-variation-settings:'FILL' 1">check_circle</span></sc-if>
+            </div>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ isNovoSheet }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:16px">Novo produto</div>
+
+          <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Fotos do produto</div>
+          <div class="zsc" style="display:flex;gap:9px;overflow-x:auto;margin:0 -20px 4px;padding:0 20px">
+            <div onClick="{{ onPhotoToast }}" style="flex-shrink:0;width:78px;height:78px;border-radius:14px;border:1.5px dashed #00a82d;background:#f0f8f1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer">
+              <span style="font-family:'Material Symbols Rounded';font-size:22px;color:#00a82d">add_a_photo</span>
+              <span style="font-size:9.5px;font-weight:700;color:#00a82d">Adicionar</span>
+            </div>
+            <sc-for list="{{ photoSlots }}" as="ps" hint-placeholder-count="3">
+            <div style="flex-shrink:0;width:78px;height:78px;border-radius:14px;background:repeating-linear-gradient(45deg,#f4eee5,#f4eee5 7px,#efe7da 7px,#efe7da 14px);display:flex;align-items:center;justify-content:center">
+              <span style="font-family:ui-monospace,monospace;font-size:9px;color:#b0a999">{{ ps.label }}</span>
+            </div>
+            </sc-for>
+          </div>
+          <div style="font-size:10.5px;color:#aaa;margin:0 2px 16px">Arraste para reordenar · até 8 fotos · 1ª foto é a capa</div>
+
+          <div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Nome</div>
+          <input placeholder="Ex.: Vestido midi linho" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:13px;padding:14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:13px" />
+          <div style="display:flex;gap:11px;margin-bottom:16px">
+            <div style="flex:1"><div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Preço</div><input value="{{ novoPrice }}" oninput="{{ onNovoPrice }}" placeholder="R$ 0,00" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:13px;padding:14px;font-size:14px;font-family:inherit;outline:none" /></div>
+            <div style="flex:1"><div style="font-size:11.5px;font-weight:700;color:#888;margin:0 2px 7px">Estoque</div><input placeholder="0" style="width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:13px;padding:14px;font-size:14px;font-family:inherit;outline:none" /></div>
+          </div>
+
+          <div style="background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:14px 15px;margin-bottom:18px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:9px">
+                <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#141414">credit_card</span>
+                <span style="font-size:13.5px;font-weight:700">Mostrar parcelamento</span>
+              </div>
+              <div onClick="{{ onToggleParcel }}" style="width:46px;height:27px;border-radius:999px;background:{{ parcelTrackBg }};position:relative;cursor:pointer;transition:background .18s">
+                <span style="position:absolute;top:3px;left:{{ parcelKnobLeft }};width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .18s"></span>
+              </div>
+            </div>
+            <sc-if value="{{ parcelOn }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:14px;animation:zfade .2s ease">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                <span style="font-size:11.5px;font-weight:700;color:#888">Número máximo de parcelas</span>
+                <span style="font-size:13px;font-weight:800">{{ parcelN }}x</span>
+              </div>
+              <input type="range" min="1" max="12" step="1" value="{{ parcelN }}" oninput="{{ onParcelN }}" style="width:100%;accent-color:#00a82d" />
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;margin-bottom:13px">
+                <span style="font-size:10.5px;color:#aaa">1x</span><span style="font-size:10.5px;color:#aaa">12x</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font-size:13px;font-weight:600">Cobrar juros?</span>
+                <div style="display:flex;background:#f4eee5;border-radius:10px;padding:3px">
+                  <div onClick="{{ onJurosNo }}" style="font-size:12px;font-weight:700;padding:6px 13px;border-radius:8px;cursor:pointer;background:{{ semJurosBg }};color:{{ semJurosFg }}">Sem juros</div>
+                  <div onClick="{{ onJurosYes }}" style="font-size:12px;font-weight:700;padding:6px 13px;border-radius:8px;cursor:pointer;background:{{ comJurosBg }};color:{{ comJurosFg }}">Com juros</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;background:#f0f8f1;border-radius:11px;padding:11px 13px">
+                <span style="font-family:'Material Symbols Rounded';font-size:19px;color:#00a82d">visibility</span>
+                <span style="font-size:12.5px;font-weight:700;color:#00772a">{{ parcelPreview }}</span>
+              </div>
+            </div>
+            </sc-if>
+          </div>
+
+          <div onClick="{{ onSaveProduct }}" style="display:flex;align-items:center;justify-content:center;height:50px;border-radius:15px;background:#00a82d;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Adicionar produto</div>
+          </sc-if>
+
+          <sc-if value="{{ isPickerSheet }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px">{{ pickerTitle }}</div>
+          <div style="font-size:12px;color:#888;margin-bottom:14px">{{ pickerSub }}</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ pickerRows }}" as="pr" hint-placeholder-count="5">
+            <div onClick="{{ pr.onClick }}" style="display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:14px;background:#fff;border:1.5px solid {{ pr.border }};cursor:pointer">
+              <div style="width:40px;height:40px;border-radius:11px;background:{{ pr.avBg }};color:{{ pr.avFg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">{{ pr.badge }}</div>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pr.title }}</div><div style="font-size:11.5px;color:#888;margin-top:1px">{{ pr.sub }}</div></div>
+              <sc-if value="{{ pr.check }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:22px;color:#00a82d;font-variation-settings:'FILL' 1">check_circle</span></sc-if>
+            </div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- ============ TOAST ============ -->
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:50%;bottom:104px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:9px;background:#141414;color:#f9f6f2;padding:12px 18px;border-radius:14px;box-shadow:0 12px 30px -8px rgba(0,0,0,.5);animation:ztoast .3s ease;white-space:nowrap">
+          <span style="font-family:'Material Symbols Rounded';font-size:19px;color:#95e030;font-variation-settings:'FILL' 1">check_circle</span>
+          <span style="font-size:13px;font-weight:600">{{ toast }}</span>
+        </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:900},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#00a82d&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;plan&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Pro&quot;,&quot;options&quot;:[&quot;Básico&quot;,&quot;Pro&quot;,&quot;Premium&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;ownerName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Carla&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;trialDays&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:7,&quot;min&quot;:0,&quot;max&quot;:14,&quot;tsType&quot;:&quot;number&quot;},&quot;showTrial&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props)
+    this.state = {
+      screen: 'inicio',
+      overlay: null, overlayId: null,
+      sheet: null,
+      ordersFilter: 'todos',
+      search: '',
+      toast: null,
+      openAcc: 'info',
+      prodTab: 'geral',
+      novoPrice: '', parcelOn: true, parcelN: 12, juros: false,
+      edit: null,
+      custEdit: false, custDraft: null, custTags: [],
+      np: null, picker: null,
+      orders: [
+        { id: 'o1', code: '#A3F7K', name: 'Mariana Alves', total: 248.0, status: 'novo', when: 'há 8 min', phone: '+55 11 98842-1190', note: 'Pode embrulhar para presente? 🎁', items: [{ name: 'Vestido Midi Linho', qty: 1, price: 189.9 }, { name: 'Lenço de Seda', qty: 1, price: 58.1 }] },
+        { id: 'o2', code: '#B8K2M', name: 'Rafael Souza', total: 89.9, status: 'novo', when: 'há 32 min', phone: '+55 21 99731-0042', note: '', items: [{ name: 'Óculos Retrô', qty: 1, price: 89.9 }] },
+        { id: 'o3', code: '#C1X9P', name: 'Juliana Costa', total: 412.5, status: 'atend', when: 'hoje 10:14', phone: '+55 31 98120-7765', note: 'Entregar depois das 14h.', items: [{ name: 'Bolsa Tiracolo Couro', qty: 1, price: 249.0 }, { name: 'Sandália Trançada', qty: 1, price: 129.9 }, { name: 'Brinco Argola', qty: 1, price: 33.6 }] },
+        { id: 'o4', code: '#D4Q7R', name: 'Pedro Henrique', total: 156.0, status: 'concl', when: 'ontem', phone: '+55 11 97654-3321', note: '', items: [{ name: 'Camisa Alfaiataria', qty: 1, price: 156.0 }] },
+        { id: 'o5', code: '#E2W5T', name: 'Beatriz Lima', total: 320.0, status: 'atend', when: 'ontem', phone: '+55 41 99988-1234', note: '', items: [{ name: 'Calça Pantalona', qty: 1, price: 199.0 }, { name: 'Lenço de Seda', qty: 1, price: 121.0 }] },
+        { id: 'o6', code: '#F9Z3L', name: 'Camila Rocha', total: 67.0, status: 'canc', when: 'há 2 dias', phone: '+55 51 98445-9090', note: '', items: [{ name: 'Brinco Argola Dourado', qty: 1, price: 67.0 }] },
+      ],
+    }
+    this.products = [
+      { id: 'p1', name: 'Vestido Midi Linho', cat: 'Vestidos', price: 189.9, stock: 12, icon: 'checkroom', desc: 'Vestido midi em linho leve, ideal para o verão. Modelagem soltinha com bolsos laterais.' },
+      { id: 'p2', name: 'Bolsa Tiracolo Couro', cat: 'Bolsas', price: 249.0, stock: 3, icon: 'work', desc: 'Bolsa tiracolo em couro legítimo com alça ajustável e fecho magnético.' },
+      { id: 'p3', name: 'Brinco Argola Dourado', cat: 'Acessórios', price: 59.9, stock: 0, icon: 'diamond', desc: 'Argola média folheada a ouro 18k, antialérgica.' },
+      { id: 'p4', name: 'Camisa Alfaiataria', cat: 'Camisas', price: 159.0, stock: 8, icon: 'apparel', desc: 'Camisa de alfaiataria em viscose com caimento impecável.' },
+      { id: 'p5', name: 'Sandália Trançada', cat: 'Calçados', price: 129.9, stock: 21, icon: 'footprint', desc: 'Sandália rasteira trançada à mão, super confortável.' },
+      { id: 'p6', name: 'Calça Pantalona', cat: 'Calças', price: 199.0, stock: 0, icon: 'apparel', desc: 'Pantalona de cintura alta com cós elástico nas costas.' },
+    ]
+    this.customers = [
+      { id: 'c1', name: 'Mariana Alves', orders: 14, spent: 2890.0, vip: true, phone: '+55 11 98842-1190', since: 'mar/2024', avBg: '#fad0f6', avFg: '#6b006b', tags: ['VIP', 'Recorrente', 'Aniversário esta semana'], ai: 'Cliente fiel de alto valor. Compra peças de festa a cada 6 semanas. Boa candidata para lançamentos exclusivos e atendimento prioritário.' },
+      { id: 'c2', name: 'Rafael Souza', orders: 2, spent: 179.8, vip: false, phone: '+55 21 99731-0042', since: 'mai/2026', avBg: '#dcefe2', avFg: '#00772a', tags: ['Novo'], ai: 'Cliente recente. Demonstrou interesse em acessórios masculinos. Vale uma mensagem de boas-vindas com cupom.' },
+      { id: 'c3', name: 'Juliana Costa', orders: 7, spent: 1640.5, vip: true, phone: '+55 31 98120-7765', since: 'ago/2024', avBg: '#fde9cf', avFg: '#7a5800', tags: ['VIP', 'Recompra em atraso'], ai: 'Não compra há 47 dias — acima da média dela (28 dias). Recomenda-se contato com novidades em bolsas.' },
+      { id: 'c4', name: 'Beatriz Lima', orders: 1, spent: 320.0, vip: false, phone: '+55 41 99988-1234', since: 'jun/2026', avBg: '#e7d8f5', avFg: '#6a2da0', tags: ['Novo'], ai: 'Primeira compra de ticket alto. Forte potencial de fidelização com bom pós-venda.' },
+      { id: 'c5', name: 'Camila Rocha', orders: 5, spent: 740.0, vip: false, phone: '+55 51 98445-9090', since: 'jan/2025', avBg: '#d6e9f5', avFg: '#1f6a99', tags: ['Recorrente'], ai: 'Compra acessórios de baixo ticket com frequência. Boa para promoções de combo.' },
+      { id: 'c6', name: 'Pedro Henrique', orders: 3, spent: 468.0, vip: false, phone: '+55 11 97654-3321', since: 'out/2025', avBg: '#f4eee5', avFg: '#5a5a5a', tags: ['Recorrente'], ai: 'Compra peças de alfaiataria. Interesse provável em camisas e calças sociais.' },
+    ]
+    this.SM = {
+      novo: { label: 'Novo', bg: '#fbe3f8', fg: '#8a1d83', dot: '#c33ab5' },
+      atend: { label: 'Em atendimento', bg: '#fff3cd', fg: '#7a5800', dot: '#e0a200' },
+      concl: { label: 'Concluído', bg: '#d8f0df', fg: '#00772a', dot: '#00a82d' },
+      canc: { label: 'Cancelado', bg: '#ffe0e0', fg: '#8b0000', dot: '#cc4040' },
+    }
+  }
+
+  money(n) {
+    return 'R$ ' + n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  }
+  initials(name) {
+    return name.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase()
+  }
+  greeting() {
+    const h = new Date().getHours()
+    if (h < 12) return 'Bom dia'
+    if (h < 18) return 'Boa tarde'
+    return 'Boa noite'
+  }
+  go(s) { this.setState({ screen: s, overlay: null, overlayId: null, sheet: null }) }
+  openOverlay(t, id) {
+    const patch = { overlay: t, overlayId: id, sheet: null }
+    if (t === 'product') {
+      const p = this.products.find((x) => x.id === id)
+      if (p) patch.edit = { name: p.name, cat: p.cat, desc: p.desc, priceStr: p.price.toFixed(2).replace('.', ','), cost: '', stock: String(p.stock), minStock: '5', sku: 'SKU-' + id.toUpperCase() + '01', barcode: '', variations: false }
+      patch.prodTab = 'geral'
+    }
+    if (t === 'customer') {
+      const c = this.customers.find((x) => x.id === id)
+      patch.custEdit = !c
+      patch.custTags = c ? c.tags.slice() : []
+      patch.custDraft = c
+        ? { name: c.name, whatsapp: c.phone, email: c.name.split(' ')[0].toLowerCase() + '@email.com', birthday: '', seller: 'A definir', notes: c.ai }
+        : { name: '', whatsapp: '+55 ', email: '', birthday: '', seller: 'A definir', notes: '' }
+    }
+    this.setState(patch)
+  }
+  closeOverlay() { this.setState({ overlay: null, overlayId: null }) }
+  openSheet(t) { this.setState({ sheet: t }) }
+  closeSheet() { this.setState({ sheet: null }) }
+  setStatus(id, st) {
+    this.setState((s) => ({ orders: s.orders.map((o) => (o.id === id ? { ...o, status: st } : o)), sheet: null }))
+    this.toast('Status atualizado')
+  }
+  toast(msg) {
+    this.setState({ toast: msg })
+    clearTimeout(this._t)
+    this._t = setTimeout(() => this.setState({ toast: null }), 2300)
+  }
+
+  decorateOrder(o) {
+    const m = this.SM[o.status]
+    return {
+      ...o, statusLabel: m.label, bg: m.bg, fg: m.fg,
+      totalFmt: this.money(o.total), initials: this.initials(o.name),
+      itemsLabel: o.items.length + (o.items.length === 1 ? ' item' : ' itens'),
+      open: () => this.openOverlay('order', o.id),
+    }
+  }
+
+  renderVals() {
+    const st = this.state
+    const accent = this.props.accentColor ?? '#00a82d'
+    const plan = this.props.plan ?? 'Pro'
+    const trialDays = this.props.trialDays ?? 7
+    const showTrial = (this.props.showTrial ?? true)
+    const firstName = this.props.ownerName ?? 'Carla'
+
+    const tabsDef = [
+      { key: 'inicio', icon: 'home', label: 'Início' },
+      { key: 'pedidos', icon: 'receipt_long', label: 'Pedidos' },
+      { key: 'produtos', icon: 'inventory_2', label: 'Produtos' },
+      { key: 'clientes', icon: 'group', label: 'Clientes' },
+      { key: 'mais', icon: 'grid_view', label: 'Mais' },
+    ]
+    const active = st.overlay ? null : st.screen
+    const tabs = tabsDef.map((t) => ({
+      ...t,
+      color: active === t.key ? accent : '#9a9488',
+      fill: active === t.key ? 1 : 0,
+      go: () => this.go(t.key),
+    }))
+
+    const quickActions = [
+      { icon: 'add', label: 'Novo produto', onClick: () => this.openSheet('novo') },
+      { icon: 'receipt_long', label: 'Ver pedidos', onClick: () => this.go('pedidos') },
+      { icon: 'ios_share', label: 'Compartilhar', onClick: () => this.toast('Link do catálogo copiado') },
+      { icon: 'open_in_new', label: 'Ver loja', onClick: () => this.toast('Abrindo catálogo público') },
+    ]
+
+    const kpis = [
+      { label: 'Pedidos hoje', value: '2', sub: '1 novo', subColor: '#00a82d', icon: 'receipt_long' },
+      { label: 'Receita do mês', value: 'R$ 4.280', sub: '+12% vs. mês ant.', subColor: '#00a82d', icon: 'trending_up' },
+      { label: 'Produtos ativos', value: '24', sub: '2 esgotados', subColor: '#8b0000', icon: 'inventory_2' },
+      { label: 'Clientes', value: '38', sub: '+5 este mês', subColor: '#00a82d', icon: 'group' },
+    ]
+
+    const counts = [1, 3, 2, 4, 2, 5, 3]
+    const labels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+    const max = Math.max(...counts)
+    const bars = counts.map((c, i) => ({
+      h: Math.round((c / max) * 84) + 8,
+      label: labels[i],
+      color: i === counts.length - 1 ? accent : '#ece5d9',
+      labelColor: i === counts.length - 1 ? accent : '#b5afa2',
+    }))
+
+    const decorated = st.orders.map((o) => this.decorateOrder(o))
+    const recentOrders = decorated.slice(0, 4)
+
+    const matchOrder = (o) => {
+      const q = st.search.trim().toLowerCase()
+      if (!q) return true
+      return o.name.toLowerCase().includes(q) || o.code.toLowerCase().includes(q)
+    }
+    let filteredOrders = decorated.filter(matchOrder)
+    if (st.ordersFilter !== 'todos') filteredOrders = filteredOrders.filter((o) => o.status === st.ordersFilter)
+
+    const filterDefs = [
+      { key: 'todos', label: 'Todos' },
+      { key: 'novo', label: 'Novos' },
+      { key: 'atend', label: 'Em atendimento' },
+      { key: 'concl', label: 'Concluídos' },
+    ]
+    const orderFilters = filterDefs.map((f) => {
+      const on = st.ordersFilter === f.key
+      return { ...f, bg: on ? '#141414' : '#fff', fg: on ? '#f9f6f2' : '#5a5a5a', border: on ? '#141414' : 'rgba(0,0,0,.08)', onClick: () => this.setState({ ordersFilter: f.key }) }
+    })
+
+    const stockMeta = (n) => {
+      if (n === 0) return { stockLabel: 'Esgotado', stockBg: '#ffe0e0', stockFg: '#8b0000' }
+      if (n <= 5) return { stockLabel: n + ' · baixo', stockBg: '#fff3cd', stockFg: '#7a5800' }
+      return { stockLabel: n + ' em estoque', stockBg: '#f0ece3', stockFg: '#5a5a5a' }
+    }
+    const decoProducts = this.products.map((p) => ({
+      ...p, priceFmt: this.money(p.price), ...stockMeta(p.stock),
+      open: () => this.openOverlay('product', p.id),
+    }))
+    const q = st.search.trim().toLowerCase()
+    const filteredProducts = q ? decoProducts.filter((p) => p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q)) : decoProducts
+
+    const customerFilters = [
+      { label: 'Aniversário esta semana', count: 1, icon: 'cake', bg: '#fad0f6', fg: '#6b006b', icColor: '#8a1d83' },
+      { label: 'Recompra em atraso', count: 3, icon: 'schedule', bg: '#fff3cd', fg: '#7a5800', icColor: '#7a5800' },
+      { label: 'Clientes VIP', count: 2, icon: 'star', bg: '#d8f0df', fg: '#00772a', icColor: '#00772a' },
+    ]
+    const customers = this.customers.map((c) => ({
+      ...c, initials: this.initials(c.name), spentFmt: this.money(c.spent),
+      ordersLabel: c.orders + (c.orders === 1 ? ' pedido' : ' pedidos'),
+      open: () => this.openOverlay('customer', c.id),
+      whats: (e) => { e.stopPropagation(); this.toast('Abrindo WhatsApp de ' + c.name.split(' ')[0]) },
+    }))
+
+    const moreItems = [
+      { key: 'catalogo', icon: 'storefront', label: 'Personalizar catálogo', desc: 'Logo, cores, categorias, contatos' },
+      { key: 'vendedores', icon: 'badge', label: 'Vendedores', desc: '2 vendedores ativos' },
+      { key: 'billing', icon: 'credit_card', label: 'Assinatura', desc: 'Plano Pro · trial' },
+      { key: 'suporte', icon: 'headset_mic', label: 'Suporte', desc: 'Fale com a equipe Zapable' },
+      { key: 'config', icon: 'settings', label: 'Configurações', desc: 'Dados da loja e da conta' },
+    ]
+    const moreDeco = moreItems.map((m, i) => ({
+      ...m, border: i === moreItems.length - 1 ? 'transparent' : 'rgba(0,0,0,.06)',
+      onClick: () => this.openOverlay(m.key, null),
+    }))
+
+    // selected entities
+    const rawSel = st.orders.find((o) => o.id === st.overlayId)
+    const selOrder = rawSel ? {
+      ...this.decorateOrder(rawSel),
+      items: rawSel.items.map((it, i) => ({ ...it, priceFmt: this.money(it.price), border: i === rawSel.items.length - 1 ? 'transparent' : 'rgba(0,0,0,.05)' })),
+    } : {}
+    const rawProd = this.products.find((p) => p.id === st.overlayId)
+    const selProduct = rawProd ? { ...rawProd, priceFmt: this.money(rawProd.price) } : {}
+    const rawCust = this.customers.find((c) => c.id === st.overlayId)
+    const selCustomer = rawCust ? { ...rawCust, initials: this.initials(rawCust.name), spentFmt: this.money(rawCust.spent) } : {}
+    const cd = st.custDraft || {}
+    const isNewCust = st.overlay === 'customer' && !rawCust
+    const custView = st.overlay === 'customer' && !st.custEdit
+    const custTitle = isNewCust ? 'Novo cliente' : (st.custEdit ? 'Editar cliente' : 'Cliente')
+    const bindCust = (f) => (e) => this.setState((s) => ({ custDraft: { ...s.custDraft, [f]: e.target.value } }))
+
+    // novo pedido
+    const np = st.np || { customerId: null, items: {}, note: '' }
+    const npCust = this.customers.find((c) => c.id === np.customerId)
+    const npItemList = Object.keys(np.items).filter((id) => np.items[id] > 0).map((id) => {
+      const p = this.products.find((x) => x.id === id)
+      return { id, name: p.name, price: p.price, qty: np.items[id] }
+    })
+    const npTotal = npItemList.reduce((s, it) => s + it.price * it.qty, 0)
+    const npCount = npItemList.reduce((s, it) => s + it.qty, 0)
+    const setQty = (id, d) => this.setState((s) => {
+      const items = { ...s.np.items }
+      items[id] = Math.max(0, (items[id] || 0) + d)
+      if (items[id] === 0) delete items[id]
+      return { np: { ...s.np, items } }
+    })
+    const npItems = npItemList.map((it, i, a) => ({
+      ...it, priceFmt: this.money(it.price), border: i === a.length - 1 ? 'transparent' : 'rgba(0,0,0,.06)',
+      inc: () => setQty(it.id, 1), dec: () => setQty(it.id, -1),
+    }))
+
+    // product tabs
+    const ptDefs = [{ k: 'geral', l: 'Geral' }, { k: 'estoque', l: 'Estoque' }, { k: 'preco', l: 'Preço' }, { k: 'fotos', l: 'Fotos' }]
+    const prodTabs = ptDefs.map((p) => {
+      const on = st.prodTab === p.k
+      return { label: p.l, bg: on ? '#fff' : 'transparent', fg: on ? '#141414' : '#888', shadow: on ? '0 1px 3px rgba(0,0,0,.12)' : 'none', onClick: () => this.setState({ prodTab: p.k }) }
+    })
+
+    // catalogo accordions
+    const accDefs = [
+      { key: 'info', icon: 'info', label: 'Informações gerais', desc: 'Nome, slogan, sobre', fields: [{ label: 'Nome da loja', value: 'Ateliê Lola' }, { label: 'Slogan', value: 'Moda autoral feita à mão' }] },
+      { key: 'visual', icon: 'palette', label: 'Logo, banner e cores', desc: 'Identidade visual', fields: [{ label: 'Cor primária', value: '🟢 Verde Zapable (#00a82d)' }, { label: 'Logo', value: 'logo-atelielola.png' }] },
+      { key: 'whats', icon: 'chat', label: 'WhatsApp e contatos', desc: 'Onde os pedidos chegam', fields: [{ label: 'WhatsApp de pedidos', value: '+55 11 98842-0000' }, { label: 'E-mail de contato', value: 'oi@atelielola.com.br' }] },
+      { key: 'pay', icon: 'payments', label: 'Pagamento e entrega', desc: 'Métodos aceitos', fields: [{ label: 'Pagamento', value: 'PIX · Cartão · Dinheiro' }, { label: 'Entrega', value: 'Domicílio · Retirada na loja' }] },
+      { key: 'cat', icon: 'category', label: 'Categorias', desc: '6 categorias ativas', fields: [{ label: 'Categorias', value: 'Vestidos, Bolsas, Acessórios…' }] },
+      { key: 'qr', icon: 'qr_code_2', label: 'QR Code do catálogo', desc: 'Para divulgar offline', fields: [{ label: 'QR Code', value: 'Baixar PNG em alta resolução' }] },
+    ]
+    const catSections = accDefs.map((a) => {
+      const open = st.openAcc === a.key
+      return { ...a, open, chevron: open ? 'rotate(180deg)' : 'rotate(0deg)', toggle: () => this.setState({ openAcc: open ? null : a.key }) }
+    })
+
+    // billing
+    const plansDef = [
+      { k: 'basico', name: 'Básico', desc: 'Até 30 produtos', price: 'R$ 39', current: false },
+      { k: 'pro', name: 'Pro', desc: 'Produtos ilimitados + IA', price: 'R$ 79', current: true },
+      { k: 'premium', name: 'Premium', desc: 'Tudo do Pro + vendedores', price: 'R$ 149', current: false },
+    ]
+    const plans = plansDef.map((p) => ({ ...p, border: p.current ? accent : 'rgba(0,0,0,.07)', onClick: () => this.toast(p.current ? 'Você já está no ' + p.name : 'Mudar para ' + p.name) }))
+    const invoices = [
+      { date: 'Jun 2026', id: 'INV-2026-06', amount: 'R$ 79,00' },
+      { date: 'Mai 2026', id: 'INV-2026-05', amount: 'R$ 79,00' },
+      { date: 'Abr 2026', id: 'INV-2026-04', amount: 'R$ 79,00' },
+    ].map((inv, i, a) => ({ ...inv, border: i === a.length - 1 ? 'transparent' : 'rgba(0,0,0,.05)' }))
+
+    // generic overlay (vendedores / suporte / config)
+    let genericTitle = '', genericRows = [], showInviteBtn = false
+    if (st.overlay === 'vendedores') {
+      genericTitle = 'Vendedores'
+      showInviteBtn = true
+      genericRows = [
+        { isCard: true, icon: 'person', iconBg: '#dcefe2', iconColor: '#00772a', title: 'Ana Beatriz', sub: '8 pedidos atribuídos', right: 'Ativo', rightBg: '#d8f0df', rightFg: '#00772a', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414' },
+        { isCard: true, icon: 'person', iconBg: '#d6e9f5', iconColor: '#1f6a99', title: 'Lucas Martins', sub: '5 pedidos atribuídos', right: 'Ativo', rightBg: '#d8f0df', rightFg: '#00772a', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414' },
+      ]
+    } else if (st.overlay === 'suporte') {
+      genericTitle = 'Suporte'
+      genericRows = [
+        { isCard: true, icon: 'chat_bubble', iconBg: '#dcefe2', iconColor: '#00772a', title: 'Abrir conversa', sub: 'Resposta em até 2h úteis', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414', onClick: () => this.toast('Abrindo conversa com o suporte') },
+        { isHeader: true, label: 'Perguntas frequentes' },
+        { isCard: true, title: 'Como compartilhar meu catálogo?', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414', onClick: () => this.toast('Abrindo artigo') },
+        { isCard: true, title: 'Como funciona o período de trial?', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414', onClick: () => this.toast('Abrindo artigo') },
+        { isCard: true, title: 'Posso adicionar vendedores?', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414', onClick: () => this.toast('Abrindo artigo') },
+      ]
+    } else if (st.overlay === 'config') {
+      genericTitle = 'Configurações'
+      genericRows = [
+        { isHeader: true, label: 'Loja' },
+        { isCard: true, icon: 'storefront', iconBg: '#f4eee5', iconColor: '#141414', title: 'Dados da loja', sub: 'Nome, slug, segmento', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414', onClick: () => this.toast('Abrir dados da loja') },
+        { isCard: true, icon: 'link', iconBg: '#f4eee5', iconColor: '#141414', title: 'Endereço da loja (URL)', sub: 'atelielola.zapable.com.br', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414', onClick: () => this.toast('A URL não pode ser alterada após publicar') },
+        { isHeader: true, label: 'Conta' },
+        { isCard: true, icon: 'person', iconBg: '#f4eee5', iconColor: '#141414', title: 'Meu perfil', sub: 'Carla Lola · oi@atelielola.com.br', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414', onClick: () => this.toast('Abrir perfil') },
+        { isCard: true, icon: 'lock', iconBg: '#f4eee5', iconColor: '#141414', title: 'Senha e segurança', cardBorder: 'rgba(0,0,0,.06)', titleColor: '#141414', onClick: () => this.toast('Abrir segurança') },
+        { isHeader: true, label: 'Zona de perigo' },
+        { isCard: true, icon: 'delete', iconBg: '#ffe0e0', iconColor: '#8b0000', title: 'Excluir loja', sub: 'Esta ação é permanente', cardBorder: '#f6cccc', titleColor: '#8b0000', onClick: () => this.toast('Ação sensível — confirme por e-mail') },
+      ]
+    }
+
+    // sheets
+    const isFilterSheet = st.sheet === 'filter'
+    const isStatusSheet = st.sheet === 'status'
+    const isNovoSheet = st.sheet === 'novo'
+    // picker sheet (customer or product) for novo pedido
+    const isPickerSheet = st.sheet === 'picker-customer' || st.sheet === 'picker-product'
+    let pickerTitle = '', pickerSub = '', pickerRows = []
+    if (st.sheet === 'picker-customer') {
+      pickerTitle = 'Escolher cliente'
+      pickerSub = 'Toque para selecionar quem está comprando'
+      pickerRows = this.customers.map((c) => ({
+        badge: this.initials(c.name), avBg: c.avBg, avFg: c.avFg, title: c.name, sub: c.phone,
+        border: (st.np && st.np.customerId === c.id) ? accent : 'rgba(0,0,0,.06)', check: st.np && st.np.customerId === c.id,
+        onClick: () => this.setState((s) => ({ np: { ...s.np, customerId: c.id }, sheet: null })),
+      }))
+    } else if (st.sheet === 'picker-product') {
+      pickerTitle = 'Adicionar produtos'
+      pickerSub = 'Toque para incluir no pedido'
+      pickerRows = this.products.filter((p) => p.stock > 0).map((p) => ({
+        badge: '', avBg: '#f4eee5', avFg: '#c2bcae', title: p.name, sub: this.money(p.price) + ' · ' + p.cat,
+        border: (st.np && st.np.items[p.id]) ? accent : 'rgba(0,0,0,.06)', check: st.np && st.np.items[p.id],
+        onClick: () => this.setState((s) => { const items = { ...s.np.items }; items[p.id] = (items[p.id] || 0) + 1; return { np: { ...s.np, items } } }),
+      }))
+    }
+    const parsePrice = (s) => { const n = parseFloat(String(s).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')); return isNaN(n) ? 0 : n }
+    const priceVal = parsePrice(st.novoPrice)
+    const per = st.parcelN > 0 ? (priceVal * (st.juros ? 1.15 : 1)) / st.parcelN : priceVal
+    const parcelPreview = priceVal <= 0 ? 'Defina o preço para ver a simulação' : (st.parcelN + 'x de ' + this.money(per) + (st.juros ? ' com juros' : ' sem juros'))
+    const photoSlots = [{ label: 'solte aqui' }, { label: 'solte aqui' }]
+
+    // editable product
+    const ed = st.edit || {}
+    const edPrice = parsePrice(ed.priceStr)
+    const edCost = parsePrice(ed.cost)
+    const margemStr = edPrice > 0 && edCost > 0 ? Math.round(((edPrice - edCost) / edPrice) * 100) + '%' : '—'
+    const edPer = st.parcelN > 0 ? (edPrice * (st.juros ? 1.15 : 1)) / st.parcelN : edPrice
+    const editParcelPreview = edPrice <= 0 ? 'Defina o preço para ver a simulação' : (st.parcelN + 'x de ' + this.money(edPer) + (st.juros ? ' com juros' : ' sem juros'))
+    const bindEdit = (f) => (e) => this.setState((s) => ({ edit: { ...s.edit, [f]: e.target.value } }))
+    const editPhotos = [{ icon: 'image', cover: true }, { icon: 'image', cover: false }]
+    const filterOptions = filterDefs.map((f) => {
+      const on = st.ordersFilter === f.key
+      return { label: f.label, border: on ? accent : 'rgba(0,0,0,.07)', check: on ? 'radio_button_checked' : 'radio_button_unchecked', checkColor: on ? accent : '#cbc6ba', onClick: () => this.setState({ ordersFilter: f.key, sheet: null }) }
+    })
+    const statusOptions = Object.keys(this.SM).map((k) => {
+      const m = this.SM[k]
+      const cur = st.orders.find((o) => o.id === st.overlayId)
+      return { label: m.label, dot: m.dot, active: cur && cur.status === k, border: cur && cur.status === k ? accent : 'rgba(0,0,0,.07)', onClick: () => this.setStatus(st.overlayId, k) }
+    })
+
+    return {
+      plan, trialDays, showTrial, firstName, greeting: this.greeting(),
+      goBilling: () => this.openOverlay('billing', null),
+      goPedidos: () => this.go('pedidos'),
+      onBell: () => this.toast('3 novos pedidos · 1 estoque baixo'),
+      isInicio: active === 'inicio', isPedidos: active === 'pedidos', isProdutos: active === 'produtos', isClientes: active === 'clientes', isMais: active === 'mais',
+      tabs, quickActions, kpis, bars, recentOrders,
+      search: st.search, onSearch: (e) => this.setState({ search: e.target.value }),
+      openFilter: () => this.openSheet('filter'), openNovo: () => this.openSheet('novo'),
+      openNovoCliente: () => this.openOverlay('customer', null),
+      openNovoPedido: () => this.setState({ overlay: 'novopedido', overlayId: null, sheet: null, np: { customerId: null, items: {}, note: '' } }),
+      showNovoPedido: st.overlay === 'novopedido',
+      npCustName: npCust ? npCust.name : 'Selecionar cliente',
+      npCustSub: npCust ? npCust.phone : 'Obrigatório',
+      npCustIcon: npCust ? 'person' : 'person_add', npCustBg: npCust ? '#dcefe2' : '#f4eee5',
+      npCustFg: npCust ? '#00772a' : '#9a948a', npCustTitleColor: npCust ? '#141414' : '#9a948a',
+      npItems, npHasItems: npItemList.length > 0, npEmpty: npItemList.length === 0,
+      npSubtotal: this.money(npTotal), npCountLabel: npCount + (npCount === 1 ? ' item' : ' itens'),
+      npNote: np.note, onNpNote: (e) => this.setState((s) => ({ np: { ...s.np, note: e.target.value } })),
+      onPickCustomer: () => this.openSheet('picker-customer'),
+      onAddItem: () => this.openSheet('picker-product'),
+      npCtaBg: (npCust && npItemList.length > 0) ? '#00a82d' : '#c2bcae',
+      onCreateOrder: () => {
+        if (!npCust || npItemList.length === 0) { this.toast('Escolha cliente e itens'); return }
+        const code = '#' + Math.random().toString(36).slice(2, 7).toUpperCase()
+        const newOrder = { id: 'n' + Date.now(), code, name: npCust.name, total: npTotal, status: 'novo', when: 'agora', phone: npCust.phone, note: np.note, items: npItemList.map((it) => ({ name: it.name, qty: it.qty, price: it.price })) }
+        this.setState((s) => ({ orders: [newOrder, ...s.orders], overlay: null, np: null }))
+        this.toast('Pedido ' + code + ' criado')
+      },
+      isPickerSheet, pickerTitle, pickerSub, pickerRows,
+      orderFilters, filteredOrders, filteredProducts, customerFilters, customers, moreItems: moreDeco,
+      onLogout: () => this.toast('Saindo da conta…'),
+      showOrder: st.overlay === 'order', showProduct: st.overlay === 'product', showCustomer: st.overlay === 'customer',
+      showCatalogo: st.overlay === 'catalogo', showBilling: st.overlay === 'billing',
+      showGeneric: ['vendedores', 'suporte', 'config'].includes(st.overlay),
+      selOrder, selProduct, selCustomer, prodTabs, catSections, plans, invoices,
+      cd, custView, custEditMode: st.overlay === 'customer' && st.custEdit, custTitle, custTags: st.custTags,
+      custSaveLabel: isNewCust ? 'Adicionar cliente' : 'Salvar alterações',
+      onCustEdit: () => this.setState({ custEdit: true }),
+      onCustSave: () => { this.setState({ custEdit: false, overlay: isNewCust ? null : 'customer' }); this.toast(isNewCust ? 'Cliente adicionado' : 'Cliente atualizado') },
+      onCdName: bindCust('name'), onCdWhats: bindCust('whatsapp'), onCdEmail: bindCust('email'),
+      onCdBirthday: bindCust('birthday'), onCdNotes: bindCust('notes'),
+      onSellerToast: () => this.toast('Selecionar vendedor'),
+      onAddTagToast: () => this.toast('Adicionar etiqueta'),
+      onAiProfileToast: () => this.toast('Gerando perfil com IA…'),
+      tabGeral: st.prodTab === 'geral', tabEstoque: st.prodTab === 'estoque', tabPreco: st.prodTab === 'preco', tabFotos: st.prodTab === 'fotos',
+      ep: ed, editPhotos, margemStr, editParcelPreview,
+      onEditName: bindEdit('name'), onEditDesc: bindEdit('desc'), onEditStock: bindEdit('stock'),
+      onEditMin: bindEdit('minStock'), onEditSku: bindEdit('sku'), onEditBarcode: bindEdit('barcode'),
+      onEditPrice: bindEdit('priceStr'), onEditCost: bindEdit('cost'),
+      onCatToast: () => this.toast('Selecionar categoria'),
+      onGenSku: () => { this.setState((s) => ({ edit: { ...s.edit, sku: 'SKU-' + Math.random().toString(36).slice(2, 7).toUpperCase() } })); this.toast('SKU gerado') },
+      onToggleVar: () => this.setState((s) => ({ edit: { ...s.edit, variations: !s.edit.variations } })),
+      varTrackBg: ed.variations ? accent : '#d8d2c6', varKnobLeft: ed.variations ? '22px' : '3px',
+      genericTitle, genericRows, showInviteBtn,
+      closeOverlay: () => this.closeOverlay(), backToMais: () => this.go('mais'),
+      openStatus: () => this.openSheet('status'),
+      onWhats: () => this.toast('Abrindo WhatsApp do cliente'),
+      onCall: () => this.toast('Ligando para o cliente'),
+      onMailToast: () => this.toast('Abrindo e-mail'),
+      onSaveToast: () => this.toast('Alterações salvas'),
+      onAiToast: () => this.toast('Gerando descrição com IA…'),
+      onCatalogToast: () => this.toast('Abrindo no catálogo público'),
+      onShare: () => this.toast('Link do catálogo copiado'),
+      onPortalToast: () => this.toast('Abrindo portal de pagamento'),
+      onInvoiceToast: () => this.toast('Baixando fatura (PDF)'),
+      onInviteToast: () => this.toast('Convite de vendedor enviado'),
+      onSaveProduct: () => { this.closeSheet(); this.toast('Produto adicionado') },
+      novoPrice: st.novoPrice, onNovoPrice: (e) => this.setState({ novoPrice: e.target.value }),
+      onPhotoToast: () => this.toast('Selecione as fotos do produto'),
+      photoSlots,
+      parcelOn: st.parcelOn, parcelN: st.parcelN, parcelPreview,
+      onToggleParcel: () => this.setState((s) => ({ parcelOn: !s.parcelOn })),
+      onParcelN: (e) => this.setState({ parcelN: parseInt(e.target.value, 10) }),
+      onJurosNo: () => this.setState({ juros: false }), onJurosYes: () => this.setState({ juros: true }),
+      parcelTrackBg: st.parcelOn ? accent : '#d8d2c6', parcelKnobLeft: st.parcelOn ? '22px' : '3px',
+      semJurosBg: !st.juros ? '#fff' : 'transparent', semJurosFg: !st.juros ? '#141414' : '#999',
+      comJurosBg: st.juros ? '#fff' : 'transparent', comJurosFg: st.juros ? '#141414' : '#999',
+      showSheet: !!st.sheet, isFilterSheet, isStatusSheet, isNovoSheet,
+      closeSheet: () => this.closeSheet(), filterOptions, statusOptions,
+      toast: st.toast,
+    }
+  }
+}
+</script>
+</body>
+</html>

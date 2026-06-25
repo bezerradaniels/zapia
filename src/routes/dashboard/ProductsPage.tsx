@@ -1,139 +1,103 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   PlusSignIcon,
-  ArrowDown01Icon,
   PackageIcon,
+  SearchIcon,
   EditIcon,
   DeleteIcon,
   PauseIcon,
   PlayIcon,
+  MoreVerticalIcon,
+  ArrowRight01Icon,
 } from '@hugeicons/core-free-icons'
 import { useActiveStore } from '@/lib/tenant'
 import {
   NewProductFullModal,
   useCreateProduct,
   useDeleteProduct,
-  useDeleteProducts,
   useSetProductActive,
-  useSetProductsActive,
   useProducts,
 } from '@/features/products'
 import { usePlanLimits } from '@/features/billing'
 import { formatMoney } from '@/lib/format'
-import { cn } from '@/lib/utils'
 import { ROUTES } from '@/config/routes'
 import { PLANS } from '@/config/plans'
-import {
-  Badge,
-  Button,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui'
+import { Badge, Button, Skeleton, Sheet } from '@/components/ui'
+import { EmptyState } from '@/components/feedback'
+import type { Product } from '@/types/domain'
+
+function stockPill(stock: number | null) {
+  if (stock === null) return null
+  if (stock === 0) return { label: 'Esgotado', tone: 'rose' as const }
+  if (stock <= 5) return { label: `${stock} · baixo`, tone: 'amber' as const }
+  return { label: `${stock} em estoque`, tone: 'neutral' as const }
+}
 
 export default function ProductsPage() {
   const { store } = useActiveStore()
+  const navigate = useNavigate()
   const products = useProducts(store?.id)
   const create = useCreateProduct(store?.id ?? '')
   const del = useDeleteProduct(store?.id ?? '')
   const setActive = useSetProductActive(store?.id ?? '')
-  const setManyActive = useSetProductsActive(store?.id ?? '')
-  const delMany = useDeleteProducts(store?.id ?? '')
   const limits = usePlanLimits(store?.id)
   const [newProductOpen, setNewProductOpen] = useState(false)
-  const [selected, setSelected] = useState<Set<string>>(new Set())
-  const list = products.data ?? []
+  const [search, setSearch] = useState('')
+  const [actionsFor, setActionsFor] = useState<Product | null>(null)
+
+  const all = products.data ?? []
   const limit = limits.productLimit
-  const atLimit = limit !== null && list.length >= limit
-  const allSelected = list.length > 0 && selected.size === list.length
+  const atLimit = limit !== null && all.length >= limit
 
-  function toggleSelected(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
-
-  function toggleSelectAll() {
-    setSelected(allSelected ? new Set() : new Set(list.map((p) => p.id)))
-  }
-
-  function handleBulkActivate(isActive: boolean) {
-    setManyActive.mutate({ ids: Array.from(selected), isActive })
-    setSelected(new Set())
-  }
-
-  function handleBulkDelete() {
-    if (!confirm(`Excluir ${selected.size} produto(s) selecionado(s)?`)) return
-    delMany.mutate(Array.from(selected))
-    setSelected(new Set())
-  }
+  const q = search.trim().toLowerCase()
+  const list = q
+    ? all.filter((p) =>
+        [p.name, p.sku, p.category].filter(Boolean).some((v) => String(v).toLowerCase().includes(q)),
+      )
+    : all
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-tighter">Produtos</h1>
-          <p className="text-sm text-z-text-muted">
-            {list.length} {list.length === 1 ? 'produto' : 'produtos'}
-            {limit !== null && (
-              <>
-                {' '}
-                de <strong className="text-z-text">{limit}</strong> no plano{' '}
-                {limits.plan ? PLANS[limits.plan.id].name : '—'}
-              </>
-            )}
-            .
-          </p>
-        </div>
-
-        {/* Header buttons — hidden on mobile */}
-        <div className="hidden items-center gap-2 sm:flex">
-          {atLimit ? (
-            <Button asChild variant="outline">
-              <Link to={ROUTES.dashboardBilling}>Aumentar limite</Link>
-            </Button>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="button">
-                  <HugeiconsIcon icon={PlusSignIcon} size={16} />
-                  Novo produto
-                  <HugeiconsIcon icon={ArrowDown01Icon} size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setNewProductOpen(true)}>
-                  <HugeiconsIcon icon={PlusSignIcon} size={16} />
-                  Novo produto
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to={ROUTES.dashboardProductsBulk}>
-                    <HugeiconsIcon icon={PlusSignIcon} size={16} />
-                    Vários produtos
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
+        <h1 className="text-[25px] font-extrabold tracking-tighter">Produtos</h1>
+        {atLimit ? (
+          <Button asChild variant="outline" size="sm">
+            <Link to={ROUTES.dashboardBilling}>Aumentar limite</Link>
+          </Button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setNewProductOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl bg-[#10b981] px-3.5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+          >
+            <HugeiconsIcon icon={PlusSignIcon} size={16} />
+            Novo
+          </button>
+        )}
       </header>
 
+      {/* Search */}
+      <div className="flex h-11 items-center gap-2.5 rounded-[13px] border border-z-border bg-white px-3.5">
+        <HugeiconsIcon icon={SearchIcon} size={18} className="shrink-0 text-z-text-hint" />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar por nome ou SKU"
+          className="min-w-0 flex-1 bg-transparent text-sm text-z-text outline-none placeholder:text-z-text-hint"
+        />
+      </div>
+
       {atLimit && (
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
-          <span className="text-amber-900">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-z-amber bg-z-amber/30 px-4 py-3 text-sm">
+          <span className="text-z-amber-fg">
             Você atingiu o limite de <strong>{limit}</strong> produtos do plano{' '}
-            <strong>{limits.plan ? PLANS[limits.plan.id].name : '—'}</strong>. Faça upgrade para adicionar
-            mais.
+            <strong>{limits.plan ? PLANS[limits.plan.id].name : '—'}</strong>.
           </span>
           <Link
             to={ROUTES.dashboardBilling}
-            className="shrink-0 text-sm font-semibold text-[#10b981] hover:underline"
+            className="shrink-0 text-sm font-semibold text-[#0bfeda] hover:underline"
           >
             Ver planos →
           </Link>
@@ -141,181 +105,132 @@ export default function ProductsPage() {
       )}
 
       {products.isLoading ? (
-        <p className="text-sm text-z-text-muted">Carregando...</p>
-      ) : list.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-z-border bg-white p-12 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-z-bg2 text-z-text-hint">
-            <HugeiconsIcon icon={PackageIcon} size={26} />
-          </div>
-          <div className="text-base font-semibold">
-            Nenhum produto cadastrado
-          </div>
-          <p className="max-w-sm text-sm text-z-text-muted">
-            Adicione seu primeiro produto e ele aparecerá no seu catálogo público.
-          </p>
-          <Button type="button" onClick={() => setNewProductOpen(true)}>
-            <HugeiconsIcon icon={PlusSignIcon} size={16} />
-            Criar produto
-          </Button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-3">
-            <label className="flex items-center gap-2 text-sm font-medium text-z-text-muted">
-              <input
-                type="checkbox"
-                checked={allSelected}
-                onChange={toggleSelectAll}
-                className="h-4 w-4 rounded accent-z-green"
-              />
-              Selecionar todos
-            </label>
-
-            {selected.size > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-z-text-muted">
-                  {selected.size} selecionado{selected.size > 1 ? 's' : ''}
-                </span>
-                <button
-                  type="button"
-                  aria-label="Ativar selecionados"
-                  title="Ativar selecionados"
-                  onClick={() => handleBulkActivate(true)}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-emerald-600 hover:bg-emerald-50"
-                >
-                  <HugeiconsIcon icon={PlayIcon} size={14} />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Desativar selecionados"
-                  title="Desativar selecionados"
-                  onClick={() => handleBulkActivate(false)}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-amber-600 hover:bg-amber-50"
-                >
-                  <HugeiconsIcon icon={PauseIcon} size={14} />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Excluir selecionados"
-                  title="Excluir selecionados"
-                  onClick={handleBulkDelete}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50"
-                >
-                  <HugeiconsIcon icon={DeleteIcon} size={14} />
-                </button>
-              </div>
-            )}
-          </div>
-
-          {list.map((product) => (
-            <div
-              key={product.id}
-              className="flex items-start gap-3 rounded-2xl border border-z-border bg-white p-3 sm:gap-4 sm:p-4"
-            >
-              <input
-                type="checkbox"
-                checked={selected.has(product.id)}
-                onChange={() => toggleSelected(product.id)}
-                className="mt-1 h-4 w-4 shrink-0 rounded accent-z-green"
-                aria-label={`Selecionar ${product.name}`}
-              />
-
-              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-z-bg2 sm:h-14 sm:w-14">
-                {product.images[0] ? (
-                  <img
-                    src={product.images[0]}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-z-text-hint">
-                    <HugeiconsIcon icon={PackageIcon} size={20} />
-                  </div>
-                )}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <p className="truncate text-sm font-semibold">{product.name}</p>
-                  {product.category && (
-                    <span className="rounded-md bg-z-bg2 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-z-text-muted">
-                      {product.category}
-                    </span>
-                  )}
-                  {product.promo_price_in_cents != null && (
-                    <Badge tone="lilac">Promo</Badge>
-                  )}
-                  {!product.is_active && <Badge tone="neutral">Inativo</Badge>}
-                </div>
-                <p className="text-sm text-z-text-muted">
-                  {product.promo_price_in_cents != null ? (
-                    <>
-                      <span className="line-through text-z-text-hint">
-                        {formatMoney(product.price_in_cents)}
-                      </span>{' '}
-                      <strong className="text-[#10b981]">
-                        {formatMoney(product.promo_price_in_cents)}
-                      </strong>
-                    </>
-                  ) : (
-                    formatMoney(product.price_in_cents)
-                  )}
-                  {product.stock !== null && ` · ${product.stock} em estoque`}
-                </p>
-
-                <div className="mt-2 flex items-center gap-1.5">
-                  <Link
-                    to={`${ROUTES.dashboardProducts}/${product.id}`}
-                    aria-label="Editar produto"
-                    title="Editar produto"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50"
-                  >
-                    <HugeiconsIcon icon={EditIcon} size={14} />
-                  </Link>
-                  <button
-                    type="button"
-                    aria-label={product.is_active ? 'Desativar produto' : 'Ativar produto'}
-                    title={product.is_active ? 'Desativar produto' : 'Ativar produto'}
-                    onClick={() =>
-                      setActive.mutate({ id: product.id, isActive: !product.is_active })
-                    }
-                    className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-lg',
-                      product.is_active
-                        ? 'text-amber-600 hover:bg-amber-50'
-                        : 'text-emerald-600 hover:bg-emerald-50',
-                    )}
-                  >
-                    <HugeiconsIcon icon={product.is_active ? PauseIcon : PlayIcon} size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Excluir produto"
-                    title="Excluir produto"
-                    onClick={() => {
-                      if (confirm(`Excluir "${product.name}"?`)) {
-                        del.mutate(product.id)
-                      }
-                    }}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50"
-                  >
-                    <HugeiconsIcon icon={DeleteIcon} size={14} />
-                  </button>
-                </div>
-              </div>
-            </div>
+        <div className="flex flex-col gap-2.5">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-[88px] rounded-[18px]" />
           ))}
+        </div>
+      ) : all.length === 0 ? (
+        <EmptyState
+          icon={PackageIcon}
+          title="Nenhum produto cadastrado"
+          description="Adicione seu primeiro produto e ele aparecerá no seu catálogo público."
+          action={
+            <Button type="button" onClick={() => setNewProductOpen(true)}>
+              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              Criar produto
+            </Button>
+          }
+        />
+      ) : list.length === 0 ? (
+        <EmptyState icon={SearchIcon} title="Nenhum produto encontrado" description={`Nada para "${search}".`} />
+      ) : (
+        <div className="flex flex-col gap-2.5">
+          {list.map((product) => {
+            const pill = stockPill(product.stock)
+            const hasPromo = product.promo_price_in_cents != null
+            return (
+              <div
+                key={product.id}
+                className="flex items-center gap-3 rounded-[18px] border border-z-border bg-white p-3"
+              >
+                <button
+                  type="button"
+                  onClick={() => navigate(`${ROUTES.dashboardProducts}/${product.id}`)}
+                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                >
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[13px] bg-z-sand">
+                    {product.images[0] ? (
+                      <img src={product.images[0]} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <HugeiconsIcon icon={PackageIcon} size={22} className="text-z-text-hint" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate text-[14px] font-bold tracking-tight">{product.name}</p>
+                      {!product.is_active && <Badge tone="neutral">Inativo</Badge>}
+                    </div>
+                    {product.category && (
+                      <p className="mt-0.5 truncate text-xs text-z-text-muted">{product.category}</p>
+                    )}
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                      <span className="text-[15px] font-extrabold tracking-tight text-[#0bfeda]">
+                        {formatMoney(product.promo_price_in_cents ?? product.price_in_cents)}
+                      </span>
+                      {hasPromo && (
+                        <span className="text-xs text-z-text-hint line-through">
+                          {formatMoney(product.price_in_cents)}
+                        </span>
+                      )}
+                      {pill && <Badge tone={pill.tone}>{pill.label}</Badge>}
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Ações do produto"
+                  onClick={() => setActionsFor(product)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-z-text-hint hover:bg-z-bg"
+                >
+                  <HugeiconsIcon icon={MoreVerticalIcon} size={18} />
+                </button>
+              </div>
+            )
+          })}
         </div>
       )}
 
-      {/* Limite atingido — aviso mobile (bottom bar não leva ao billing) */}
+      {/* Per-product actions sheet */}
+      <Sheet
+        open={actionsFor !== null}
+        onOpenChange={(open) => !open && setActionsFor(null)}
+        title={actionsFor?.name}
+      >
+        {actionsFor && (
+          <div className="flex flex-col gap-1">
+            <SheetAction
+              icon={EditIcon}
+              label="Editar produto"
+              onClick={() => {
+                navigate(`${ROUTES.dashboardProducts}/${actionsFor.id}`)
+                setActionsFor(null)
+              }}
+            />
+            <SheetAction
+              icon={actionsFor.is_active ? PauseIcon : PlayIcon}
+              label={actionsFor.is_active ? 'Desativar' : 'Ativar'}
+              onClick={() => {
+                setActive.mutate({ id: actionsFor.id, isActive: !actionsFor.is_active })
+                setActionsFor(null)
+              }}
+            />
+            <SheetAction
+              icon={DeleteIcon}
+              label="Excluir produto"
+              danger
+              onClick={() => {
+                if (confirm(`Excluir "${actionsFor.name}"?`)) {
+                  del.mutate(actionsFor.id)
+                  setActionsFor(null)
+                }
+              }}
+            />
+          </div>
+        )}
+      </Sheet>
+
+      {/* Limite atingido — aviso mobile */}
       {atLimit && (
         <Link
           to={ROUTES.dashboardBilling}
           aria-label="Aumentar limite de produtos"
-          className="fixed bottom-20 right-4 z-30 flex items-center gap-2 rounded-full bg-amber-500 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-transform active:scale-95 sm:hidden"
+          className="fixed bottom-20 right-4 z-30 flex items-center gap-2 rounded-full bg-z-amber px-4 py-3 text-sm font-semibold text-z-amber-fg shadow-lg transition-transform active:scale-95 sm:hidden"
         >
-          Aumentar limite →
+          Aumentar limite
+          <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
         </Link>
       )}
 
@@ -331,5 +246,30 @@ export default function ProductsPage() {
         />
       )}
     </div>
+  )
+}
+
+function SheetAction({
+  icon,
+  label,
+  danger,
+  onClick,
+}: {
+  icon: Parameters<typeof HugeiconsIcon>[0]['icon']
+  label: string
+  danger?: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex h-12 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors hover:bg-z-bg ${
+        danger ? 'text-z-red' : 'text-z-text'
+      }`}
+    >
+      <HugeiconsIcon icon={icon} size={18} />
+      {label}
+    </button>
   )
 }

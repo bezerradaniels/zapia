@@ -10,7 +10,6 @@ import { STATES, toE164BR } from '@/lib/br'
 import { createStore, SlugTakenError, patchStore } from '@/features/catalog'
 import { slugify } from '@/lib/utils/slugify'
 import { ROUTES } from '@/config/routes'
-import { TRIAL_DAYS } from '@/config/plans'
 import { track } from '@/features/analytics'
 import { loadOnboardingSession, saveOnboardingSession } from '../utils/onboardingSession'
 import { saveDraft, loadDraft } from '../utils/onboardingDraft'
@@ -109,10 +108,7 @@ export function OnboardingStep1() {
 
       if (isNewStore) {
         track('store_created', { store_id: store.id, store_slug: store.slug })
-        // A `subscriptions` row is auto-created by a DB trigger on store
-        // insert (7-day trial, no card, always on the `pro` plan — see
-        // supabase/migrations/20260618232429_trial_7_days.sql).
-        track('trial_started', { store_id: store.id, plan_tier: 'pro', trial_days: TRIAL_DAYS })
+        track('free_plan_started', { store_id: store.id, plan_tier: 'basico' })
       }
 
       saveOnboardingSession({
@@ -264,7 +260,7 @@ export function OnboardingStep1() {
       )}
 
       <Button type="submit" size="lg" fullWidth disabled={isSubmitting}>
-        {isSubmitting ? 'Criando sua loja...' : 'Próxima etapa'}
+        {isSubmitting ? 'Criando sua loja...' : 'Continuar'}
         {!isSubmitting && <HugeiconsIcon icon={ArrowRight02Icon} size={20} />}
       </Button>
     </form>

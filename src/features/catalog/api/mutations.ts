@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@/lib/supabase'
 import { toE164BR } from '@/lib/br'
+import { buildStoreUrl } from '@/lib/tenant'
 import type { Store } from '@/types/domain'
 import type { CreateStoreInput, UpdateStoreInput } from '../schemas'
 
@@ -40,7 +41,32 @@ export async function createStore(input: CreateStoreInput): Promise<Store> {
     if (error.code === '23505') throw new SlugTakenError()
     throw error
   }
-  return data as unknown as Store
+
+  const store = data as unknown as Store
+
+  try {
+    const { data: sessionData } = await supabase.auth.getSession()
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (sessionData.session?.access_token) {
+      headers.Authorization = `Bearer ${sessionData.session.access_token}`
+    }
+
+    await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/store-created-notification`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        name: userData.user.user_metadata?.name ?? '',
+        email: userData.user.email ?? '',
+        whatsapp_phone: store.whatsapp_phone ?? '',
+        store_name: store.name,
+        store_url: buildStoreUrl(store.slug),
+      }),
+    })
+  } catch {
+    // Don't block store creation if notification fails
+  }
+
+  return store
 }
 
 export async function updateStore(

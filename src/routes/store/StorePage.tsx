@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { PackageIcon, SearchIcon, ArrowDownIcon, StarIcon } from '@hugeicons/core-free-icons'
+import {
+  PackageIcon,
+  SearchIcon,
+  StarIcon,
+  Sorting01Icon,
+  CheckmarkCircle01Icon,
+} from '@hugeicons/core-free-icons'
 import type { Product, Store } from '@/types/domain'
 // Direct file imports (not the '@/features/products' barrel) so this
 // storefront page doesn't pull in ProductForm's dashboard-only weight.
@@ -13,6 +19,8 @@ import { cn } from '@/lib/utils'
 import { ProductCard } from '@/components/store/ProductCard'
 import { useDocumentMeta } from '@/hooks/useDocumentMeta'
 import { track } from '@/features/analytics'
+import { Skeleton, Sheet } from '@/components/ui'
+import { EmptyState } from '@/components/feedback'
 
 const ALL_CATEGORY = '__all__'
 type SortKey = 'recent' | 'price_asc' | 'price_desc' | 'name'
@@ -110,22 +118,30 @@ export default function StorePage() {
 
   if (products.isLoading) {
     return (
-      <div className="px-5 py-12 text-center text-sm text-z-text-muted">
-        Carregando produtos...
+      <div className="mx-auto w-full max-w-[800px] px-3 py-4 sm:px-6 sm:py-6">
+        <Skeleton className="mb-4 h-11 rounded-2xl" />
+        <div className="flex gap-2">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-7 w-20 shrink-0 rounded-lg" />
+          ))}
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-[6px] sm:gap-[12px] lg:grid-cols-3 xl:grid-cols-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} className="aspect-square rounded-2xl" />
+          ))}
+        </div>
       </div>
     )
   }
 
   if (list.length === 0) {
     return (
-      <div className="px-5 py-16 text-center">
-        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-z-bg2 text-z-text-hint">
-          <HugeiconsIcon icon={PackageIcon} size={26} />
-        </div>
-        <h2 className="text-base font-semibold">Catálogo em construção</h2>
-        <p className="mt-1 text-sm text-z-text-muted">
-          Nenhum produto disponível no momento.
-        </p>
+      <div className="px-5 py-16">
+        <EmptyState
+          icon={PackageIcon}
+          title="Catálogo em construção"
+          description="Nenhum produto disponível no momento."
+        />
       </div>
     )
   }
@@ -166,7 +182,7 @@ export default function StorePage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar produtos..."
-            className="h-11 w-full rounded-2xl border border-[#cbd5e1] bg-white pl-10 pr-4 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
+            className="h-11 w-full rounded-2xl border border-z-border bg-white pl-10 pr-4 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
           />
         </div>
         <SortDropdown value={sort} onChange={setSort} />
@@ -198,9 +214,12 @@ export default function StorePage() {
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <p className="py-12 text-center text-sm text-z-text-muted">
-          Nenhum produto encontrado.
-        </p>
+        <EmptyState
+          icon={SearchIcon}
+          title="Nenhum produto encontrado"
+          description={search ? `Não encontramos resultados para "${search}".` : 'Tente outro filtro.'}
+          className="mt-5"
+        />
       ) : (
         <div className="mt-5 grid grid-cols-2 gap-[6px] sm:gap-[12px] lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((p) => (
@@ -235,10 +254,10 @@ function CategoryChip({
       type="button"
       onClick={onClick}
       className={cn(
-        'shrink-0 rounded-lg border px-4 py-1.5 text-[13px] font-semibold transition-colors',
+        'shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-semibold transition-colors',
         active
           ? 'border-transparent text-white'
-          : 'border-[#cbd5e1] bg-white text-z-text-muted hover:bg-z-bg2',
+          : 'border-z-border bg-white text-z-text-muted hover:bg-z-sand',
       )}
       style={
         active
@@ -258,31 +277,44 @@ function SortDropdown({
   value: SortKey
   onChange: (next: SortKey) => void
 }) {
+  const [open, setOpen] = useState(false)
+
   return (
-    <div className="relative inline-flex shrink-0">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as SortKey)}
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
         aria-label="Ordenar"
-        className="h-11 w-11 appearance-none rounded-2xl border border-[#cbd5e1] bg-white text-sm font-medium opacity-0 focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 sm:w-auto sm:pl-5 sm:pr-10 sm:opacity-100"
+        className="flex h-11 shrink-0 items-center gap-2 rounded-2xl border border-z-border bg-white px-3.5 text-sm font-medium text-z-text-muted focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 sm:px-5"
       >
-        {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
-          <option key={k} value={k}>
-            {SORT_LABELS[k]}
-          </option>
-        ))}
-      </select>
-      {/* Mobile: icon-only handle behind the (transparent) select */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl border border-[#cbd5e1] bg-white sm:hidden">
-        <HugeiconsIcon icon={ArrowDownIcon} size={16} className="text-z-text-muted" />
-      </div>
-      {/* Desktop: caret */}
-      <HugeiconsIcon
-        icon={ArrowDownIcon}
-        size={14}
-        className="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 text-z-text-hint sm:block"
-      />
-    </div>
+        <HugeiconsIcon icon={Sorting01Icon} size={16} />
+        <span className="hidden sm:inline">{SORT_LABELS[value]}</span>
+      </button>
+
+      <Sheet open={open} onOpenChange={setOpen} title="Ordenar por">
+        <div className="flex flex-col gap-1">
+          {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => {
+                onChange(k)
+                setOpen(false)
+              }}
+              className={cn(
+                'flex h-12 items-center justify-between rounded-xl px-3 text-sm font-medium',
+                value === k ? 'bg-z-bg text-z-text' : 'text-z-text-muted hover:bg-z-bg',
+              )}
+            >
+              {SORT_LABELS[k]}
+              {value === k && (
+                <HugeiconsIcon icon={CheckmarkCircle01Icon} size={16} className="text-[#10b981]" />
+              )}
+            </button>
+          ))}
+        </div>
+      </Sheet>
+    </>
   )
 }
 

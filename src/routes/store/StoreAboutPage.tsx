@@ -154,7 +154,7 @@ export default function StoreAboutPage() {
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25d366] py-3 text-[15px] font-semibold text-white transition-opacity hover:opacity-85"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-100 py-3 text-[15px] font-semibold text-white transition-opacity hover:opacity-85"
                 >
                   <HugeiconsIcon icon={WhatsappIcon} size={18} />
                   WhatsApp

@@ -26,7 +26,7 @@ export default function EditCustomerPage() {
         <p className="text-sm text-z-text-muted">Cliente não encontrado.</p>
         <Link
           to={ROUTES.dashboardCustomers}
-          className="text-sm font-medium text-[#10b981] hover:underline"
+          className="text-sm font-medium text-[#0bfeda] hover:underline"
         >
           Voltar
         </Link>
@@ -45,7 +45,7 @@ export default function EditCustomerPage() {
       birthday: values.birthday || null,
       profile_notes: values.profile_notes || null,
     })
-    navigate(ROUTES.dashboardCustomers)
+    navigate(`${ROUTES.dashboardCustomers}/${id}`)
   }
 
   async function handleDelete() {
@@ -56,24 +56,26 @@ export default function EditCustomerPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <header className="flex items-center gap-3 px-1">
+    <div className="flex min-w-0 flex-col gap-5 overflow-x-hidden">
+      <header className="flex min-w-0 items-center gap-3 px-1">
         <button
           type="button"
-          onClick={() => navigate(ROUTES.dashboardCustomers)}
+          onClick={() => navigate(`${ROUTES.dashboardCustomers}/${id}`)}
           className="flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted transition-colors hover:bg-z-bg2 hover:text-z-text"
         >
           <HugeiconsIcon icon={ArrowLeft02Icon} size={18} />
         </button>
-        <h1 className="text-[22px] font-bold tracking-tighter">{customer.data.name}</h1>
+        <h1 className="min-w-0 truncate text-[22px] font-bold tracking-tighter">
+          {customer.data.name}
+        </h1>
       </header>
 
-      <div className="overflow-hidden rounded-2xl border border-z-border bg-z-bg">
+      <div className="min-w-0 overflow-hidden">
         <CustomerForm
           storeId={store.id}
           initial={customer.data}
           onSubmit={handleSubmit}
-          onCancel={() => navigate(ROUTES.dashboardCustomers)}
+          onCancel={() => navigate(`${ROUTES.dashboardCustomers}/${id}`)}
           onDelete={handleDelete}
         />
       </div>

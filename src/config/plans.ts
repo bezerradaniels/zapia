@@ -19,9 +19,9 @@ export type PlanConfig = {
 export const PLANS: Record<PlanId, PlanConfig> = {
   basico: {
     id: 'basico',
-    name: 'Básico',
-    priceInCents: 990,
-    priceInCentsAnnual: 10692,
+    name: 'Gratuito',
+    priceInCents: 0,
+    priceInCentsAnnual: 0,
     maxProducts: 10,
     maxSellers: 0,
     maxCoupons: 1,
@@ -29,8 +29,8 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     hasPdfExport: false,
     hasCustomTheme: false,
     hasAiHelpers: false,
-    stripePriceId: 'price_1TbMQb1oLw5d2Hz3YJfgWwv9',
-    stripePriceIdAnnual: 'price_1TbMQg1oLw5d2Hz3SXpCAriP',
+    stripePriceId: '',
+    stripePriceIdAnnual: '',
   },
   pro: {
     id: 'pro',
@@ -63,5 +63,3 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     stripePriceIdAnnual: 'price_1TbMQh1oLw5d2Hz3cls8wmCQ',
   },
 }
-
-export const TRIAL_DAYS = 7

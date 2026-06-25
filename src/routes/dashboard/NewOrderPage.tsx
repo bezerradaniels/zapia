@@ -368,7 +368,7 @@ export default function NewOrderPage() {
                 <button
                   type="button"
                   onClick={() => setPickerOpen(true)}
-                  className="flex items-center gap-1.5 rounded-xl border border-z-border px-3 py-1.5 text-sm text-z-text-muted transition-colors hover:border-z-green hover:text-[#10b981]"
+                  className="flex items-center gap-1.5 rounded-xl border border-z-border px-3 py-1.5 text-sm text-z-text-muted transition-colors hover:border-z-green hover:text-[#0bfeda]"
                 >
                   <HugeiconsIcon icon={PlusSignIcon} size={14} />
                   Adicionar mais
@@ -407,7 +407,7 @@ export default function NewOrderPage() {
                 <button
                   type="button"
                   onClick={() => setPickerOpen(true)}
-                  className="mt-1 flex items-center gap-1.5 rounded-full bg-z-green/10 px-5 py-2 text-sm font-medium text-[#10b981] transition-colors hover:bg-z-green/15"
+                  className="mt-1 flex items-center gap-1.5 rounded-full bg-slate-900 px-5 py-2 text-sm font-medium text-[#0bfeda] transition-colors hover:bg-slate-800"
                 >
                   Adicionar produtos
                   <HugeiconsIcon icon={PlusSignIcon} size={14} />

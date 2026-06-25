@@ -182,6 +182,7 @@ export type Order = {
   shipping_method: ShippingMethod
   coupon_id: string | null
   customer_id: string | null
+  seller_id: string | null
   notes: string | null
   address_cep: string | null
   address_street: string | null

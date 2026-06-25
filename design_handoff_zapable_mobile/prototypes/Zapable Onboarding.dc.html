@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  .zsc { -ms-overflow-style: none; scrollbar-width: none; }
+  @keyframes zfade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes zstep { from { transform: translateX(18px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+  @keyframes zslideup { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes zpop { 0% { transform: scale(.6); opacity: 0 } 60% { transform: scale(1.08) } 100% { transform: scale(1); opacity: 1 } }
+  @keyframes ztoast { from { opacity: 0 } to { opacity: 1 } }
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#e7e2da;padding:28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#141414;-webkit-font-smoothing:antialiased">
+
+  <div style="position:relative;width:392px;height:844px;background:#0e0e0e;border-radius:52px;padding:11px;box-shadow:0 50px 90px -28px rgba(20,20,20,.5),0 0 0 1.5px rgba(0,0,0,.35)">
+    <div style="position:relative;width:100%;height:100%;background:#f9f6f2;border-radius:42px;overflow:hidden;display:flex;flex-direction:column">
+
+      <!-- Status bar -->
+      <div style="height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:relative;z-index:5">
+        <span style="font-size:14px;font-weight:700;letter-spacing:-.02em">9:41</span>
+        <div style="position:absolute;left:50%;top:9px;transform:translateX(-50%);width:104px;height:28px;background:#0e0e0e;border-radius:16px"></div>
+        <div style="display:flex;gap:6px;align-items:center;font-family:'Material Symbols Rounded';font-size:17px;color:#141414">
+          <span>signal_cellular_alt</span><span>wifi</span><span>battery_full</span>
+        </div>
+      </div>
+
+      <div style="position:relative;flex:1;display:flex;flex-direction:column;min-height:0">
+
+        <!-- ===== HEADER: progress (steps 1-4) ===== -->
+        <sc-if value="{{ inWizard }}" hint-placeholder-val="{{ true }}">
+        <div style="flex-shrink:0;padding:6px 20px 14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div onClick="{{ onBack }}" style="width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;cursor:pointer">
+              <span style="font-family:'Material Symbols Rounded';font-size:22px">{{ backIcon }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-weight:800;font-size:15px;letter-spacing:-.03em;color:#141414">zapable</span>
+              <span style="width:7px;height:7px;border-radius:50%;background:#00a82d;display:inline-block"></span>
+            </div>
+            <div onClick="{{ onSkipToast }}" style="font-size:12.5px;font-weight:600;color:#9a948a;cursor:pointer;width:40px;text-align:right">Sair</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ progress }}" as="p" hint-placeholder-count="4">
+            <div style="flex:1;height:5px;border-radius:999px;background:{{ p.bg }};overflow:hidden">
+              <div style="height:100%;width:{{ p.fill }};background:#00a82d;border-radius:999px;transition:width .35s ease"></div>
+            </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px">
+            <span style="font-size:11.5px;font-weight:700;color:#00a82d">Etapa {{ step }} de 4</span>
+            <span style="font-size:11.5px;color:#9a948a;font-weight:600">{{ stepLabel }}</span>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ===== SCROLL CONTENT ===== -->
+        <div class="zsc" key="{{ stepKey }}" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 20px 20px">
+
+          <!-- ============ STEP 1: SUA LOJA ============ -->
+          <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ true }}">
+          <div style="animation:zstep .3s ease">
+            <h1 style="font-size:24px;font-weight:800;letter-spacing:-.035em;line-height:1.1;margin:6px 0 6px">Vamos criar sua loja 🎉</h1>
+            <p style="font-size:13.5px;color:#7c766c;line-height:1.45;margin:0 0 22px">Começe com o básico. Você pode editar tudo depois.</p>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">Nome da loja</div>
+            <input value="{{ v.name }}" oninput="{{ bind.name }}" placeholder="Ex.: Ateliê Lola" style="width:100%;background:#fff;border:1.5px solid {{ nameBorder }};border-radius:14px;padding:15px;font-size:15px;font-weight:600;font-family:inherit;outline:none;color:#141414;margin-bottom:18px" />
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">WhatsApp da loja</div>
+            <div style="display:flex;align-items:center;gap:0;background:#fff;border:1.5px solid {{ whatsBorder }};border-radius:14px;padding:0 15px;margin-bottom:6px">
+              <span style="display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:#5a5a5a;padding-right:11px;border-right:1px solid rgba(0,0,0,.08)"><span style="font-family:'Material Symbols Rounded';font-size:19px;color:#00a82d">chat</span>+55</span>
+              <input value="{{ v.whatsapp }}" oninput="{{ bind.whatsapp }}" inputmode="tel" placeholder="(11) 90000-0000" style="flex:1;border:none;outline:none;background:transparent;font-size:15px;font-weight:600;font-family:inherit;padding:15px 0 15px 11px;color:#141414;min-width:0" />
+            </div>
+            <div style="font-size:11px;color:#9a948a;margin:0 2px 18px;line-height:1.35">É aqui que seus pedidos vão chegar.</div>
+
+            <div style="display:flex;gap:11px;margin-bottom:18px">
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">Estado</div>
+                <div onClick="{{ openStateSheet }}" style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1.5px solid rgba(0,0,0,.08);border-radius:14px;padding:15px;font-size:15px;font-weight:600;cursor:pointer;color:{{ stateColor }}">{{ stateLabel }}<span style="font-family:'Material Symbols Rounded';font-size:20px;color:#cbc6ba">expand_more</span></div>
+              </div>
+              <div style="flex:1.4">
+                <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">Cidade</div>
+                <input value="{{ v.city }}" oninput="{{ bind.city }}" placeholder="Cidade" style="width:100%;background:#fff;border:1.5px solid rgba(0,0,0,.08);border-radius:14px;padding:15px;font-size:15px;font-weight:600;font-family:inherit;outline:none;color:#141414" />
+              </div>
+            </div>
+
+            <div onClick="{{ toggleAddress }}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 2px">
+              <span style="font-size:13px;font-weight:600;color:#00a82d">+ Adicionar endereço completo (opcional)</span>
+              <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#00a82d;transform:{{ addrChevron }}">expand_more</span>
+            </div>
+            <sc-if value="{{ v.showAddress }}" hint-placeholder-val="{{ false }}">
+            <div style="animation:zfade .2s ease;padding-top:12px">
+              <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">Rua e número</div>
+              <input value="{{ v.street }}" oninput="{{ bind.street }}" placeholder="Rua das Flores, 123" style="width:100%;background:#fff;border:1.5px solid rgba(0,0,0,.08);border-radius:14px;padding:15px;font-size:15px;font-weight:600;font-family:inherit;outline:none;color:#141414;margin-bottom:14px" />
+              <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">Bairro</div>
+              <input value="{{ v.neighborhood }}" oninput="{{ bind.neighborhood }}" placeholder="Centro" style="width:100%;background:#fff;border:1.5px solid rgba(0,0,0,.08);border-radius:14px;padding:15px;font-size:15px;font-weight:600;font-family:inherit;outline:none;color:#141414" />
+            </div>
+            </sc-if>
+          </div>
+          </sc-if>
+
+          <!-- ============ STEP 2: SOBRE O NEGÓCIO ============ -->
+          <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:zstep .3s ease">
+            <h1 style="font-size:24px;font-weight:800;letter-spacing:-.035em;line-height:1.1;margin:6px 0 6px">O que você vende?</h1>
+            <p style="font-size:13.5px;color:#7c766c;line-height:1.45;margin:0 0 18px">Escolha o ramo para personalizarmos sua experiência.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:24px">
+              <sc-for list="{{ categories }}" as="c" hint-placeholder-count="12">
+              <div onClick="{{ c.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 4px;border-radius:15px;background:{{ c.bg }};border:1.5px solid {{ c.border }};cursor:pointer">
+                <span style="font-family:'Material Symbols Rounded';font-size:24px;color:{{ c.iconColor }}">{{ c.icon }}</span>
+                <span style="font-size:10.5px;font-weight:700;color:{{ c.textColor }};text-align:center;line-height:1.15">{{ c.label }}</span>
+              </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">Instagram <span style="color:#b3ada3;font-weight:500">(opcional)</span></div>
+            <div style="display:flex;align-items:center;background:#fff;border:1.5px solid rgba(0,0,0,.08);border-radius:14px;padding:0 15px;margin-bottom:18px">
+              <span style="font-size:15px;font-weight:700;color:#9a948a">@</span>
+              <input value="{{ v.instagram }}" oninput="{{ bind.instagram }}" placeholder="sualoja" style="flex:1;border:none;outline:none;background:transparent;font-size:15px;font-weight:600;font-family:inherit;padding:15px 0 15px 4px;color:#141414;min-width:0" />
+            </div>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 7px">Endereço da sua loja</div>
+            <div style="display:flex;align-items:center;background:#fff;border:1.5px solid {{ slugBorder }};border-radius:14px;padding:0 0 0 15px;margin-bottom:8px;overflow:hidden">
+              <input value="{{ v.slug }}" oninput="{{ bind.slug }}" placeholder="sualoja" style="flex:1;border:none;outline:none;background:transparent;font-size:15px;font-weight:700;font-family:inherit;padding:15px 0;color:#141414;min-width:0" />
+              <span style="font-size:13px;font-weight:600;color:#9a948a;padding:0 15px;background:#f4eee5;align-self:stretch;display:flex;align-items:center">.zapable.com.br</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin:0 2px 14px">
+              <span style="font-family:'Material Symbols Rounded';font-size:16px;color:{{ slugStatusColor }}">{{ slugStatusIcon }}</span>
+              <span style="font-size:11.5px;font-weight:600;color:{{ slugStatusColor }}">{{ slugStatus }}</span>
+            </div>
+            <sc-if value="{{ showSuggestions }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;gap:7px">
+              <sc-for list="{{ slugSuggestions }}" as="s" hint-placeholder-count="3">
+              <div onClick="{{ s.onClick }}" style="font-size:12px;font-weight:600;padding:7px 12px;border-radius:999px;background:#fff;border:1px solid rgba(0,0,0,.1);color:#5a5a5a;cursor:pointer">{{ s.label }}</div>
+              </sc-for>
+            </div>
+            </sc-if>
+          </div>
+          </sc-if>
+
+          <!-- ============ STEP 3: PAGAMENTO E ENTREGA ============ -->
+          <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:zstep .3s ease">
+            <h1 style="font-size:24px;font-weight:800;letter-spacing:-.035em;line-height:1.1;margin:6px 0 6px">Como você vende?</h1>
+            <p style="font-size:13.5px;color:#7c766c;line-height:1.45;margin:0 0 20px">Defina pagamento e entrega. Tudo editável depois.</p>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 10px">Formas de pagamento</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
+              <sc-for list="{{ payments }}" as="p" hint-placeholder-count="7">
+              <div onClick="{{ p.onClick }}" style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;padding:10px 14px;border-radius:999px;background:{{ p.bg }};border:1.5px solid {{ p.border }};color:{{ p.color }};cursor:pointer">
+                <span style="font-family:'Material Symbols Rounded';font-size:18px">{{ p.icon }}</span>{{ p.label }}
+              </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 10px">Formas de entrega</div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px">
+              <sc-for list="{{ shippings }}" as="s" hint-placeholder-count="3">
+              <div onClick="{{ s.onClick }}" style="display:flex;align-items:center;gap:12px;padding:14px 15px;border-radius:14px;background:#fff;border:1.5px solid {{ s.border }};cursor:pointer">
+                <span style="font-family:'Material Symbols Rounded';font-size:22px;color:{{ s.iconColor }}">{{ s.icon }}</span>
+                <span style="flex:1;font-size:14px;font-weight:600;color:#141414">{{ s.label }}</span>
+                <span style="font-family:'Material Symbols Rounded';font-size:23px;color:{{ s.checkColor }};font-variation-settings:'FILL' 1">{{ s.check }}</span>
+              </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 10px">Onde você entrega?</div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px">
+              <sc-for list="{{ deliveryAreas }}" as="d" hint-placeholder-count="3">
+              <div onClick="{{ d.onClick }}" style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:14px;background:{{ d.bg }};border:1.5px solid {{ d.border }};cursor:pointer">
+                <span style="width:11px;height:11px;border-radius:50%;border:{{ d.dotBorder }};background:{{ d.dotBg }};flex-shrink:0"></span>
+                <span style="font-size:14px;font-weight:600;color:#141414">{{ d.label }}</span>
+              </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 10px">Horário de atendimento</div>
+            <div style="display:flex;align-items:center;gap:11px;background:#fff;border:1.5px solid rgba(0,0,0,.08);border-radius:14px;padding:14px 15px">
+              <span style="font-family:'Material Symbols Rounded';font-size:21px;color:#00a82d">schedule</span>
+              <span style="flex:1;font-size:13.5px;font-weight:600;color:#141414">Todos os dias</span>
+              <span style="font-size:14px;font-weight:700;color:#5a5a5a">{{ v.deliveryStart }}</span>
+              <span style="font-size:13px;color:#b3ada3">até</span>
+              <span style="font-size:14px;font-weight:700;color:#5a5a5a">{{ v.deliveryEnd }}</span>
+            </div>
+          </div>
+          </sc-if>
+
+          <!-- ============ STEP 4: VISUAL ============ -->
+          <sc-if value="{{ isStep4 }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:zstep .3s ease">
+            <h1 style="font-size:24px;font-weight:800;letter-spacing:-.035em;line-height:1.1;margin:6px 0 6px">A cara da sua loja</h1>
+            <p style="font-size:13.5px;color:#7c766c;line-height:1.45;margin:0 0 18px">Escolha as cores e a logo. Veja a prévia ao vivo.</p>
+
+            <!-- Live preview -->
+            <div style="border-radius:18px;overflow:hidden;border:1px solid rgba(0,0,0,.07);margin-bottom:22px;box-shadow:0 8px 24px -12px rgba(0,0,0,.25)">
+              <div style="height:74px;background:{{ bannerBg }};position:relative;display:flex;align-items:flex-end;padding:0 16px">
+                <sc-if value="{{ v.hasBanner }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.12),rgba(255,255,255,.12) 8px,transparent 8px,transparent 16px)"></span></sc-if>
+                <div style="width:54px;height:54px;border-radius:16px;background:#fff;box-shadow:0 3px 10px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;transform:translateY(50%);font-size:19px;font-weight:800;color:{{ v.color }};letter-spacing:-.04em">{{ logoInitials }}</div>
+              </div>
+              <div style="padding:34px 16px 16px;background:#fff">
+                <div style="font-size:16px;font-weight:800;letter-spacing:-.02em">{{ previewName }}</div>
+                <div style="font-size:11.5px;color:#9a948a;margin-top:1px">{{ previewSlug }}</div>
+                <div style="display:flex;gap:8px;margin-top:13px">
+                  <div style="flex:1;height:34px;border-radius:10px;background:{{ v.color }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">Ver catálogo</div>
+                  <div style="width:34px;height:34px;border-radius:10px;background:{{ chipBg }};display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-size:18px;color:{{ v.color }}">chat</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="font-size:12px;font-weight:700;color:#3a352e;margin:0 2px 11px">Cor principal</div>
+            <div style="display:flex;flex-wrap:wrap;gap:11px;margin-bottom:22px">
+              <sc-for list="{{ colors }}" as="c" hint-placeholder-count="12">
+              <div onClick="{{ c.onClick }}" style="width:40px;height:40px;border-radius:50%;background:{{ c.hex }};cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:{{ c.ring }}">
+                <sc-if value="{{ c.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:22px;color:#fff;font-variation-settings:'FILL' 1">check</span></sc-if>
+              </div>
+              </sc-for>
+            </div>
+
+            <div style="display:flex;gap:11px">
+              <div onClick="{{ toggleLogo }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px;border-radius:15px;background:#fff;border:1.5px dashed {{ logoBorder }};cursor:pointer">
+                <span style="font-family:'Material Symbols Rounded';font-size:24px;color:{{ logoIconColor }}">{{ logoUpIcon }}</span>
+                <span style="font-size:12px;font-weight:700;color:{{ logoTextColor }}">{{ logoText }}</span>
+              </div>
+              <div onClick="{{ toggleBanner }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px;border-radius:15px;background:#fff;border:1.5px dashed {{ bannerBorder }};cursor:pointer">
+                <span style="font-family:'Material Symbols Rounded';font-size:24px;color:{{ bannerIconColor }}">{{ bannerUpIcon }}</span>
+                <span style="font-size:12px;font-weight:700;color:{{ bannerTextColor }}">{{ bannerText }}</span>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+
+          <!-- ============ STEP 5: COMPLETO ============ -->
+          <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:zfade .3s ease;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:30px">
+            <div style="width:88px;height:88px;border-radius:50%;background:rgba(0,168,45,.12);display:flex;align-items:center;justify-content:center;margin-bottom:20px;animation:zpop .5s cubic-bezier(.22,1,.36,1)">
+              <span style="font-family:'Material Symbols Rounded';font-size:48px;color:#00a82d;font-variation-settings:'FILL' 1">verified</span>
+            </div>
+            <h1 style="font-size:26px;font-weight:800;letter-spacing:-.035em;margin:0 0 8px">Sua loja está no ar! 🚀</h1>
+            <p style="font-size:14px;color:#7c766c;line-height:1.45;margin:0 0 8px;max-width:280px">{{ previewName }} já pode receber pedidos pelo WhatsApp.</p>
+            <div onClick="{{ onCopyLink }}" style="display:flex;align-items:center;gap:7px;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:9px 15px;margin-bottom:28px;cursor:pointer">
+              <span style="font-family:'Material Symbols Rounded';font-size:17px;color:#00a82d">link</span>
+              <span style="font-size:12.5px;font-weight:700;color:#141414">{{ previewSlug }}</span>
+              <span style="font-family:'Material Symbols Rounded';font-size:17px;color:#9a948a">content_copy</span>
+            </div>
+
+            <div style="width:100%;display:flex;flex-direction:column;gap:11px;text-align:left">
+              <sc-for list="{{ doneActions }}" as="a" hint-placeholder-count="3">
+              <div onClick="{{ a.onClick }}" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:16px;padding:15px">
+                <div style="position:relative;width:46px;height:46px;border-radius:13px;background:{{ a.iconBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <span style="font-family:'Material Symbols Rounded';font-size:23px;color:{{ a.iconColor }}">{{ a.icon }}</span>
+                </div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:14px;font-weight:700;letter-spacing:-.01em">{{ a.title }}</div>
+                  <div style="font-size:11.5px;color:#8a847a;margin-top:2px;line-height:1.3">{{ a.desc }}</div>
+                </div>
+                <span style="font-family:'Material Symbols Rounded';font-size:20px;color:#cbc6ba">arrow_outward</span>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+
+        </div>
+
+        <!-- ===== STICKY FOOTER CTA (wizard) ===== -->
+        <sc-if value="{{ inWizard }}" hint-placeholder-val="{{ true }}">
+        <div style="flex-shrink:0;padding:12px 20px 26px;background:linear-gradient(to top,#f9f6f2 70%,rgba(249,246,242,0))">
+          <div onClick="{{ onNext }}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:54px;border-radius:16px;background:{{ ctaBg }};color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s">
+            {{ ctaLabel }}<span style="font-family:'Material Symbols Rounded';font-size:21px">{{ ctaIcon }}</span>
+          </div>
+          <sc-if value="{{ ctaHint }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;font-size:11px;color:#b3ada3;margin-top:9px">{{ ctaHint }}</div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- ===== STATE SHEET ===== -->
+        <sc-if value="{{ showStateSheet }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(20,20,20,.42);z-index:40;animation:zfade .2s ease"></div>
+        <div class="zsc" style="position:absolute;left:0;right:0;bottom:0;z-index:41;background:#f9f6f2;border-radius:26px 26px 0 0;padding:10px 0 26px;animation:zslideup .28s cubic-bezier(.22,1,.36,1);max-height:78%;overflow-y:auto">
+          <div style="width:40px;height:5px;border-radius:999px;background:#d8d2c6;margin:0 auto 14px"></div>
+          <div style="font-size:16px;font-weight:800;letter-spacing:-.02em;padding:0 20px 12px">Selecione o estado</div>
+          <sc-for list="{{ states }}" as="st" hint-placeholder-count="8">
+          <div onClick="{{ st.onClick }}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;background:{{ st.bg }}">
+            <span style="font-size:14.5px;font-weight:600;color:#141414">{{ st.label }}</span>
+            <sc-if value="{{ st.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:22px;color:#00a82d;font-variation-settings:'FILL' 1">check_circle</span></sc-if>
+          </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <!-- ===== TOAST ===== -->
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:50%;bottom:110px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:9px;background:#141414;color:#f9f6f2;padding:12px 18px;border-radius:14px;box-shadow:0 12px 30px -8px rgba(0,0,0,.5);animation:ztoast .3s ease;white-space:nowrap">
+          <span style="font-family:'Material Symbols Rounded';font-size:19px;color:#95e030;font-variation-settings:'FILL' 1">check_circle</span>
+          <span style="font-size:13px;font-weight:600">{{ toast }}</span>
+        </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:900},&quot;startStep&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;1&quot;,&quot;options&quot;:[&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,&quot;5&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props)
+    const start = parseInt(props.startStep ?? 1, 10)
+    let saved = null
+    try { saved = JSON.parse(localStorage.getItem('zap_onboarding_v2') || 'null') } catch (e) {}
+    this.state = {
+      step: (saved && saved.step) || start,
+      sheet: null,
+      toast: null,
+      v: (saved && saved.v) || {
+        name: '', whatsapp: '', state: '', city: '', street: '', neighborhood: '', showAddress: false,
+        category: '', instagram: '', slug: '',
+        payments: ['pix'], shippings: [], deliveryArea: 'city_only',
+        deliveryStart: '08:00', deliveryEnd: '18:00',
+        color: '#00a82d', hasLogo: false, hasBanner: false,
+      },
+    }
+    this.CATEGORIES = [
+      { value: 'moda', label: 'Moda', icon: 'checkroom' },
+      { value: 'suplementos', label: 'Suplementos', icon: 'fitness_center' },
+      { value: 'beleza', label: 'Beleza', icon: 'spa' },
+      { value: 'sexshop', label: 'Sex Shop', icon: 'favorite' },
+      { value: 'eletronicos', label: 'Eletrônicos', icon: 'devices' },
+      { value: 'alimentos', label: 'Alimentos', icon: 'restaurant' },
+      { value: 'pet', label: 'Pet Shop', icon: 'pets' },
+      { value: 'casa', label: 'Casa', icon: 'chair' },
+      { value: 'esportes', label: 'Esportes', icon: 'sports_soccer' },
+      { value: 'infantil', label: 'Infantil', icon: 'child_care' },
+      { value: 'servicos', label: 'Serviços', icon: 'handyman' },
+      { value: 'outro', label: 'Outro', icon: 'more_horiz' },
+    ]
+    this.PAYMENTS = [
+      { value: 'pix', label: 'PIX', icon: 'pix' },
+      { value: 'cash', label: 'Dinheiro', icon: 'payments' },
+      { value: 'credit_card', label: 'Crédito', icon: 'credit_card' },
+      { value: 'debit_card', label: 'Débito', icon: 'credit_card' },
+      { value: 'bank_transfer', label: 'Transferência', icon: 'account_balance' },
+      { value: 'boleto', label: 'Boleto', icon: 'receipt' },
+      { value: 'payment_link', label: 'Link', icon: 'link' },
+    ]
+    this.SHIPPINGS = [
+      { value: 'delivery', label: 'Entrega em domicílio', icon: 'local_shipping' },
+      { value: 'pickup_in_store', label: 'Retirada na loja', icon: 'storefront' },
+      { value: 'digital', label: 'Entrega digital', icon: 'cloud_download' },
+    ]
+    this.AREAS = [
+      { value: 'city_only', label: 'Apenas na minha cidade' },
+      { value: 'state_only', label: 'Apenas meu estado' },
+      { value: 'brazil', label: 'Brasil inteiro' },
+      { value: 'worldwide', label: 'Mundo inteiro' },
+      { value: 'digital_only', label: 'Apenas digital' },
+    ]
+    this.STATES = ['SP', 'RJ', 'MG', 'RS', 'PR', 'SC', 'BA', 'PE', 'CE', 'GO', 'DF', 'ES', 'PA', 'AM', 'MT', 'MS']
+    this.COLORS = ['#00a82d', '#10b981', '#14b8a6', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#f97316']
+  }
+
+  persist() {
+    try { localStorage.setItem('zap_onboarding_v2', JSON.stringify({ step: this.state.step, v: this.state.v })) } catch (e) {}
+  }
+  setV(patch) { this.setState((s) => ({ v: { ...s.v, ...patch } }), () => this.persist()) }
+  bindV(f) { return (e) => this.setV({ [f]: e.target.value }) }
+  toggleArr(field, val) {
+    this.setState((s) => {
+      const arr = s.v[field].includes(val) ? s.v[field].filter((x) => x !== val) : [...s.v[field], val]
+      return { v: { ...s.v, [field]: arr } }
+    }, () => this.persist())
+  }
+  go(step) { this.setState({ step, sheet: null }, () => { this.persist(); }) }
+  toast(msg) {
+    this.setState({ toast: msg }); clearTimeout(this._t)
+    this._t = setTimeout(() => this.setState({ toast: null }), 2200)
+  }
+  slugify(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') }
+
+  stepValid() {
+    const v = this.state.v
+    switch (this.state.step) {
+      case 1: return v.name.trim().length > 0 && v.whatsapp.replace(/\D/g, '').length >= 10 && v.state && v.city.trim().length > 0
+      case 2: return !!v.category && this.slugify(v.slug).length >= 3
+      case 3: return v.payments.length > 0 && v.shippings.length > 0
+      case 4: return /^#[0-9A-Fa-f]{6}$/.test(v.color)
+      default: return true
+    }
+  }
+  onNext() {
+    if (this.state.step <= 4 && !this.stepValid()) { this.toast('Preencha os campos obrigatórios'); return }
+    if (this.state.step < 4) { this.go(this.state.step + 1) }
+    else if (this.state.step === 4) { this.go(5); try { localStorage.removeItem('zap_onboarding_v2') } catch (e) {} }
+  }
+  onBack() {
+    if (this.state.step === 1) { this.toast('Início do cadastro'); return }
+    this.go(Math.max(1, this.state.step - 1))
+  }
+
+  renderVals() {
+    const st = this.state
+    const v = st.v
+    const step = st.step
+    const inWizard = step >= 1 && step <= 4
+    const stepLabels = { 1: 'Sua loja', 2: 'Sobre o negócio', 3: 'Pagamento e entrega', 4: 'Visual' }
+    const slug = this.slugify(v.slug)
+    const valid = this.stepValid()
+
+    const progress = [1, 2, 3, 4].map((i) => ({
+      bg: '#e8e1d5',
+      fill: step > i ? '100%' : step === i ? '50%' : '0%',
+    }))
+
+    const categories = this.CATEGORIES.map((c) => {
+      const on = v.category === c.value
+      return {
+        ...c, onClick: () => this.setV({ category: c.value }),
+        bg: on ? '#eafaef' : '#fff', border: on ? '#00a82d' : 'rgba(0,0,0,.07)',
+        iconColor: on ? '#00a82d' : '#7c766c', textColor: on ? '#00772a' : '#5a5a5a',
+      }
+    })
+
+    const payments = this.PAYMENTS.map((p) => {
+      const on = v.payments.includes(p.value)
+      return { ...p, onClick: () => this.toggleArr('payments', p.value), bg: on ? '#141414' : '#fff', border: on ? '#141414' : 'rgba(0,0,0,.1)', color: on ? '#f9f6f2' : '#5a5a5a' }
+    })
+    const shippings = this.SHIPPINGS.map((s) => {
+      const on = v.shippings.includes(s.value)
+      return { ...s, onClick: () => this.toggleArr('shippings', s.value), border: on ? '#00a82d' : 'rgba(0,0,0,.08)', iconColor: on ? '#00a82d' : '#9a948a', check: on ? 'check_circle' : 'radio_button_unchecked', checkColor: on ? '#00a82d' : '#d4cec2' }
+    })
+    const deliveryAreas = this.AREAS.map((a) => {
+      const on = v.deliveryArea === a.value
+      const label = a.value === 'city_only' && v.city ? `Apenas na cidade (${v.city})` : a.label
+      return { label, onClick: () => this.setV({ deliveryArea: a.value }), bg: on ? '#eafaef' : '#fff', border: on ? '#00a82d' : 'rgba(0,0,0,.07)', dotBorder: on ? '4px solid #00a82d' : '2px solid #cbc6ba', dotBg: on ? '#fff' : '#fff' }
+    })
+
+    const colors = this.COLORS.map((hex) => {
+      const on = v.color === hex
+      return { hex, selected: on, onClick: () => this.setV({ color: hex }), ring: on ? `0 0 0 3px #f9f6f2, 0 0 0 5px ${hex}` : 'inset 0 0 0 1px rgba(0,0,0,.06)' }
+    })
+
+    // slug suggestions from name
+    const base = this.slugify(v.name) || 'sualoja'
+    const sugg = [base, base + '-oficial', base + '-loja'].filter((s, i, a) => a.indexOf(s) === i).slice(0, 3)
+    const slugSuggestions = sugg.map((s) => ({ label: s, onClick: () => this.setV({ slug: s }) }))
+
+    // slug status
+    let slugStatus = 'Pelo menos 3 caracteres', slugStatusColor = '#b3ada3', slugStatusIcon = 'info'
+    if (slug.length >= 3) {
+      const taken = ['loja', 'teste', 'admin', 'zapable']
+      if (taken.includes(slug)) { slugStatus = 'Este endereço já está em uso'; slugStatusColor = '#cc4040'; slugStatusIcon = 'cancel' }
+      else { slugStatus = 'Endereço disponível!'; slugStatusColor = '#00a82d'; slugStatusIcon = 'check_circle' }
+    }
+
+    const states = this.STATES.map((code) => ({ label: code, selected: v.state === code, bg: v.state === code ? '#eafaef' : 'transparent', onClick: () => this.setV({ state: code }) }))
+
+    // step 4 preview
+    const previewName = v.name.trim() || 'Sua Loja'
+    const previewSlug = (slug || 'sualoja') + '.zapable.com.br'
+    const logoInitials = previewName.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'SL'
+    const hexToSoft = (hex) => hex + '22'
+
+    const ctaMap = { 1: 'Continuar', 2: 'Continuar', 3: 'Continuar', 4: 'Publicar minha loja' }
+
+    const doneActions = [
+      { icon: 'add_box', iconBg: 'rgba(0,168,45,.12)', iconColor: '#00a82d', title: 'Adicionar primeiro produto', desc: 'Cadastre fotos, preço e estoque.', onClick: () => this.toast('Abrindo cadastro de produto') },
+      { icon: 'palette', iconBg: '#f4eee5', iconColor: '#141414', title: 'Personalizar catálogo', desc: 'Aparência, contatos e configurações.', onClick: () => this.toast('Abrindo personalização') },
+      { icon: 'storefront', iconBg: '#f4eee5', iconColor: '#141414', title: 'Ver minha loja publicada', desc: 'Veja como seus clientes verão.', onClick: () => this.toast('Abrindo catálogo público') },
+    ]
+
+    return {
+      step, inWizard, stepKey: 'step' + step,
+      isStep1: step === 1, isStep2: step === 2, isStep3: step === 3, isStep4: step === 4, isDone: step === 5,
+      stepLabel: stepLabels[step] || '',
+      backIcon: step === 1 ? 'close' : 'arrow_back',
+      onBack: () => this.onBack(), onNext: () => this.onNext(),
+      onSkipToast: () => this.toast('Você pode terminar depois'),
+      progress,
+      v, bind: { name: this.bindV('name'), whatsapp: this.bindV('whatsapp'), city: this.bindV('city'), street: this.bindV('street'), neighborhood: this.bindV('neighborhood'), instagram: this.bindV('instagram'), slug: this.bindV('slug') },
+      nameBorder: v.name.trim() ? '#00a82d' : 'rgba(0,0,0,.08)',
+      whatsBorder: v.whatsapp.replace(/\D/g, '').length >= 10 ? '#00a82d' : 'rgba(0,0,0,.08)',
+      stateLabel: v.state || 'UF', stateColor: v.state ? '#141414' : '#b3ada3',
+      openStateSheet: () => this.setState({ sheet: 'state' }), closeSheet: () => this.setState({ sheet: null }),
+      showStateSheet: st.sheet === 'state', states,
+      toggleAddress: () => this.setV({ showAddress: !v.showAddress }), addrChevron: v.showAddress ? 'rotate(180deg)' : 'rotate(0deg)',
+      categories,
+      slugBorder: slug.length >= 3 ? '#00a82d' : 'rgba(0,0,0,.08)',
+      slugStatus, slugStatusColor, slugStatusIcon,
+      showSuggestions: slug.length < 3, slugSuggestions,
+      payments, shippings, deliveryAreas,
+      colors, bannerBg: v.hasBanner ? v.color : hexToSoft(v.color), chipBg: hexToSoft(v.color),
+      previewName, previewSlug, logoInitials,
+      toggleLogo: () => this.setV({ hasLogo: !v.hasLogo }), toggleBanner: () => this.setV({ hasBanner: !v.hasBanner }),
+      logoBorder: v.hasLogo ? '#00a82d' : '#d4cec2', logoIconColor: v.hasLogo ? '#00a82d' : '#9a948a', logoTextColor: v.hasLogo ? '#00772a' : '#5a5a5a', logoUpIcon: v.hasLogo ? 'check_circle' : 'add_photo_alternate', logoText: v.hasLogo ? 'Logo enviada' : 'Enviar logo',
+      bannerBorder: v.hasBanner ? '#00a82d' : '#d4cec2', bannerIconColor: v.hasBanner ? '#00a82d' : '#9a948a', bannerTextColor: v.hasBanner ? '#00772a' : '#5a5a5a', bannerUpIcon: v.hasBanner ? 'check_circle' : 'image', bannerText: v.hasBanner ? 'Banner enviado' : 'Enviar banner',
+      ctaLabel: ctaMap[step] || 'Continuar', ctaIcon: step === 4 ? 'rocket_launch' : 'arrow_forward',
+      ctaBg: valid ? '#00a82d' : '#c8c2b6',
+      ctaHint: step === 4 ? 'Tudo pode ser alterado depois no painel' : '',
+      doneActions, onCopyLink: () => this.toast('Link copiado!'),
+      toast: st.toast,
+    }
+  }
+}
+</script>
+</body>
+</html>

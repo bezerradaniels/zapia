@@ -27,7 +27,7 @@ export default function EditProductPage() {
         <p className="text-sm text-z-text-muted">Produto não encontrado.</p>
         <Link
           to={ROUTES.dashboardProducts}
-          className="text-sm font-medium text-[#10b981] hover:underline"
+          className="text-sm font-medium text-[#0bfeda] hover:underline"
         >
           Voltar
         </Link>

@@ -58,7 +58,10 @@ export default function CouponRedirectPage() {
         </div>
       ) : (
         <div className="text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-z-border border-t-z-green" />
+          <div
+            className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-z-border"
+            style={{ borderTopColor: 'var(--store-primary)' }}
+          />
           <p className="text-sm text-z-text-muted">Carregando cupom...</p>
         </div>
       )}

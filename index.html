@@ -33,6 +33,24 @@
           script.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-TXTFF99H'
           document.head.appendChild(script)
         }
+        const loadRdStation = () => {
+          if (window.__rdStationLoaded) return
+          try {
+            if (window.localStorage.getItem(consentKey) !== 'accepted') return
+          } catch {
+            return
+          }
+          window.__rdStationLoaded = true
+          const script = document.createElement('script')
+          script.async = true
+          script.src =
+            'https://d335luupugsy2.cloudfront.net/js/loader-scripts/7675dd27-b676-4787-b5aa-a9b61f9f7aa2-loader.js'
+          document.body.appendChild(script)
+        }
+        const loadTrackers = () => {
+          loadGtm()
+          loadRdStation()
+        }
         const schedule = () => {
           try {
             if (window.localStorage.getItem(consentKey) !== 'accepted') return
@@ -40,15 +58,15 @@
             return
           }
           if ('requestIdleCallback' in window) {
-            window.requestIdleCallback(loadGtm, { timeout: 3500 })
+            window.requestIdleCallback(loadTrackers, { timeout: 3500 })
             return
           }
-          window.setTimeout(loadGtm, 2500)
+          window.setTimeout(loadTrackers, 2500)
         }
         window.addEventListener('load', schedule, { once: true })
         window.addEventListener('zapia:cookie-consent-accepted', schedule)
         ;['pointerdown', 'keydown', 'touchstart'].forEach((eventName) => {
-          window.addEventListener(eventName, loadGtm, { once: true, passive: true })
+          window.addEventListener(eventName, loadTrackers, { once: true, passive: true })
         })
       })()
     </script>

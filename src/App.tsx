@@ -33,7 +33,6 @@ const ProfilePage = lazy(() => import('@/routes/dashboard/ProfilePage'))
 const ProductsPage = lazy(() => import('@/routes/dashboard/ProductsPage'))
 const NewProductPage = lazy(() => import('@/routes/dashboard/NewProductPage'))
 const EditProductPage = lazy(() => import('@/routes/dashboard/EditProductPage'))
-const BulkAddProductsPage = lazy(() => import('@/routes/dashboard/BulkAddProductsPage'))
 const StoreLayout = lazy(() => import('@/routes/store/StoreLayout'))
 const StoreHomePage = lazy(() => import('@/routes/store/StoreHomePage'))
 const StorePage = lazy(() => import('@/routes/store/StorePage'))
@@ -46,10 +45,14 @@ const CouponRedirectPage = lazy(() => import('@/routes/store/CouponRedirectPage'
 const CatalogPage = lazy(() => import('@/routes/dashboard/CatalogPage'))
 const CustomersPage = lazy(() => import('@/routes/dashboard/CustomersPage'))
 const NewCustomerPage = lazy(() => import('@/routes/dashboard/NewCustomerPage'))
+const CustomerDetailsPage = lazy(() => import('@/routes/dashboard/CustomerDetailsPage'))
 const EditCustomerPage = lazy(() => import('@/routes/dashboard/EditCustomerPage'))
 const SellersPage = lazy(() => import('@/routes/dashboard/SellersPage'))
+const SellerDetailPage = lazy(() => import('@/routes/dashboard/SellerDetailPage'))
+const EditSellerPage = lazy(() => import('@/routes/dashboard/EditSellerPage'))
 const CouponsPage = lazy(() => import('@/routes/dashboard/CouponsPage'))
 const SupportPage = lazy(() => import('@/routes/dashboard/SupportPage'))
+const MorePage = lazy(() => import('@/routes/dashboard/MorePage'))
 const NewOrderPage = lazy(() => import('@/routes/dashboard/NewOrderPage'))
 const NotFoundPage = lazy(() => import('@/routes/NotFoundPage'))
 const AdminLayout = lazy(() => import('@/routes/admin/AdminLayout'))
@@ -160,6 +163,10 @@ function AppRoutes() {
       </Route>
       <Route path={ROUTES.onboardComplete} element={<AppProviders><OnboardCompletePage /></AppProviders>} />
 
+      <Route path={ROUTES.dashboardMore} element={<AppProviders><DashboardLayout /></AppProviders>}>
+        <Route index element={<MorePage />} />
+      </Route>
+
       <Route path={ROUTES.dashboard} element={<AppProviders><DashboardLayout /></AppProviders>}>
         <Route path="perfil" element={<ProfilePage />} />
         <Route index element={<DashboardHome />} />
@@ -170,15 +177,18 @@ function AppRoutes() {
         <Route path="categorias" element={<Navigate to="/dashboard/catalogo/categorias" replace />} />
         <Route path="clientes" element={<CustomersPage />} />
         <Route path="clientes/novo" element={<NewCustomerPage />} />
-        <Route path="clientes/:id" element={<EditCustomerPage />} />
+        <Route path="clientes/:id" element={<CustomerDetailsPage />} />
+        <Route path="clientes/:id/editar" element={<EditCustomerPage />} />
         <Route path="vendedores" element={<SellersPage />} />
+        <Route path="vendedores/:id" element={<SellerDetailPage />} />
+        <Route path="vendedores/:id/editar" element={<EditSellerPage />} />
         <Route path="cupons" element={<CouponsPage />} />
         <Route path="produtos" element={<ProductsPage />} />
-        <Route path="produtos/bulk" element={<BulkAddProductsPage />} />
         <Route path="produtos/novo" element={<NewProductPage />} />
         <Route path="produtos/:id" element={<EditProductPage />} />
         <Route path="assinatura" element={<BillingPage />} />
         <Route path="suporte" element={<SupportPage />} />
+        <Route path="mais" element={<MorePage />} />
       </Route>
 
       <Route path=":storeSlug" element={<AppProviders><StoreLayout /></AppProviders>}>

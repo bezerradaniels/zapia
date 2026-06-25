@@ -3,6 +3,7 @@ export type AdminPlatformStats = {
   total_stores: number
   total_products: number
   total_sellers: number
+  free_customers: number
   paying_customers: number
   trial_customers: number
   cities_with_stores: { city: string; count: number }[]

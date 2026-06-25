@@ -1,15 +1,12 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
   InvoiceIcon,
   WhatsappIcon,
-  CancelIcon,
   PlusSignIcon,
-  EyeIcon,
+  SearchIcon,
   Delete02Icon,
-  CheckmarkCircle01Icon,
-  ShoppingBagCheckIcon,
 } from '@hugeicons/core-free-icons'
 import { useActiveStore } from '@/lib/tenant'
 import {
@@ -21,7 +18,8 @@ import {
 import { ROUTES } from '@/config/routes'
 import { formatMoney } from '@/lib/format'
 import { fromE164BR } from '@/lib/br'
-import { Badge } from '@/components/ui'
+import { Badge, Skeleton, Sheet } from '@/components/ui'
+import { EmptyState } from '@/components/feedback'
 import { cn } from '@/lib/utils'
 import type { OrderStatus, OrderWithItems } from '@/types/domain'
 
@@ -54,7 +52,6 @@ export default function OrdersPage() {
   const orders = useOrders(store?.id)
   const [searchParams] = useSearchParams()
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const updateStatus = useUpdateOrderStatus()
   const deleteOrder = useDeleteOrder(store?.id)
   const orderFromSearch = searchParams.get('order')
 
@@ -66,181 +63,187 @@ export default function OrdersPage() {
     setSelectedId(orderFromSearch)
   }
 
-  if (orders.isLoading) {
-    return <p className="text-sm text-z-text-muted">Carregando...</p>
-  }
+  const allOrders = orders.data ?? []
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all')
 
-  const list = orders.data ?? []
+  const q = search.trim().toLowerCase()
+  const list = allOrders.filter((o) => {
+    if (statusFilter !== 'all' && o.status !== statusFilter) return false
+    if (q && !o.customer_name.toLowerCase().includes(q) && !String(o.order_number).includes(q)) {
+      return false
+    }
+    return true
+  })
 
   return (
-    <div className="flex flex-col gap-6">
-      <section className="flex flex-col gap-4">
-        <header className="flex items-center justify-between gap-3">
-          <div>
-            <h1 className="text-[22px] font-bold tracking-tighter">Pedidos</h1>
-            <p className="text-sm text-z-text-muted">
-              {list.length} {list.length === 1 ? 'pedido' : 'pedidos'}
-            </p>
-          </div>
-          <Link
-            to={ROUTES.dashboardOrdersNew}
-            className="flex items-center gap-1.5 rounded-xl bg-z-green px-4 py-2 text-sm font-semibold text-z-ink transition-opacity hover:opacity-90"
-          >
-            <HugeiconsIcon icon={PlusSignIcon} size={14} />
-            Novo pedido
-          </Link>
-        </header>
+    <div className="flex flex-col gap-4">
+      <header className="flex items-center justify-between gap-3">
+        <h1 className="text-[25px] font-extrabold tracking-tighter">Pedidos</h1>
+        <Link
+          to={ROUTES.dashboardOrdersNew}
+          className="flex items-center gap-1.5 rounded-xl bg-[#10b981] px-3.5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+        >
+          <HugeiconsIcon icon={PlusSignIcon} size={16} />
+          Novo
+        </Link>
+      </header>
 
-        {list.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-z-border bg-white p-12 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-z-bg2 text-z-text-hint">
-              <HugeiconsIcon icon={InvoiceIcon} size={26} />
-            </div>
-            <div className="text-base font-semibold">Nenhum pedido ainda</div>
-            <p className="max-w-sm text-sm text-z-text-muted">
-              Quando um cliente finalizar o checkout, o pedido aparecerá aqui — mesmo
-              que a mensagem do WhatsApp não seja enviada.
-            </p>
-          </div>
-        ) : (
-          <ul className="divide-y divide-z-border overflow-hidden rounded-2xl border border-z-border bg-white">
-            {list.map((o) => {
-              return (
-                <li key={o.id}>
-                  <div className="flex flex-col gap-3 p-4 transition-colors hover:bg-z-bg2/40 sm:flex-row sm:items-center sm:justify-between">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedId(o.id)}
-                      className="min-w-0 flex-1 text-left"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="truncate font-semibold">{o.customer_name}</span>
-                        <Badge tone={STATUS_TONE[o.status]}>
-                          {STATUS_LABEL[o.status]}
-                        </Badge>
-                      </div>
-                      <div className="mt-1 flex items-center justify-between gap-3 text-xs text-z-text-muted sm:justify-start sm:gap-5">
-                        <span>{formatDateTime(o.created_at)}</span>
-                        <span className="text-sm font-bold tabular-nums text-z-text">
-                          {formatMoney(o.total_in_cents)}
-                        </span>
-                      </div>
-                    </button>
+      {/* Search */}
+      <div className="flex h-11 items-center gap-2.5 rounded-[13px] border border-z-border bg-white px-3.5">
+        <HugeiconsIcon icon={SearchIcon} size={18} className="shrink-0 text-z-text-hint" />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar pedido ou cliente"
+          className="min-w-0 flex-1 bg-transparent text-sm text-z-text outline-none placeholder:text-z-text-hint"
+        />
+      </div>
 
-                    <div className="flex shrink-0 items-center gap-1.5">
-                      <QuickActionButton
-                        label="Ver detalhes"
-                        icon={EyeIcon}
-                        onClick={() => setSelectedId(o.id)}
-                      />
-                      <QuickActionLink
-                        label="Abrir WhatsApp"
-                        icon={WhatsappIcon}
-                        href={`https://wa.me/${o.customer_phone.replace('+', '')}`}
-                      />
-                      {o.status === 'pending' && (
-                        <QuickActionButton
-                          label="Confirmar pedido"
-                          icon={CheckmarkCircle01Icon}
-                          disabled={updateStatus.isPending}
-                          onClick={() =>
-                            updateStatus.mutate({ id: o.id, status: 'confirmed', oldStatus: o.status })
-                          }
-                        />
-                      )}
-                      {o.status !== 'completed' && o.status !== 'cancelled' && (
-                        <QuickActionButton
-                          label="Concluir pedido"
-                          icon={ShoppingBagCheckIcon}
-                          disabled={updateStatus.isPending}
-                          onClick={() =>
-                            updateStatus.mutate({ id: o.id, status: 'completed', oldStatus: o.status })
-                          }
-                        />
-                      )}
-                      <QuickActionButton
-                        label="Excluir pedido"
-                        icon={Delete02Icon}
-                        tone="danger"
-                        disabled={deleteOrder.isPending}
-                        onClick={() => {
-                          if (!confirm(`Excluir pedido de "${o.customer_name}"?`)) return
-                          deleteOrder.mutate(o.id, {
-                            onSuccess: () => {
-                              if (selectedId === o.id) setSelectedId(null)
-                            },
-                          })
-                        }}
-                      />
-                    </div>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        )}
-      </section>
+      {/* Filter chips */}
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {STATUS_FILTERS.map((f) => {
+          const active = statusFilter === f.value
+          return (
+            <button
+              key={f.value}
+              type="button"
+              onClick={() => setStatusFilter(f.value)}
+              className={cn(
+                'shrink-0 rounded-full px-3.5 py-2 text-[12.5px] font-bold transition-colors',
+                active
+                  ? 'bg-z-ink text-white'
+                  : 'border border-z-border bg-white text-z-text-muted hover:bg-z-sand',
+              )}
+            >
+              {f.label}
+            </button>
+          )
+        })}
+      </div>
+
+      {orders.isLoading ? (
+        <div className="flex flex-col gap-2.5">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-[78px] rounded-[18px]" />
+          ))}
+        </div>
+      ) : allOrders.length === 0 ? (
+        <EmptyState
+          icon={InvoiceIcon}
+          title="Nenhum pedido ainda"
+          description="Quando um cliente finalizar o checkout, o pedido aparecerá aqui — mesmo que a mensagem do WhatsApp não seja enviada."
+        />
+      ) : list.length === 0 ? (
+        <EmptyState icon={SearchIcon} title="Nenhum pedido encontrado" description="Tente outro filtro ou busca." />
+      ) : (
+        <div className="flex flex-col gap-2.5">
+          {list.map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() => setSelectedId(o.id)}
+              className="flex flex-col gap-2.5 rounded-[18px] border border-z-border bg-white p-4 text-left transition-colors hover:bg-z-bg active:bg-z-bg"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate text-[15px] font-extrabold tracking-tight">
+                  {o.customer_name}
+                </span>
+                <Badge tone={STATUS_TONE[o.status]}>{STATUS_LABEL[o.status]}</Badge>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate text-xs text-z-text-muted">
+                  #{o.order_number} · {formatDateTime(o.created_at)}
+                </span>
+                <span className="shrink-0 text-[15px] font-extrabold tracking-tight tabular-nums">
+                  {formatMoney(o.total_in_cents)}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
 
       {selectedId && (
-        <OrderDetailModal id={selectedId} onClose={() => setSelectedId(null)} />
+        <OrderDetailModal
+          id={selectedId}
+          onClose={() => setSelectedId(null)}
+          onDeleted={() => setSelectedId(null)}
+          deleteOrder={deleteOrder}
+        />
       )}
     </div>
   )
 }
 
-function OrderDetailModal({ id, onClose }: { id: string; onClose: () => void }) {
+const STATUS_FILTERS: { value: OrderStatus | 'all'; label: string }[] = [
+  { value: 'all', label: 'Todos' },
+  { value: 'pending', label: 'Novos' },
+  { value: 'confirmed', label: 'Em atendimento' },
+  { value: 'completed', label: 'Concluídos' },
+  { value: 'cancelled', label: 'Cancelados' },
+]
+
+function OrderDetailModal({
+  id,
+  onClose,
+  onDeleted,
+  deleteOrder,
+}: {
+  id: string
+  onClose: () => void
+  onDeleted: () => void
+  deleteOrder: ReturnType<typeof useDeleteOrder>
+}) {
   const order = useOrder(id)
   const updateStatus = useUpdateOrderStatus()
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/40 p-4 sm:items-center">
-      <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-z-border bg-white shadow-xl">
-        {order.isLoading ? (
-          <p className="p-5 text-sm text-z-text-muted">Carregando...</p>
-        ) : order.data ? (
-          <OrderDetailContent
-            order={order.data}
-            updateStatus={updateStatus}
-            onClose={onClose}
-          />
-        ) : (
-          <div className="p-5">
-            <header className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-bold">Pedido não encontrado</h2>
-              <CloseButton onClick={onClose} />
-            </header>
-            <p className="text-sm text-z-text-muted">
-              Não foi possível carregar as informações do pedido.
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
+    <Sheet open onOpenChange={(open) => !open && onClose()} className="sm:max-w-lg">
+      {order.isLoading ? (
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-6 w-2/3 rounded-lg" />
+          <Skeleton className="h-20 rounded-xl" />
+          <Skeleton className="h-20 rounded-xl" />
+        </div>
+      ) : order.data ? (
+        <OrderDetailContent
+          order={order.data}
+          updateStatus={updateStatus}
+          deleteOrder={deleteOrder}
+          onDeleted={onDeleted}
+        />
+      ) : (
+        <div>
+          <h2 className="mb-2 text-base font-bold">Pedido não encontrado</h2>
+          <p className="text-sm text-z-text-muted">
+            Não foi possível carregar as informações do pedido.
+          </p>
+        </div>
+      )}
+    </Sheet>
   )
 }
 
 function OrderDetailContent({
   order: o,
   updateStatus,
-  onClose,
+  deleteOrder,
+  onDeleted,
 }: {
   order: OrderWithItems
   updateStatus: ReturnType<typeof useUpdateOrderStatus>
-  onClose: () => void
+  deleteOrder: ReturnType<typeof useDeleteOrder>
+  onDeleted: () => void
 }) {
   return (
-    <div className="flex min-h-0 flex-col">
-      <header className="flex items-start justify-between gap-2">
-        <div className="min-w-0 p-5 pb-3">
-          <h2 className="truncate text-lg font-bold">{o.customer_name}</h2>
-          <p className="text-xs text-z-text-muted">{formatDateTime(o.created_at)}</p>
-        </div>
-        <div className="p-4">
-          <CloseButton onClick={onClose} />
-        </div>
+    <div className="flex min-h-0 flex-col gap-4">
+      <header>
+        <h2 className="truncate text-lg font-bold">{o.customer_name}</h2>
+        <p className="text-xs text-z-text-muted">{formatDateTime(o.created_at)}</p>
       </header>
 
-      <div className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pb-5">
+      <div className="flex min-h-0 flex-col gap-4">
         <div className="flex flex-col gap-1.5 text-sm">
           <div className="flex items-center gap-2">
             <span className="text-z-text-muted">WhatsApp:</span>
@@ -248,7 +251,7 @@ function OrderDetailContent({
               href={`https://wa.me/${o.customer_phone.replace('+', '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-medium text-[#10b981] hover:underline"
+              className="inline-flex items-center gap-1 font-medium text-[#0bfeda] hover:underline"
             >
               <HugeiconsIcon icon={WhatsappIcon} size={14} />
               {fromE164BR(o.customer_phone)}
@@ -280,7 +283,7 @@ function OrderDetailContent({
         </ul>
         <div className="mt-3 flex justify-between border-t border-z-border pt-3 font-bold">
           <span>Total</span>
-          <span className="tabular-nums text-[#10b981]">
+          <span className="tabular-nums text-[#0bfeda]">
             {formatMoney(o.total_in_cents)}
           </span>
         </div>
@@ -309,75 +312,21 @@ function OrderDetailContent({
           ))}
         </div>
       </div>
+
+      <button
+        type="button"
+        disabled={deleteOrder.isPending}
+        onClick={() => {
+          if (!confirm(`Excluir pedido de "${o.customer_name}"?`)) return
+          deleteOrder.mutate(o.id, { onSuccess: onDeleted })
+        }}
+        className="flex items-center justify-center gap-2 rounded-xl border border-z-border py-3 text-sm font-semibold text-z-red transition-colors hover:bg-z-rose/40 disabled:opacity-50"
+      >
+        <HugeiconsIcon icon={Delete02Icon} size={16} />
+        Excluir pedido
+      </button>
     </div>
     </div>
   )
 }
 
-function QuickActionButton({
-  label,
-  icon,
-  tone = 'default',
-  disabled,
-  onClick,
-}: {
-  label: string
-  icon: IconSvgElement
-  tone?: 'default' | 'danger'
-  disabled?: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      title={label}
-      aria-label={label}
-      className={cn(
-        'flex h-9 w-9 items-center justify-center rounded-lg border transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-        tone === 'danger'
-          ? 'border-z-primary/30 bg-z-primary/10 text-z-primary hover:bg-z-primary/15'
-          : 'border-z-border bg-white text-z-text-muted hover:bg-z-bg2 hover:text-z-text',
-      )}
-    >
-      <HugeiconsIcon icon={icon} size={16} />
-    </button>
-  )
-}
-
-function QuickActionLink({
-  label,
-  icon,
-  href,
-}: {
-  label: string
-  icon: IconSvgElement
-  href: string
-}) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      title={label}
-      aria-label={label}
-      className="flex h-9 w-9 items-center justify-center rounded-lg border border-z-border bg-white text-z-text-muted transition-colors hover:bg-z-bg2 hover:text-[#10b981]"
-    >
-      <HugeiconsIcon icon={icon} size={16} />
-    </a>
-  )
-}
-
-function CloseButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-bg2"
-      aria-label="Fechar"
-    >
-      <HugeiconsIcon icon={CancelIcon} size={16} />
-    </button>
-  )
-}

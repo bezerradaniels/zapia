@@ -1,20 +1,12 @@
-import { useState, useRef, useEffect } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   WhatsappIcon,
-  ShoppingCart01Icon,
-  Notification03Icon,
-  MoreVerticalIcon,
-  Edit02Icon,
-  Delete02Icon,
 } from '@hugeicons/core-free-icons'
-import { fromE164BR } from '@/lib/br'
 import type { Customer } from '../types'
 
 type Props = {
   customer: Customer
-  onEdit: (customer: Customer) => void
-  onDelete: (customer: Customer) => void
+  onDetails: (customer: Customer) => void
 }
 
 function initials(name: string) {
@@ -41,20 +33,7 @@ function avatarColor(name: string) {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
 }
 
-export function CustomerRow({ customer, onEdit, onDelete }: Props) {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!menuOpen) return
-    function handleClick(e: MouseEvent) {
-      if (!menuRef.current?.contains(e.target as Node)) setMenuOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [menuOpen])
-
-  const phone = fromE164BR(customer.whatsapp_phone)
+export function CustomerRow({ customer, onDetails }: Props) {
   const waHref = `https://wa.me/${customer.whatsapp_phone.replace('+', '')}`
   const colorClass = avatarColor(customer.name)
 
@@ -78,15 +57,11 @@ export function CustomerRow({ customer, onEdit, onDelete }: Props) {
       {/* Info */}
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold leading-tight text-z-text">{customer.name}</p>
-        <a
-          href={waHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 text-xs text-z-text-muted hover:text-[#10b981]"
-        >
-          <HugeiconsIcon icon={WhatsappIcon} size={12} />
-          {phone}
-        </a>
+        {customer.tags.length > 0 && (
+          <p className="mt-0.5 truncate text-xs text-z-text-muted">
+            {customer.tags.slice(0, 2).join(' · ')}
+          </p>
+        )}
       </div>
 
       {/* Actions */}
@@ -102,49 +77,11 @@ export function CustomerRow({ customer, onEdit, onDelete }: Props) {
         </a>
         <button
           type="button"
-          title="Novo pedido"
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-z-text-hint transition-colors hover:bg-z-bg2 hover:text-z-text"
+          onClick={() => onDetails(customer)}
+          className="flex h-9 items-center justify-center rounded-xl border border-z-border px-3 text-xs font-semibold text-z-text-muted transition-colors hover:border-z-green hover:text-z-text"
         >
-          <HugeiconsIcon icon={ShoppingCart01Icon} size={18} />
+          Ver detalhes
         </button>
-        <button
-          type="button"
-          title="Notificações"
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-z-text-hint transition-colors hover:bg-z-bg2 hover:text-z-text"
-        >
-          <HugeiconsIcon icon={Notification03Icon} size={18} />
-        </button>
-
-        {/* Three-dot menu */}
-        <div className="relative" ref={menuRef}>
-          <button
-            type="button"
-            onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-z-text-hint transition-colors hover:bg-z-bg2 hover:text-z-text"
-          >
-            <HugeiconsIcon icon={MoreVerticalIcon} size={18} />
-          </button>
-          {menuOpen && (
-            <div className="absolute right-0 top-full z-20 mt-1 min-w-[130px] overflow-hidden rounded-xl border border-z-border bg-white shadow-lg">
-              <button
-                type="button"
-                onClick={() => { setMenuOpen(false); onEdit(customer) }}
-                className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-z-text transition-colors hover:bg-z-bg2"
-              >
-                <HugeiconsIcon icon={Edit02Icon} size={15} className="text-z-text-muted" />
-                Editar
-              </button>
-              <button
-                type="button"
-                onClick={() => { setMenuOpen(false); onDelete(customer) }}
-                className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-z-primary transition-colors hover:bg-z-primary/10"
-              >
-                <HugeiconsIcon icon={Delete02Icon} size={15} />
-                Excluir
-              </button>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   )

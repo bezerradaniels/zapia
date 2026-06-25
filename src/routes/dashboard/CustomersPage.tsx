@@ -1,25 +1,28 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Search01Icon, UserGroupIcon, Add01Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
+import { Search01Icon, UserGroupIcon, Add01Icon, FilterHorizontalIcon } from '@hugeicons/core-free-icons'
 import { useActiveStore } from '@/lib/tenant'
-import { useCustomers, useDeleteCustomer } from '@/features/customers'
+import { useCustomers } from '@/features/customers'
 import { CustomerRow } from '@/features/customers/components/CustomerRow'
 import { IntelligenceCards, type IntelligenceFilter } from '@/features/customers/components/IntelligenceCards'
 import { AIPanel } from '@/features/customers/components/AIPanel'
 import { ROUTES } from '@/config/routes'
+import { Skeleton, Sheet, Button } from '@/components/ui'
+import { EmptyState } from '@/components/feedback'
 import type { Customer } from '@/features/customers/types'
 
 export default function CustomersPage() {
   const navigate = useNavigate()
   const { store } = useActiveStore()
   const customers = useCustomers(store?.id)
-  const deleteCustomer = useDeleteCustomer(store?.id ?? '')
 
   const [search, setSearch] = useState('')
   const [tagFilter, setTagFilter] = useState('')
   const [sellerFilter, setSellerFilter] = useState('')
   const [intelligenceFilter, setIntelligenceFilter] = useState<IntelligenceFilter | null>(null)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const activeFilterCount = (tagFilter ? 1 : 0) + (sellerFilter ? 1 : 0)
 
   // Memoize so the `?? []` fallback keeps a stable reference and the
   // dependent useMemos below don't recompute on every render.
@@ -43,13 +46,8 @@ export default function CustomersPage() {
     })
   }, [list, search, tagFilter, sellerFilter])
 
-  function handleEdit(customer: Customer) {
+  function handleDetails(customer: Customer) {
     navigate(`${ROUTES.dashboardCustomers}/${customer.id}`)
-  }
-
-  async function handleDelete(customer: Customer) {
-    if (!confirm(`Excluir o cliente "${customer.name}"? Esta ação não pode ser desfeita.`)) return
-    await deleteCustomer.mutateAsync(customer.id)
   }
 
   return (
@@ -65,88 +63,95 @@ export default function CustomersPage() {
         {/* Main list panel */}
         <div className="flex min-w-0 flex-1 flex-col gap-4 rounded-2xl border border-z-border bg-white p-5">
           {/* Filters row */}
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              {/* Search */}
-              <div className="relative flex-1">
-                <HugeiconsIcon
-                  icon={Search01Icon}
-                  size={14}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-z-primary"
-                />
-                <input
-                  type="search"
-                  placeholder="Pesquisar nos dados do cliente"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-z-border bg-white pl-9 pr-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none"
-                />
-              </div>
-
-              {/* Filtrar por */}
-              <div className="relative">
-                <select
-                  value=""
-                  onChange={() => {}}
-                  className="h-10 appearance-none rounded-xl border border-z-border bg-white pl-3 pr-8 text-sm text-z-text-muted focus:border-z-green focus:outline-none"
-                >
-                  <option value="">Filtrar por</option>
-                </select>
-                <HugeiconsIcon
-                  icon={ArrowDown01Icon}
-                  size={14}
-                  className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-z-primary"
-                />
-              </div>
+          <div className="flex items-center gap-2">
+            {/* Search */}
+            <div className="relative flex-1">
+              <HugeiconsIcon
+                icon={Search01Icon}
+                size={14}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-z-primary"
+              />
+              <input
+                type="search"
+                placeholder="Pesquisar nos dados do cliente"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-11 w-full rounded-xl border border-z-border bg-white pl-9 pr-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none"
+              />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Tag filter */}
-              <div className="relative">
+            <button
+              type="button"
+              onClick={() => setFiltersOpen(true)}
+              aria-label="Filtros"
+              className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-z-border bg-white text-z-text-muted hover:bg-z-bg"
+            >
+              <HugeiconsIcon icon={FilterHorizontalIcon} size={16} />
+              {activeFilterCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-z-green text-[10px] font-bold text-z-ink">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate(ROUTES.dashboardCustomersNew)}
+              aria-label="Novo cliente"
+              className="flex h-11 shrink-0 items-center gap-2 rounded-xl bg-z-green px-4 text-sm font-semibold text-z-ink transition-opacity hover:opacity-90"
+            >
+              <HugeiconsIcon icon={Add01Icon} size={16} />
+              <span className="hidden sm:inline">Novo cliente</span>
+            </button>
+          </div>
+
+          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen} title="Filtros">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-z-text-muted">Tag</label>
                 <select
                   value={tagFilter}
                   onChange={(e) => setTagFilter(e.target.value)}
-                  className="h-10 appearance-none rounded-xl border border-z-border bg-white pl-3 pr-8 text-sm text-z-text-muted focus:border-z-green focus:outline-none"
+                  className="h-11 rounded-xl border border-z-border bg-white px-3 text-sm text-z-text focus:border-z-green focus:outline-none"
                 >
-                  <option value="">Tag</option>
+                  <option value="">Todas</option>
                   {allTags.map((t) => (
                     <option key={t} value={t}>
                       {t}
                     </option>
                   ))}
                 </select>
-                <HugeiconsIcon
-                  icon={ArrowDown01Icon}
-                  size={14}
-                  className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-z-primary"
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-z-text-muted">
+                  Vendedor responsável
+                </label>
+                <input
+                  type="text"
+                  placeholder="Nome do vendedor"
+                  value={sellerFilter}
+                  onChange={(e) => setSellerFilter(e.target.value)}
+                  className="h-11 rounded-xl border border-z-border bg-white px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none"
                 />
               </div>
 
-              {/* Seller filter (free-text for now) */}
-              <input
-                type="text"
-                placeholder="Vendedor responsável"
-                value={sellerFilter}
-                onChange={(e) => setSellerFilter(e.target.value)}
-                className="h-10 flex-1 rounded-xl border border-z-border bg-white px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none"
-              />
-
-              {/* Crown (premium feature indicator) */}
-              <span title="Recurso premium" className="text-amber-400">
-                👑
-              </span>
-
-              {/* New customer */}
-              <button
-                type="button"
-                onClick={() => navigate(ROUTES.dashboardCustomersNew)}
-                className="flex h-10 items-center gap-2 rounded-full bg-z-green px-5 text-sm font-semibold text-z-ink transition-opacity hover:opacity-90"
+              <Button
+                fullWidth
+                size="lg"
+                variant="outline"
+                onClick={() => {
+                  setTagFilter('')
+                  setSellerFilter('')
+                }}
               >
-                <HugeiconsIcon icon={Add01Icon} size={16} />
-                Novo cliente
-              </button>
+                Limpar filtros
+              </Button>
+              <Button fullWidth size="lg" onClick={() => setFiltersOpen(false)}>
+                Aplicar
+              </Button>
             </div>
-          </div>
+          </Sheet>
 
           {/* Count */}
           {!customers.isLoading && (
@@ -157,33 +162,30 @@ export default function CustomersPage() {
 
           {/* List */}
           {customers.isLoading ? (
-            <p className="py-6 text-center text-sm text-z-text-muted">Carregando...</p>
-          ) : list.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-12 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-z-bg2 text-z-text-hint">
-                <HugeiconsIcon icon={UserGroupIcon} size={26} />
-              </div>
-              <p className="text-base font-semibold">Ainda não há clientes</p>
-              <p className="max-w-xs text-sm text-z-text-muted">
-                Cadastre o primeiro cliente ou aguarde pedidos chegarem pelo catálogo.
-              </p>
-              <button
-                type="button"
-                onClick={() => navigate(ROUTES.dashboardCustomersNew)}
-                className="mt-1 flex h-9 items-center gap-2 rounded-full bg-z-green px-5 text-sm font-semibold text-z-ink"
-              >
-                <HugeiconsIcon icon={Add01Icon} size={15} />
-                Novo cliente
-              </button>
+            <div className="flex flex-col gap-2">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-[60px] rounded-2xl" />
+              ))}
             </div>
+          ) : list.length === 0 ? (
+            <EmptyState
+              icon={UserGroupIcon}
+              title="Ainda não há clientes"
+              description="Cadastre o primeiro cliente ou aguarde pedidos chegarem pelo catálogo."
+              action={
+                <Button onClick={() => navigate(ROUTES.dashboardCustomersNew)}>
+                  <HugeiconsIcon icon={Add01Icon} size={15} />
+                  Novo cliente
+                </Button>
+              }
+            />
           ) : (
             <div className="flex flex-col gap-2">
               {filtered.map((c) => (
                 <CustomerRow
                   key={c.id}
                   customer={c}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
+                  onDetails={handleDetails}
                 />
               ))}
               {filtered.length === 0 && (

@@ -17,6 +17,7 @@ type Props = {
   aspect?: number
   label?: string
   hint?: string
+  compact?: boolean
 }
 
 const MAX_OUTPUT_DIM = 1600
@@ -89,6 +90,7 @@ export function ImageCropUploader({
   aspect = 1,
   label = 'Imagem',
   hint,
+  compact = false,
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -153,18 +155,18 @@ export function ImageCropUploader({
     onChange(null)
   }
 
-  const thumbH = aspect >= 2 ? 'h-16' : 'h-20'
-  const thumbW = aspect >= 2 ? 'w-32' : aspect === 1 ? 'w-20' : 'w-28'
+  const thumbH = compact ? (aspect >= 2 ? 'h-12' : 'h-14') : aspect >= 2 ? 'h-16' : 'h-20'
+  const thumbW = compact ? (aspect >= 2 ? 'w-24' : aspect === 1 ? 'w-14' : 'w-20') : aspect >= 2 ? 'w-32' : aspect === 1 ? 'w-20' : 'w-28'
 
   return (
     <>
-      <div className="flex flex-col gap-2">
-        <span className="text-[13px] font-semibold text-z-text-hint">
+      <div className={cn('flex flex-col', compact ? 'gap-1.5' : 'gap-2')}>
+        <span className={cn('font-semibold text-z-text-hint', compact ? 'text-xs' : 'text-[13px]')}>
           {label}
         </span>
 
         {value ? (
-          <div className="flex items-center gap-3">
+          <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
             <div
               className={cn(
                 'shrink-0 overflow-hidden rounded-lg border border-z-border bg-z-bg2',
@@ -174,11 +176,14 @@ export function ImageCropUploader({
             >
               <img src={value} alt="" className="h-full w-full object-cover" />
             </div>
-            <div className="flex flex-col gap-1.5">
+            <div className={cn('flex flex-col', compact ? 'gap-1' : 'gap-1.5')}>
               <button
                 type="button"
                 onClick={pick}
-                className="flex items-center gap-1.5 rounded-lg border border-z-border bg-white px-3 py-1.5 text-xs font-medium hover:bg-z-bg2"
+                className={cn(
+                  'flex items-center gap-1.5 rounded-lg border border-z-border bg-white text-xs font-medium hover:bg-z-bg2',
+                  compact ? 'px-2.5 py-1' : 'px-3 py-1.5',
+                )}
               >
                 <HugeiconsIcon icon={UploadIcon} size={13} />
                 Substituir
@@ -186,7 +191,10 @@ export function ImageCropUploader({
               <button
                 type="button"
                 onClick={remove}
-                className="flex items-center gap-1.5 rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
+                className={cn(
+                  'flex items-center gap-1.5 rounded-lg border border-red-300 bg-red-50 text-xs font-medium text-red-700 hover:bg-red-100',
+                  compact ? 'px-2.5 py-1' : 'px-3 py-1.5',
+                )}
               >
                 <HugeiconsIcon icon={DeleteIcon} size={13} />
                 Remover
@@ -198,14 +206,17 @@ export function ImageCropUploader({
             type="button"
             onClick={pick}
             style={{ backgroundColor: '#10b981' }}
-            className="flex w-fit items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium text-white transition-opacity hover:opacity-85"
+            className={cn(
+              'flex w-fit items-center gap-2 rounded-lg text-xs font-medium text-white transition-opacity hover:opacity-85',
+              compact ? 'px-3 py-1.5' : 'px-4 py-2',
+            )}
           >
             <HugeiconsIcon icon={ImageIcon} size={15} />
             Clique para enviar
           </button>
         )}
 
-        {hint && <span className="text-[13px] text-z-text-hint">{hint}</span>}
+        {hint && <span className={cn('text-z-text-hint', compact ? 'text-xs' : 'text-[13px]')}>{hint}</span>}
         {error && <p className="text-xs text-destructive">{error}</p>}
 
         <input

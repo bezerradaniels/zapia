@@ -203,22 +203,10 @@ export function OnboardingStep3() {
         </p>
       )}
 
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          onClick={() => navigate(ROUTES.onboardingStep2)}
-          disabled={isSubmitting}
-          className="flex-1"
-        >
-          ← Voltar
-        </Button>
-        <Button type="submit" size="lg" disabled={isSubmitting} className="flex-[2]">
-          {isSubmitting ? 'Salvando...' : 'Próxima etapa'}
-          {!isSubmitting && <HugeiconsIcon icon={ArrowRight02Icon} size={20} />}
-        </Button>
-      </div>
+      <Button type="submit" size="lg" fullWidth disabled={isSubmitting}>
+        {isSubmitting ? 'Salvando...' : 'Continuar'}
+        {!isSubmitting && <HugeiconsIcon icon={ArrowRight02Icon} size={20} />}
+      </Button>
     </form>
   )
 }

@@ -24,14 +24,14 @@ export default function OnboardCompletePage() {
   }, [])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-z-bg px-6">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-100 px-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex justify-center">
           <Logo size="lg" />
         </div>
 
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-z-green/10 text-[#10b981]">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-[#0bfeda]">
             <HugeiconsIcon icon={CheckmarkBadge01Icon} size={30} />
           </div>
           <h1 className="mb-2 text-xl font-semibold text-z-text">Sua loja está no ar!</h1>

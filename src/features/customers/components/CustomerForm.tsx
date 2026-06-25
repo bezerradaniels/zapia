@@ -16,6 +16,7 @@ import { useProducts } from '@/features/products'
 import { usePlanLimits } from '@/features/billing'
 import { ROUTES } from '@/config/routes'
 import { cn } from '@/lib/utils'
+import { deleteImageByUrl, uploadImage, UploadError } from '@/lib/supabase'
 import { customerSchema, type CustomerFormValues } from '../schemas/customerSchema'
 import type { Customer } from '../types'
 import { ProductRichTextEditor } from '@/features/products/components/ProductRichTextEditor'
@@ -31,6 +32,27 @@ const PLATFORMS = [
   { value: 'whatsapp', label: 'WhatsApp' },
 ] as const
 
+function maskCpf(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 11)
+  return digits
+    .replace(/^(\d{3})(\d)/, '$1.$2')
+    .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4')
+}
+
+function maskCnpj(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 14)
+  return digits
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3/$4')
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, '$1.$2.$3/$4-$5')
+}
+
+function maskTaxId(value: string, type: 'cpf' | 'cnpj'): string {
+  return type === 'cpf' ? maskCpf(value) : maskCnpj(value)
+}
+
 type Props = {
   storeId: string
   initial?: Customer
@@ -42,7 +64,7 @@ type Props = {
 export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }: Props) {
   const sellerCatalogs = useSellerCatalogs(storeId)
   const products = useProducts(storeId)
-  usePlanLimits(storeId)
+  const planLimits = usePlanLimits(storeId)
 
   const [socialPlatform, setSocialPlatform] = useState<string>('instagram')
   const [socialValue, setSocialValue] = useState('')
@@ -50,6 +72,9 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
   const [categoryInput, setCategoryInput] = useState('')
   const [productSearch, setProductSearch] = useState('')
   const [showProductSearch, setShowProductSearch] = useState(false)
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
   const productSearchRef = useRef<HTMLInputElement>(null)
 
   const {
@@ -69,8 +94,9 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
       cpf_cnpj: initial?.cpf_cnpj ?? '',
       birthday: initial?.birthday ?? '',
       email: initial?.email ?? '',
-      website: initial?.website ?? '',
+      website: '',
       social_links: initial?.social_links ?? [],
+      avatar_url: initial?.avatar_url ?? null,
       profile_notes: initial?.profile_notes ?? '',
       seller_id: initial?.seller_id ?? null,
       tags: initial?.tags ?? [],
@@ -83,6 +109,47 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
   const tags = watch('tags')
   const categoryInterests = watch('category_interests')
   const productInterests = watch('product_interests')
+  const avatarUrl = watch('avatar_url')
+  const birthday = watch('birthday')
+  const cpfCnpjType = watch('cpf_cnpj_type')
+  const cpfCnpj = watch('cpf_cnpj') ?? ''
+  const canUseAi = planLimits.canUse('ai')
+
+  function birthdayToDateInput(value: string | null | undefined): string {
+    if (!value || !/^\d{2}\/\d{2}$/.test(value)) return ''
+    const [day, month] = value.split('/')
+    const year = new Date().getFullYear()
+    return `${year}-${month}-${day}`
+  }
+
+  function dateInputToBirthday(value: string): string {
+    if (!value) return ''
+    const [, month, day] = value.split('-')
+    return `${day}/${month}`
+  }
+
+  async function handleAvatarFile(file: File) {
+    setAvatarError(null)
+    setIsAvatarUploading(true)
+    try {
+      const url = await uploadImage('store-logos', storeId, file)
+      if (avatarUrl) deleteImageByUrl('store-logos', avatarUrl).catch(() => {})
+      setValue('avatar_url', url, { shouldDirty: true })
+    } catch (err) {
+      setAvatarError(
+        err instanceof UploadError ? err.message : 'Não foi possível enviar a imagem.',
+      )
+    } finally {
+      setIsAvatarUploading(false)
+      if (avatarInputRef.current) avatarInputRef.current.value = ''
+    }
+  }
+
+  function removeAvatar() {
+    if (avatarUrl) deleteImageByUrl('store-logos', avatarUrl).catch(() => {})
+    setValue('avatar_url', null, { shouldDirty: true })
+    setAvatarError(null)
+  }
 
   function addSocialLink() {
     if (!socialValue.trim()) return
@@ -148,25 +215,62 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
   const sellers = (sellerCatalogs.data ?? []).filter((s) => s.linked_user_id)
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-0">
-      <div className="flex gap-6 px-6 py-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex min-w-0 flex-col gap-0 overflow-x-hidden">
+      <div className="flex min-w-0 flex-col gap-5 px-0 py-4 sm:py-6 lg:flex-row lg:gap-6">
         {/* Left column */}
-        <div className="flex flex-1 flex-col gap-6 min-w-0">
+        <div className="flex min-w-0 flex-1 flex-col gap-5 lg:gap-6">
           {/* Personal info */}
-          <section className="rounded-2xl border border-z-border bg-white p-6">
+          <section className="min-w-0 rounded-2xl border border-z-border bg-white p-4 sm:p-6">
             <div className="mb-5 flex items-center gap-2 text-base font-semibold">
               <HugeiconsIcon icon={UserIcon} size={18} className="text-z-text-muted" />
               Informações pessoais
             </div>
 
             {/* Avatar placeholder */}
-            <div className="mb-6 flex items-center">
+            <div className="mb-6 flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-z-border bg-z-bg2 text-z-text-hint transition-colors hover:border-z-green hover:text-[#10b981]"
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={isAvatarUploading}
+                className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-z-border bg-z-bg2 text-z-text-hint transition-colors hover:border-z-green hover:text-[#10b981] disabled:opacity-60"
               >
-                <HugeiconsIcon icon={Camera02Icon} size={22} />
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <HugeiconsIcon icon={Camera02Icon} size={22} />
+                )}
               </button>
+              <div className="flex min-w-0 flex-col gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={isAvatarUploading}
+                  className="self-start rounded-lg border border-z-border bg-white px-3 py-1.5 text-xs font-medium text-z-text-muted transition-colors hover:bg-z-bg disabled:opacity-60"
+                >
+                  {isAvatarUploading ? 'Enviando...' : avatarUrl ? 'Trocar foto' : 'Adicionar foto'}
+                </button>
+                {avatarUrl && (
+                  <button
+                    type="button"
+                    onClick={removeAvatar}
+                    disabled={isAvatarUploading}
+                    className="self-start text-xs font-medium text-z-primary hover:underline disabled:opacity-60"
+                  >
+                    Remover foto
+                  </button>
+                )}
+                {avatarError && <p className="text-xs text-rose-500">{avatarError}</p>}
+              </div>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0]
+                  if (file) void handleAvatarFile(file)
+                }}
+              />
             </div>
 
             {/* Name */}
@@ -188,8 +292,8 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
             </div>
 
             {/* Phones */}
-            <div className="mb-4 grid grid-cols-2 gap-3">
-              <div>
+            <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="min-w-0">
                 <label className="mb-1.5 block text-xs font-medium text-z-text-muted">
                   WhatsApp <span className="text-rose-500">*</span>
                 </label>
@@ -202,7 +306,7 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
                   <p className="mt-1 text-xs text-rose-500">{errors.whatsapp_phone.message}</p>
                 )}
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="mb-1.5 block text-xs font-medium text-z-text-muted">
                   Telefone secundário
                 </label>
@@ -215,8 +319,8 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
             </div>
 
             {/* CPF/CNPJ */}
-            <div className="mb-4 grid grid-cols-2 gap-3">
-              <div>
+            <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="min-w-0">
                 <div className="mb-1.5 flex items-center gap-3">
                   <Controller
                     name="cpf_cnpj_type"
@@ -228,7 +332,13 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
                             type="radio"
                             value="cpf"
                             checked={field.value === 'cpf'}
-                            onChange={() => field.onChange('cpf')}
+                            onChange={() => {
+                              field.onChange('cpf')
+                              setValue('cpf_cnpj', maskCpf(cpfCnpj), {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              })
+                            }}
                             className="accent-z-green"
                           />
                           CPF
@@ -238,29 +348,55 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
                             type="radio"
                             value="cnpj"
                             checked={field.value === 'cnpj'}
-                            onChange={() => field.onChange('cnpj')}
+                            onChange={() => {
+                              field.onChange('cnpj')
+                              setValue('cpf_cnpj', maskCnpj(cpfCnpj), {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              })
+                            }}
                             className="accent-z-green"
                           />
                           CNPJ
                         </label>
+                        <span className="text-xs text-z-text-hint">Opcional</span>
                       </>
                     )}
                   />
                 </div>
                 <input
-                  {...register('cpf_cnpj')}
-                  placeholder="Documento do cliente no pedido"
-                  className="h-10 w-full rounded-lg border border-z-border bg-white px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none"
+                  value={cpfCnpj}
+                  onChange={(event) =>
+                    setValue('cpf_cnpj', maskTaxId(event.target.value, cpfCnpjType), {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  inputMode="numeric"
+                  maxLength={cpfCnpjType === 'cpf' ? 14 : 18}
+                  placeholder={cpfCnpjType === 'cpf' ? '000.000.000-00' : '00.000.000/0000-00'}
+                  className={cn(
+                    'h-10 w-full rounded-lg border bg-white px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none',
+                    errors.cpf_cnpj ? 'border-rose-400' : 'border-z-border',
+                  )}
                 />
+                {errors.cpf_cnpj && (
+                  <p className="mt-1 text-xs text-rose-500">{errors.cpf_cnpj.message}</p>
+                )}
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="mb-1.5 block text-xs font-medium text-z-text-muted">
                   Aniversário
                 </label>
                 <input
-                  {...register('birthday')}
-                  placeholder="25/12"
-                  maxLength={5}
+                  type="date"
+                  value={birthdayToDateInput(birthday)}
+                  onChange={(event) =>
+                    setValue('birthday', dateInputToBirthday(event.target.value), {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
                   className={cn(
                     'h-10 w-full rounded-lg border bg-white px-3 text-sm placeholder:text-z-text-hint focus:outline-none focus:border-z-green',
                     errors.birthday ? 'border-rose-400' : 'border-z-border',
@@ -272,9 +408,9 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
               </div>
             </div>
 
-            {/* Email & Site */}
-            <div className="mb-4 grid grid-cols-2 gap-3">
-              <div>
+            {/* Email */}
+            <div className="mb-4">
+              <div className="min-w-0">
                 <label className="mb-1.5 block text-xs font-medium text-z-text-muted">
                   E-mail
                 </label>
@@ -288,16 +424,6 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
                   <p className="mt-1 text-xs text-rose-500">{errors.email.message}</p>
                 )}
               </div>
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-z-text-muted">
-                  Site
-                </label>
-                <input
-                  {...register('website')}
-                  placeholder="https://site.com"
-                  className="h-10 w-full rounded-lg border border-z-border bg-white px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none"
-                />
-              </div>
             </div>
 
             {/* Social links */}
@@ -305,31 +431,29 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
               <label className="mb-1.5 block text-xs font-medium text-z-text-muted">
                 Adicione os links das redes sociais do seu cliente
               </label>
-              <div className="flex gap-2">
-                <div className="flex h-10 overflow-hidden rounded-lg border border-z-border focus-within:border-z-green">
-                  <select
-                    value={socialPlatform}
-                    onChange={(e) => setSocialPlatform(e.target.value)}
-                    className="border-r border-z-border bg-z-bg2 px-2 text-xs text-z-text-muted focus:outline-none"
-                  >
-                    {PLATFORMS.map((p) => (
-                      <option key={p.value} value={p.value}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    value={socialValue}
-                    onChange={(e) => setSocialValue(e.target.value)}
-                    placeholder="Cole o link do perfil ou nome de usuário"
-                    className="flex-1 bg-white px-3 text-sm placeholder:text-z-text-hint focus:outline-none"
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSocialLink())}
-                  />
-                </div>
+              <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-[150px_minmax(0,1fr)]">
+                <select
+                  value={socialPlatform}
+                  onChange={(e) => setSocialPlatform(e.target.value)}
+                  className="h-10 w-full rounded-lg border border-z-border bg-white px-3 text-sm text-z-text-muted focus:border-z-green focus:outline-none"
+                >
+                  {PLATFORMS.map((p) => (
+                    <option key={p.value} value={p.value}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  value={socialValue}
+                  onChange={(e) => setSocialValue(e.target.value)}
+                  placeholder="Cole o link do perfil ou nome de usuário"
+                  className="h-10 min-w-0 rounded-lg border border-z-border bg-white px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none"
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSocialLink())}
+                />
                 <button
                   type="button"
                   onClick={addSocialLink}
-                  className="h-10 rounded-lg border border-z-border bg-z-bg2 px-3 text-xs font-medium text-z-text-muted transition-colors hover:bg-z-border"
+                  className="h-10 rounded-lg border border-z-border bg-z-bg2 px-3 text-xs font-medium text-z-text-muted transition-colors hover:bg-z-border sm:col-span-2"
                 >
                   Adicionar
                 </button>
@@ -355,13 +479,14 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
           </section>
 
           {/* Profile notes */}
-          <section className="rounded-2xl border border-z-border bg-white p-6">
+          <section className="min-w-0 rounded-2xl border border-z-border bg-white p-4 sm:p-6">
             <div className="mb-1">
               <p className="text-base font-semibold">Perfil do cliente e observações</p>
             </div>
             <p className="mb-3 text-xs text-z-text-muted">
               Adicione aqui informações relevantes que podem ser usadas para gerar vendas para este cliente
             </p>
+            <AiTrainingHint enabled={canUseAi} />
             <Controller
               name="profile_notes"
               control={control}
@@ -377,9 +502,9 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
         </div>
 
         {/* Right column */}
-        <div className="flex w-72 shrink-0 flex-col gap-4">
+        <div className="flex min-w-0 flex-col gap-4 lg:w-72 lg:shrink-0">
           {/* Seller */}
-          <section className="rounded-2xl border border-z-border bg-white p-5">
+          <section className="min-w-0 rounded-2xl border border-z-border bg-white p-4 sm:p-5">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-semibold">Vendedor responsável</p>
               <Link
@@ -411,7 +536,7 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
           </section>
 
           {/* Tags */}
-          <section className="rounded-2xl border border-z-border bg-white p-5">
+          <section className="min-w-0 rounded-2xl border border-z-border bg-white p-4 sm:p-5">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-semibold">Tags</p>
             </div>
@@ -424,7 +549,7 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagKeyDown}
                 placeholder="Digite a tag e pressione enter"
-                className="flex-1 bg-white px-3 text-sm placeholder:text-z-text-hint focus:outline-none"
+                className="min-w-0 flex-1 bg-white px-3 text-sm placeholder:text-z-text-hint focus:outline-none"
               />
               <HugeiconsIcon icon={Search01Icon} size={14} className="mr-3 text-z-primary" />
             </div>
@@ -446,13 +571,14 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
           </section>
 
           {/* Category interests */}
-          <section className="rounded-2xl border border-z-border bg-white p-5">
+          <section className="min-w-0 rounded-2xl border border-z-border bg-white p-4 sm:p-5">
             <div className="mb-1 flex items-center gap-2">
               <p className="text-sm font-semibold">Categorias e subcategorias de interesse</p>
             </div>
             <p className="mb-2 text-xs text-z-text-muted">
               Vincule categorias e subcategorias de produtos nos quais seu cliente tem interesse
             </p>
+            <AiTrainingHint enabled={canUseAi} compact />
             <div className="relative">
               <select
                 value=""
@@ -488,7 +614,7 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
           </section>
 
           {/* Product interests */}
-          <section className="rounded-2xl border border-z-border bg-white p-5">
+          <section className="min-w-0 rounded-2xl border border-z-border bg-white p-4 sm:p-5">
             <div className="mb-1 flex items-center justify-between">
               <p className="text-sm font-semibold">Produtos de interesse</p>
               <button
@@ -505,6 +631,7 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
             <p className="mb-2 text-xs text-z-text-muted">
               Adicione os produtos de interesse desse cliente
             </p>
+            <AiTrainingHint enabled={canUseAi} compact />
 
             {showProductSearch && (
               <div className="mb-3">
@@ -515,7 +642,7 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
                     value={productSearch}
                     onChange={(e) => setProductSearch(e.target.value)}
                     placeholder="Pesquisar produto..."
-                    className="flex-1 bg-white px-2 text-sm placeholder:text-z-text-hint focus:outline-none"
+                    className="min-w-0 flex-1 bg-white px-2 text-sm placeholder:text-z-text-hint focus:outline-none"
                   />
                 </div>
                 {filteredProducts.length > 0 && (
@@ -584,7 +711,7 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
             <button
               type="button"
               onClick={onDelete}
-              className="flex items-center gap-2 self-start text-xs font-medium text-z-primary hover:underline"
+              className="flex h-11 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-100"
             >
               Excluir cliente
               <HugeiconsIcon icon={Delete02Icon} size={14} />
@@ -594,22 +721,40 @@ export function CustomerForm({ storeId, initial, onSubmit, onCancel, onDelete }:
       </div>
 
       {/* Footer */}
-      <div className="sticky bottom-0 z-10 flex items-center justify-center gap-3 border-t border-z-border bg-z-dark px-6 py-4">
+      <div className="sticky bottom-0 z-10 flex items-center justify-center gap-3 border-t border-z-border bg-white px-4 py-4 sm:px-6">
         <button
           type="button"
           onClick={onCancel}
-          className="h-10 rounded-full border border-z-border px-6 text-sm font-medium text-white/80 transition-colors hover:bg-white/10"
+          className="h-10 rounded-full border border-z-border bg-white px-6 text-sm font-medium text-z-text-muted transition-colors hover:bg-z-bg hover:text-z-text"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="h-10 rounded-full bg-z-green px-8 text-sm font-semibold text-z-ink transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="h-10 rounded-full bg-[#10b981] px-8 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {isSubmitting ? 'Salvando...' : 'Salvar dados'}
         </button>
       </div>
     </form>
+  )
+}
+
+function AiTrainingHint({ enabled, compact }: { enabled: boolean; compact?: boolean }) {
+  return (
+    <p
+      className={cn(
+        'rounded-lg border px-3 py-2 text-xs leading-relaxed',
+        compact ? 'mb-2' : 'mb-3',
+        enabled
+          ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+          : 'border-z-border bg-z-bg text-z-text-muted',
+      )}
+    >
+      {enabled
+        ? 'A IA usa estes dados para sugerir insumos comerciais e oportunidades de venda.'
+        : 'Nos planos pagos, a IA usa estes dados para gerar insumos comerciais e oportunidades de venda.'}
+    </p>
   )
 }
