@@ -138,7 +138,7 @@ export default function CustomerDetailsPage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => navigate(`${ROUTES.dashboardCustomers}/${customer.data.id}/editar`)}
+          onClick={() => customer.data && navigate(`${ROUTES.dashboardCustomers}/${customer.data.id}/editar`)}
         >
           <HugeiconsIcon icon={Edit02Icon} size={15} />
           Editar

@@ -658,12 +658,13 @@ export default function CatalogPage() {
         ? `Apenas na cidade (${form.watch('address_city')})`
         : 'Apenas na cidade'
       : {
+          city_only: 'Apenas na cidade',
           state_only: 'Apenas meu estado',
           brazil: 'Brasil inteiro',
           worldwide: 'Mundo inteiro',
           digital_only: 'Apenas digital',
           custom: 'Personalizado',
-        }[form.watch('delivery_area_scope') ?? 'city_only'] ?? 'Apenas na cidade'
+        }[form.watch('delivery_area_scope') ?? 'city_only']
 
   const handleCreateMobileCategory = async () => {
     const categoryName = mobileCategoryName.trim()

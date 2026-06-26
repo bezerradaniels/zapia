@@ -39,14 +39,14 @@ export default function DashboardLayout() {
 
   // 3. Keep layout visible while myStores loads
   return (
-    <div className="flex min-h-screen bg-slate-100">
+    <div className="flex h-screen bg-slate-100 overflow-hidden">
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
       />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar />
-        <main className="flex-1 px-4 py-4 pb-24 lg:px-6 lg:py-6 lg:pb-6">
+        <main className="flex-1 overflow-y-auto px-4 py-4 pb-24 lg:px-6 lg:py-6 lg:pb-6">
           {myStores.isLoading ? (
             <div className="flex h-64 items-center justify-center text-sm text-z-text-muted">
               Carregando dados da loja...
