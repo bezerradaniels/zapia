@@ -1,6 +1,6 @@
 # Supabase project configuration (versioned).
-# project_id is the linked project ref (zapable / dikfnpcmutnqrndnyzga).
-project_id = "dikfnpcmutnqrndnyzga"
+# project_id is the linked project ref (zapia / xopesjswojsesjmvazel).
+project_id = "xopesjswojsesjmvazel"
 
 # =============================================================================
 # Edge Functions — explicit JWT gating (SECURITY)

@@ -2,8 +2,9 @@
 
 function resolveOrigin(req: Request): string {
   const origin = req.headers.get('origin') ?? ''
-  if (origin === 'https://zapia.app') return origin
-  if (origin === 'https://staging.zapia.app') return origin
+  if (origin === 'https://zapia.app' || origin === 'https://staging.zapia.app') return origin
+  if (/^https:\/\/([a-z0-9-]+\.)?zapia\.app$/.test(origin)) return origin
+  if (/^https:\/\/([a-z0-9-]+\.)?zapable\.com\.br$/.test(origin)) return origin
   // localhost for local development
   if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return origin
   if (/^https?:\/\/[a-z0-9-]+\.localhost(:\d+)?$/.test(origin)) return origin

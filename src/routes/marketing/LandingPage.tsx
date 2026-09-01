@@ -443,14 +443,19 @@ function HeroSalesMockup() {
 /* ─── Hero ───────────────────────────────────────────────────────────────── */
 function Hero() {
   return (
-    <section className="relative overflow-hidden bg-[#f5f1ec] px-6 pb-16 md:pb-0 pt-10 md:pt-16">
+    <section className="relative overflow-hidden bg-[#f8fafc] px-6 pb-16 md:pb-0 pt-10 md:pt-16">
       {/* Centered copy */}
-      <div className="relative mx-auto max-w-2xl text-center">
-        <h1 className="text-[36px] font-black leading-[1.05] tracking-tighter text-z-text md:text-[56px] lg:text-[62px]" style={{ letterSpacing: '-0.055em' }}>
-          Crie seu catálogo digital em poucos passos
+      <div className="relative mx-auto max-w-3xl text-center">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-50 px-3.5 py-1 text-xs font-semibold text-emerald-700 shadow-sm">
+          <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          O catálogo digital do comércio de Bom Jesus da Lapa - BA
+        </div>
+
+        <h1 className="text-[36px] font-black leading-[1.08] tracking-tighter text-z-ink md:text-[54px] lg:text-[60px]">
+          Seus produtos no WhatsApp dos clientes de <span className="text-emerald-600">Bom Jesus da Lapa</span>
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-z-text-muted md:text-[22px]">
-          Cadastre seus produtos, compartilhe o link do seu catálogo e receba pedidos diretamente no seu WhatsApp.
+        <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-z-text-muted md:text-[20px]">
+          Crie seu catálogo online em menos de 5 minutos, envie seu link exclusivo e receba pedidos estruturados direto no WhatsApp.
         </p>
 
         {/* CTAs */}
@@ -458,13 +463,14 @@ function Hero() {
           <Button
             asChild
             size="lg"
-            className="h-14 rounded-2xl bg-[#07feda] px-8 text-base font-bold text-[#020617] hover:bg-[#07feda]/90 shadow-sm transition-all duration-300 hover:scale-[1.02]"
+            className="h-14 rounded-2xl bg-emerald-500 px-8 text-base font-bold text-white hover:bg-emerald-600 shadow-md shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02]"
           >
             <Link id="lp-hero-cta-signup" to={ROUTES.signup}>
-              Crie seu catálogo grátis
+              Criar catálogo da minha loja
               <HugeiconsIcon icon={ArrowRight02Icon} size={18} />
             </Link>
           </Button>
+          <span className="text-xs text-z-text-hint">Sem complicação · Rápido no celular · Feito para o comércio local</span>
         </div>
       </div>
 

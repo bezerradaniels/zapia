@@ -84,8 +84,8 @@ Ensure these secrets are set in your Supabase project. `SUPABASE_URL` and
 rest:
 
 ```bash
-supabase secrets set RESEND_API_KEY=re_xxx --project-ref dikfnpcmutnqrndnyzga
-supabase secrets set CRON_SECRET=$(openssl rand -hex 32) --project-ref dikfnpcmutnqrndnyzga
+supabase secrets set RESEND_API_KEY=re_xxx --project-ref xopesjswojsesjmvazel
+supabase secrets set CRON_SECRET=$(openssl rand -hex 32) --project-ref xopesjswojsesjmvazel
 # Optional: ADMIN_EMAIL (defaults to daniel.ddsb@gmail.com in code)
 ```
 
@@ -106,7 +106,7 @@ header:
       - name: Call check-trial-completions edge function
         run: |
           curl -fsS -X POST \
-            'https://dikfnpcmutnqrndnyzga.supabase.co/functions/v1/check-trial-completions' \
+            'https://xopesjswojsesjmvazel.supabase.co/functions/v1/check-trial-completions' \
             -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
             -H 'Content-Type: application/json'
 ```
@@ -124,7 +124,7 @@ printf '%s' "$YOUR_CRON_SECRET" | gh secret set CRON_SECRET --repo bezerradaniel
 Use a service like cron-job.org, EasyCron, or similar:
 
 ```
-URL: https://dikfnpcmutnqrndnyzga.supabase.co/functions/v1/check-trial-completions
+URL: https://xopesjswojsesjmvazel.supabase.co/functions/v1/check-trial-completions
 Method: POST
 Headers:
   x-cron-secret: YOUR_CRON_SECRET
@@ -175,7 +175,7 @@ Note: This requires the `pg_net` extension and proper configuration.
 1. Manually trigger the check function:
 ```bash
 curl -X POST \
-  'https://dikfnpcmutnqrndnyzga.supabase.co/functions/v1/check-trial-completions' \
+  'https://xopesjswojsesjmvazel.supabase.co/functions/v1/check-trial-completions' \
   -H 'x-cron-secret: YOUR_CRON_SECRET' \
   -H 'Content-Type: application/json'
 ```

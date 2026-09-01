@@ -38,8 +38,8 @@ export function OnboardingStep1() {
     defaultValues: {
       name: draft?.name ?? '',
       whatsapp_phone: draft?.whatsapp_phone ?? '',
-      address_state: draft?.address_state ?? '',
-      address_city: draft?.address_city ?? '',
+      address_state: draft?.address_state || 'BA',
+      address_city: draft?.address_city || 'Bom Jesus da Lapa',
       address_street: draft?.address_street ?? '',
       address_neighborhood: draft?.address_neighborhood ?? '',
     },

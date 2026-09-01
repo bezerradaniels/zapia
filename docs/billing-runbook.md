@@ -1,43 +1,24 @@
-# Billing runbook
+# Billing runbook (Configuração Stripe Brasil)
 
-Stripe account: **DANI BEZERRA MARKETING DIGITAL** (`acct_1TPiLg1oLw5d2Hz3`).
+## Passos para configurar a NOVA conta da Stripe
 
-## Live products & prices (BRL, monthly)
+### 1. Criar os Produtos & Preços no Stripe Dashboard
+Acesse o Dashboard da sua nova conta Stripe (<https://dashboard.stripe.com>) e crie os produtos em BRL:
+- **Plano Pro**: R$ 19,90/mês (ou valor desejado)
+- **Plano Ilimitado/Premium**: R$ 29,90/mês (ou valor desejado)
 
-| Plan    | Product ID                | Price ID                           | Amount    |
-| ------- | ------------------------- | ---------------------------------- | --------- |
-| Básico  | `prod_UOy89EBfVigDlf`     | `price_1TQAC11oLw5d2Hz37zjRB0U1`   | R$ 4,99   |
-| Pro     | `prod_UOyANqNcntMck3`     | `price_1TQAEc1oLw5d2Hz3MY7cucqX`   | R$ 9,99   |
-| Premium | `prod_UOyBSIRyJ92Vur`     | `price_1TQAF01oLw5d2Hz3WNOYl28z`   | R$ 29,99  |
+Copie os `price_...` gerados para cada plano.
 
-These IDs are **already mirrored** into `plan_features` via migration
-`20260425220605_billing_seed_stripe_price_ids.sql`.
-
-## One-time setup steps
-
-### 1. Apply migrations and regenerate types
-
-```bash
-npm run db:push           # applies billing_init + price-id seed
-npm run db:types          # regenerates src/types/database.ts
-```
-
-After `db:types` runs, drop the `as any` casts in
-`src/features/billing/api/queries.ts` (search for `// NOTE:`).
-
-### 2. Set Edge Function secrets
-
-Get the keys from <https://dashboard.stripe.com/acct_1TPiLg1oLw5d2Hz3/apikeys>.
-Use **test keys** for staging and live keys only for production.
+### 2. Configurar os Secrets nas Edge Functions do Supabase
+Obtenha as chaves em <https://dashboard.stripe.com/apikeys>:
 
 ```bash
 supabase secrets set \
   STRIPE_SECRET_KEY=sk_live_xxx \
   STRIPE_WEBHOOK_SECRET=whsec_xxx \
-  STRIPE_PRICE_BASICO=price_1TQAC11oLw5d2Hz37zjRB0U1 \
-  STRIPE_PRICE_PRO=price_1TQAEc1oLw5d2Hz3MY7cucqX \
-  STRIPE_PRICE_PREMIUM=price_1TQAF01oLw5d2Hz3WNOYl28z \
-  APP_URL=https://zapable.com.br
+  STRIPE_PRICE_PRO=price_xxx \
+  STRIPE_PRICE_PREMIUM=price_xxx \
+  APP_URL=https://zapia.app
 ```
 
 `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are

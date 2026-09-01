@@ -1,12 +1,12 @@
 # Investigação do Erro 401 na Criação de Pedidos
 
 ## Contexto
-Erro reportado: `POST https://dikfnpcmutnqrndnyzga.supabase.co/rest/v1/orders?select=* 401 (Bad Request)`
+Erro reportado: `POST https://xopesjswojsesjmvazel.supabase.co/rest/v1/orders?select=* 401 (Bad Request)`
 
 ## Projeto Supabase
 - **Nome:** Zapable
-- **ID:** dikfnpcmutnqrndnyzga
-- **URL:** https://dikfnpcmutnqrndnyzga.supabase.co
+- **ID:** xopesjswojsesjmvazel
+- **URL:** https://xopesjswojsesjmvazel.supabase.co
 - **Região:** sa-east-1 (São Paulo)
 
 ## Testes Realizados

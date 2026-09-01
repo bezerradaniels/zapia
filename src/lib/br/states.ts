@@ -35,3 +35,26 @@ export const STATES: StateOption[] = [
 
 export const UF_LIST = STATES.map((s) => s.uf) as UF[]
 export type UF = (typeof STATES)[number]['uf']
+
+export const DEFAULT_CITY = 'Bom Jesus da Lapa'
+export const DEFAULT_STATE = 'BA'
+export const DEFAULT_DDD = '77'
+export const DEFAULT_CEP = '47600-000'
+
+export const BOM_JESUS_DA_LAPA_NEIGHBORHOODS = [
+  'Centro',
+  'Amaralina',
+  'São Gotardo',
+  'Primavera',
+  'Magalhães Neto',
+  'Lagoa Grande',
+  'Maravilha',
+  'João Paulo II',
+  'Residencial São Geraldo',
+  'Nova Brasília',
+  'Barrinha',
+  'Parque Verde',
+  'Vila Maia',
+  'Vila Nova',
+  'São João',
+] as const

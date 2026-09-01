@@ -15,6 +15,10 @@ const RESERVED_PATHS = new Set([
 export function isStoreDomain(): boolean {
   const { hostname } = window.location
   if (hostname === 'localhost' || hostname === '127.0.0.1') return false
+  if (hostname.endsWith('.localhost')) {
+    const sub = hostname.slice(0, hostname.length - '.localhost'.length)
+    return !!sub && !RESERVED_SUBDOMAINS.has(sub)
+  }
   if (!hostname.endsWith(`.${ROOT_DOMAIN}`)) return false
   const sub = hostname.slice(0, hostname.length - ROOT_DOMAIN.length - 1)
   return !!sub && !RESERVED_SUBDOMAINS.has(sub)
@@ -22,9 +26,14 @@ export function isStoreDomain(): boolean {
 
 export function resolveStoreSlug(): string | null {
   if (isStoreDomain()) {
-    const sub = window.location.hostname.slice(
+    const { hostname } = window.location
+    if (hostname.endsWith('.localhost')) {
+      const sub = hostname.slice(0, hostname.length - '.localhost'.length)
+      return sub || null
+    }
+    const sub = hostname.slice(
       0,
-      window.location.hostname.length - ROOT_DOMAIN.length - 1,
+      hostname.length - ROOT_DOMAIN.length - 1,
     )
     return sub || null
   }

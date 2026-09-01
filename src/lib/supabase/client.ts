@@ -2,8 +2,14 @@ import { createClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/types/database'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const DEFAULT_SUPABASE_URL = 'https://xopesjswojsesjmvazel.supabase.co'
+const DEFAULT_SUPABASE_KEY = 'sb_publishable_1MqkyaZBHj5GkHqVAT9wPw_aCTpl2dl'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL
+const supabaseAnonKey =
+  import.meta.env.VITE_SUPABASE_ANON_KEY ??
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  DEFAULT_SUPABASE_KEY
 
 let client: ReturnType<typeof createClient<Database>> | null = null
 
