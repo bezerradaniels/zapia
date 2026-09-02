@@ -51,7 +51,12 @@ export default function DashboardLayout() {
             <div className="flex h-64 items-center justify-center text-sm text-z-text-muted">
               Carregando dados da loja...
             </div>
-          ) : myStores.data && myStores.data.length === 0 ? (
+          ) : myStores.isError ? (
+            <div className="flex h-64 flex-col gap-4 items-center justify-center text-sm text-z-text-muted">
+              <p>Ocorreu um erro ao carregar os dados. O banco de dados pode estar indisponível.</p>
+              <button className="px-4 py-2 bg-z-ink text-white rounded" onClick={() => window.location.reload()}>Tentar novamente</button>
+            </div>
+          ) : myStores.data && (myStores.data.length === 0 || !myStores.data.some((s) => s.onboarding_completed)) ? (
             <Navigate to={ROUTES.onboarding} replace />
           ) : (
             <Suspense

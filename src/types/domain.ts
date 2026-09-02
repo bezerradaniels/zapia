@@ -104,6 +104,7 @@ export type Store = {
   gallery_images: string[];
   // Integrations
   gtm_id: string | null;
+  onboarding_completed: boolean;
   slug_last_updated_at: string | null;
   created_at: string;
   updated_at: string;

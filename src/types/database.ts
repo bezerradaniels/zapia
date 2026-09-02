@@ -842,6 +842,7 @@ export type Database = {
           locale: string;
           logo_url: string | null;
           name: string;
+          onboarding_completed: boolean;
           owner_id: string;
           payment_instructions_message: string | null;
           payment_instructions_title: string | null;
@@ -892,6 +893,7 @@ export type Database = {
           locale?: string;
           logo_url?: string | null;
           name: string;
+          onboarding_completed?: boolean;
           owner_id: string;
           payment_instructions_message?: string | null;
           payment_instructions_title?: string | null;
@@ -942,6 +944,7 @@ export type Database = {
           locale?: string;
           logo_url?: string | null;
           name?: string;
+          onboarding_completed?: boolean;
           owner_id?: string;
           payment_instructions_message?: string | null;
           payment_instructions_title?: string | null;

@@ -67,6 +67,7 @@ export function OnboardingStep4() {
         primary_color: activeColor,
         logo_url: values.logo_url || null,
         banner_url: values.banner_url || null,
+        onboarding_completed: true,
       });
       await queryClient.invalidateQueries({ queryKey: catalogKeys.all });
 
