@@ -16,9 +16,11 @@ import {
   ArrowRight01Icon,
   Cancel01Icon,
   FolderOpenIcon,
+  Globe02Icon,
 } from "@hugeicons/core-free-icons";
 import { ROUTES } from "@/config/routes";
 import { useSignOut } from "@/features/auth";
+import { useActiveStore, buildStoreUrl } from "@/lib/tenant";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 
@@ -101,6 +103,7 @@ interface SidebarProps {
 
 export function Sidebar({ isMobileOpen = false, onClose }: SidebarProps) {
   const signOut = useSignOut();
+  const { store } = useActiveStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [collapsedGroups, setCollapsedGroups] = useState<
     Record<NavGroup["id"], boolean>
@@ -203,6 +206,43 @@ export function Sidebar({ isMobileOpen = false, onClose }: SidebarProps) {
             />
           </button>
         </div>
+
+        {store?.slug && (
+          <div className="px-3 pt-3 pb-1">
+            {!isCollapsed ? (
+              <a
+                href={buildStoreUrl(store.slug)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between rounded-xl border border-z-border bg-white px-3 py-2 text-xs font-semibold text-z-text shadow-sm transition-all hover:border-z-green hover:text-z-green"
+              >
+                <span className="flex items-center gap-2 truncate">
+                  <HugeiconsIcon
+                    icon={Globe02Icon}
+                    size={16}
+                    className="shrink-0 text-z-primary"
+                  />
+                  <span className="truncate">Acessar loja</span>
+                </span>
+                <HugeiconsIcon
+                  icon={ArrowRight01Icon}
+                  size={14}
+                  className="shrink-0 text-z-text-muted"
+                />
+              </a>
+            ) : (
+              <a
+                href={buildStoreUrl(store.slug)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Acessar loja"
+                className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl border border-z-border bg-white text-z-primary shadow-sm transition-all hover:border-z-green hover:text-z-green"
+              >
+                <HugeiconsIcon icon={Globe02Icon} size={18} />
+              </a>
+            )}
+          </div>
+        )}
 
         <nav className="flex flex-1 flex-col gap-2 overflow-y-auto px-3 py-4">
           {renderNavItem(HOME_ITEM)}

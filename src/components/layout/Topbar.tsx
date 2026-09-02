@@ -10,9 +10,10 @@ import {
   PackageIcon,
   UserGroupIcon,
   InvoiceIcon,
+  Globe02Icon,
 } from "@hugeicons/core-free-icons";
 import { useSignOut } from "@/features/auth";
-import { useActiveStore } from "@/lib/tenant";
+import { useActiveStore, buildStoreUrl } from "@/lib/tenant";
 import { NotificationsBell } from "@/features/notifications";
 import { ROUTES } from "@/config/routes";
 import { useProducts } from "@/features/products";
@@ -166,6 +167,18 @@ export function Topbar() {
                 onClick={() => setIsUserMenuOpen(false)}
               />
               <div className="absolute left-0 top-full z-20 mt-2 w-56 rounded-xl border border-z-border bg-white py-1 shadow-z-lg">
+                {store?.slug && (
+                  <a
+                    href={buildStoreUrl(store.slug)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-z-text hover:bg-z-bg"
+                  >
+                    <HugeiconsIcon icon={Globe02Icon} size={16} />
+                    Acessar loja
+                  </a>
+                )}
                 <Link
                   to={ROUTES.dashboardProfile}
                   onClick={() => setIsUserMenuOpen(false)}
