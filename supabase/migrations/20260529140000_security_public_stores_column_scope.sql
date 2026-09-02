@@ -14,6 +14,10 @@
 -- `authenticated` is untouched: owners/members/admin keep full column access.
 -- NOTE: the public catalog query was switched off `select('*')` to an explicit
 -- column list (src/features/catalog/api/queries.ts) in the same change.
+--
+-- Columns added in later migrations (gallery_images, delivery_hours,
+-- custom_links, slug_last_updated_at, home_view, delivery_area_*,
+-- onboarding_completed) are granted in THEIR respective migration files.
 
 revoke select on public.stores from anon;
 
@@ -54,7 +58,6 @@ grant select (
   address_neighborhood,
   address_city,
   address_state,
-  slug_last_updated_at,
   created_at,
   updated_at,
   deleted_at
