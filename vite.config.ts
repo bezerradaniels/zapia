@@ -20,7 +20,6 @@ export default defineConfig({
             return 'vendor-react'
           if (id.includes('@tanstack')) return 'vendor-query'
           if (/(react-hook-form|@hookform|[\\/]zod[\\/])/.test(id)) return 'vendor-forms'
-          if (/(i18next|react-i18next)/.test(id)) return 'vendor-i18n'
           if (id.includes('@hugeicons')) return 'vendor-icons'
         },
       },
