@@ -103,18 +103,20 @@ runs daily at 12:00 UTC (09:00 BRT). It authenticates via the `x-cron-secret`
 header:
 
 ```yaml
-      - name: Call check-trial-completions edge function
-        run: |
-          curl -fsS -X POST \
-            'https://xopesjswojsesjmvazel.supabase.co/functions/v1/check-trial-completions' \
-            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
-            -H 'Content-Type: application/json'
+- name: Call check-trial-completions edge function
+  run: |
+    curl -fsS -X POST \
+      'https://xopesjswojsesjmvazel.supabase.co/functions/v1/check-trial-completions' \
+      -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+      -H 'Content-Type: application/json'
 ```
 
 Required GitHub repository secret:
+
 - `CRON_SECRET` — must match the `CRON_SECRET` Supabase function secret.
 
 Set it with the GitHub CLI:
+
 ```bash
 printf '%s' "$YOUR_CRON_SECRET" | gh secret set CRON_SECRET --repo bezerradaniels/zapable
 ```
@@ -173,6 +175,7 @@ Note: This requires the `pg_net` extension and proper configuration.
 #### Test Trial Completion
 
 1. Manually trigger the check function:
+
 ```bash
 curl -X POST \
   'https://xopesjswojsesjmvazel.supabase.co/functions/v1/check-trial-completions' \
@@ -181,6 +184,7 @@ curl -X POST \
 ```
 
 Or trigger the GitHub Actions workflow manually:
+
 ```bash
 gh workflow run "Check Trial Completions" --repo bezerradaniels/zapable
 ```
@@ -190,6 +194,7 @@ gh workflow run "Check Trial Completions" --repo bezerradaniels/zapable
 ## Email Templates
 
 All emails follow a consistent design with:
+
 - Zapable branding
 - Clear subject lines with emojis
 - Color-coded borders (green for success, yellow for warnings, red for cancellations)
@@ -219,15 +224,18 @@ The TypeScript errors about `Deno` are expected - these are Deno edge functions.
 ## Files Modified/Created
 
 ### Created
+
 - `supabase/functions/billing-notification/index.ts` - Main billing notification handler
 - `supabase/functions/check-trial-completions/index.ts` - Trial completion checker
 - `supabase/functions/store-created-notification/index.ts` - Sends full owner+store details (incl. WhatsApp button) when a store is created
 - `supabase/migrations/20260529180000_trial_completion_notification.sql` - (Placeholder, using edge function approach)
 
 ### Modified
+
 - `supabase/functions/stripe-webhook/index.ts` - Added billing notification calls
 - `src/features/catalog/api/mutations.ts` - `createStore()` now calls `store-created-notification` after insert succeeds
 
 ### Existing (No Changes Needed)
+
 - `supabase/functions/signup-notification/index.ts` - Already working
 - `src/features/auth/api/mutations.ts` - Already calls signup-notification

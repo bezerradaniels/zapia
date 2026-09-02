@@ -1,16 +1,16 @@
-import { useRef, useState } from 'react'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Search01Icon, BarCode02Icon } from '@hugeicons/core-free-icons'
-import { cn } from '@/lib/utils'
+import { useRef, useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon, BarCode02Icon } from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
 
-const DEBOUNCE_MS = 500
+const DEBOUNCE_MS = 500;
 
 interface Props {
-  onDebouncedChange: (value: string) => void
-  onBarcodeScanClick: () => void
-  isLoading: boolean
-  disabled?: boolean
-  initialValue?: string
+  onDebouncedChange: (value: string) => void;
+  onBarcodeScanClick: () => void;
+  isLoading: boolean;
+  disabled?: boolean;
+  initialValue?: string;
 }
 
 export function SearchInput({
@@ -18,25 +18,25 @@ export function SearchInput({
   onBarcodeScanClick,
   isLoading,
   disabled,
-  initialValue = '',
+  initialValue = "",
 }: Props) {
-  const [raw, setRaw] = useState(initialValue)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [raw, setRaw] = useState(initialValue);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [prevInitial, setPrevInitial] = useState(initialValue)
+  const [prevInitial, setPrevInitial] = useState(initialValue);
   if (initialValue !== prevInitial) {
-    setPrevInitial(initialValue)
-    setRaw(initialValue)
+    setPrevInitial(initialValue);
+    setRaw(initialValue);
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value
-    setRaw(value)
+    const value = e.target.value;
+    setRaw(value);
 
-    if (timerRef.current) clearTimeout(timerRef.current)
+    if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      onDebouncedChange(value.trim())
-    }, DEBOUNCE_MS)
+      onDebouncedChange(value.trim());
+    }, DEBOUNCE_MS);
   }
 
   return (
@@ -56,10 +56,10 @@ export function SearchInput({
           disabled={disabled}
           placeholder="Nome do produto, marca ou código de barras…"
           className={cn(
-            'w-full rounded-lg border border-input bg-background py-2.5 pl-9 pr-10 text-sm',
-            'placeholder:text-muted-foreground',
-            'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
-            'disabled:cursor-not-allowed disabled:opacity-50',
+            "w-full rounded-lg border border-input bg-background py-2.5 pl-9 pr-10 text-sm",
+            "placeholder:text-muted-foreground",
+            "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1",
+            "disabled:cursor-not-allowed disabled:opacity-50",
           )}
         />
       </div>
@@ -70,15 +70,15 @@ export function SearchInput({
         disabled={disabled}
         title="Escanear código de barras"
         className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-input',
-          'bg-background text-muted-foreground transition-colors',
-          'hover:bg-accent hover:text-accent-foreground',
-          'focus:outline-none focus:ring-2 focus:ring-ring',
-          'disabled:cursor-not-allowed disabled:opacity-50',
+          "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-input",
+          "bg-background text-muted-foreground transition-colors",
+          "hover:bg-accent hover:text-accent-foreground",
+          "focus:outline-none focus:ring-2 focus:ring-ring",
+          "disabled:cursor-not-allowed disabled:opacity-50",
         )}
       >
         <HugeiconsIcon icon={BarCode02Icon} className="h-5 w-5" />
       </button>
     </div>
-  )
+  );
 }

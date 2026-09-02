@@ -1,27 +1,27 @@
-import { Suspense, useState } from 'react'
-import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { Toaster } from 'sonner'
-import { useSession } from '@/features/auth'
-import { useMyStores } from '@/features/catalog'
-import { useActiveStore } from '@/lib/tenant'
-import { useOrderNotifications } from '@/features/orders'
-import { useNotificationRealtime } from '@/features/notifications'
-import { ROUTES } from '@/config/routes'
-import { Sidebar } from '@/components/layout/Sidebar'
-import { Topbar } from '@/components/layout/Topbar'
-import { BottomBar } from '@/components/layout/BottomBar'
+import { Suspense, useState } from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Toaster } from "sonner";
+import { useSession } from "@/features/auth";
+import { useMyStores } from "@/features/catalog";
+import { useActiveStore } from "@/lib/tenant";
+import { useOrderNotifications } from "@/features/orders";
+import { useNotificationRealtime } from "@/features/notifications";
+import { ROUTES } from "@/config/routes";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Topbar } from "@/components/layout/Topbar";
+import { BottomBar } from "@/components/layout/BottomBar";
 
 export default function DashboardLayout() {
-  const { session, isLoading } = useSession()
-  const myStores = useMyStores(!!session)
-  const { store } = useActiveStore()
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const { pathname } = useLocation()
-  const hideBottomBar = pathname.startsWith('/dashboard/produtos/')
+  const { session, isLoading } = useSession();
+  const myStores = useMyStores(!!session);
+  const { store } = useActiveStore();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { pathname } = useLocation();
+  const hideBottomBar = pathname.startsWith("/dashboard/produtos/");
 
   // Live toast for new orders + bell-icon badge realtime invalidation.
-  useOrderNotifications(store?.id)
-  useNotificationRealtime(store?.id)
+  useOrderNotifications(store?.id);
+  useNotificationRealtime(store?.id);
 
   // 1. Initial auth check - only block the whole screen here
   if (isLoading) {
@@ -29,12 +29,12 @@ export default function DashboardLayout() {
       <div className="flex min-h-screen items-center justify-center bg-slate-100 text-sm text-z-text-muted">
         Carregando...
       </div>
-    )
+    );
   }
 
   // 2. Redirect if no session
   if (!session) {
-    return <Navigate to={ROUTES.login} replace />
+    return <Navigate to={ROUTES.login} replace />;
   }
 
   // 3. Keep layout visible while myStores loads
@@ -74,10 +74,10 @@ export default function DashboardLayout() {
         toastOptions={{
           classNames: {
             toast:
-              'rounded-2xl border border-z-border bg-white shadow-z-lg font-sans',
+              "rounded-2xl border border-z-border bg-white shadow-z-lg font-sans",
           },
         }}
       />
     </div>
-  )
+  );
 }

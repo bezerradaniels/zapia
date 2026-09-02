@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
-import { Link, useOutletContext, useSearchParams } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { useState, useEffect, useRef } from "react";
+import { Link, useOutletContext, useSearchParams } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft02Icon,
   ArrowRight02Icon,
@@ -11,67 +11,73 @@ import {
   ShoppingCartIcon,
   Tick02Icon,
   WhatsappIcon,
-} from '@hugeicons/core-free-icons'
-import { useCartStore } from '@/features/cart'
+} from "@hugeicons/core-free-icons";
+import { useCartStore } from "@/features/cart";
 // Direct file imports (not the '@/features/products' barrel) so this
 // storefront page doesn't pull in ProductForm's dashboard-only weight.
-import { effectivePrice } from '@/features/products/utils/price'
-import { getVariationImage, getVariationStock } from '@/features/products/utils/variation'
+import { effectivePrice } from "@/features/products/utils/price";
+import {
+  getVariationImage,
+  getVariationStock,
+} from "@/features/products/utils/variation";
 import {
   validateCouponCode,
   CouponValidationError,
   couponErrorMessage,
-} from '@/features/coupons'
-import { formatMoney, toTitleCase } from '@/lib/format'
-import { buildStorePath } from '@/lib/tenant'
-import type { Store } from '@/types/domain'
-import { useDocumentMeta } from '@/hooks/useDocumentMeta'
-import { track } from '@/features/analytics'
-import { EmptyState } from '@/components/feedback'
+} from "@/features/coupons";
+import { formatMoney, toTitleCase } from "@/lib/format";
+import { buildStorePath } from "@/lib/tenant";
+import type { Store } from "@/types/domain";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import { track } from "@/features/analytics";
+import { EmptyState } from "@/components/feedback";
 
 export default function CartPage() {
-  const store = useOutletContext<Store>()
+  const store = useOutletContext<Store>();
 
   useDocumentMeta({
     title: `Carrinho - ${store.name}`,
     description: `Revise os itens do seu carrinho na ${store.name} e finalize seu pedido pelo WhatsApp.`,
-  })
+  });
 
-  const [searchParams] = useSearchParams()
-  const items = useCartStore((s) => s.items)
-  const updateQuantity = useCartStore((s) => s.updateQuantity)
-  const removeItem = useCartStore((s) => s.removeItem)
-  const subtotal = useCartStore((s) => s.subtotalInCents())
-  const discount = useCartStore((s) => s.discountInCents())
-  const total = useCartStore((s) => s.totalInCents())
-  const appliedCoupon = useCartStore((s) => s.coupon)
-  const originalSubtotal = items.reduce((sum, i) => sum + i.product.price_in_cents * i.quantity, 0)
-  const promoDiscount = originalSubtotal - subtotal
-  const applyCouponToCart = useCartStore((s) => s.applyCoupon)
-  const clearCoupon = useCartStore((s) => s.clearCoupon)
+  const [searchParams] = useSearchParams();
+  const items = useCartStore((s) => s.items);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const subtotal = useCartStore((s) => s.subtotalInCents());
+  const discount = useCartStore((s) => s.discountInCents());
+  const total = useCartStore((s) => s.totalInCents());
+  const appliedCoupon = useCartStore((s) => s.coupon);
+  const originalSubtotal = items.reduce(
+    (sum, i) => sum + i.product.price_in_cents * i.quantity,
+    0,
+  );
+  const promoDiscount = originalSubtotal - subtotal;
+  const applyCouponToCart = useCartStore((s) => s.applyCoupon);
+  const clearCoupon = useCartStore((s) => s.clearCoupon);
 
-  const [code, setCode] = useState(() => searchParams.get('coupon') ?? '')
-  const [error, setError] = useState<string | null>(null)
-  const [isValidating, setIsValidating] = useState(false)
-  const [showStickyBar, setShowStickyBar] = useState(false)
-  const checkoutBtnRef = useRef<HTMLAnchorElement>(null)
+  const [code, setCode] = useState(() => searchParams.get("coupon") ?? "");
+  const [error, setError] = useState<string | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const checkoutBtnRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
-    const el = checkoutBtnRef.current
-    if (!el) return
+    const el = checkoutBtnRef.current;
+    if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => setShowStickyBar(!entry.isIntersecting),
       { threshold: 0 },
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-  const homePath = buildStorePath(store.slug)
-  const checkoutPath = buildStorePath(store.slug, 'checkout')
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  const homePath = buildStorePath(store.slug);
+  const checkoutPath = buildStorePath(store.slug, "checkout");
 
   // Auto-apply coupon from URL parameter (e.g., from custom coupon link)
   useEffect(() => {
-    const couponFromUrl = searchParams.get('coupon')
+    const couponFromUrl = searchParams.get("coupon");
     if (couponFromUrl && !appliedCoupon) {
       // `code` is pre-filled from the URL via lazy state init; here we just
       // validate and apply it.
@@ -89,26 +95,33 @@ export default function CartPage() {
             discountValue: validated.discount_value,
             discountInCents: validated.discount_in_cents,
             subtotalInCentsAtApply: subtotal,
-          })
-          setCode('')
+          });
+          setCode("");
         })
         .catch(() => {
           // If auto-apply fails, just clear the code
-          setCode('')
-        })
+          setCode("");
+        });
     }
-  }, [searchParams, store.id, subtotal, items, appliedCoupon, applyCouponToCart])
+  }, [
+    searchParams,
+    store.id,
+    subtotal,
+    items,
+    appliedCoupon,
+    applyCouponToCart,
+  ]);
 
   const onApplyCoupon = async () => {
-    setError(null)
-    setIsValidating(true)
+    setError(null);
+    setIsValidating(true);
     try {
       const validated = await validateCouponCode({
         storeId: store.id,
         code,
         subtotalInCents: subtotal,
         cartItems: items,
-      })
+      });
       applyCouponToCart({
         id: validated.id,
         code: validated.code,
@@ -116,26 +129,30 @@ export default function CartPage() {
         discountValue: validated.discount_value,
         discountInCents: validated.discount_in_cents,
         subtotalInCentsAtApply: subtotal,
-      })
-      setCode('')
+      });
+      setCode("");
     } catch (err) {
       const codeStr =
-        err instanceof CouponValidationError ? err.code : 'unknown'
-      setError(couponErrorMessage(codeStr))
+        err instanceof CouponValidationError ? err.code : "unknown";
+      setError(couponErrorMessage(codeStr));
     } finally {
-      setIsValidating(false)
+      setIsValidating(false);
     }
-  }
+  };
 
   const onRemoveCoupon = () => {
-    clearCoupon()
-    setCode('')
-    setError(null)
-  }
+    clearCoupon();
+    setCode("");
+    setError(null);
+  };
 
   const onBeginCheckout = () => {
-    track('begin_checkout', { store_id: store.id, item_count: items.length, value: total })
-  }
+    track("begin_checkout", {
+      store_id: store.id,
+      item_count: items.length,
+      value: total,
+    });
+  };
 
   if (items.length === 0) {
     return (
@@ -147,14 +164,14 @@ export default function CartPage() {
             <Link
               to={homePath}
               className="text-sm font-semibold hover:underline"
-              style={{ color: 'var(--store-primary)' }}
+              style={{ color: "var(--store-primary)" }}
             >
               Voltar ao catálogo
             </Link>
           }
         />
       </div>
-    )
+    );
   }
 
   return (
@@ -177,141 +194,165 @@ export default function CartPage() {
 
           <div className="flex flex-col gap-3">
             {items.map((item) => {
-              const { product, quantity, selectedVariation, cartKey } = item
-              const image = getVariationImage(product, selectedVariation)
-              const stock = getVariationStock(product, selectedVariation)
+              const { product, quantity, selectedVariation, cartKey } = item;
+              const image = getVariationImage(product, selectedVariation);
+              const stock = getVariationStock(product, selectedVariation);
               return (
-              <div
-                key={cartKey}
-                className="flex gap-4 rounded-xl border bg-white p-4 shadow-sm"
-                style={{ borderColor: '#cbd5e1' }}
-              >
-                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-z-bg2 ring-1 ring-z-border">
-                  {image ? (
-                    <img
-                      src={image}
-                      alt={product.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-z-text-hint">
-                      <HugeiconsIcon icon={PackageIcon} size={28} />
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-1 flex-col justify-center">
-                  <div className="text-[14px] font-bold leading-tight tracking-tight text-z-ink">
-                    {toTitleCase(product.name)}
-                  </div>
-                  {selectedVariation && (
-                    <div className="mt-0.5 inline-flex">
-                      <span className="rounded-full border border-z-border bg-z-bg px-2.5 py-0.5 text-[14px] font-medium text-z-text">
-                        {toTitleCase(selectedVariation)}
-                      </span>
-                    </div>
-                  )}
-                  {product.promo_price_in_cents != null && product.promo_price_in_cents < product.price_in_cents && (
-                    <div className="mt-0.5 text-[14px] text-z-text-hint line-through">
-                      {formatMoney(product.price_in_cents)} / un.
-                    </div>
-                  )}
-                  <div className="text-[14px] font-bold text-z-ink">
-                    {formatMoney(effectivePrice(product))} / un.
-                    {product.promo_price_in_cents != null && product.promo_price_in_cents < product.price_in_cents && (
-                      <span className="ml-2 text-[14px] font-semibold text-[#02a650]">
-                        {Math.round((1 - product.promo_price_in_cents / product.price_in_cents) * 100)}% OFF
-                      </span>
+                <div
+                  key={cartKey}
+                  className="flex gap-4 rounded-xl border bg-white p-4 shadow-sm"
+                  style={{ borderColor: "#cbd5e1" }}
+                >
+                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-z-bg2 ring-1 ring-z-border">
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={product.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-z-text-hint">
+                        <HugeiconsIcon icon={PackageIcon} size={28} />
+                      </div>
                     )}
                   </div>
+                  <div className="flex flex-1 flex-col justify-center">
+                    <div className="text-[14px] font-bold leading-tight tracking-tight text-z-ink">
+                      {toTitleCase(product.name)}
+                    </div>
+                    {selectedVariation && (
+                      <div className="mt-0.5 inline-flex">
+                        <span className="rounded-full border border-z-border bg-z-bg px-2.5 py-0.5 text-[14px] font-medium text-z-text">
+                          {toTitleCase(selectedVariation)}
+                        </span>
+                      </div>
+                    )}
+                    {product.promo_price_in_cents != null &&
+                      product.promo_price_in_cents < product.price_in_cents && (
+                        <div className="mt-0.5 text-[14px] text-z-text-hint line-through">
+                          {formatMoney(product.price_in_cents)} / un.
+                        </div>
+                      )}
+                    <div className="text-[14px] font-bold text-z-ink">
+                      {formatMoney(effectivePrice(product))} / un.
+                      {product.promo_price_in_cents != null &&
+                        product.promo_price_in_cents <
+                          product.price_in_cents && (
+                          <span className="ml-2 text-[14px] font-semibold text-[#02a650]">
+                            {Math.round(
+                              (1 -
+                                product.promo_price_in_cents /
+                                  product.price_in_cents) *
+                                100,
+                            )}
+                            % OFF
+                          </span>
+                        )}
+                    </div>
 
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateQuantity(cartKey, Math.max(1, quantity - 1))
-                        }
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-z-border bg-white hover:bg-z-bg2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
-                        aria-label="Diminuir"
-                      >
-                        <HugeiconsIcon icon={MinusSignIcon} size={14} />
-                      </button>
-                      <span className="w-6 text-center text-[14px] font-bold tabular-nums">
-                        {quantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(cartKey, quantity + 1)}
-                        disabled={stock != null && quantity >= stock}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-z-border bg-white hover:bg-z-bg2 active:scale-95"
-                        aria-label="Aumentar"
-                      >
-                        <HugeiconsIcon icon={PlusSignIcon} size={14} />
-                      </button>
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateQuantity(cartKey, Math.max(1, quantity - 1))
+                          }
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-z-border bg-white hover:bg-z-bg2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                          aria-label="Diminuir"
+                        >
+                          <HugeiconsIcon icon={MinusSignIcon} size={14} />
+                        </button>
+                        <span className="w-6 text-center text-[14px] font-bold tabular-nums">
+                          {quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(cartKey, quantity + 1)}
+                          disabled={stock != null && quantity >= stock}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-z-border bg-white hover:bg-z-bg2 active:scale-95"
+                          aria-label="Aumentar"
+                        >
+                          <HugeiconsIcon icon={PlusSignIcon} size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => removeItem(cartKey)}
+                    className="self-start p-1 text-z-text-hint hover:text-rose-600"
+                    aria-label="Remover"
+                  >
+                    <HugeiconsIcon icon={CancelIcon} size={18} />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => removeItem(cartKey)}
-                  className="self-start p-1 text-z-text-hint hover:text-rose-600"
-                  aria-label="Remover"
-                >
-                  <HugeiconsIcon icon={CancelIcon} size={18} />
-                </button>
-              </div>
-            )})}
-
+              );
+            })}
           </div>
-
         </div>
 
         {/* Right Column: Sticky Summary & Coupon */}
         <div className="lg:sticky lg:top-24 flex flex-col gap-4 mt-6 lg:mt-0">
-          <div className="rounded-xl border bg-white p-6 shadow-sm" style={{ borderColor: '#cbd5e1' }}>
-            <h2 className="text-[14px] font-bold mb-5 text-z-ink border-b border-z-border pb-4">Resumo do pedido</h2>
-            
+          <div
+            className="rounded-xl border bg-white p-6 shadow-sm"
+            style={{ borderColor: "#cbd5e1" }}
+          >
+            <h2 className="text-[14px] font-bold mb-5 text-z-ink border-b border-z-border pb-4">
+              Resumo do pedido
+            </h2>
+
             <div className="flex flex-col gap-2">
               <div className="mb-3 flex flex-col gap-2 border-b border-z-border pb-4">
-                {items.map(({ product, quantity, selectedVariation, cartKey }) => (
-                  <div
-                    key={cartKey}
-                    className="flex items-start justify-between gap-3 text-[14px]"
-                  >
-                    <span className="min-w-0 text-z-text-muted">
-                      <span className="font-semibold text-z-text">
-                        {quantity}x
-                      </span>{' '}
-                      {toTitleCase(product.name)}
-                      {selectedVariation && (
-                        <span className="text-z-text-hint"> · {toTitleCase(selectedVariation)}</span>
-                      )}
-                    </span>
-                    <span className="shrink-0 font-semibold tabular-nums text-z-text">
-                      {formatMoney(effectivePrice(product) * quantity)}
-                    </span>
-                  </div>
-                ))}
+                {items.map(
+                  ({ product, quantity, selectedVariation, cartKey }) => (
+                    <div
+                      key={cartKey}
+                      className="flex items-start justify-between gap-3 text-[14px]"
+                    >
+                      <span className="min-w-0 text-z-text-muted">
+                        <span className="font-semibold text-z-text">
+                          {quantity}x
+                        </span>{" "}
+                        {toTitleCase(product.name)}
+                        {selectedVariation && (
+                          <span className="text-z-text-hint">
+                            {" "}
+                            · {toTitleCase(selectedVariation)}
+                          </span>
+                        )}
+                      </span>
+                      <span className="shrink-0 font-semibold tabular-nums text-z-text">
+                        {formatMoney(effectivePrice(product) * quantity)}
+                      </span>
+                    </div>
+                  ),
+                )}
               </div>
 
               {(promoDiscount > 0 || discount > 0) && (
                 <div className="flex justify-between text-[14px]">
                   <span className="text-z-text-muted">Subtotal</span>
-                  <span className="tabular-nums text-z-text-muted">{formatMoney(originalSubtotal)}</span>
+                  <span className="tabular-nums text-z-text-muted">
+                    {formatMoney(originalSubtotal)}
+                  </span>
                 </div>
               )}
               {promoDiscount > 0 && (
                 <div className="flex justify-between text-[14px]">
                   <span className="text-[#02a650]">Desconto produtos</span>
-                  <span className="font-semibold text-[#02a650] tabular-nums">−{formatMoney(promoDiscount)}</span>
+                  <span className="font-semibold text-[#02a650] tabular-nums">
+                    −{formatMoney(promoDiscount)}
+                  </span>
                 </div>
               )}
               {discount > 0 && (
                 <div className="flex justify-between text-[14px]">
                   <span className="text-[#02a650]">
-                    Cupom{appliedCoupon ? ` · ${appliedCoupon.code}` : ''}
+                    Cupom{appliedCoupon ? ` · ${appliedCoupon.code}` : ""}
                   </span>
-                  <span className="font-semibold text-[#02a650] tabular-nums">−{formatMoney(discount)}</span>
+                  <span className="font-semibold text-[#02a650] tabular-nums">
+                    −{formatMoney(discount)}
+                  </span>
                 </div>
               )}
               <div className="mt-1 flex justify-between border-t border-z-border pt-3 text-[14px] font-bold tracking-tight text-z-ink">
@@ -326,7 +367,7 @@ export default function CartPage() {
                 to={checkoutPath}
                 onClick={onBeginCheckout}
                 className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-[14px] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                style={{ background: '#34d399' }}
+                style={{ background: "#34d399" }}
               >
                 <HugeiconsIcon icon={WhatsappIcon} size={20} />
                 Fechar pedido
@@ -342,8 +383,13 @@ export default function CartPage() {
           </div>
 
           {/* Coupon */}
-          <div className="rounded-xl border bg-white p-5 shadow-sm" style={{ borderColor: '#cbd5e1' }}>
-            <div className="mb-3 text-[14px] font-bold text-z-ink">Cupom de desconto</div>
+          <div
+            className="rounded-xl border bg-white p-5 shadow-sm"
+            style={{ borderColor: "#cbd5e1" }}
+          >
+            <div className="mb-3 text-[14px] font-bold text-z-ink">
+              Cupom de desconto
+            </div>
             {appliedCoupon ? (
               <div className="flex items-center justify-between gap-3 rounded-lg bg-z-bg2 px-3 py-3">
                 <div className="flex min-w-0 items-center gap-2">
@@ -373,9 +419,9 @@ export default function CartPage() {
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        void onApplyCoupon()
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        void onApplyCoupon();
                       }
                     }}
                     placeholder="Inserir código"
@@ -386,9 +432,9 @@ export default function CartPage() {
                     onClick={() => void onApplyCoupon()}
                     disabled={isValidating || !code.trim()}
                     className="rounded-lg px-4 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-50"
-                    style={{ background: '#34d399' }}
+                    style={{ background: "#34d399" }}
                   >
-                    {isValidating ? '...' : 'Aplicar'}
+                    {isValidating ? "..." : "Aplicar"}
                   </button>
                 </div>
                 {error && (
@@ -404,14 +450,14 @@ export default function CartPage() {
 
       {/* Sticky bottom checkout CTA — mobile only, visible only after main button scrolls out */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-z-border bg-white px-4 py-3 shadow-z-lg transition-transform duration-300 sm:hidden ${showStickyBar ? 'translate-y-0' : 'translate-y-full'}`}
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}
+        className={`fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-z-border bg-white px-4 py-3 shadow-z-lg transition-transform duration-300 sm:hidden ${showStickyBar ? "translate-y-0" : "translate-y-full"}`}
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
       >
         <div className="min-w-0 flex-1">
           <div className="text-[14px] text-z-text-hint">Total</div>
           <div
             className="text-[14px] font-bold tracking-tight tabular-nums"
-            style={{ color: 'var(--store-primary)' }}
+            style={{ color: "var(--store-primary)" }}
           >
             {formatMoney(total)}
           </div>
@@ -420,12 +466,12 @@ export default function CartPage() {
           to={checkoutPath}
           onClick={onBeginCheckout}
           className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-full px-6 text-[14px] font-bold uppercase tracking-wider text-white transition-all active:scale-[0.98]"
-          style={{ background: '#34d399' }}
+          style={{ background: "#34d399" }}
         >
           <HugeiconsIcon icon={WhatsappIcon} size={18} />
           Fechar pedido
         </Link>
       </div>
     </div>
-  )
+  );
 }

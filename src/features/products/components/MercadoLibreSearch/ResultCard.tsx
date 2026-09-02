@@ -1,23 +1,27 @@
-import { useState } from 'react'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Download02Icon, ExternalLink, Package01Icon } from '@hugeicons/core-free-icons'
-import { cn } from '@/lib/utils'
-import type { MlProductResult } from '@/features/products/types'
+import { useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Download02Icon,
+  ExternalLink,
+  Package01Icon,
+} from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
+import type { MlProductResult } from "@/features/products/types";
 
 interface Props {
-  result: MlProductResult
-  isImporting: boolean
-  onImport: (result: MlProductResult) => void
+  result: MlProductResult;
+  isImporting: boolean;
+  onImport: (result: MlProductResult) => void;
 }
 
 export function ResultCard({ result, isImporting, onImport }: Props) {
-  const [imgFailed, setImgFailed] = useState(false)
+  const [imgFailed, setImgFailed] = useState(false);
 
   return (
     <div
       className={cn(
-        'flex gap-3 rounded-lg border bg-card p-3 transition-colors',
-        'hover:border-primary/40 hover:bg-accent/30',
+        "flex gap-3 rounded-lg border bg-card p-3 transition-colors",
+        "hover:border-primary/40 hover:bg-accent/30",
       )}
     >
       {/* Thumbnail */}
@@ -35,7 +39,7 @@ export function ResultCard({ result, isImporting, onImport }: Props) {
             <HugeiconsIcon icon={Package01Icon} className="h-7 w-7" />
           </div>
         )}
-        {result.source === 'catalog' && (
+        {result.source === "catalog" && (
           <span className="absolute left-0.5 top-0.5 rounded bg-primary px-1 py-0.5 text-[9px] font-semibold uppercase leading-none text-primary-foreground">
             Catálogo
           </span>
@@ -45,7 +49,10 @@ export function ResultCard({ result, isImporting, onImport }: Props) {
       {/* Info */}
       <div className="flex min-w-0 flex-1 flex-col justify-between gap-1">
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium leading-snug" title={result.title}>
+          <p
+            className="truncate text-sm font-medium leading-snug"
+            title={result.title}
+          >
             {result.title}
           </p>
           {result.brand && (
@@ -64,9 +71,9 @@ export function ResultCard({ result, isImporting, onImport }: Props) {
             onClick={() => onImport(result)}
             disabled={isImporting}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground',
-              'transition-opacity hover:opacity-90',
-              'disabled:cursor-not-allowed disabled:opacity-50',
+              "inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground",
+              "transition-opacity hover:opacity-90",
+              "disabled:cursor-not-allowed disabled:opacity-50",
             )}
           >
             {isImporting ? (
@@ -74,7 +81,7 @@ export function ResultCard({ result, isImporting, onImport }: Props) {
             ) : (
               <HugeiconsIcon icon={Download02Icon} className="h-3 w-3" />
             )}
-            {isImporting ? 'Importando…' : 'Importar'}
+            {isImporting ? "Importando…" : "Importar"}
           </button>
 
           {result.permalink && (
@@ -91,5 +98,5 @@ export function ResultCard({ result, isImporting, onImport }: Props) {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,25 +1,25 @@
-import type { PlanId } from '@/types/domain'
+import type { PlanId } from "@/types/domain";
 
 export type PlanConfig = {
-  id: PlanId
-  name: string
-  priceInCents: number
-  priceInCentsAnnual: number
-  maxProducts: number | null
-  maxSellers: number
-  maxCoupons: number | null
-  hasFeaturedProducts: boolean
-  hasPdfExport: boolean
-  hasCustomTheme: boolean
-  hasAiHelpers: boolean
-  stripePriceId: string
-  stripePriceIdAnnual: string
-}
+  id: PlanId;
+  name: string;
+  priceInCents: number;
+  priceInCentsAnnual: number;
+  maxProducts: number | null;
+  maxSellers: number;
+  maxCoupons: number | null;
+  hasFeaturedProducts: boolean;
+  hasPdfExport: boolean;
+  hasCustomTheme: boolean;
+  hasAiHelpers: boolean;
+  stripePriceId: string;
+  stripePriceIdAnnual: string;
+};
 
 export const PLANS: Record<PlanId, PlanConfig> = {
   basico: {
-    id: 'basico',
-    name: 'Gratuito',
+    id: "basico",
+    name: "Gratuito",
     priceInCents: 0,
     priceInCentsAnnual: 0,
     maxProducts: 10,
@@ -29,12 +29,12 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     hasPdfExport: false,
     hasCustomTheme: false,
     hasAiHelpers: false,
-    stripePriceId: '',
-    stripePriceIdAnnual: '',
+    stripePriceId: "",
+    stripePriceIdAnnual: "",
   },
   pro: {
-    id: 'pro',
-    name: 'Pro',
+    id: "pro",
+    name: "Pro",
     priceInCents: 1990,
     priceInCentsAnnual: 19104,
     maxProducts: 100,
@@ -44,12 +44,12 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     hasPdfExport: true,
     hasCustomTheme: true,
     hasAiHelpers: true,
-    stripePriceId: 'price_1TbMQb1oLw5d2Hz3pvTSPKMz',
-    stripePriceIdAnnual: 'price_1TbMQg1oLw5d2Hz34oXnpGtp',
+    stripePriceId: "price_1TbMQb1oLw5d2Hz3pvTSPKMz",
+    stripePriceIdAnnual: "price_1TbMQg1oLw5d2Hz34oXnpGtp",
   },
   premium: {
-    id: 'premium',
-    name: 'Ilimitado',
+    id: "premium",
+    name: "Ilimitado",
     priceInCents: 2990,
     priceInCentsAnnual: 25116,
     maxProducts: null,
@@ -59,7 +59,7 @@ export const PLANS: Record<PlanId, PlanConfig> = {
     hasPdfExport: true,
     hasCustomTheme: true,
     hasAiHelpers: true,
-    stripePriceId: 'price_1TbMQb1oLw5d2Hz3Fl8g9l6B',
-    stripePriceIdAnnual: 'price_1TbMQh1oLw5d2Hz3cls8wmCQ',
+    stripePriceId: "price_1TbMQb1oLw5d2Hz3Fl8g9l6B",
+    stripePriceIdAnnual: "price_1TbMQh1oLw5d2Hz3cls8wmCQ",
   },
-}
+};

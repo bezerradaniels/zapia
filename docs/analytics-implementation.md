@@ -17,13 +17,13 @@ Manager até chegar no GA4**.
 
 ## 1. Como já está montado
 
-| Camada | Onde | Estado |
-| --- | --- | --- |
-| Container GTM | [`index.html`](../index.html) — `GTM-5FR2J6C7` | ✅ instalado |
-| Carregamento | só após **consentimento** de cookies + on idle/interação | ✅ LGPD |
-| `dataLayer` | inicializada em `index.html` antes de tudo; tipada em [`env.d.ts`](../src/types/env.d.ts) | ✅ |
-| Consentimento | `localStorage['zapable_cookie_consent'] === 'accepted'` ([`CookieConsentBanner.tsx`](../src/components/CookieConsentBanner.tsx)) | ✅ |
-| Módulo de eventos | [`src/features/analytics/`](../src/features/analytics) | ✅ novo |
+| Camada            | Onde                                                                                                                             | Estado       |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Container GTM     | [`index.html`](../index.html) — `GTM-5FR2J6C7`                                                                                   | ✅ instalado |
+| Carregamento      | só após **consentimento** de cookies + on idle/interação                                                                         | ✅ LGPD      |
+| `dataLayer`       | inicializada em `index.html` antes de tudo; tipada em [`env.d.ts`](../src/types/env.d.ts)                                        | ✅           |
+| Consentimento     | `localStorage['zapable_cookie_consent'] === 'accepted'` ([`CookieConsentBanner.tsx`](../src/components/CookieConsentBanner.tsx)) | ✅           |
+| Módulo de eventos | [`src/features/analytics/`](../src/features/analytics)                                                                           | ✅ novo      |
 
 O fluxo é: **app dá `track(...)` → push na `dataLayer` → GTM dispara a tag GA4 →
 evento aparece no GA4**.
@@ -36,18 +36,18 @@ configurar as tags/triggers no painel do GTM (seções 4 e 5).
 ## 2. Disparando um evento no app: `track()`
 
 ```ts
-import { track } from '@/features/analytics'
+import { track } from "@/features/analytics";
 
-track('product_created', {
+track("product_created", {
   store_id: storeId,
   product_id: product.id,
   product_name: product.name,
   has_image: true,
   has_variations: false,
-})
+});
 
 // Eventos sem parâmetros não precisam do segundo argumento:
-track('logout')
+track("logout");
 ```
 
 `track()` é **totalmente tipado**: o nome do evento e o shape dos parâmetros são
@@ -83,55 +83,55 @@ dispara em sucesso real. **Já implementado** como referência em
 [`useProductMutations.ts`](../src/features/products/hooks/useProductMutations.ts):
 
 ```ts
-import { track } from '@/features/analytics'
+import { track } from "@/features/analytics";
 
 export function useCreateProduct(storeId: string) {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: ProductInput) => createProduct(storeId, input),
     onSuccess: (product) => {
-      track('product_created', {
+      track("product_created", {
         store_id: storeId,
         product_id: product.id,
         product_name: product.name,
         has_image: (product.images?.length ?? 0) > 0,
         has_variations: product.has_variations ?? false,
-      })
-      qc.invalidateQueries({ queryKey: productsKeys.list(storeId) })
-      qc.invalidateQueries({ queryKey: productsKeys.publicList(storeId) })
+      });
+      qc.invalidateQueries({ queryKey: productsKeys.list(storeId) });
+      qc.invalidateQueries({ queryKey: productsKeys.publicList(storeId) });
     },
-  })
+  });
 }
 ```
 
 Replique esse padrão nos demais hooks de mutation:
 
-| Ação | Arquivo | Evento |
-| --- | --- | --- |
-| Criar/editar/excluir produto | `features/products/hooks/useProductMutations.ts` | ✅ feito |
-| Criar/editar/excluir vendedor | `features/sellers/hooks/` | `seller_created` / `_updated` / `_deleted` |
-| Criar/editar/excluir cliente | `features/customers/hooks/useCustomerMutations.ts` | `customer_created` / `_updated` / `_deleted` |
-| Criar/editar/excluir categoria | `features/categories/hooks/` | `category_created` / `_updated` / `_deleted` |
-| Criar/editar/excluir cupom | `features/coupons/hooks/` | `coupon_created` / `_updated` / `_deleted` |
-| Criar pedido (dashboard) | `features/orders/hooks/` | `order_created` |
-| Mudar status do pedido | `features/orders/hooks/` | `order_status_changed` |
+| Ação                           | Arquivo                                            | Evento                                       |
+| ------------------------------ | -------------------------------------------------- | -------------------------------------------- |
+| Criar/editar/excluir produto   | `features/products/hooks/useProductMutations.ts`   | ✅ feito                                     |
+| Criar/editar/excluir vendedor  | `features/sellers/hooks/`                          | `seller_created` / `_updated` / `_deleted`   |
+| Criar/editar/excluir cliente   | `features/customers/hooks/useCustomerMutations.ts` | `customer_created` / `_updated` / `_deleted` |
+| Criar/editar/excluir categoria | `features/categories/hooks/`                       | `category_created` / `_updated` / `_deleted` |
+| Criar/editar/excluir cupom     | `features/coupons/hooks/`                          | `coupon_created` / `_updated` / `_deleted`   |
+| Criar pedido (dashboard)       | `features/orders/hooks/`                           | `order_created`                              |
+| Mudar status do pedido         | `features/orders/hooks/`                           | `order_status_changed`                       |
 
 ### 3.2 Cliques de botão (CTAs, compartilhar, etc.) → no `onClick`
 
 Para botões que **não** disparam uma mutation (ex.: copiar link, CTAs da landing):
 
 ```tsx
-import { track } from '@/features/analytics'
+import { track } from "@/features/analytics";
 
 <Button
   id="lp-hero-cta-signup"
   onClick={() => {
-    track('share_link_copied', { link_type: 'store', item_id: store.id })
-    copyToClipboard(url)
+    track("share_link_copied", { link_type: "store", item_id: store.id });
+    copyToClipboard(url);
   }}
 >
   Compartilhar loja
-</Button>
+</Button>;
 ```
 
 > Os CTAs da landing já têm `id`s estáveis (ver
@@ -145,10 +145,10 @@ Dispare **depois** que a ação deu certo (não no submit que pode falhar):
 
 ```ts
 const onSubmit = async (values) => {
-  await signIn(values)        // só segue se não lançar
-  track('login', { method: 'email' })
-  navigate(ROUTES.dashboard)
-}
+  await signIn(values); // só segue se não lançar
+  track("login", { method: "email" });
+  navigate(ROUTES.dashboard);
+};
 ```
 
 ---
@@ -163,7 +163,7 @@ Acesse [tagmanager.google.com](https://tagmanager.google.com/) → container
 
 1. **Tags → Nova → Google Tag** (ou "GA4 Configuration").
 2. **Tag ID / Measurement ID:** `G-XXXXXXXXXX` (o ID da sua propriedade GA4 — ver seção 5).
-3. **Trigger:** *Initialization - All Pages* (ou *All Pages*).
+3. **Trigger:** _Initialization - All Pages_ (ou _All Pages_).
 4. Salvar. Isso já manda `page_view` automaticamente.
 
 ### 4.2 Variáveis de Data Layer (uma por parâmetro que você usa)
@@ -185,13 +185,13 @@ Em vez de uma tag por evento, faça **uma tag** que repassa qualquer evento:
    - Marque **"Usar correspondência de regex"**
    - (Opcional) condição: `Event` **não corresponde a regex** `gtm\.js|gtm\.dom|gtm\.load`
      para não repassar eventos internos do GTM.
-   - Nome do trigger: *CE - Todos eventos do app*.
+   - Nome do trigger: _CE - Todos eventos do app_.
 2. **Tag → Nova → Google Analytics: evento do GA4**
    - **Tag de configuração:** a do passo 4.1.
    - **Nome do evento:** `{{Event}}` (repassa o nome vindo da `dataLayer`).
    - **Parâmetros do evento:** mapeie cada um para a variável da DL, ex.:
      `product_id` → `{{product_id}}`, `value` → `{{value}}`, etc.
-   - **Trigger:** *CE - Todos eventos do app*.
+   - **Trigger:** _CE - Todos eventos do app_.
 3. Salvar.
 
 Assim, qualquer `track('novo_evento', {...})` chega no GA4 sem criar tag nova —

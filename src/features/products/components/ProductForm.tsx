@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ImageIcon,
   Package01Icon,
@@ -16,81 +16,108 @@ import {
   ColorPickerIcon,
   RulerIcon,
   Settings01Icon,
-} from '@hugeicons/core-free-icons'
-import confetti from 'canvas-confetti'
-import { toast } from 'sonner'
-import { ROUTES } from '@/config/routes'
-import { productSchema, type ProductInput } from '../schemas'
-import { marginPercent } from '../utils/price'
-import { MAX_FEATURED_PRODUCTS, featuredSlots } from '../utils/featured'
-import { formatMoney } from '@/lib/format'
-import { MoneyInput } from '@/components/forms/MoneyInput'
-import { ProductImagesUploader } from '@/components/forms/ProductImagesUploader'
-import { ProductVariationModal } from './ProductVariationModal'
-import type { VariationType } from '@/types/domain'
-import { cn } from '@/lib/utils'
-import { useCreateCategory } from '@/features/categories'
-import { usePlanLimits } from '@/features/billing'
-import { useProducts } from '../hooks/useProducts'
+} from "@hugeicons/core-free-icons";
+import confetti from "canvas-confetti";
+import { toast } from "sonner";
+import { ROUTES } from "@/config/routes";
+import { productSchema, type ProductInput } from "../schemas";
+import { marginPercent } from "../utils/price";
+import { MAX_FEATURED_PRODUCTS, featuredSlots } from "../utils/featured";
+import { formatMoney } from "@/lib/format";
+import { MoneyInput } from "@/components/forms/MoneyInput";
+import { ProductImagesUploader } from "@/components/forms/ProductImagesUploader";
+import { ProductVariationModal } from "./ProductVariationModal";
+import type { VariationType } from "@/types/domain";
+import { cn } from "@/lib/utils";
+import { useCreateCategory } from "@/features/categories";
+import { usePlanLimits } from "@/features/billing";
+import { useProducts } from "../hooks/useProducts";
 
-type Tab = 'info' | 'stock' | 'photos' | 'price'
+type Tab = "info" | "stock" | "photos" | "price";
 
-const TABS: { id: Tab; label: string; shortLabel: string; icon: typeof Package01Icon }[] = [
-  { id: 'info', label: 'Informações Gerais', shortLabel: 'Geral', icon: InformationCircleIcon },
-  { id: 'stock', label: 'Estoque e variações', shortLabel: 'Estoque', icon: Package01Icon },
-  { id: 'photos', label: 'Fotos', shortLabel: 'Fotos', icon: ImageIcon },
-  { id: 'price', label: 'Preço', shortLabel: 'Preço', icon: MoneyBag02Icon },
-]
+const TABS: {
+  id: Tab;
+  label: string;
+  shortLabel: string;
+  icon: typeof Package01Icon;
+}[] = [
+  {
+    id: "info",
+    label: "Informações Gerais",
+    shortLabel: "Geral",
+    icon: InformationCircleIcon,
+  },
+  {
+    id: "stock",
+    label: "Estoque e variações",
+    shortLabel: "Estoque",
+    icon: Package01Icon,
+  },
+  { id: "photos", label: "Fotos", shortLabel: "Fotos", icon: ImageIcon },
+  { id: "price", label: "Preço", shortLabel: "Preço", icon: MoneyBag02Icon },
+];
 
 const FIELD_TAB_MAP: Partial<Record<string, { label: string; tab: Tab }>> = {
-  name: { label: 'Título do produto', tab: 'info' },
-  price_in_cents: { label: 'Preço', tab: 'price' },
-  promo_price_in_cents: { label: 'Preço promocional', tab: 'price' },
-  images: { label: 'Fotos do produto', tab: 'photos' },
-  description: { label: 'Descrição', tab: 'info' },
-  brand: { label: 'Marca', tab: 'info' },
-  barcode: { label: 'Código de barras', tab: 'info' },
-  stock: { label: 'Estoque', tab: 'stock' },
-}
+  name: { label: "Título do produto", tab: "info" },
+  price_in_cents: { label: "Preço", tab: "price" },
+  promo_price_in_cents: { label: "Preço promocional", tab: "price" },
+  images: { label: "Fotos do produto", tab: "photos" },
+  description: { label: "Descrição", tab: "info" },
+  brand: { label: "Marca", tab: "info" },
+  barcode: { label: "Código de barras", tab: "info" },
+  stock: { label: "Estoque", tab: "stock" },
+};
 
 const BARCODE_TYPES = [
-  { value: '', label: 'Não possui código de barras' },
-  { value: 'ean13', label: 'EAN-13' },
-  { value: 'ean8', label: 'EAN-8' },
-  { value: 'upc', label: 'UPC-A' },
-  { value: 'qrcode', label: 'QR Code' },
-  { value: 'other', label: 'Outro' },
-]
+  { value: "", label: "Não possui código de barras" },
+  { value: "ean13", label: "EAN-13" },
+  { value: "ean8", label: "EAN-8" },
+  { value: "upc", label: "UPC-A" },
+  { value: "qrcode", label: "QR Code" },
+  { value: "other", label: "Outro" },
+];
 
 const UNITS = [
-  'Unidade', 'Par', 'Kit', 'Caixa', 'Pacote', 'Saco',
-  'Kg', 'g', 'mg', 'L', 'mL', 'Metro', 'cm', 'mm',
-]
+  "Unidade",
+  "Par",
+  "Kit",
+  "Caixa",
+  "Pacote",
+  "Saco",
+  "Kg",
+  "g",
+  "mg",
+  "L",
+  "mL",
+  "Metro",
+  "cm",
+  "mm",
+];
 
 const RECURRENCES = [
-  { value: '', label: 'Nenhuma' },
-  { value: 'weekly', label: 'Semanal' },
-  { value: 'biweekly', label: 'Quinzenal' },
-  { value: 'monthly', label: 'Mensal' },
-  { value: 'quarterly', label: 'Trimestral' },
-  { value: 'semiannual', label: 'Semestral' },
-  { value: 'annual', label: 'Anual' },
-]
+  { value: "", label: "Nenhuma" },
+  { value: "weekly", label: "Semanal" },
+  { value: "biweekly", label: "Quinzenal" },
+  { value: "monthly", label: "Mensal" },
+  { value: "quarterly", label: "Trimestral" },
+  { value: "semiannual", label: "Semestral" },
+  { value: "annual", label: "Anual" },
+];
 
 const CONDITIONS = [
-  { value: 'new', label: 'Novo' },
-  { value: 'used', label: 'Usado' },
-  { value: 'refurbished', label: 'Recondicionado' },
-]
+  { value: "new", label: "Novo" },
+  { value: "used", label: "Usado" },
+  { value: "refurbished", label: "Recondicionado" },
+];
 
 type Props = {
-  storeId: string
-  catalogUrl?: string
-  initialValues?: Partial<ProductInput>
-  isSubmitting?: boolean
-  justPublished?: boolean
-  onSubmit: (values: ProductInput) => Promise<void> | void
-}
+  storeId: string;
+  catalogUrl?: string;
+  initialValues?: Partial<ProductInput>;
+  isSubmitting?: boolean;
+  justPublished?: boolean;
+  onSubmit: (values: ProductInput) => Promise<void> | void;
+};
 
 export function ProductForm({
   storeId,
@@ -100,33 +127,35 @@ export function ProductForm({
   justPublished,
   onSubmit,
 }: Props) {
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<Tab>('info')
-  const [variationModalOpen, setVariationModalOpen] = useState(false)
-  const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false)
-  const [newCategoryName, setNewCategoryName] = useState('')
-  const [homeModalOpen, setHomeModalOpen] = useState(false)
-  const [missingFieldsModalOpen, setMissingFieldsModalOpen] = useState(false)
-  const newCategoryInputRef = useRef<HTMLInputElement>(null)
-  const submitModeRef = useRef<'publish' | 'draft'>('publish')
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<Tab>("info");
+  const [variationModalOpen, setVariationModalOpen] = useState(false);
+  const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [homeModalOpen, setHomeModalOpen] = useState(false);
+  const [missingFieldsModalOpen, setMissingFieldsModalOpen] = useState(false);
+  const newCategoryInputRef = useRef<HTMLInputElement>(null);
+  const submitModeRef = useRef<"publish" | "draft">("publish");
 
-  const planLimits = usePlanLimits(storeId)
-  const allProductsQuery = useProducts(planLimits.canUse('featured') ? storeId : undefined)
-  const createCategoryMutation = useCreateCategory()
+  const planLimits = usePlanLimits(storeId);
+  const allProductsQuery = useProducts(
+    planLimits.canUse("featured") ? storeId : undefined,
+  );
+  const createCategoryMutation = useCreateCategory();
 
   const defaults = useMemo(
     () => ({
-      name: '',
+      name: "",
       description: undefined,
       category: undefined,
       subcategory: undefined,
       brand: undefined,
-      unit: 'Unidade',
+      unit: "Unidade",
       barcode: undefined,
       barcode_type: null,
       sku: undefined,
       auto_sku: true,
-      condition: 'new' as const,
+      condition: "new" as const,
       purchase_recurrence: null,
       has_no_brand: false,
       cost_in_cents: null,
@@ -145,33 +174,33 @@ export function ProductForm({
       ...initialValues,
     }),
     [initialValues],
-  )
+  );
 
   const form = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
     defaultValues: defaults as ProductInput,
-  })
+  });
 
-  const name = form.watch('name') ?? ''
-  const images = form.watch('images') ?? []
-  const priceCents = form.watch('price_in_cents') ?? 0
-  const costCents = form.watch('cost_in_cents') ?? null
-  const promoCents = form.watch('promo_price_in_cents') ?? null
-  const installmentCount = form.watch('installment_count') ?? null
-  const installmentTotal = form.watch('installment_total_in_cents') ?? null
-  const hasVariations = form.watch('has_variations')
-  const variationType = form.watch('variation_type')
-  const variationLabel = form.watch('variation_label')
-  const variationOptions = form.watch('variation_options')
-  const autoSku = form.watch('auto_sku')
-  const hasBarcodeType = !!form.watch('barcode_type')
-  const hasNoBrand = form.watch('has_no_brand')
-  const isEditing = !!initialValues
-  const isDirty = form.formState.isDirty
-  const isFeatured = form.watch('is_featured')
+  const name = form.watch("name") ?? "";
+  const images = form.watch("images") ?? [];
+  const priceCents = form.watch("price_in_cents") ?? 0;
+  const costCents = form.watch("cost_in_cents") ?? null;
+  const promoCents = form.watch("promo_price_in_cents") ?? null;
+  const installmentCount = form.watch("installment_count") ?? null;
+  const installmentTotal = form.watch("installment_total_in_cents") ?? null;
+  const hasVariations = form.watch("has_variations");
+  const variationType = form.watch("variation_type");
+  const variationLabel = form.watch("variation_label");
+  const variationOptions = form.watch("variation_options");
+  const autoSku = form.watch("auto_sku");
+  const hasBarcodeType = !!form.watch("barcode_type");
+  const hasNoBrand = form.watch("has_no_brand");
+  const isEditing = !!initialValues;
+  const isDirty = form.formState.isDirty;
+  const isFeatured = form.watch("is_featured");
 
   // Featured-slot availability (max-4 limit), excluding this product itself.
-  const allProducts = allProductsQuery?.data ?? []
+  const allProducts = allProductsQuery?.data ?? [];
   const {
     canEnable: canEnableFeatured,
     displayedCount: displayedFeaturedCount,
@@ -179,78 +208,77 @@ export function ProductForm({
     allProducts,
     isFeatured,
     initiallyFeatured: initialValues?.is_featured ?? false,
-  })
+  });
 
-  const margin = marginPercent(priceCents, costCents)
+  const margin = marginPercent(priceCents, costCents);
 
   const submit = form.handleSubmit(async (values) => {
     const finalValues = isEditing
       ? values
-      : { ...values, is_active: submitModeRef.current === 'publish' }
+      : { ...values, is_active: submitModeRef.current === "publish" };
     try {
-      await onSubmit(finalValues)
-      form.reset(finalValues)
+      await onSubmit(finalValues);
+      form.reset(finalValues);
       toast.success(
         isEditing
-          ? 'Produto atualizado com sucesso.'
-          : submitModeRef.current === 'draft'
-            ? 'Rascunho salvo com sucesso.'
-            : 'Produto publicado com sucesso.',
-      )
+          ? "Produto atualizado com sucesso."
+          : submitModeRef.current === "draft"
+            ? "Rascunho salvo com sucesso."
+            : "Produto publicado com sucesso.",
+      );
     } catch {
-      toast.error('Não foi possível salvar o produto. Tente novamente.')
+      toast.error("Não foi possível salvar o produto. Tente novamente.");
     }
-  })
-
+  });
 
   const handlePublish = async () => {
-    submitModeRef.current = 'publish'
-    const isValid = await form.trigger()
+    submitModeRef.current = "publish";
+    const isValid = await form.trigger();
     if (!isValid) {
-      setMissingFieldsModalOpen(true)
-      return
+      setMissingFieldsModalOpen(true);
+      return;
     }
-    submit()
-  }
+    submit();
+  };
 
   const handleDraftAndNavigate = async () => {
-    submitModeRef.current = 'draft'
+    submitModeRef.current = "draft";
     await form.handleSubmit(async (values) => {
       try {
-        await onSubmit({ ...values, is_active: false })
-        toast.success('Rascunho salvo com sucesso.')
-        navigate(ROUTES.dashboard)
+        await onSubmit({ ...values, is_active: false });
+        toast.success("Rascunho salvo com sucesso.");
+        navigate(ROUTES.dashboard);
       } catch {
-        toast.error('Não foi possível salvar o rascunho. Tente novamente.')
+        toast.error("Não foi possível salvar o rascunho. Tente novamente.");
       }
-    })()
-    setHomeModalOpen(false)
-  }
+    })();
+    setHomeModalOpen(false);
+  };
 
-  const coverImage = images[0]
-  const remainingChars = 120 - name.length
+  const coverImage = images[0];
+  const remainingChars = 120 - name.length;
 
   useEffect(() => {
     if (justPublished) {
-      confetti({ particleCount: 160, spread: 100, origin: { y: 0.65 } })
+      confetti({ particleCount: 160, spread: 100, origin: { y: 0.65 } });
     }
-  }, [justPublished])
+  }, [justPublished]);
 
   useEffect(() => {
     if (newCategoryModalOpen) {
-      setTimeout(() => newCategoryInputRef.current?.focus(), 50)
+      setTimeout(() => newCategoryInputRef.current?.focus(), 50);
     }
-  }, [newCategoryModalOpen])
+  }, [newCategoryModalOpen]);
 
   const handleCreateCategory = async () => {
-    if (!newCategoryName.trim()) return
+    if (!newCategoryName.trim()) return;
     await createCategoryMutation.mutateAsync({
       store_id: storeId,
       name: newCategoryName.trim(),
-    })
-    setNewCategoryModalOpen(false)
-    setNewCategoryName('')
-  }
+    });
+    setNewCategoryModalOpen(false);
+    setNewCategoryName("");
+  };
 
   return (
     <form onSubmit={submit} className="flex flex-col pb-20">
@@ -258,7 +286,11 @@ export function ProductForm({
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-z-border bg-white p-4 xl:hidden">
         <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-z-border bg-z-bg">
           {coverImage ? (
-            <img src={coverImage} alt="" className="h-full w-full object-cover" />
+            <img
+              src={coverImage}
+              alt=""
+              className="h-full w-full object-cover"
+            />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-z-text-hint">
               <HugeiconsIcon icon={ImageIcon} size={24} />
@@ -267,13 +299,15 @@ export function ProductForm({
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold text-z-text">
-            {name || 'Novo produto'}
+            {name || "Novo produto"}
           </p>
           <div className="mt-1 flex flex-wrap items-center gap-3 text-sm">
             {priceCents > 0 && (
               <span className="text-z-text-muted">
-                Preço{' '}
-                <strong className="text-rose-500">{formatMoney(priceCents)}</strong>
+                Preço{" "}
+                <strong className="text-rose-500">
+                  {formatMoney(priceCents)}
+                </strong>
               </span>
             )}
           </div>
@@ -290,11 +324,11 @@ export function ProductForm({
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-xs font-medium transition-colors',
-                'lg:flex-row lg:w-full lg:gap-2 lg:px-4 lg:py-2.5 lg:text-sm lg:text-left',
+                "flex flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-xs font-medium transition-colors",
+                "lg:flex-row lg:w-full lg:gap-2 lg:px-4 lg:py-2.5 lg:text-sm lg:text-left",
                 activeTab === tab.id
-                  ? 'bg-z-text text-white'
-                  : 'text-z-text-muted hover:bg-z-bg2 hover:text-z-text',
+                  ? "bg-z-text text-white"
+                  : "text-z-text-muted hover:bg-z-bg2 hover:text-z-text",
               )}
             >
               <HugeiconsIcon icon={tab.icon} size={15} className="shrink-0" />
@@ -307,11 +341,13 @@ export function ProductForm({
         {/* Tab content */}
         <div className="min-w-0 flex-1 rounded-2xl border border-z-border bg-white p-4 lg:p-6">
           {/* ─── INFORMAÇÕES GERAIS ─── */}
-          {activeTab === 'info' && (
+          {activeTab === "info" && (
             <div className="flex flex-col gap-8">
               {/* Título */}
               <section>
-                <h3 className="mb-4 font-semibold text-z-text">Título do produto</h3>
+                <h3 className="mb-4 font-semibold text-z-text">
+                  Título do produto
+                </h3>
 
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-1.5">
@@ -326,8 +362,10 @@ export function ProductForm({
                       </label>
                       <span
                         className={cn(
-                          'text-xs',
-                          remainingChars < 20 ? 'text-amber-500' : 'text-z-text-hint',
+                          "text-xs",
+                          remainingChars < 20
+                            ? "text-amber-500"
+                            : "text-z-text-hint",
                         )}
                       >
                         {remainingChars} caracteres restantes
@@ -337,12 +375,12 @@ export function ProductForm({
                       maxLength={120}
                       placeholder="Ex: Camiseta básica algodão"
                       className={cn(
-                        'h-11 w-full rounded-lg border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:outline-none focus:ring-2',
+                        "h-11 w-full rounded-lg border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:outline-none focus:ring-2",
                         form.formState.errors.name
-                          ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                          : 'border-z-border focus:border-z-green focus:ring-z-green/20',
+                          ? "border-red-400 focus:border-red-400 focus:ring-red-400/20"
+                          : "border-z-border focus:border-z-green focus:ring-z-green/20",
                       )}
-                      {...form.register('name')}
+                      {...form.register("name")}
                     />
                     {form.formState.errors.name && (
                       <span className="text-xs text-destructive">
@@ -352,7 +390,6 @@ export function ProductForm({
                   </div>
                 </div>
               </section>
-
 
               {/* Códigos de identificação */}
               <section className="border-t border-z-border pt-6">
@@ -372,7 +409,7 @@ export function ProductForm({
                     </label>
                     <select
                       className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                      {...form.register('barcode_type')}
+                      {...form.register("barcode_type")}
                     >
                       {BARCODE_TYPES.map((t) => (
                         <option key={t.value} value={t.value}>
@@ -395,7 +432,7 @@ export function ProductForm({
                       placeholder="Código de barras do produto"
                       disabled={!hasBarcodeType}
                       className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 disabled:bg-z-bg disabled:text-z-text-hint"
-                      {...form.register('barcode')}
+                      {...form.register("barcode")}
                     />
                     {form.formState.errors.barcode && (
                       <span className="text-xs text-destructive">
@@ -416,9 +453,9 @@ export function ProductForm({
                     <input
                       placeholder="Seu código interno (SKU)"
                       disabled={autoSku}
-                      value={autoSku ? '(gerado automaticamente)' : undefined}
+                      value={autoSku ? "(gerado automaticamente)" : undefined}
                       className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 disabled:bg-z-bg disabled:italic disabled:text-z-text-hint"
-                      {...(autoSku ? {} : form.register('sku'))}
+                      {...(autoSku ? {} : form.register("sku"))}
                     />
                     <Controller
                       control={form.control}
@@ -433,7 +470,11 @@ export function ProductForm({
                             <HugeiconsIcon
                               icon={field.value ? ToggleOnIcon : ToggleOffIcon}
                               size={22}
-                              className={field.value ? 'text-[#10b981]' : 'text-z-text-hint'}
+                              className={
+                                field.value
+                                  ? "text-[#10b981]"
+                                  : "text-z-text-hint"
+                              }
                             />
                           </button>
                           Gerar automaticamente
@@ -446,7 +487,9 @@ export function ProductForm({
 
               {/* Especificações */}
               <section className="border-t border-z-border pt-6">
-                <h3 className="mb-4 font-semibold text-z-text">Especificações</h3>
+                <h3 className="mb-4 font-semibold text-z-text">
+                  Especificações
+                </h3>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <div className="flex flex-col gap-1.5">
@@ -460,7 +503,7 @@ export function ProductForm({
                     </label>
                     <select
                       className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                      {...form.register('condition')}
+                      {...form.register("condition")}
                     >
                       {CONDITIONS.map((c) => (
                         <option key={c.value} value={c.value}>
@@ -481,7 +524,7 @@ export function ProductForm({
                     </label>
                     <select
                       className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                      {...form.register('unit')}
+                      {...form.register("unit")}
                     >
                       <option value="">Selecione...</option>
                       {UNITS.map((u) => (
@@ -503,7 +546,7 @@ export function ProductForm({
                     </label>
                     <select
                       className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                      {...form.register('purchase_recurrence')}
+                      {...form.register("purchase_recurrence")}
                     >
                       {RECURRENCES.map((r) => (
                         <option key={r.value} value={r.value}>
@@ -527,7 +570,7 @@ export function ProductForm({
                     placeholder="Ex: Nike, Apple, Samsung..."
                     disabled={hasNoBrand}
                     className="h-11 max-w-xs rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 disabled:bg-z-bg disabled:text-z-text-hint"
-                    {...form.register('brand')}
+                    {...form.register("brand")}
                   />
                   {form.formState.errors.brand && (
                     <span className="text-xs text-destructive">
@@ -547,7 +590,11 @@ export function ProductForm({
                           <HugeiconsIcon
                             icon={field.value ? ToggleOnIcon : ToggleOffIcon}
                             size={22}
-                            className={field.value ? 'text-[#10b981]' : 'text-z-text-hint'}
+                            className={
+                              field.value
+                                ? "text-[#10b981]"
+                                : "text-z-text-hint"
+                            }
                           />
                         </button>
                         Não possui marca ou é um kit
@@ -571,12 +618,18 @@ export function ProductForm({
                         <HugeiconsIcon
                           icon={field.value ? ToggleOnIcon : ToggleOffIcon}
                           size={28}
-                          className={field.value ? 'text-[#10b981]' : 'text-z-text-hint'}
+                          className={
+                            field.value ? "text-[#10b981]" : "text-z-text-hint"
+                          }
                         />
                       </button>
                       <div>
-                        <p className="text-sm font-medium text-z-text">Produto ativo</p>
-                        <p className="text-xs text-z-text-muted">Visível no catálogo</p>
+                        <p className="text-sm font-medium text-z-text">
+                          Produto ativo
+                        </p>
+                        <p className="text-xs text-z-text-muted">
+                          Visível no catálogo
+                        </p>
                       </div>
                     </label>
                   )}
@@ -584,7 +637,7 @@ export function ProductForm({
               </section>
 
               {/* Produto em destaque — plano Ilimitado */}
-              {planLimits.canUse('featured') && (
+              {planLimits.canUse("featured") && (
                 <section className="border-t border-z-border pt-6">
                   <Controller
                     control={form.control}
@@ -593,42 +646,50 @@ export function ProductForm({
                       <div className="flex items-center justify-between gap-3">
                         <label
                           className={cn(
-                            'flex cursor-pointer items-center gap-3',
-                            !canEnableFeatured && 'cursor-not-allowed opacity-50',
+                            "flex cursor-pointer items-center gap-3",
+                            !canEnableFeatured &&
+                              "cursor-not-allowed opacity-50",
                           )}
                         >
                           <button
                             type="button"
                             disabled={!canEnableFeatured && !field.value}
                             onClick={() => {
-                              if (!canEnableFeatured && !field.value) return
-                              field.onChange(!field.value)
+                              if (!canEnableFeatured && !field.value) return;
+                              field.onChange(!field.value);
                             }}
                           >
                             <HugeiconsIcon
                               icon={field.value ? ToggleOnIcon : ToggleOffIcon}
                               size={28}
-                              className={field.value ? 'text-amber-500' : 'text-z-text-hint'}
+                              className={
+                                field.value
+                                  ? "text-amber-500"
+                                  : "text-z-text-hint"
+                              }
                             />
                           </button>
                           <div>
-                            <p className="text-sm font-medium text-z-text">Produto em destaque</p>
+                            <p className="text-sm font-medium text-z-text">
+                              Produto em destaque
+                            </p>
                             <p className="text-xs text-z-text-muted">
                               {!canEnableFeatured && !field.value
-                                ? 'Limite de 4 destaques atingido'
-                                : 'Aparece na seção de destaques do catálogo'}
+                                ? "Limite de 4 destaques atingido"
+                                : "Aparece na seção de destaques do catálogo"}
                             </p>
                           </div>
                         </label>
                         <span
                           className={cn(
-                            'shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold',
+                            "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
                             displayedFeaturedCount >= MAX_FEATURED_PRODUCTS
-                              ? 'bg-amber-100 text-amber-700'
-                              : 'bg-z-bg2 text-z-text-muted',
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-z-bg2 text-z-text-muted",
                           )}
                         >
-                          {displayedFeaturedCount}/{MAX_FEATURED_PRODUCTS} destaques
+                          {displayedFeaturedCount}/{MAX_FEATURED_PRODUCTS}{" "}
+                          destaques
                         </span>
                       </div>
                     )}
@@ -639,7 +700,7 @@ export function ProductForm({
           )}
 
           {/* ─── ESTOQUE E VARIAÇÕES ─── */}
-          {activeTab === 'stock' && (
+          {activeTab === "stock" && (
             <div className="flex flex-col gap-6">
               {/* Has variations */}
               <section>
@@ -652,8 +713,8 @@ export function ProductForm({
                   render={({ field }) => (
                     <div className="flex gap-4">
                       {[
-                        { label: 'Não', value: false },
-                        { label: 'Sim', value: true },
+                        { label: "Não", value: false },
+                        { label: "Sim", value: true },
                       ].map((opt) => (
                         <label
                           key={String(opt.value)}
@@ -661,10 +722,10 @@ export function ProductForm({
                         >
                           <span
                             className={cn(
-                              'flex h-4 w-4 items-center justify-center rounded-full border-2 transition-colors',
+                              "flex h-4 w-4 items-center justify-center rounded-full border-2 transition-colors",
                               field.value === opt.value
-                                ? 'border-z-green bg-z-green'
-                                : 'border-z-border',
+                                ? "border-z-green bg-z-green"
+                                : "border-z-border",
                             )}
                           >
                             {field.value === opt.value && (
@@ -696,9 +757,11 @@ export function ProductForm({
                       min={0}
                       placeholder="Em branco = ilimitado"
                       className="h-11 max-w-xs rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                      {...form.register('stock', {
+                      {...form.register("stock", {
                         setValueAs: (v) =>
-                          v === '' || v === null || v === undefined ? null : Number(v),
+                          v === "" || v === null || v === undefined
+                            ? null
+                            : Number(v),
                       })}
                     />
                     {form.formState.errors.stock && (
@@ -721,19 +784,31 @@ export function ProductForm({
 
                   <div className="flex flex-wrap gap-2">
                     {[
-                      { type: 'color' as VariationType, label: 'Cor', icon: ColorPickerIcon },
-                      { type: 'size' as VariationType, label: 'Tamanho', icon: RulerIcon },
-                      { type: 'other' as VariationType, label: 'Outro tipo', icon: Settings01Icon },
+                      {
+                        type: "color" as VariationType,
+                        label: "Cor",
+                        icon: ColorPickerIcon,
+                      },
+                      {
+                        type: "size" as VariationType,
+                        label: "Tamanho",
+                        icon: RulerIcon,
+                      },
+                      {
+                        type: "other" as VariationType,
+                        label: "Outro tipo",
+                        icon: Settings01Icon,
+                      },
                     ].map((opt) => (
                       <button
                         key={opt.type}
                         type="button"
                         onClick={() => setVariationModalOpen(true)}
                         className={cn(
-                          'flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors',
+                          "flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors",
                           variationType === opt.type
-                            ? 'border-z-green bg-z-green/10 text-[#10b981]'
-                            : 'border-z-border text-z-text-muted hover:border-z-text hover:text-z-text',
+                            ? "border-z-green bg-z-green/10 text-[#10b981]"
+                            : "border-z-border text-z-text-muted hover:border-z-text hover:text-z-text",
                         )}
                       >
                         <HugeiconsIcon icon={opt.icon} size={16} />
@@ -742,33 +817,38 @@ export function ProductForm({
                     ))}
                   </div>
 
-                  {variationType && variationOptions && variationOptions.length > 0 && (
-                    <div className="mt-4 rounded-xl border border-z-border bg-z-bg p-4">
-                      <p className="mb-2 text-xs font-semibold text-z-text-hint">
-                        {variationLabel} configurado
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {variationOptions.map((opt) => (
-                          <span
-                            key={opt.name}
-                            className="inline-flex items-center gap-2 rounded-lg border border-z-border bg-white px-2.5 py-1 text-sm text-z-text"
-                          >
-                            {opt.name}
-                            <span className="text-xs text-z-text-hint">
-                              · {opt.stock == null ? 'ilimitado' : `${opt.stock} un.`}
+                  {variationType &&
+                    variationOptions &&
+                    variationOptions.length > 0 && (
+                      <div className="mt-4 rounded-xl border border-z-border bg-z-bg p-4">
+                        <p className="mb-2 text-xs font-semibold text-z-text-hint">
+                          {variationLabel} configurado
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {variationOptions.map((opt) => (
+                            <span
+                              key={opt.name}
+                              className="inline-flex items-center gap-2 rounded-lg border border-z-border bg-white px-2.5 py-1 text-sm text-z-text"
+                            >
+                              {opt.name}
+                              <span className="text-xs text-z-text-hint">
+                                ·{" "}
+                                {opt.stock == null
+                                  ? "ilimitado"
+                                  : `${opt.stock} un.`}
+                              </span>
                             </span>
-                          </span>
-                        ))}
+                          ))}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setVariationModalOpen(true)}
+                          className="mt-3 text-xs font-medium text-[#10b981] hover:underline"
+                        >
+                          Editar variação
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setVariationModalOpen(true)}
-                        className="mt-3 text-xs font-medium text-[#10b981] hover:underline"
-                      >
-                        Editar variação
-                      </button>
-                    </div>
-                  )}
+                    )}
 
                   <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
                     <HugeiconsIcon
@@ -777,7 +857,8 @@ export function ProductForm({
                       className="mt-0.5 shrink-0 text-amber-600"
                     />
                     <p className="text-sm text-amber-800">
-                      Atenção: O estoque passará a ser gerenciado por variação do produto
+                      Atenção: O estoque passará a ser gerenciado por variação
+                      do produto
                     </p>
                   </div>
                 </section>
@@ -786,16 +867,18 @@ export function ProductForm({
           )}
 
           {/* ─── FOTOS ─── */}
-          {activeTab === 'photos' && (
+          {activeTab === "photos" && (
             <div className="flex flex-col gap-4">
-              <h3 className="font-semibold text-z-text">Fotos principais do produto</h3>
+              <h3 className="font-semibold text-z-text">
+                Fotos principais do produto
+              </h3>
 
               <ProductImagesUploader
                 storeId={storeId}
                 value={images}
                 max={10}
                 onChange={(urls) =>
-                  form.setValue('images', urls, {
+                  form.setValue("images", urls, {
                     shouldValidate: true,
                     shouldDirty: true,
                   })
@@ -816,8 +899,8 @@ export function ProductForm({
                     className="mt-0.5 shrink-0 text-amber-600"
                   />
                   <p className="text-sm text-amber-800">
-                    Essas são as fotos principais do produto. Você também pode definir fotos
-                    específicas por variação se necessário.
+                    Essas são as fotos principais do produto. Você também pode
+                    definir fotos específicas por variação se necessário.
                   </p>
                 </div>
               )}
@@ -825,7 +908,7 @@ export function ProductForm({
           )}
 
           {/* ─── PREÇO ─── */}
-          {activeTab === 'price' && (
+          {activeTab === "price" && (
             <div className="flex flex-col gap-6">
               <h3 className="font-semibold text-z-text">Preço do produto</h3>
 
@@ -843,13 +926,13 @@ export function ProductForm({
                     valueInCents={priceCents}
                     placeholder="R$ 0,00"
                     className={cn(
-                      'h-12 max-w-sm rounded-lg border bg-white px-3.5 text-base placeholder:text-z-text-hint focus:outline-none focus:ring-2',
+                      "h-12 max-w-sm rounded-lg border bg-white px-3.5 text-base placeholder:text-z-text-hint focus:outline-none focus:ring-2",
                       form.formState.errors.price_in_cents
-                        ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                        : 'border-z-border focus:border-z-green focus:ring-z-green/20',
+                        ? "border-red-400 focus:border-red-400 focus:ring-red-400/20"
+                        : "border-z-border focus:border-z-green focus:ring-z-green/20",
                     )}
                     onChange={(cents) =>
-                      form.setValue('price_in_cents', cents ?? 0, {
+                      form.setValue("price_in_cents", cents ?? 0, {
                         shouldValidate: true,
                         shouldDirty: true,
                       })
@@ -878,7 +961,9 @@ export function ProductForm({
                       placeholder="R$ 0,00"
                       className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                       onChange={(cents) =>
-                        form.setValue('cost_in_cents', cents, { shouldDirty: true })
+                        form.setValue("cost_in_cents", cents, {
+                          shouldDirty: true,
+                        })
                       }
                     />
                   </div>
@@ -894,7 +979,11 @@ export function ProductForm({
                     </label>
                     <div className="flex h-11 w-full items-center rounded-lg border border-z-border bg-z-bg px-3.5 text-sm text-z-text-muted">
                       {margin != null ? (
-                        <span className={cn(margin < 0 ? 'text-rose-500' : 'text-z-text')}>
+                        <span
+                          className={cn(
+                            margin < 0 ? "text-rose-500" : "text-z-text",
+                          )}
+                        >
                           {margin.toFixed(2)}%
                         </span>
                       ) : (
@@ -914,7 +1003,7 @@ export function ProductForm({
                     placeholder="Em branco = sem promoção"
                     className="h-11 max-w-sm rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                     onChange={(cents) =>
-                      form.setValue('promo_price_in_cents', cents, {
+                      form.setValue("promo_price_in_cents", cents, {
                         shouldValidate: true,
                         shouldDirty: true,
                       })
@@ -928,7 +1017,7 @@ export function ProductForm({
                     <span className="text-xs text-z-text-muted">
                       <strong className="text-[#10b981]">
                         -{Math.round((1 - promoCents / priceCents) * 100)}%
-                      </strong>{' '}
+                      </strong>{" "}
                       de desconto · {formatMoney(promoCents)}
                     </span>
                   ) : (
@@ -940,7 +1029,9 @@ export function ProductForm({
                 <div className="flex flex-col gap-3 rounded-xl border border-z-border bg-z-bg p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-semibold text-z-text">Parcelamento</p>
+                      <p className="text-sm font-semibold text-z-text">
+                        Parcelamento
+                      </p>
                       <p className="text-xs text-z-text-muted">
                         Exibe opção de parcelamento no catálogo
                       </p>
@@ -949,19 +1040,37 @@ export function ProductForm({
                       type="button"
                       onClick={() => {
                         if (installmentCount != null) {
-                          form.setValue('installment_count', null, { shouldDirty: true })
-                          form.setValue('installment_total_in_cents', null, { shouldDirty: true })
+                          form.setValue("installment_count", null, {
+                            shouldDirty: true,
+                          });
+                          form.setValue("installment_total_in_cents", null, {
+                            shouldDirty: true,
+                          });
                         } else {
-                          form.setValue('installment_count', 2, { shouldDirty: true })
-                          form.setValue('installment_total_in_cents', promoCents ?? priceCents ?? null, { shouldDirty: true })
+                          form.setValue("installment_count", 2, {
+                            shouldDirty: true,
+                          });
+                          form.setValue(
+                            "installment_total_in_cents",
+                            promoCents ?? priceCents ?? null,
+                            { shouldDirty: true },
+                          );
                         }
                       }}
                       className="shrink-0"
                     >
                       <HugeiconsIcon
-                        icon={installmentCount != null ? ToggleOnIcon : ToggleOffIcon}
+                        icon={
+                          installmentCount != null
+                            ? ToggleOnIcon
+                            : ToggleOffIcon
+                        }
                         size={28}
-                        className={installmentCount != null ? 'text-[#10b981]' : 'text-z-text-hint'}
+                        className={
+                          installmentCount != null
+                            ? "text-[#10b981]"
+                            : "text-z-text-hint"
+                        }
                       />
                     </button>
                   </div>
@@ -979,7 +1088,11 @@ export function ProductForm({
                             placeholder="R$ 0,00"
                             className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                             onChange={(cents) =>
-                              form.setValue('installment_total_in_cents', cents, { shouldDirty: true })
+                              form.setValue(
+                                "installment_total_in_cents",
+                                cents,
+                                { shouldDirty: true },
+                              )
                             }
                           />
                         </div>
@@ -990,51 +1103,75 @@ export function ProductForm({
                           <select
                             value={installmentCount ?? 2}
                             onChange={(e) =>
-                              form.setValue('installment_count', Number(e.target.value), { shouldDirty: true })
+                              form.setValue(
+                                "installment_count",
+                                Number(e.target.value),
+                                { shouldDirty: true },
+                              )
                             }
                             className="h-11 w-full rounded-lg border border-z-border bg-white px-3 text-sm focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                           >
-                            {Array.from({ length: 23 }, (_, i) => i + 2).map((n) => (
-                              <option key={n} value={n}>{n}x</option>
-                            ))}
+                            {Array.from({ length: 23 }, (_, i) => i + 2).map(
+                              (n) => (
+                                <option key={n} value={n}>
+                                  {n}x
+                                </option>
+                              ),
+                            )}
                           </select>
                         </div>
                       </div>
 
                       {/* Preview */}
-                      {priceCents > 0 && installmentCount != null && installmentTotal != null && (
-                        <div className="rounded-xl border border-z-border bg-white p-4">
-                          <p className="mb-2 text-[10px] font-semibold text-z-text-hint">
-                            Preview no catálogo
-                          </p>
-                          <div className="flex flex-col gap-0.5">
-                            {promoCents != null && promoCents < priceCents && (
-                              <span className="text-sm text-z-text-hint line-through">
-                                {formatMoney(priceCents)}
-                              </span>
-                            )}
-                            <div className="flex items-center gap-2">
-                              <span className="text-2xl font-bold text-z-ink">
-                                {formatMoney(promoCents ?? priceCents)}
-                              </span>
-                              {promoCents != null && promoCents < priceCents && (
-                                <span className="rounded-full bg-[#e6f7ef] px-2 py-0.5 text-[11px] font-bold text-[#02a650]">
-                                  {Math.round((1 - promoCents / priceCents) * 100)}% OFF
+                      {priceCents > 0 &&
+                        installmentCount != null &&
+                        installmentTotal != null && (
+                          <div className="rounded-xl border border-z-border bg-white p-4">
+                            <p className="mb-2 text-[10px] font-semibold text-z-text-hint">
+                              Preview no catálogo
+                            </p>
+                            <div className="flex flex-col gap-0.5">
+                              {promoCents != null &&
+                                promoCents < priceCents && (
+                                  <span className="text-sm text-z-text-hint line-through">
+                                    {formatMoney(priceCents)}
+                                  </span>
+                                )}
+                              <div className="flex items-center gap-2">
+                                <span className="text-2xl font-bold text-z-ink">
+                                  {formatMoney(promoCents ?? priceCents)}
                                 </span>
-                              )}
+                                {promoCents != null &&
+                                  promoCents < priceCents && (
+                                    <span className="rounded-full bg-[#e6f7ef] px-2 py-0.5 text-[11px] font-bold text-[#02a650]">
+                                      {Math.round(
+                                        (1 - promoCents / priceCents) * 100,
+                                      )}
+                                      % OFF
+                                    </span>
+                                  )}
+                              </div>
+                              <span className="text-sm text-z-text-muted">
+                                ou{" "}
+                                <strong className="text-z-text">
+                                  {installmentCount}x de{" "}
+                                  {formatMoney(
+                                    Math.ceil(
+                                      installmentTotal / installmentCount,
+                                    ),
+                                  )}
+                                </strong>
+                                {installmentTotal <=
+                                  (promoCents ?? priceCents) && (
+                                  <span className="text-[#02a650]">
+                                    {" "}
+                                    sem juros
+                                  </span>
+                                )}
+                              </span>
                             </div>
-                            <span className="text-sm text-z-text-muted">
-                              ou{' '}
-                              <strong className="text-z-text">
-                                {installmentCount}x de {formatMoney(Math.ceil(installmentTotal / installmentCount))}
-                              </strong>
-                              {installmentTotal <= (promoCents ?? priceCents) && (
-                                <span className="text-[#02a650]"> sem juros</span>
-                              )}
-                            </span>
                           </div>
-                        </div>
-                      )}
+                        )}
                     </div>
                   )}
                 </div>
@@ -1053,46 +1190,64 @@ export function ProductForm({
               {/* Product image */}
               <div className="relative aspect-square w-full overflow-hidden bg-z-bg">
                 {coverImage ? (
-                  <img src={coverImage} alt="" className="h-full w-full object-cover" />
+                  <img
+                    src={coverImage}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-z-text-hint">
                     <HugeiconsIcon icon={ImageIcon} size={32} />
                     <span className="text-xs">Sem foto</span>
                   </div>
                 )}
-                {promoCents != null && priceCents > 0 && promoCents < priceCents && (
-                  <span className="absolute right-2 top-2 rounded-full bg-[#02a650] px-2 py-0.5 text-[11px] font-bold text-white">
-                    -{Math.round((1 - promoCents / priceCents) * 100)}% OFF
-                  </span>
-                )}
+                {promoCents != null &&
+                  priceCents > 0 &&
+                  promoCents < priceCents && (
+                    <span className="absolute right-2 top-2 rounded-full bg-[#02a650] px-2 py-0.5 text-[11px] font-bold text-white">
+                      -{Math.round((1 - promoCents / priceCents) * 100)}% OFF
+                    </span>
+                  )}
               </div>
 
               {/* Info */}
               <div className="p-3">
                 <p className="line-clamp-2 min-h-[2.5em] text-[15px] font-bold leading-tight tracking-tight text-z-ink">
-                  {name || <span className="text-z-text-hint">Nome do produto</span>}
+                  {name || (
+                    <span className="text-z-text-hint">Nome do produto</span>
+                  )}
                 </p>
 
                 <div className="mt-2 flex flex-col gap-0.5">
-                  {promoCents != null && priceCents > 0 && promoCents < priceCents && (
-                    <span className="text-[11px] text-z-text-hint line-through">
-                      {formatMoney(priceCents)}
-                    </span>
-                  )}
+                  {promoCents != null &&
+                    priceCents > 0 &&
+                    promoCents < priceCents && (
+                      <span className="text-[11px] text-z-text-hint line-through">
+                        {formatMoney(priceCents)}
+                      </span>
+                    )}
                   <span className="text-[17px] font-bold text-z-ink">
-                    {priceCents > 0
-                      ? formatMoney(promoCents ?? priceCents)
-                      : <span className="text-z-text-hint text-sm font-normal">Sem preço</span>
-                    }
+                    {priceCents > 0 ? (
+                      formatMoney(promoCents ?? priceCents)
+                    ) : (
+                      <span className="text-z-text-hint text-sm font-normal">
+                        Sem preço
+                      </span>
+                    )}
                   </span>
-                  {installmentCount != null && installmentTotal != null && installmentTotal > 0 && (
-                    <span className="text-[11px] text-z-text-muted">
-                      {installmentCount}x de {formatMoney(Math.ceil(installmentTotal / installmentCount))}
-                      {installmentTotal <= (promoCents ?? priceCents) && (
-                        <span className="text-[#02a650]"> sem juros</span>
-                      )}
-                    </span>
-                  )}
+                  {installmentCount != null &&
+                    installmentTotal != null &&
+                    installmentTotal > 0 && (
+                      <span className="text-[11px] text-z-text-muted">
+                        {installmentCount}x de{" "}
+                        {formatMoney(
+                          Math.ceil(installmentTotal / installmentCount),
+                        )}
+                        {installmentTotal <= (promoCents ?? priceCents) && (
+                          <span className="text-[#02a650]"> sem juros</span>
+                        )}
+                      </span>
+                    )}
                 </div>
 
                 <div className="mt-3 flex h-9 w-full items-center justify-center rounded-xl bg-z-text text-[12px] font-bold text-white">
@@ -1129,8 +1284,8 @@ export function ProductForm({
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => {
-                    submitModeRef.current = 'draft'
-                    submit()
+                    submitModeRef.current = "draft";
+                    submit();
                   }}
                   className="rounded-xl border border-z-border px-4 py-2.5 text-sm font-medium text-z-text-muted transition-colors hover:bg-z-bg hover:text-z-text disabled:opacity-60"
                 >
@@ -1143,12 +1298,27 @@ export function ProductForm({
                   className="flex items-center gap-2 rounded-xl bg-z-green px-6 py-2.5 text-sm font-semibold text-z-ink transition-opacity hover:bg-green-600 disabled:opacity-60"
                 >
                   {isSubmitting && (
-                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    <svg
+                      className="h-4 w-4 animate-spin"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
                     </svg>
                   )}
-                  {isSubmitting ? 'Salvando...' : 'Publicar'}
+                  {isSubmitting ? "Salvando..." : "Publicar"}
                 </button>
               </div>
             </>
@@ -1172,7 +1342,7 @@ export function ProductForm({
                 disabled={isSubmitting || !isDirty}
                 className="rounded-xl bg-z-green px-6 py-2.5 text-sm font-semibold text-z-ink transition-opacity hover:bg-green-600 disabled:opacity-60"
               >
-                {isSubmitting ? 'Salvando...' : 'Salvar alterações'}
+                {isSubmitting ? "Salvando..." : "Salvar alterações"}
               </button>
             </>
           )}
@@ -1183,9 +1353,12 @@ export function ProductForm({
       {homeModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 p-4 sm:items-center">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="mb-1 font-semibold text-z-text">Sair do cadastro?</h3>
+            <h3 className="mb-1 font-semibold text-z-text">
+              Sair do cadastro?
+            </h3>
             <p className="mb-5 text-sm text-z-text-muted">
-              O produto ainda não foi salvo. Deseja salvar como rascunho antes de sair?
+              O produto ainda não foi salvo. Deseja salvar como rascunho antes
+              de sair?
             </p>
             <div className="flex flex-col gap-2">
               <button
@@ -1194,7 +1367,7 @@ export function ProductForm({
                 onClick={handleDraftAndNavigate}
                 className="rounded-xl bg-z-green px-4 py-2.5 text-sm font-semibold text-z-ink hover:bg-green-600 disabled:opacity-60"
               >
-                {isSubmitting ? 'Salvando...' : 'Salvar rascunho e sair'}
+                {isSubmitting ? "Salvando..." : "Salvar rascunho e sair"}
               </button>
               <button
                 type="button"
@@ -1215,49 +1388,61 @@ export function ProductForm({
         </div>
       )}
 
-
       {/* Missing fields modal */}
       {missingFieldsModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 p-4 sm:items-center">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-4 flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
-                <HugeiconsIcon icon={AlertCircleIcon} size={20} className="text-red-500" />
+                <HugeiconsIcon
+                  icon={AlertCircleIcon}
+                  size={20}
+                  className="text-red-500"
+                />
               </div>
               <div>
-                <h3 className="font-semibold text-z-text">Campos obrigatórios</h3>
-                <p className="text-sm text-z-text-muted">Preencha as informações abaixo para publicar</p>
+                <h3 className="font-semibold text-z-text">
+                  Campos obrigatórios
+                </h3>
+                <p className="text-sm text-z-text-muted">
+                  Preencha as informações abaixo para publicar
+                </p>
               </div>
             </div>
             <ul className="mb-5 flex flex-col gap-2">
               {Object.entries(form.formState.errors)
-                .filter(([key]) => key in (FIELD_TAB_MAP as Record<string, unknown>))
+                .filter(
+                  ([key]) => key in (FIELD_TAB_MAP as Record<string, unknown>),
+                )
                 .map(([key, error]) => {
-                  const fieldInfo = FIELD_TAB_MAP[key]
-                  if (!fieldInfo) return null
+                  const fieldInfo = FIELD_TAB_MAP[key];
+                  if (!fieldInfo) return null;
                   return (
                     <li
                       key={key}
                       className="flex items-center justify-between rounded-xl border border-red-100 bg-red-50 px-4 py-2.5"
                     >
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-z-text">{fieldInfo.label}</p>
+                        <p className="text-sm font-medium text-z-text">
+                          {fieldInfo.label}
+                        </p>
                         <p className="truncate text-xs text-red-600">
-                          {(error as { message?: string })?.message ?? 'Campo inválido'}
+                          {(error as { message?: string })?.message ??
+                            "Campo inválido"}
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => {
-                          setActiveTab(fieldInfo.tab)
-                          setMissingFieldsModalOpen(false)
+                          setActiveTab(fieldInfo.tab);
+                          setMissingFieldsModalOpen(false);
                         }}
                         className="ml-3 shrink-0 text-xs font-semibold text-[#10b981] hover:underline"
                       >
                         Adicionar
                       </button>
                     </li>
-                  )
+                  );
                 })}
             </ul>
             <button
@@ -1275,14 +1460,14 @@ export function ProductForm({
       <ProductVariationModal
         open={variationModalOpen}
         productName={name}
-        productStock={form.watch('stock') ?? null}
+        productStock={form.watch("stock") ?? null}
         initialType={variationType ?? null}
         initialLabel={variationLabel ?? null}
         initialOptions={variationOptions ?? null}
         onSave={(type, label, options) => {
-          form.setValue('variation_type', type, { shouldDirty: true })
-          form.setValue('variation_label', label, { shouldDirty: true })
-          form.setValue('variation_options', options, { shouldDirty: true })
+          form.setValue("variation_type", type, { shouldDirty: true });
+          form.setValue("variation_label", label, { shouldDirty: true });
+          form.setValue("variation_options", options, { shouldDirty: true });
         }}
         onClose={() => setVariationModalOpen(false)}
       />
@@ -1293,8 +1478,8 @@ export function ProductForm({
           className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 p-4 sm:items-center"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
-              setNewCategoryModalOpen(false)
-              setNewCategoryName('')
+              setNewCategoryModalOpen(false);
+              setNewCategoryName("");
             }
           }}
         >
@@ -1313,10 +1498,10 @@ export function ProductForm({
                 maxLength={60}
                 className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleCreateCategory()
-                  if (e.key === 'Escape') {
-                    setNewCategoryModalOpen(false)
-                    setNewCategoryName('')
+                  if (e.key === "Enter") handleCreateCategory();
+                  if (e.key === "Escape") {
+                    setNewCategoryModalOpen(false);
+                    setNewCategoryName("");
                   }
                 }}
               />
@@ -1324,8 +1509,8 @@ export function ProductForm({
                 <button
                   type="button"
                   onClick={() => {
-                    setNewCategoryModalOpen(false)
-                    setNewCategoryName('')
+                    setNewCategoryModalOpen(false);
+                    setNewCategoryName("");
                   }}
                   className="flex-1 rounded-xl border border-z-border px-4 py-2.5 text-sm font-medium text-z-text-muted hover:bg-z-bg"
                 >
@@ -1334,10 +1519,12 @@ export function ProductForm({
                 <button
                   type="button"
                   onClick={handleCreateCategory}
-                  disabled={!newCategoryName.trim() || createCategoryMutation.isPending}
+                  disabled={
+                    !newCategoryName.trim() || createCategoryMutation.isPending
+                  }
                   className="flex-1 rounded-xl bg-z-green px-4 py-2.5 text-sm font-semibold text-z-ink hover:bg-green-600 disabled:opacity-60"
                 >
-                  {createCategoryMutation.isPending ? 'Criando...' : 'Criar'}
+                  {createCategoryMutation.isPending ? "Criando..." : "Criar"}
                 </button>
               </div>
             </div>
@@ -1345,5 +1532,5 @@ export function ProductForm({
         </div>
       )}
     </form>
-  )
+  );
 }

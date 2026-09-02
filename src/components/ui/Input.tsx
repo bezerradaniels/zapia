@@ -1,16 +1,16 @@
-import * as React from 'react'
-import { cn } from '@/lib/utils'
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ViewIcon, ViewOffSlashIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 
-export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type = 'text', ...props }, ref) => {
-    const [showPassword, setShowPassword] = React.useState(false)
-    const isPassword = type === 'password'
-    const finalType = isPassword ? (showPassword ? 'text' : 'password') : type
+  ({ className, type = "text", ...props }, ref) => {
+    const [showPassword, setShowPassword] = React.useState(false);
+    const isPassword = type === "password";
+    const finalType = isPassword ? (showPassword ? "text" : "password") : type;
 
     return (
       <div className="relative w-full">
@@ -18,11 +18,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           type={finalType}
           className={cn(
-            'flex h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm outline-none transition-colors',
-            'placeholder:text-z-text-hint',
-            'focus:border-z-green focus:ring-0',
-            'disabled:cursor-not-allowed disabled:opacity-50',
-            isPassword && 'pr-11',
+            "flex h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm outline-none transition-colors",
+            "placeholder:text-z-text-hint",
+            "focus:border-z-green focus:ring-0",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+            isPassword && "pr-11",
             className,
           )}
           {...props}
@@ -41,7 +41,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </button>
         )}
       </div>
-    )
+    );
   },
-)
-Input.displayName = 'Input'
+);
+Input.displayName = "Input";

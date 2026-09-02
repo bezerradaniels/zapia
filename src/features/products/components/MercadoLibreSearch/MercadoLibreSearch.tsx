@@ -14,54 +14,65 @@
 //
 // Price and stock are intentionally left out — the lojista fills those manually.
 
-import { useState } from 'react'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Cancel01Icon, InformationCircleIcon } from '@hugeicons/core-free-icons'
-import { SearchInput } from './SearchInput'
-import { BarcodeScanner } from './BarcodeScanner'
-import { ResultsGrid } from './ResultsGrid'
-import { useMercadoLibreSearch } from '@/features/products/hooks/useMercadoLibreSearch'
-import { useMercadoLibreImport } from '@/features/products/hooks/useMercadoLibreImport'
-import type { MlImportPayload, MlProductResult } from '@/features/products/types'
+import { useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Cancel01Icon,
+  InformationCircleIcon,
+} from "@hugeicons/core-free-icons";
+import { SearchInput } from "./SearchInput";
+import { BarcodeScanner } from "./BarcodeScanner";
+import { ResultsGrid } from "./ResultsGrid";
+import { useMercadoLibreSearch } from "@/features/products/hooks/useMercadoLibreSearch";
+import { useMercadoLibreImport } from "@/features/products/hooks/useMercadoLibreImport";
+import type {
+  MlImportPayload,
+  MlProductResult,
+} from "@/features/products/types";
 
 interface Props {
-  storeId: string
-  onImport: (payload: MlImportPayload) => void
-  onClose: () => void
+  storeId: string;
+  onImport: (payload: MlImportPayload) => void;
+  onClose: () => void;
 }
 
 export function MercadoLibreSearch({ storeId, onImport, onClose }: Props) {
-  const [query, setQuery] = useState('')
-  const [scannerOpen, setScannerOpen] = useState(false)
-  const [scannedBarcode, setScannedBarcode] = useState<string | undefined>()
-  const [importingId, setImportingId] = useState<string | null>(null)
+  const [query, setQuery] = useState("");
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [scannedBarcode, setScannedBarcode] = useState<string | undefined>();
+  const [importingId, setImportingId] = useState<string | null>(null);
 
-  const { results, isLoading, isEmpty, isError } = useMercadoLibreSearch({ query })
+  const { results, isLoading, isEmpty, isError } = useMercadoLibreSearch({
+    query,
+  });
 
   const importMutation = useMercadoLibreImport({
     storeId,
     onSuccess: (payload) => {
-      onImport(payload)
-      onClose()
+      onImport(payload);
+      onClose();
     },
-  })
+  });
 
   function handleBarcodeScan(barcode: string) {
-    setScannerOpen(false)
-    setScannedBarcode(barcode)
-    setQuery(barcode)
+    setScannerOpen(false);
+    setScannedBarcode(barcode);
+    setQuery(barcode);
   }
 
   async function handleImport(result: MlProductResult) {
-    setImportingId(result.mlId)
+    setImportingId(result.mlId);
     try {
-      await importMutation.mutateAsync({ result, searchedBarcode: scannedBarcode })
+      await importMutation.mutateAsync({
+        result,
+        searchedBarcode: scannedBarcode,
+      });
     } finally {
-      setImportingId(null)
+      setImportingId(null);
     }
   }
 
-  const showResults = query.trim().length >= 2
+  const showResults = query.trim().length >= 2;
 
   return (
     <>
@@ -111,10 +122,14 @@ export function MercadoLibreSearch({ storeId, onImport, onClose }: Props) {
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
           {!showResults ? (
             <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/40 px-3 py-4 text-xs text-muted-foreground">
-              <HugeiconsIcon icon={InformationCircleIcon} className="mt-0.5 h-4 w-4 shrink-0" />
+              <HugeiconsIcon
+                icon={InformationCircleIcon}
+                className="mt-0.5 h-4 w-4 shrink-0"
+              />
               <span>
-                Resultados com o badge <strong>Catálogo</strong> são produtos oficiais com dados
-                verificados — prefira-os. Preço e estoque não são importados; preencha manualmente.
+                Resultados com o badge <strong>Catálogo</strong> são produtos
+                oficiais com dados verificados — prefira-os. Preço e estoque não
+                são importados; preencha manualmente.
               </span>
             </div>
           ) : (
@@ -138,5 +153,5 @@ export function MercadoLibreSearch({ storeId, onImport, onClose }: Props) {
         />
       )}
     </>
-  )
+  );
 }

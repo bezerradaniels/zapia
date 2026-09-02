@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { ROUTES } from '@/config/routes'
+import { Link } from "react-router-dom";
+import { ROUTES } from "@/config/routes";
 
 export default function NotFoundPage() {
   return (
@@ -10,5 +10,5 @@ export default function NotFoundPage() {
         Voltar para o início
       </Link>
     </main>
-  )
+  );
 }

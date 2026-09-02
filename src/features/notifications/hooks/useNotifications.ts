@@ -1,21 +1,19 @@
-import { useEffect } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { notificationsKeys } from '../api/keys'
-import { getUnreadCount, listNotifications } from '../api/queries'
+import { useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { notificationsKeys } from "../api/keys";
+import { getUnreadCount, listNotifications } from "../api/queries";
 import {
   markAllNotificationsRead,
   markNotificationRead,
-} from '../api/mutations'
-import { createBrowserClient } from '@/lib/supabase'
+} from "../api/mutations";
+import { createBrowserClient } from "@/lib/supabase";
 
 export function useNotifications(storeId: string | undefined) {
   return useQuery({
-    queryKey: storeId
-      ? notificationsKeys.list(storeId)
-      : notificationsKeys.all,
+    queryKey: storeId ? notificationsKeys.list(storeId) : notificationsKeys.all,
     queryFn: () => listNotifications(storeId!),
     enabled: !!storeId,
-  })
+  });
 }
 
 export function useUnreadCount(storeId: string | undefined) {
@@ -28,31 +26,31 @@ export function useUnreadCount(storeId: string | undefined) {
     // Cache stays warm via realtime invalidation, but a 60s background refetch
     // keeps things sane if a websocket message is missed.
     refetchInterval: 60_000,
-  })
+  });
 }
 
 export function useMarkNotificationRead(storeId: string | undefined) {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => markNotificationRead(id),
     onSuccess: () => {
-      if (!storeId) return
-      qc.invalidateQueries({ queryKey: notificationsKeys.list(storeId) })
-      qc.invalidateQueries({ queryKey: notificationsKeys.unread(storeId) })
+      if (!storeId) return;
+      qc.invalidateQueries({ queryKey: notificationsKeys.list(storeId) });
+      qc.invalidateQueries({ queryKey: notificationsKeys.unread(storeId) });
     },
-  })
+  });
 }
 
 export function useMarkAllNotificationsRead(storeId: string | undefined) {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: () => markAllNotificationsRead(storeId!),
     onSuccess: () => {
-      if (!storeId) return
-      qc.invalidateQueries({ queryKey: notificationsKeys.list(storeId) })
-      qc.invalidateQueries({ queryKey: notificationsKeys.unread(storeId) })
+      if (!storeId) return;
+      qc.invalidateQueries({ queryKey: notificationsKeys.list(storeId) });
+      qc.invalidateQueries({ queryKey: notificationsKeys.unread(storeId) });
     },
-  })
+  });
 }
 
 /**
@@ -61,30 +59,30 @@ export function useMarkAllNotificationsRead(storeId: string | undefined) {
  * automatically. Mount once at the dashboard shell level.
  */
 export function useNotificationRealtime(storeId: string | undefined) {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
 
   useEffect(() => {
-    if (!storeId) return
-    const supabase = createBrowserClient()
+    if (!storeId) return;
+    const supabase = createBrowserClient();
     const channel = supabase
       .channel(`notifications:${storeId}`)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
           filter: `store_id=eq.${storeId}`,
         },
         () => {
-          qc.invalidateQueries({ queryKey: notificationsKeys.list(storeId) })
-          qc.invalidateQueries({ queryKey: notificationsKeys.unread(storeId) })
+          qc.invalidateQueries({ queryKey: notificationsKeys.list(storeId) });
+          qc.invalidateQueries({ queryKey: notificationsKeys.unread(storeId) });
         },
       )
-      .subscribe()
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [storeId, qc])
+      supabase.removeChannel(channel);
+    };
+  }, [storeId, qc]);
 }

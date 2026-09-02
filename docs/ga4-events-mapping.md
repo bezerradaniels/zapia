@@ -37,104 +37,104 @@ implementado).
 
 ### Autenticação
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `sign_up` | `method: "email"` | ✅ | `useSignUp` (`src/features/auth/hooks/useSignUp.ts`) — usado por `SignupPage` e `TrialSignupPage` |
-| `login` | `method: "email"` | ✅ | `useSignIn` (`src/features/auth/hooks/useSignIn.ts`) |
-| `logout` | — | ✅ | `useSignOut` (`src/features/auth/hooks/useSignOut.ts`) |
+| Evento    | Parâmetros        | Status | Onde                                                                                              |
+| --------- | ----------------- | ------ | ------------------------------------------------------------------------------------------------- |
+| `sign_up` | `method: "email"` | ✅     | `useSignUp` (`src/features/auth/hooks/useSignUp.ts`) — usado por `SignupPage` e `TrialSignupPage` |
+| `login`   | `method: "email"` | ✅     | `useSignIn` (`src/features/auth/hooks/useSignIn.ts`)                                              |
+| `logout`  | —                 | ✅     | `useSignOut` (`src/features/auth/hooks/useSignOut.ts`)                                            |
 
 ### Onboarding
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `onboarding_started` | `step: 1` | ✅ | `OnboardingStep1` (1ª visita, sem sessão de onboarding salva) |
-| `onboarding_step_completed` | `step`, `step_name` | ✅ | Submit de cada um dos 4 passos (`OnboardingStep1..4`) |
-| `onboarding_completed` | `total_time_seconds` | ✅ | `OnboardingStep4`, calculado a partir de `OnboardingSession.startedAt` |
+| Evento                      | Parâmetros           | Status | Onde                                                                   |
+| --------------------------- | -------------------- | ------ | ---------------------------------------------------------------------- |
+| `onboarding_started`        | `step: 1`            | ✅     | `OnboardingStep1` (1ª visita, sem sessão de onboarding salva)          |
+| `onboarding_step_completed` | `step`, `step_name`  | ✅     | Submit de cada um dos 4 passos (`OnboardingStep1..4`)                  |
+| `onboarding_completed`      | `total_time_seconds` | ✅     | `OnboardingStep4`, calculado a partir de `OnboardingSession.startedAt` |
 
 ### Loja
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `store_created` | `store_id`, `store_slug` | ✅ | `OnboardingStep1` (único call site de `createStore` hoje) e `useCreateStore` |
-| `store_updated` | `store_id`, `field` | ✅ | `useUpdateStore` (`field` = chaves alteradas, ex. `"name,whatsapp_phone"`) |
+| Evento          | Parâmetros               | Status | Onde                                                                         |
+| --------------- | ------------------------ | ------ | ---------------------------------------------------------------------------- |
+| `store_created` | `store_id`, `store_slug` | ✅     | `OnboardingStep1` (único call site de `createStore` hoje) e `useCreateStore` |
+| `store_updated` | `store_id`, `field`      | ✅     | `useUpdateStore` (`field` = chaves alteradas, ex. `"name,whatsapp_phone"`)   |
 
 ### Produtos
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `product_created` | `product_id`, `product_name`, `has_image`, `has_variations` | ✅ | `useCreateProduct` |
-| `product_updated` | `product_id` | ✅ | `useUpdateProduct` |
-| `product_deleted` | `product_id` | ✅ | `useDeleteProduct` |
-| `product_bulk_created` | `product_count` | ⏳ | Sem feature de importação em massa de produtos hoje |
+| Evento                 | Parâmetros                                                  | Status | Onde                                                |
+| ---------------------- | ----------------------------------------------------------- | ------ | --------------------------------------------------- |
+| `product_created`      | `product_id`, `product_name`, `has_image`, `has_variations` | ✅     | `useCreateProduct`                                  |
+| `product_updated`      | `product_id`                                                | ✅     | `useUpdateProduct`                                  |
+| `product_deleted`      | `product_id`                                                | ✅     | `useDeleteProduct`                                  |
+| `product_bulk_created` | `product_count`                                             | ⏳     | Sem feature de importação em massa de produtos hoje |
 
 ### Vendedores
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `seller_created` | `seller_id`, `has_dashboard_access` | ✅ | `useCreateSellerCatalog` |
-| `seller_updated` | `seller_id` | ✅ | `useUpdateSellerCatalog` |
-| `seller_deleted` | `seller_id` | ✅ | `useDeleteSellerCatalog` |
+| Evento           | Parâmetros                          | Status | Onde                     |
+| ---------------- | ----------------------------------- | ------ | ------------------------ |
+| `seller_created` | `seller_id`, `has_dashboard_access` | ✅     | `useCreateSellerCatalog` |
+| `seller_updated` | `seller_id`                         | ✅     | `useUpdateSellerCatalog` |
+| `seller_deleted` | `seller_id`                         | ✅     | `useDeleteSellerCatalog` |
 
 ### Clientes
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `customer_created` | `customer_id` | ✅ | `useCreateCustomer` |
-| `customer_updated` | `customer_id` | ✅ | `useUpdateCustomer` |
-| `customer_deleted` | `customer_id` | ✅ | `useDeleteCustomer` |
+| Evento             | Parâmetros    | Status | Onde                |
+| ------------------ | ------------- | ------ | ------------------- |
+| `customer_created` | `customer_id` | ✅     | `useCreateCustomer` |
+| `customer_updated` | `customer_id` | ✅     | `useUpdateCustomer` |
+| `customer_deleted` | `customer_id` | ✅     | `useDeleteCustomer` |
 
 ### Categorias
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `category_created` | `category_id`, `category_name` | ✅ | `useCreateCategory` |
-| `category_updated` | `category_id` | ✅ | `useUpdateCategory` |
-| `category_deleted` | `category_id` | ✅ | `useDeleteCategory` |
+| Evento             | Parâmetros                     | Status | Onde                |
+| ------------------ | ------------------------------ | ------ | ------------------- |
+| `category_created` | `category_id`, `category_name` | ✅     | `useCreateCategory` |
+| `category_updated` | `category_id`                  | ✅     | `useUpdateCategory` |
+| `category_deleted` | `category_id`                  | ✅     | `useDeleteCategory` |
 
 ### Cupons
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `coupon_created` | `coupon_id`, `coupon_code`, `discount_type`, `discount_value` | ✅ | `useCreateCoupon` (dashboard) |
-| `coupon_updated` | `coupon_id` | ✅ | `useUpdateCoupon` |
-| `coupon_deleted` | `coupon_id` | ✅ | `useDeleteCoupon` |
-| `coupon_applied` | `coupon_code`, `discount_value` | ✅ | `cartStore.applyCoupon` (vitrine — aplicado pelo cliente final no carrinho) |
-| `coupon_removed` | `coupon_code` | ✅ | `cartStore.clearCoupon` |
+| Evento           | Parâmetros                                                    | Status | Onde                                                                        |
+| ---------------- | ------------------------------------------------------------- | ------ | --------------------------------------------------------------------------- |
+| `coupon_created` | `coupon_id`, `coupon_code`, `discount_type`, `discount_value` | ✅     | `useCreateCoupon` (dashboard)                                               |
+| `coupon_updated` | `coupon_id`                                                   | ✅     | `useUpdateCoupon`                                                           |
+| `coupon_deleted` | `coupon_id`                                                   | ✅     | `useDeleteCoupon`                                                           |
+| `coupon_applied` | `coupon_code`, `discount_value`                               | ✅     | `cartStore.applyCoupon` (vitrine — aplicado pelo cliente final no carrinho) |
+| `coupon_removed` | `coupon_code`                                                 | ✅     | `cartStore.clearCoupon`                                                     |
 
 ### Pedidos
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `order_created` | `order_id`, `total_value`, `item_count`, `has_coupon` | ✅ | `useCreateManualOrder` (pedido criado manualmente pelo lojista/vendedor no dashboard) |
-| `order_status_changed` | `order_id`, `old_status`, `new_status` | ✅ | `useUpdateOrderStatus` (`OrdersPage`) |
+| Evento                 | Parâmetros                                            | Status | Onde                                                                                  |
+| ---------------------- | ----------------------------------------------------- | ------ | ------------------------------------------------------------------------------------- |
+| `order_created`        | `order_id`, `total_value`, `item_count`, `has_coupon` | ✅     | `useCreateManualOrder` (pedido criado manualmente pelo lojista/vendedor no dashboard) |
+| `order_status_changed` | `order_id`, `old_status`, `new_status`                | ✅     | `useUpdateOrderStatus` (`OrdersPage`)                                                 |
 
 ### Vitrine pública / e-commerce
 
 Nomes alinhados às recomendações de e-commerce do GA4 para os relatórios
 funcionarem sem configuração extra.
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `view_item` | `item_id`, `item_name` | ✅ | `ProductPage` (ao carregar o produto) |
-| `add_to_cart` | `item_id`, `item_name`, `quantity`, `price` | ✅ | `cartStore.addItem` (cobre `StorePage`, `ProductPage` e relacionados) |
-| `remove_from_cart` | `item_id`, `quantity` | ✅ | `cartStore.removeItem` |
-| `begin_checkout` | `item_count`, `value` | ✅ | `CartPage`, clique em "Fechar pedido" (desktop e CTA fixo mobile) |
-| `order_submitted` | `order_id`, `value`, `item_count`, `has_coupon` | ✅ | `useCreateOrder` — pedido do cliente final, enviado via WhatsApp (equivalente a `purchase`) |
+| Evento             | Parâmetros                                      | Status | Onde                                                                                        |
+| ------------------ | ----------------------------------------------- | ------ | ------------------------------------------------------------------------------------------- |
+| `view_item`        | `item_id`, `item_name`                          | ✅     | `ProductPage` (ao carregar o produto)                                                       |
+| `add_to_cart`      | `item_id`, `item_name`, `quantity`, `price`     | ✅     | `cartStore.addItem` (cobre `StorePage`, `ProductPage` e relacionados)                       |
+| `remove_from_cart` | `item_id`, `quantity`                           | ✅     | `cartStore.removeItem`                                                                      |
+| `begin_checkout`   | `item_count`, `value`                           | ✅     | `CartPage`, clique em "Fechar pedido" (desktop e CTA fixo mobile)                           |
+| `order_submitted`  | `order_id`, `value`, `item_count`, `has_coupon` | ✅     | `useCreateOrder` — pedido do cliente final, enviado via WhatsApp (equivalente a `purchase`) |
 
 ### Engajamento
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `share_link_copied` | `link_type: "store"\|"product"\|"seller"`, `item_id` | ✅ | `StoreLayout` (botão compartilhar da vitrine), `SellersPage` (copiar link do vendedor), `CatalogPage` (copiar link da loja) |
-| `search_performed` | `search_term`, `result_count` | ✅ | `StorePage`, debounced (600ms) enquanto o cliente digita na busca do catálogo |
+| Evento              | Parâmetros                                           | Status | Onde                                                                                                                        |
+| ------------------- | ---------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `share_link_copied` | `link_type: "store"\|"product"\|"seller"`, `item_id` | ✅     | `StoreLayout` (botão compartilhar da vitrine), `SellersPage` (copiar link do vendedor), `CatalogPage` (copiar link da loja) |
+| `search_performed`  | `search_term`, `result_count`                        | ✅     | `StorePage`, debounced (600ms) enquanto o cliente digita na busca do catálogo                                               |
 
 ### Faturamento (assinatura do lojista)
 
-| Evento | Parâmetros | Status | Onde |
-|---|---|---|---|
-| `pricing_page_viewed` | — | ✅ | `PricingPage` (marketing) |
-| `free_plan_started` | `plan_tier` | ✅ | `OnboardingStep1`, junto com `store_created` — o plano gratuito (plano `basico`, 10 produtos, sem cartão) é criado por trigger no banco no insert da loja (`supabase/migrations/20260625182002_free_plan_no_trial.sql`); o evento é disparado no cliente no mesmo instante por ser o sinal de conversão mais próximo disponível |
-| `subscription_started` | `plan_tier` | ✅ | `BillingPage`, ao retornar do Stripe Checkout com `?checkout=success`. O plano é lido de `sessionStorage` (gravado por `useStartCheckout` antes do redirect, já que a `success_url` do Stripe não carrega o plano). **O estado real da assinatura continua vindo exclusivamente do webhook do Stripe** (`stripe-webhook`) — este evento é só telemetria de funil, nunca fonte de verdade de billing (ver `CLAUDE.md` §13) |
+| Evento                 | Parâmetros  | Status | Onde                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ---------------------- | ----------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pricing_page_viewed`  | —           | ✅     | `PricingPage` (marketing)                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `free_plan_started`    | `plan_tier` | ✅     | `OnboardingStep1`, junto com `store_created` — o plano gratuito (plano `basico`, 10 produtos, sem cartão) é criado por trigger no banco no insert da loja (`supabase/migrations/20260625182002_free_plan_no_trial.sql`); o evento é disparado no cliente no mesmo instante por ser o sinal de conversão mais próximo disponível                                                                                           |
+| `subscription_started` | `plan_tier` | ✅     | `BillingPage`, ao retornar do Stripe Checkout com `?checkout=success`. O plano é lido de `sessionStorage` (gravado por `useStartCheckout` antes do redirect, já que a `success_url` do Stripe não carrega o plano). **O estado real da assinatura continua vindo exclusivamente do webhook do Stripe** (`stripe-webhook`) — este evento é só telemetria de funil, nunca fonte de verdade de billing (ver `CLAUDE.md` §13) |
 
 ## Adicionando um novo evento
 

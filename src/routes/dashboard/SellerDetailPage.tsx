@@ -1,5 +1,5 @@
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft02Icon,
   Edit02Icon,
@@ -7,17 +7,23 @@ import {
   ShoppingCart01Icon,
   UserGroupIcon,
   Delete02Icon,
-} from '@hugeicons/core-free-icons'
-import { useActiveStore } from '@/lib/tenant'
-import { useSellerCatalog, useDeleteSellerCatalog } from '@/features/sellers'
-import { useOrders } from '@/features/orders'
-import { ROUTES } from '@/config/routes'
-import { formatDate } from '@/lib/format'
-import { Button, Badge } from '@/components/ui'
-import { useState } from 'react'
-import { cn } from '@/lib/utils'
+} from "@hugeicons/core-free-icons";
+import { useActiveStore } from "@/lib/tenant";
+import { useSellerCatalog, useDeleteSellerCatalog } from "@/features/sellers";
+import { useOrders } from "@/features/orders";
+import { ROUTES } from "@/config/routes";
+import { formatDate } from "@/lib/format";
+import { Button, Badge } from "@/components/ui";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
-function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+function Toggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
   return (
     <button
       type="button"
@@ -25,33 +31,33 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       aria-checked={checked}
       onClick={() => onChange(!checked)}
       className={cn(
-        'relative inline-flex h-4 w-7 shrink-0 cursor-pointer items-center rounded-full transition-colors',
-        checked ? 'bg-green-500' : 'bg-slate-400',
+        "relative inline-flex h-4 w-7 shrink-0 cursor-pointer items-center rounded-full transition-colors",
+        checked ? "bg-green-500" : "bg-slate-400",
       )}
     >
       <span
         className={cn(
-          'inline-block h-2.5 w-2.5 transform rounded-full bg-white shadow transition-transform',
-          checked ? 'translate-x-4' : 'translate-x-0.5',
+          "inline-block h-2.5 w-2.5 transform rounded-full bg-white shadow transition-transform",
+          checked ? "translate-x-4" : "translate-x-0.5",
         )}
       />
     </button>
-  )
+  );
 }
 
 export default function SellerDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
-  const { store, isLoading: storeLoading } = useActiveStore()
-  const seller = useSellerCatalog(id)
-  const orders = useOrders(store?.id)
-  const deleteSeller = useDeleteSellerCatalog(store?.id ?? '')
-  const [isActive, setIsActive] = useState(true)
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { store, isLoading: storeLoading } = useActiveStore();
+  const seller = useSellerCatalog(id);
+  const orders = useOrders(store?.id);
+  const deleteSeller = useDeleteSellerCatalog(store?.id ?? "");
+  const [isActive, setIsActive] = useState(true);
 
   if (storeLoading || seller.isLoading) {
-    return <p className="text-sm text-z-text-muted">Carregando...</p>
+    return <p className="text-sm text-z-text-muted">Carregando...</p>;
   }
-  if (!store) return <Navigate to={ROUTES.onboarding} replace />
+  if (!store) return <Navigate to={ROUTES.onboarding} replace />;
   if (!seller.data) {
     return (
       <div className="flex flex-col gap-3">
@@ -63,21 +69,33 @@ export default function SellerDetailPage() {
           Voltar
         </Link>
       </div>
-    )
+    );
   }
 
-  const displayName = seller.data.name
+  const displayName = seller.data.name;
 
-  const orderList = orders.data ?? []
-  const assignedOrders = orderList.filter(order => order.seller_id === seller.data!.id)
-  const billableOrders = assignedOrders.filter(order => order.status !== 'cancelled')
-  const totalRevenue = billableOrders.reduce((sum, order) => sum + order.total_in_cents, 0)
+  const orderList = orders.data ?? [];
+  const assignedOrders = orderList.filter(
+    (order) => order.seller_id === seller.data!.id,
+  );
+  const billableOrders = assignedOrders.filter(
+    (order) => order.status !== "cancelled",
+  );
+  const totalRevenue = billableOrders.reduce(
+    (sum, order) => sum + order.total_in_cents,
+    0,
+  );
 
   async function handleDelete() {
-    if (!id) return
-    if (!confirm(`Remover ${seller.data!.name} da equipe? Esta ação não pode ser desfeita.`)) return
-    await deleteSeller.mutateAsync(id)
-    navigate(ROUTES.dashboardSellers)
+    if (!id) return;
+    if (
+      !confirm(
+        `Remover ${seller.data!.name} da equipe? Esta ação não pode ser desfeita.`,
+      )
+    )
+      return;
+    await deleteSeller.mutateAsync(id);
+    navigate(ROUTES.dashboardSellers);
   }
 
   return (
@@ -104,7 +122,9 @@ export default function SellerDetailPage() {
           <Button
             variant="primary"
             size="sm"
-            onClick={() => navigate(`${ROUTES.dashboardSellers}/${seller.data.id}/editar`)}
+            onClick={() =>
+              navigate(`${ROUTES.dashboardSellers}/${seller.data.id}/editar`)
+            }
           >
             <HugeiconsIcon icon={Edit02Icon} size={15} />
             Editar
@@ -113,12 +133,28 @@ export default function SellerDetailPage() {
       </header>
 
       <section className="grid w-full min-w-0 grid-cols-2 gap-3">
-        <StatCard label="Pedidos atribuídos" value={assignedOrders.length.toString()} />
-        <StatCard label="Vendas concluídas" value={billableOrders.length.toString()} />
-        <StatCard label="Receita total" value={(totalRevenue / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} />
+        <StatCard
+          label="Pedidos atribuídos"
+          value={assignedOrders.length.toString()}
+        />
+        <StatCard
+          label="Vendas concluídas"
+          value={billableOrders.length.toString()}
+        />
+        <StatCard
+          label="Receita total"
+          value={(totalRevenue / 100).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          })}
+        />
         <StatCard
           label="Última venda"
-          value={billableOrders[0] ? formatDate(billableOrders[0].created_at) : 'Nenhuma'}
+          value={
+            billableOrders[0]
+              ? formatDate(billableOrders[0].created_at)
+              : "Nenhuma"
+          }
         />
       </section>
 
@@ -126,10 +162,26 @@ export default function SellerDetailPage() {
         <InfoPanel title="Informações do catálogo" icon={LinkSquare01Icon}>
           <InfoLine label="Nome" value={seller.data.name} />
           <InfoLine label="Slug do catálogo" value={seller.data.catalog_slug} />
-          <InfoLine label="WhatsApp" value={seller.data.whatsapp_phone || 'Usar WhatsApp da loja'} />
-          <InfoLine label="E-mail de contato" value={seller.data.contact_email || 'Não informado'} />
-          <InfoLine label="Acesso ao dashboard" value={seller.data.has_dashboard_access ? 'Sim' : 'Não'} />
-          <InfoLine label="Produtos" value={seller.data.catalog_products === 'all' ? 'Todos os produtos' : `${seller.data.specific_product_ids.length} produtos específicos`} />
+          <InfoLine
+            label="WhatsApp"
+            value={seller.data.whatsapp_phone || "Usar WhatsApp da loja"}
+          />
+          <InfoLine
+            label="E-mail de contato"
+            value={seller.data.contact_email || "Não informado"}
+          />
+          <InfoLine
+            label="Acesso ao dashboard"
+            value={seller.data.has_dashboard_access ? "Sim" : "Não"}
+          />
+          <InfoLine
+            label="Produtos"
+            value={
+              seller.data.catalog_products === "all"
+                ? "Todos os produtos"
+                : `${seller.data.specific_product_ids.length} produtos específicos`
+            }
+          />
         </InfoPanel>
 
         <InfoPanel title="Ações rápidas" icon={UserGroupIcon}>
@@ -146,7 +198,9 @@ export default function SellerDetailPage() {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => navigate(`${ROUTES.dashboardSellers}/${seller.data.id}/editar`)}
+              onClick={() =>
+                navigate(`${ROUTES.dashboardSellers}/${seller.data.id}/editar`)
+              }
             >
               <HugeiconsIcon icon={Edit02Icon} size={18} />
               Editar cadastro
@@ -175,12 +229,33 @@ export default function SellerDetailPage() {
                   <p className="text-sm font-semibold text-z-text">
                     Pedido #{order.order_number}
                   </p>
-                  <p className="text-xs text-z-text-muted">{formatDate(order.created_at)}</p>
+                  <p className="text-xs text-z-text-muted">
+                    {formatDate(order.created_at)}
+                  </p>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
-                  <span className="text-sm font-bold">{(order.total_in_cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                  <Badge tone={order.status === 'completed' ? 'green' : order.status === 'cancelled' ? 'rose' : 'amber'}>
-                    {order.status === 'completed' ? 'Concluído' : order.status === 'cancelled' ? 'Cancelado' : order.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
+                  <span className="text-sm font-bold">
+                    {(order.total_in_cents / 100).toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </span>
+                  <Badge
+                    tone={
+                      order.status === "completed"
+                        ? "green"
+                        : order.status === "cancelled"
+                          ? "rose"
+                          : "amber"
+                    }
+                  >
+                    {order.status === "completed"
+                      ? "Concluído"
+                      : order.status === "cancelled"
+                        ? "Cancelado"
+                        : order.status === "confirmed"
+                          ? "Confirmado"
+                          : "Pendente"}
                   </Badge>
                 </div>
               </div>
@@ -189,16 +264,18 @@ export default function SellerDetailPage() {
         </InfoPanel>
       )}
     </div>
-  )
+  );
 }
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 rounded-2xl border border-z-border bg-white p-4">
       <p className="text-xs font-semibold text-z-text-muted">{label}</p>
-      <p className="mt-2 break-words text-xl font-extrabold tracking-tight text-z-text">{value}</p>
+      <p className="mt-2 break-words text-xl font-extrabold tracking-tight text-z-text">
+        {value}
+      </p>
     </div>
-  )
+  );
 }
 
 function InfoPanel({
@@ -206,9 +283,9 @@ function InfoPanel({
   icon,
   children,
 }: {
-  title: string
-  icon: Parameters<typeof HugeiconsIcon>[0]['icon']
-  children: React.ReactNode
+  title: string;
+  icon: Parameters<typeof HugeiconsIcon>[0]["icon"];
+  children: React.ReactNode;
 }) {
   return (
     <section className="w-full min-w-0 overflow-hidden rounded-2xl border border-z-border bg-white p-5">
@@ -218,15 +295,23 @@ function InfoPanel({
       </div>
       <div className="flex min-w-0 flex-col gap-2">{children}</div>
     </section>
-  )
+  );
 }
 
-function InfoLine({ label, value }: { label: string; value: string | null | undefined }) {
-  if (!value) return null
+function InfoLine({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | null | undefined;
+}) {
+  if (!value) return null;
   return (
     <div className="flex min-w-0 flex-col gap-1 rounded-xl bg-z-bg px-3 py-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
       <span className="text-xs font-semibold text-z-text-muted">{label}</span>
-      <span className="min-w-0 break-words text-sm font-medium text-z-text sm:text-right">{value}</span>
+      <span className="min-w-0 break-words text-sm font-medium text-z-text sm:text-right">
+        {value}
+      </span>
     </div>
-  )
+  );
 }

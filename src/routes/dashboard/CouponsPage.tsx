@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   PlusSignIcon,
   DiscountTagIcon,
@@ -9,8 +9,8 @@ import {
   DeleteIcon,
   Tick02Icon,
   CancelIcon,
-} from '@hugeicons/core-free-icons'
-import { useActiveStore } from '@/lib/tenant'
+} from "@hugeicons/core-free-icons";
+import { useActiveStore } from "@/lib/tenant";
 import {
   useCoupons,
   useCreateCoupon,
@@ -18,44 +18,44 @@ import {
   useUpdateCoupon,
   couponFormSchema,
   type CouponFormInput,
-} from '@/features/coupons'
-import { useCategories } from '@/features/categories'
-import { Badge, Button, Field } from '@/components/ui'
-import { formatMoney, parseMoneyToCents } from '@/lib/format'
-import { cn } from '@/lib/utils'
-import type { StoreCoupon } from '@/types/domain'
+} from "@/features/coupons";
+import { useCategories } from "@/features/categories";
+import { Badge, Button, Field } from "@/components/ui";
+import { formatMoney, parseMoneyToCents } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import type { StoreCoupon } from "@/types/domain";
 
 function formatDate(iso: string | null): string {
-  if (!iso) return '—'
-  return new Intl.DateTimeFormat('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-    dateStyle: 'short',
-  }).format(new Date(iso))
+  if (!iso) return "—";
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    dateStyle: "short",
+  }).format(new Date(iso));
 }
 
 function isExpired(coupon: StoreCoupon): boolean {
-  if (!coupon.expires_at) return false
-  return new Date(coupon.expires_at).getTime() < Date.now()
+  if (!coupon.expires_at) return false;
+  return new Date(coupon.expires_at).getTime() < Date.now();
 }
 
 export default function CouponsPage() {
-  const { store } = useActiveStore()
-  const coupons = useCoupons(store?.id)
-  const del = useDeleteCoupon(store?.id ?? '')
+  const { store } = useActiveStore();
+  const coupons = useCoupons(store?.id);
+  const del = useDeleteCoupon(store?.id ?? "");
 
-  const [editing, setEditing] = useState<StoreCoupon | null>(null)
-  const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState<StoreCoupon | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
-  const list = coupons.data ?? []
+  const list = coupons.data ?? [];
 
   const handleOpenCreate = () => {
-    setEditing(null)
-    setShowForm(true)
-  }
+    setEditing(null);
+    setShowForm(true);
+  };
   const handleOpenEdit = (c: StoreCoupon) => {
-    setEditing(c)
-    setShowForm(true)
-  }
+    setEditing(c);
+    setShowForm(true);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -93,13 +93,16 @@ export default function CouponsPage() {
           {/* Mobile card list */}
           <div className="flex flex-col divide-y divide-z-border sm:hidden">
             {list.map((c) => {
-              const expired = isExpired(c)
-              const exhausted = c.max_uses !== null && c.used_count >= c.max_uses
+              const expired = isExpired(c);
+              const exhausted =
+                c.max_uses !== null && c.used_count >= c.max_uses;
               return (
                 <div key={c.id} className="flex items-start gap-3 px-4 py-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-sm font-bold">{c.code}</span>
+                      <span className="font-mono text-sm font-bold">
+                        {c.code}
+                      </span>
                       {!c.is_active ? (
                         <Badge tone="neutral">Inativo</Badge>
                       ) : expired ? (
@@ -111,11 +114,13 @@ export default function CouponsPage() {
                       )}
                     </div>
                     {c.description && (
-                      <p className="mt-0.5 text-xs text-z-text-muted">{c.description}</p>
+                      <p className="mt-0.5 text-xs text-z-text-muted">
+                        {c.description}
+                      </p>
                     )}
                     <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-z-text-muted">
                       <span className="font-semibold text-z-text">
-                        {c.discount_type === 'percent'
+                        {c.discount_type === "percent"
                           ? `${c.discount_value}% off`
                           : `${formatMoney(c.discount_value)} off`}
                       </span>
@@ -123,10 +128,12 @@ export default function CouponsPage() {
                         <span>Mín. {formatMoney(c.min_subtotal_in_cents)}</span>
                       )}
                       <span>
-                        {c.used_count} uso{c.used_count !== 1 ? 's' : ''}
+                        {c.used_count} uso{c.used_count !== 1 ? "s" : ""}
                         {c.max_uses !== null && ` / ${c.max_uses}`}
                       </span>
-                      {c.expires_at && <span>Até {formatDate(c.expires_at)}</span>}
+                      {c.expires_at && (
+                        <span>Até {formatDate(c.expires_at)}</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex shrink-0 gap-1">
@@ -140,7 +147,10 @@ export default function CouponsPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => { if (confirm(`Excluir o cupom ${c.code}?`)) del.mutate(c.id) }}
+                      onClick={() => {
+                        if (confirm(`Excluir o cupom ${c.code}?`))
+                          del.mutate(c.id);
+                      }}
                       aria-label="Excluir"
                       className="flex h-8 w-8 items-center justify-center rounded-md text-z-text-muted hover:bg-z-primary/10 hover:text-z-primary"
                     >
@@ -148,7 +158,7 @@ export default function CouponsPage() {
                     </button>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
 
@@ -167,31 +177,38 @@ export default function CouponsPage() {
             </thead>
             <tbody className="divide-y divide-z-border">
               {list.map((c) => {
-                const expired = isExpired(c)
+                const expired = isExpired(c);
                 const exhausted =
-                  c.max_uses !== null && c.used_count >= c.max_uses
+                  c.max_uses !== null && c.used_count >= c.max_uses;
                 return (
                   <tr key={c.id} className="hover:bg-z-bg2/40">
                     <td className="px-4 py-3">
-                      <div className="font-mono text-[13px] font-bold">{c.code}</div>
+                      <div className="font-mono text-[13px] font-bold">
+                        {c.code}
+                      </div>
                       {c.description && (
-                        <div className="text-xs text-z-text-muted">{c.description}</div>
+                        <div className="text-xs text-z-text-muted">
+                          {c.description}
+                        </div>
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      {c.discount_type === 'percent'
+                      {c.discount_type === "percent"
                         ? `${c.discount_value}%`
                         : formatMoney(c.discount_value)}
                     </td>
                     <td className="px-4 py-3 text-z-text-muted">
                       {c.min_subtotal_in_cents > 0
                         ? formatMoney(c.min_subtotal_in_cents)
-                        : '—'}
+                        : "—"}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums">
                       {c.used_count}
                       {c.max_uses !== null && (
-                        <span className="text-z-text-hint"> / {c.max_uses}</span>
+                        <span className="text-z-text-hint">
+                          {" "}
+                          / {c.max_uses}
+                        </span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-z-text-muted">
@@ -221,7 +238,8 @@ export default function CouponsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            if (confirm(`Excluir o cupom ${c.code}?`)) del.mutate(c.id)
+                            if (confirm(`Excluir o cupom ${c.code}?`))
+                              del.mutate(c.id);
                           }}
                           aria-label="Excluir"
                           className="flex h-8 w-8 items-center justify-center rounded-md text-z-text-muted hover:bg-z-primary/10 hover:text-z-primary"
@@ -231,7 +249,7 @@ export default function CouponsPage() {
                       </div>
                     </td>
                   </tr>
-                )
+                );
               })}
             </tbody>
           </table>
@@ -243,13 +261,13 @@ export default function CouponsPage() {
           storeId={store.id}
           coupon={editing}
           onClose={() => {
-            setShowForm(false)
-            setEditing(null)
+            setShowForm(false);
+            setEditing(null);
           }}
         />
       )}
     </div>
-  )
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -261,21 +279,21 @@ function CouponFormDialog({
   coupon,
   onClose,
 }: {
-  storeId: string
-  coupon: StoreCoupon | null
-  onClose: () => void
+  storeId: string;
+  coupon: StoreCoupon | null;
+  onClose: () => void;
 }) {
-  const create = useCreateCoupon(storeId)
-  const update = useUpdateCoupon(storeId)
-  const isEdit = !!coupon
-  const categories = useCategories(storeId)
-  const allCategories = categories.data ?? []
+  const create = useCreateCoupon(storeId);
+  const update = useUpdateCoupon(storeId);
+  const isEdit = !!coupon;
+  const categories = useCategories(storeId);
+  const allCategories = categories.data ?? [];
 
   const initial = useMemo<CouponFormInput>(
     () => ({
-      code: coupon?.code ?? '',
+      code: coupon?.code ?? "",
       description: coupon?.description ?? undefined,
-      discount_type: coupon?.discount_type ?? 'percent',
+      discount_type: coupon?.discount_type ?? "percent",
       discount_value: coupon?.discount_value ?? 10,
       min_subtotal_in_cents: coupon?.min_subtotal_in_cents ?? 0,
       max_uses: coupon?.max_uses ?? null,
@@ -287,20 +305,20 @@ function CouponFormDialog({
       custom_url: coupon?.custom_url ?? undefined,
     }),
     [coupon],
-  )
+  );
 
   const form = useForm<CouponFormInput>({
     resolver: zodResolver(couponFormSchema),
     defaultValues: initial,
-  })
+  });
 
   // Re-sync when switching between create/edit without remounting.
   useEffect(() => {
-    form.reset(initial)
-  }, [initial, form])
+    form.reset(initial);
+  }, [initial, form]);
 
-  const discountType = form.watch('discount_type')
-  const minSubtotalCents = form.watch('min_subtotal_in_cents') ?? 0
+  const discountType = form.watch("discount_type");
+  const minSubtotalCents = form.watch("min_subtotal_in_cents") ?? 0;
 
   const submit = form.handleSubmit(async (values) => {
     try {
@@ -317,34 +335,34 @@ function CouponFormDialog({
           : null,
         category_id: values.category_id ?? null,
         custom_url: values.custom_url ?? null,
-      }
+      };
       if (isEdit && coupon) {
-        await update.mutateAsync({ id: coupon.id, input: payload })
+        await update.mutateAsync({ id: coupon.id, input: payload });
       } else {
-        await create.mutateAsync(payload)
+        await create.mutateAsync(payload);
       }
-      onClose()
+      onClose();
     } catch (err) {
       const message =
-        err instanceof Error && err.message.includes('duplicate key')
-          ? 'Já existe um cupom com este código ou URL personalizada.'
-          : 'Não foi possível salvar o cupom. Tente novamente.'
-      form.setError('root', { message })
+        err instanceof Error && err.message.includes("duplicate key")
+          ? "Já existe um cupom com este código ou URL personalizada."
+          : "Não foi possível salvar o cupom. Tente novamente.";
+      form.setError("root", { message });
     }
-  })
+  });
 
   return (
     <div
       className="fixed inset-0 z-40 flex items-end justify-center bg-slate-50/80 px-0 py-0 sm:items-center sm:px-4"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
+        if (e.target === e.currentTarget) onClose();
       }}
     >
       <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-white shadow-z-lg sm:rounded-3xl">
         <header className="flex items-center justify-between border-b border-z-border px-5 py-4">
           <div>
             <h2 className="text-base font-bold">
-              {isEdit ? 'Editar cupom' : 'Novo cupom'}
+              {isEdit ? "Editar cupom" : "Novo cupom"}
             </h2>
             <p className="text-xs text-z-text-muted">
               Cupons ativos podem ser usados no checkout pelos seus clientes.
@@ -360,20 +378,23 @@ function CouponFormDialog({
           </button>
         </header>
 
-        <form onSubmit={submit} className="flex flex-col gap-4 overflow-y-auto px-5 py-5">
+        <form
+          onSubmit={submit}
+          className="flex flex-col gap-4 overflow-y-auto px-5 py-5"
+        >
           <Field
             label="Código"
             placeholder="Ex: PROMO10"
             hint="Letras maiúsculas, números, _ ou -"
             error={form.formState.errors.code?.message}
-            {...form.register('code')}
+            {...form.register("code")}
           />
 
           <Field
             label="Descrição (opcional)"
             placeholder="Ex: 10% off em pedidos acima de R$ 100"
             error={form.formState.errors.description?.message}
-            {...form.register('description')}
+            {...form.register("description")}
           />
 
           <div className="grid grid-cols-2 gap-3">
@@ -386,19 +407,19 @@ function CouponFormDialog({
                 name="discount_type"
                 render={({ field }) => (
                   <div className="grid grid-cols-2 gap-1.5 rounded-lg border border-z-border bg-z-bg2 p-1">
-                    {(['percent', 'fixed'] as const).map((opt) => (
+                    {(["percent", "fixed"] as const).map((opt) => (
                       <button
                         key={opt}
                         type="button"
                         onClick={() => field.onChange(opt)}
                         className={cn(
-                          'h-9 rounded-md text-xs font-semibold transition-colors',
+                          "h-9 rounded-md text-xs font-semibold transition-colors",
                           field.value === opt
-                            ? 'bg-white text-z-text shadow-sm'
-                            : 'text-z-text-muted hover:text-z-text',
+                            ? "bg-white text-z-text shadow-sm"
+                            : "text-z-text-muted hover:text-z-text",
                         )}
                       >
-                        {opt === 'percent' ? 'Porcentagem' : 'Valor fixo'}
+                        {opt === "percent" ? "Porcentagem" : "Valor fixo"}
                       </button>
                     ))}
                   </div>
@@ -406,23 +427,23 @@ function CouponFormDialog({
               />
             </div>
 
-            {discountType === 'percent' ? (
+            {discountType === "percent" ? (
               <Field
                 label="Desconto (%)"
                 type="number"
                 min={1}
                 max={100}
                 error={form.formState.errors.discount_value?.message}
-                {...form.register('discount_value', {
+                {...form.register("discount_value", {
                   setValueAs: (v) =>
-                    v === '' || v === null || v === undefined ? 0 : Number(v),
+                    v === "" || v === null || v === undefined ? 0 : Number(v),
                 })}
               />
             ) : (
               <FixedDiscountInput
-                value={form.watch('discount_value') ?? 0}
+                value={form.watch("discount_value") ?? 0}
                 onChange={(cents) =>
-                  form.setValue('discount_value', cents, {
+                  form.setValue("discount_value", cents, {
                     shouldDirty: true,
                     shouldValidate: true,
                   })
@@ -436,7 +457,7 @@ function CouponFormDialog({
             <MinSubtotalInput
               value={minSubtotalCents}
               onChange={(cents) =>
-                form.setValue('min_subtotal_in_cents', cents, {
+                form.setValue("min_subtotal_in_cents", cents, {
                   shouldDirty: true,
                   shouldValidate: true,
                 })
@@ -448,9 +469,9 @@ function CouponFormDialog({
               min={1}
               placeholder="Em branco = ilimitado"
               error={form.formState.errors.max_uses?.message}
-              {...form.register('max_uses', {
+              {...form.register("max_uses", {
                 setValueAs: (v) =>
-                  v === '' || v === null || v === undefined ? null : Number(v),
+                  v === "" || v === null || v === undefined ? null : Number(v),
               })}
             />
           </div>
@@ -460,7 +481,7 @@ function CouponFormDialog({
             type="date"
             hint="Em branco = sem expiração"
             error={form.formState.errors.expires_at?.message}
-            {...form.register('expires_at')}
+            {...form.register("expires_at")}
           />
 
           <div className="flex flex-col gap-1.5">
@@ -469,7 +490,7 @@ function CouponFormDialog({
             </span>
             <select
               className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-              {...form.register('category_id')}
+              {...form.register("category_id")}
             >
               <option value="">Todas as categorias</option>
               {allCategories
@@ -502,7 +523,7 @@ function CouponFormDialog({
             placeholder="Ex: promo-verao-2025"
             hint="Cria um link exclusivo como /c/promo-verao-2025"
             error={form.formState.errors.custom_url?.message}
-            {...form.register('custom_url')}
+            {...form.register("custom_url")}
           />
 
           <Controller
@@ -515,10 +536,10 @@ function CouponFormDialog({
                   onClick={() => field.onChange(!field.value)}
                   aria-pressed={field.value}
                   className={cn(
-                    'mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-2 transition-colors',
+                    "mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-2 transition-colors",
                     field.value
-                      ? 'border-z-green bg-z-green'
-                      : 'border-z-border bg-white',
+                      ? "border-z-green bg-z-green"
+                      : "border-z-border bg-white",
                   )}
                 >
                   {field.value && (
@@ -531,7 +552,7 @@ function CouponFormDialog({
                   )}
                 </button>
                 <span className="text-sm">
-                  Cupom ativo{' '}
+                  Cupom ativo{" "}
                   <span className="text-z-text-muted">
                     (disponível no checkout)
                   </span>
@@ -557,15 +578,15 @@ function CouponFormDialog({
             disabled={create.isPending || update.isPending}
           >
             {create.isPending || update.isPending
-              ? 'Salvando...'
+              ? "Salvando..."
               : isEdit
-                ? 'Salvar alterações'
-                : 'Criar cupom'}
+                ? "Salvar alterações"
+                : "Criar cupom"}
           </Button>
         </footer>
       </div>
     </div>
-  )
+  );
 }
 
 function FixedDiscountInput({
@@ -573,9 +594,9 @@ function FixedDiscountInput({
   onChange,
   error,
 }: {
-  value: number
-  onChange: (cents: number) => void
-  error?: string
+  value: number;
+  onChange: (cents: number) => void;
+  error?: string;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -585,31 +606,30 @@ function FixedDiscountInput({
       <input
         inputMode="decimal"
         placeholder="R$ 0,00"
-        defaultValue={value ? formatMoney(value) : ''}
+        defaultValue={value ? formatMoney(value) : ""}
         className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
         onChange={(e) => {
-          const cents = parseMoneyToCents(e.target.value)
-          onChange(Number.isNaN(cents) ? 0 : cents)
+          const cents = parseMoneyToCents(e.target.value);
+          onChange(Number.isNaN(cents) ? 0 : cents);
         }}
       />
       {error ? (
         <span className="text-xs text-destructive">{error}</span>
       ) : (
         <span className="text-xs text-z-text-muted">
-          Atual:{' '}
-          <strong className="text-z-text">{formatMoney(value)}</strong>
+          Atual: <strong className="text-z-text">{formatMoney(value)}</strong>
         </span>
       )}
     </div>
-  )
+  );
 }
 
 function MinSubtotalInput({
   value,
   onChange,
 }: {
-  value: number
-  onChange: (cents: number) => void
+  value: number;
+  onChange: (cents: number) => void;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -619,14 +639,14 @@ function MinSubtotalInput({
       <input
         inputMode="decimal"
         placeholder="R$ 0,00 (sem mínimo)"
-        defaultValue={value ? formatMoney(value) : ''}
+        defaultValue={value ? formatMoney(value) : ""}
         className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
         onChange={(e) => {
-          const cents = parseMoneyToCents(e.target.value)
-          onChange(Number.isNaN(cents) ? 0 : cents)
+          const cents = parseMoneyToCents(e.target.value);
+          onChange(Number.isNaN(cents) ? 0 : cents);
         }}
       />
       <span className="text-xs text-z-text-hint">Opcional</span>
     </div>
-  )
+  );
 }

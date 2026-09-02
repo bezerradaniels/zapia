@@ -3,13 +3,16 @@
 ## Passos para configurar a NOVA conta da Stripe
 
 ### 1. Criar os Produtos & Preços no Stripe Dashboard
+
 Acesse o Dashboard da sua nova conta Stripe (<https://dashboard.stripe.com>) e crie os produtos em BRL:
+
 - **Plano Pro**: R$ 19,90/mês (ou valor desejado)
 - **Plano Ilimitado/Premium**: R$ 29,90/mês (ou valor desejado)
 
 Copie os `price_...` gerados para cada plano.
 
 ### 2. Configurar os Secrets nas Edge Functions do Supabase
+
 Obtenha as chaves em <https://dashboard.stripe.com/apikeys>:
 
 ```bash

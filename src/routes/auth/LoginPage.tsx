@@ -1,21 +1,21 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from 'react-router-dom'
-import { signInSchema, useSignIn, type SignInInput } from '@/features/auth'
-import { ROUTES } from '@/config/routes'
-import { isAdminEmail } from '@/config/admin'
-import { Button, Field } from '@/components/ui'
-import { AuthShell } from './_shared/AuthShell'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router-dom";
+import { signInSchema, useSignIn, type SignInInput } from "@/features/auth";
+import { ROUTES } from "@/config/routes";
+import { isAdminEmail } from "@/config/admin";
+import { Button, Field } from "@/components/ui";
+import { AuthShell } from "./_shared/AuthShell";
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const signIn = useSignIn()
-  const form = useForm<SignInInput>({ resolver: zodResolver(signInSchema) })
+  const navigate = useNavigate();
+  const signIn = useSignIn();
+  const form = useForm<SignInInput>({ resolver: zodResolver(signInSchema) });
 
   const onSubmit = form.handleSubmit(async (values) => {
-    const data = await signIn.mutateAsync(values)
-    navigate(isAdminEmail(data.user?.email) ? ROUTES.admin : ROUTES.dashboard)
-  })
+    const data = await signIn.mutateAsync(values);
+    navigate(isAdminEmail(data.user?.email) ? ROUTES.admin : ROUTES.dashboard);
+  });
 
   return (
     <AuthShell title="Entrar na sua conta" subtitle="Bem-vindo de volta 👋">
@@ -26,7 +26,7 @@ export default function LoginPage() {
           autoComplete="email"
           placeholder="seu@email.com"
           error={form.formState.errors.email?.message}
-          {...form.register('email')}
+          {...form.register("email")}
         />
         <Field
           label="Senha"
@@ -34,7 +34,7 @@ export default function LoginPage() {
           autoComplete="current-password"
           placeholder="Sua senha"
           error={form.formState.errors.password?.message}
-          {...form.register('password')}
+          {...form.register("password")}
         />
         <div className="-mt-1 text-right">
           <Link
@@ -52,12 +52,12 @@ export default function LoginPage() {
         )}
 
         <Button type="submit" disabled={signIn.isPending} fullWidth>
-          {signIn.isPending ? 'Entrando...' : 'Entrar'}
+          {signIn.isPending ? "Entrando..." : "Entrar"}
         </Button>
       </form>
 
       <p className="mt-5 text-center text-sm text-z-text-muted">
-        Não tem conta?{' '}
+        Não tem conta?{" "}
         <Link
           to={ROUTES.signup}
           className="font-semibold text-[#10b981] hover:underline"
@@ -66,5 +66,5 @@ export default function LoginPage() {
         </Link>
       </p>
     </AuthShell>
-  )
+  );
 }

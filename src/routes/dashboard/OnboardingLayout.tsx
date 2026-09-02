@@ -1,19 +1,25 @@
-import { Navigate, Outlet, useLocation, useNavigate, Link } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Cancel01Icon, ArrowLeft02Icon } from '@hugeicons/core-free-icons'
-import { useSession } from '@/features/auth'
-import { useMyStores } from '@/features/catalog'
-import { loadOnboardingSession } from '@/features/onboarding/utils/onboardingSession'
-import { ROUTES } from '@/config/routes'
-import { Logo } from '@/components/ui'
-import { cn } from '@/lib/utils'
+import {
+  Navigate,
+  Outlet,
+  useLocation,
+  useNavigate,
+  Link,
+} from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { useSession } from "@/features/auth";
+import { useMyStores } from "@/features/catalog";
+import { loadOnboardingSession } from "@/features/onboarding/utils/onboardingSession";
+import { ROUTES } from "@/config/routes";
+import { Logo } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
 const STEPS = [
-  { path: ROUTES.onboardingStep1, label: 'Sua loja' },
-  { path: ROUTES.onboardingStep2, label: 'Sobre o negócio' },
-  { path: ROUTES.onboardingStep3, label: 'Pagamento e entrega' },
-  { path: ROUTES.onboardingStep4, label: 'Visual' },
-]
+  { path: ROUTES.onboardingStep1, label: "Sua loja" },
+  { path: ROUTES.onboardingStep2, label: "Sobre o negócio" },
+  { path: ROUTES.onboardingStep3, label: "Pagamento e entrega" },
+  { path: ROUTES.onboardingStep4, label: "Visual" },
+];
 
 function StepIndicator({ current }: { current: number }) {
   return (
@@ -23,8 +29,8 @@ function StepIndicator({ current }: { current: number }) {
           <div
             key={step.path}
             className={cn(
-              'h-1.5 flex-1 rounded-full transition-colors',
-              i + 1 <= current ? 'bg-z-green' : 'bg-z-border',
+              "h-1.5 flex-1 rounded-full transition-colors",
+              i + 1 <= current ? "bg-z-green" : "bg-z-border",
             )}
           />
         ))}
@@ -33,40 +39,40 @@ function StepIndicator({ current }: { current: number }) {
         Etapa {current} de {STEPS.length} · {STEPS[current - 1]?.label}
       </p>
     </div>
-  )
+  );
 }
 
 export default function OnboardingLayout() {
-  const { session, isLoading } = useSession()
-  const myStores = useMyStores(!!session)
-  const location = useLocation()
-  const navigate = useNavigate()
+  const { session, isLoading } = useSession();
+  const myStores = useMyStores(!!session);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   if (isLoading || myStores.isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-100 text-sm text-z-text-muted">
         Carregando...
       </div>
-    )
+    );
   }
 
-  if (!session) return <Navigate to={ROUTES.login} replace />
+  if (!session) return <Navigate to={ROUTES.login} replace />;
 
   // Redirect to dashboard only if user already has a store AND there's no
   // active onboarding session (which means they're mid-flow after step 1).
-  const hasActiveSession = !!loadOnboardingSession()
+  const hasActiveSession = !!loadOnboardingSession();
   if (!hasActiveSession && myStores.data && myStores.data.length > 0) {
-    return <Navigate to={ROUTES.dashboard} replace />
+    return <Navigate to={ROUTES.dashboard} replace />;
   }
 
-  const currentStep = STEPS.findIndex((s) => location.pathname === s.path) + 1
-  const inWizard = currentStep > 0
+  const currentStep = STEPS.findIndex((s) => location.pathname === s.path) + 1;
+  const inWizard = currentStep > 0;
 
   function handleBack() {
     if (currentStep <= 1) {
-      navigate(ROUTES.home)
+      navigate(ROUTES.home);
     } else {
-      navigate(STEPS[currentStep - 2].path)
+      navigate(STEPS[currentStep - 2].path);
     }
   }
 
@@ -78,10 +84,13 @@ export default function OnboardingLayout() {
             <button
               type="button"
               onClick={handleBack}
-              aria-label={currentStep === 1 ? 'Sair' : 'Voltar'}
+              aria-label={currentStep === 1 ? "Sair" : "Voltar"}
               className="flex h-10 w-10 items-center justify-center rounded-[13px] border border-z-border bg-white text-z-text transition-colors hover:bg-z-bg2"
             >
-              <HugeiconsIcon icon={currentStep === 1 ? Cancel01Icon : ArrowLeft02Icon} size={20} />
+              <HugeiconsIcon
+                icon={currentStep === 1 ? Cancel01Icon : ArrowLeft02Icon}
+                size={20}
+              />
             </button>
             <div className="flex items-center gap-2">
               <Logo height={20} />
@@ -108,5 +117,5 @@ export default function OnboardingLayout() {
         <Outlet />
       </div>
     </div>
-  )
+  );
 }

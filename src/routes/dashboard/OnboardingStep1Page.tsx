@@ -1,5 +1,5 @@
-import { OnboardingStep1 } from '@/features/onboarding'
+import { OnboardingStep1 } from "@/features/onboarding";
 
 export default function OnboardingStep1Page() {
-  return <OnboardingStep1 />
+  return <OnboardingStep1 />;
 }

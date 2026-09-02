@@ -1,17 +1,17 @@
-import type { MlProductResult, MlImportPayload } from '../types'
+import type { MlProductResult, MlImportPayload } from "../types";
 
 // ---------------------------------------------------------------------------
 // Barcode type inference from digit count
 // ---------------------------------------------------------------------------
 
 function inferBarcodeType(barcode: string | null): string | null {
-  if (!barcode) return null
-  const digits = barcode.replace(/\D/g, '')
-  if (digits.length === 13) return 'EAN-13'
-  if (digits.length === 8) return 'EAN-8'
-  if (digits.length === 12) return 'UPC-A'
-  if (digits.length === 14) return 'GTIN-14'
-  return 'GTIN'
+  if (!barcode) return null;
+  const digits = barcode.replace(/\D/g, "");
+  if (digits.length === 13) return "EAN-13";
+  if (digits.length === 8) return "EAN-8";
+  if (digits.length === 12) return "UPC-A";
+  if (digits.length === 14) return "GTIN-14";
+  return "GTIN";
 }
 
 // ---------------------------------------------------------------------------
@@ -23,19 +23,21 @@ function inferBarcodeType(barcode: string | null): string | null {
 // ---------------------------------------------------------------------------
 
 const EXCLUDED_ATTRIBUTE_IDS = new Set([
-  'BRAND',    // surfaced separately in the `brand` field
-  'GTIN',     // surfaced separately in the `barcode` field
-  'EAN',
-  'ITEM_CONDITION',
-])
+  "BRAND", // surfaced separately in the `brand` field
+  "GTIN", // surfaced separately in the `barcode` field
+  "EAN",
+  "ITEM_CONDITION",
+]);
 
 export function buildDescriptionFromAttributes(
   attributes: { name: string; value: string }[],
 ): string {
-  const relevant = attributes.filter((a) => !EXCLUDED_ATTRIBUTE_IDS.has(a.name.toUpperCase()))
-  if (relevant.length === 0) return ''
+  const relevant = attributes.filter(
+    (a) => !EXCLUDED_ATTRIBUTE_IDS.has(a.name.toUpperCase()),
+  );
+  if (relevant.length === 0) return "";
 
-  return relevant.map((a) => `<p>${a.name}: ${a.value}</p>`).join('')
+  return relevant.map((a) => `<p>${a.name}: ${a.value}</p>`).join("");
 }
 
 // ---------------------------------------------------------------------------
@@ -51,8 +53,8 @@ export function mapMlResultToFormPayload(
   result: MlProductResult,
   /** Pass the barcode the user typed/scanned when the search was a barcode lookup. */
   searchedBarcode?: string,
-): Omit<MlImportPayload, 'images'> & { mlImages: string[] } {
-  const barcode = searchedBarcode ?? result.barcode
+): Omit<MlImportPayload, "images"> & { mlImages: string[] } {
+  const barcode = searchedBarcode ?? result.barcode;
   return {
     name: result.title,
     brand: result.brand,
@@ -61,5 +63,5 @@ export function mapMlResultToFormPayload(
     barcode: barcode ?? null,
     barcode_type: inferBarcodeType(barcode ?? null),
     attributes: result.attributes,
-  }
+  };
 }

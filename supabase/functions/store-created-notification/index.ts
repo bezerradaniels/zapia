@@ -1,77 +1,89 @@
 // Sends email notification to admin when a new store is created (end of onboarding).
 // Requires a valid user JWT — called right after the `stores` row is inserted.
-import { requireAuth } from '../_shared/auth.ts'
+import { requireAuth } from "../_shared/auth.ts";
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
-const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'daniel.ddsb@gmail.com'
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
+const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") || "daniel.ddsb@gmail.com";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://zapia.app',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+  "Access-Control-Allow-Origin": "https://zapia.app",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
 
 function escapeHtml(str: string): string {
   return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 /** Builds a wa.me link from a BR phone number (accepts E.164 or local format). */
 function buildWhatsAppLink(phone: string): string {
-  const digits = phone.replace(/\D/g, '')
-  const e164digits = digits.startsWith('55') ? digits : `55${digits}`
-  return `https://wa.me/${e164digits}`
+  const digits = phone.replace(/\D/g, "");
+  const e164digits = digits.startsWith("55") ? digits : `55${digits}`;
+  return `https://wa.me/${e164digits}`;
 }
 
 interface StoreCreatedNotificationRequest {
-  name: string
-  email: string
-  whatsapp_phone: string
-  store_name: string
-  store_url: string
+  name: string;
+  email: string;
+  whatsapp_phone: string;
+  store_name: string;
+  store_url: string;
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
-  if (req.method !== 'POST') {
-    return new Response('method_not_allowed', { status: 405, headers: corsHeaders })
+  if (req.method !== "POST") {
+    return new Response("method_not_allowed", {
+      status: 405,
+      headers: corsHeaders,
+    });
   }
 
   try {
-    await requireAuth(req)
+    await requireAuth(req);
   } catch {
-    return new Response('unauthorized', { status: 401, headers: corsHeaders })
+    return new Response("unauthorized", { status: 401, headers: corsHeaders });
   }
 
   try {
-    const { name, email, whatsapp_phone, store_name, store_url }: StoreCreatedNotificationRequest =
-      await req.json()
+    const {
+      name,
+      email,
+      whatsapp_phone,
+      store_name,
+      store_url,
+    }: StoreCreatedNotificationRequest = await req.json();
 
     if (!name || !email || !whatsapp_phone || !store_name || !store_url) {
-      return new Response('missing_fields', { status: 400, headers: corsHeaders })
+      return new Response("missing_fields", {
+        status: 400,
+        headers: corsHeaders,
+      });
     }
 
-    const safeName = escapeHtml(name)
-    const safeEmail = escapeHtml(email)
-    const safeWhatsapp = escapeHtml(whatsapp_phone)
-    const safeStoreName = escapeHtml(store_name)
-    const safeStoreUrl = escapeHtml(store_url)
-    const whatsappLink = buildWhatsAppLink(whatsapp_phone)
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeWhatsapp = escapeHtml(whatsapp_phone);
+    const safeStoreName = escapeHtml(store_name);
+    const safeStoreUrl = escapeHtml(store_url);
+    const whatsappLink = buildWhatsAppLink(whatsapp_phone);
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: 'Zapia <noreply@zapia.app>',
+        from: "Zapia <noreply@zapia.app>",
         to: [ADMIN_EMAIL],
         subject: `Nova loja criada: ${safeStoreName}`,
         html: `
@@ -99,17 +111,23 @@ Deno.serve(async (req) => {
           </div>
         `,
       }),
-    })
+    });
 
     if (!res.ok) {
-      const error = await res.text()
-      console.error('Resend API error:', error)
-      return new Response('email_send_failed', { status: 500, headers: corsHeaders })
+      const error = await res.text();
+      console.error("Resend API error:", error);
+      return new Response("email_send_failed", {
+        status: 500,
+        headers: corsHeaders,
+      });
     }
 
-    return new Response('ok', { status: 200, headers: corsHeaders })
+    return new Response("ok", { status: 200, headers: corsHeaders });
   } catch (err) {
-    console.error('store created notification error:', err)
-    return new Response('internal_error', { status: 500, headers: corsHeaders })
+    console.error("store created notification error:", err);
+    return new Response("internal_error", {
+      status: 500,
+      headers: corsHeaders,
+    });
   }
-})
+});

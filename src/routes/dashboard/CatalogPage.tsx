@@ -1,10 +1,36 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useParams } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { toast } from 'sonner'
-import { LockedIcon, StoreLocationIcon, EyeIcon, ShoppingCart01Icon, InstagramIcon, NewTwitterIcon, FacebookIcon, YoutubeIcon, TiktokIcon, Globe02Icon, Settings01Icon, PaintBrush01Icon, ContactIcon, GoogleIcon, FileDownloadIcon, Alert01Icon, Add01Icon, Edit02Icon, Delete02Icon, ArrowDown01Icon, ArrowRight02Icon, CheckmarkCircle02Icon, Cancel01Icon, CreditCardIcon, ArrowLeft01Icon } from '@hugeicons/core-free-icons'
+import { useEffect, useState, type ReactNode } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useParams } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { toast } from "sonner";
+import {
+  LockedIcon,
+  StoreLocationIcon,
+  EyeIcon,
+  ShoppingCart01Icon,
+  InstagramIcon,
+  NewTwitterIcon,
+  FacebookIcon,
+  YoutubeIcon,
+  TiktokIcon,
+  Globe02Icon,
+  Settings01Icon,
+  PaintBrush01Icon,
+  ContactIcon,
+  GoogleIcon,
+  FileDownloadIcon,
+  Alert01Icon,
+  Add01Icon,
+  Edit02Icon,
+  Delete02Icon,
+  ArrowDown01Icon,
+  ArrowRight02Icon,
+  CheckmarkCircle02Icon,
+  Cancel01Icon,
+  CreditCardIcon,
+  ArrowLeft01Icon,
+} from "@hugeicons/core-free-icons";
 import {
   updateStoreSchema,
   useUpdateStore,
@@ -12,106 +38,121 @@ import {
   useSlugAvailability,
   type UpdateStoreInput,
   type StoreCopyKind,
-} from '@/features/catalog'
-import { useProducts } from '@/features/products'
+} from "@/features/catalog";
+import { useProducts } from "@/features/products";
 import {
   useCategories,
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
   type Category,
-} from '@/features/categories'
-import { useActiveStore, buildStoreUrl, ROOT_DOMAIN } from '@/lib/tenant'
-import { usePlanLimits } from '@/features/billing'
-import { useCatalogPdf } from '@/lib/pdf'
-import { fromE164BR } from '@/lib/br'
-import { PhoneInput } from '@/components/forms/PhoneInput'
-import { ImageCropUploader } from '@/components/forms/ImageCropUploader'
-import { RoundMultiCheck } from '@/components/forms/RoundMultiCheck'
-import { RoundSingleCheck } from '@/components/forms/RoundSingleCheck'
-import { DeliveryAreaCustomLocations } from '@/components/forms/DeliveryAreaCustomLocations'
-import { DeliveryHoursEditor } from '@/components/forms/DeliveryHoursEditor'
-import { GalleryUploader } from '@/components/forms/GalleryUploader'
-import { Button, Combobox, Field, Textarea, Label, AiGenerateButton } from '@/components/ui'
-import { ROUTES } from '@/config/routes'
-import { track } from '@/features/analytics'
-import { cn } from '@/lib/utils'
-import { COLOR_PRESETS } from '@/config/colorPresets'
-import { STATES } from '@/lib/br'
-import { useCities } from '@/features/onboarding/hooks/useCities'
+} from "@/features/categories";
+import { useActiveStore, buildStoreUrl, ROOT_DOMAIN } from "@/lib/tenant";
+import { usePlanLimits } from "@/features/billing";
+import { useCatalogPdf } from "@/lib/pdf";
+import { fromE164BR } from "@/lib/br";
+import { PhoneInput } from "@/components/forms/PhoneInput";
+import { ImageCropUploader } from "@/components/forms/ImageCropUploader";
+import { RoundMultiCheck } from "@/components/forms/RoundMultiCheck";
+import { RoundSingleCheck } from "@/components/forms/RoundSingleCheck";
+import { DeliveryAreaCustomLocations } from "@/components/forms/DeliveryAreaCustomLocations";
+import { DeliveryHoursEditor } from "@/components/forms/DeliveryHoursEditor";
+import { GalleryUploader } from "@/components/forms/GalleryUploader";
+import {
+  Button,
+  Combobox,
+  Field,
+  Textarea,
+  Label,
+  AiGenerateButton,
+} from "@/components/ui";
+import { ROUTES } from "@/config/routes";
+import { track } from "@/features/analytics";
+import { cn } from "@/lib/utils";
+import { COLOR_PRESETS } from "@/config/colorPresets";
+import { STATES } from "@/lib/br";
+import { useCities } from "@/features/onboarding/hooks/useCities";
 
 type TabId =
-  | 'gerais'
-  | 'aparencia'
-  | 'contato'
-  | 'pedidos'
-  | 'pagamento'
-  | 'entrega'
-  | 'categorias'
-  | 'links'
-  | 'site'
+  | "gerais"
+  | "aparencia"
+  | "contato"
+  | "pedidos"
+  | "pagamento"
+  | "entrega"
+  | "categorias"
+  | "links"
+  | "site";
 
 const TABS: { id: TabId; label: string; icon?: typeof Settings01Icon }[] = [
-  { id: 'gerais',     label: 'Gerais',    icon: Settings01Icon },
-  { id: 'aparencia',  label: 'Aparência', icon: PaintBrush01Icon },
-  { id: 'site',       label: 'Site',      icon: Globe02Icon },
-  { id: 'contato',    label: 'Contato',   icon: ContactIcon },
-  { id: 'pedidos',    label: 'Pedidos',   icon: ShoppingCart01Icon },
-  { id: 'pagamento',  label: 'Pagamento', icon: LockedIcon },
-  { id: 'entrega',    label: 'Entrega',   icon: StoreLocationIcon },
-  { id: 'categorias', label: 'Categorias', icon: LockedIcon },
-  { id: 'links',      label: 'Links',      icon: EyeIcon },
-]
+  { id: "gerais", label: "Gerais", icon: Settings01Icon },
+  { id: "aparencia", label: "Aparência", icon: PaintBrush01Icon },
+  { id: "site", label: "Site", icon: Globe02Icon },
+  { id: "contato", label: "Contato", icon: ContactIcon },
+  { id: "pedidos", label: "Pedidos", icon: ShoppingCart01Icon },
+  { id: "pagamento", label: "Pagamento", icon: LockedIcon },
+  { id: "entrega", label: "Entrega", icon: StoreLocationIcon },
+  { id: "categorias", label: "Categorias", icon: LockedIcon },
+  { id: "links", label: "Links", icon: EyeIcon },
+];
 
-const TAB_IDS = new Set<TabId>(TABS.map((tab) => tab.id))
-const STATE_OPTIONS = STATES.map((state) => ({ value: state.uf, label: state.name }))
+const TAB_IDS = new Set<TabId>(TABS.map((tab) => tab.id));
+const STATE_OPTIONS = STATES.map((state) => ({
+  value: state.uf,
+  label: state.name,
+}));
 const PAYMENT_OPTIONS = [
-  { value: 'pix', label: 'PIX' },
-  { value: 'cash', label: 'Dinheiro' },
-  { value: 'credit_card', label: 'Cartão' },
-  { value: 'debit_card', label: 'Débito' },
-  { value: 'bank_transfer', label: 'Transferência' },
-  { value: 'boleto', label: 'Boleto' },
-  { value: 'payment_link', label: 'Link de pagamento' },
-]
+  { value: "pix", label: "PIX" },
+  { value: "cash", label: "Dinheiro" },
+  { value: "credit_card", label: "Cartão" },
+  { value: "debit_card", label: "Débito" },
+  { value: "bank_transfer", label: "Transferência" },
+  { value: "boleto", label: "Boleto" },
+  { value: "payment_link", label: "Link de pagamento" },
+];
 const SHIPPING_OPTIONS = [
-  { value: 'delivery', label: 'Domicílio' },
-  { value: 'pickup_in_store', label: 'Retirada na loja' },
-  { value: 'digital', label: 'Digital' },
-]
+  { value: "delivery", label: "Domicílio" },
+  { value: "pickup_in_store", label: "Retirada na loja" },
+  { value: "digital", label: "Digital" },
+];
 
-function labelsFor(values: string[] | undefined, options: { value: string; label: string }[]): string {
+function labelsFor(
+  values: string[] | undefined,
+  options: { value: string; label: string }[],
+): string {
   const labels = (values ?? [])
     .map((value) => options.find((option) => option.value === value)?.label)
-    .filter(Boolean)
-  return labels.length > 0 ? labels.join(' · ') : 'Não configurado'
+    .filter(Boolean);
+  return labels.length > 0 ? labels.join(" · ") : "Não configurado";
 }
 
 function isTabId(value: string | undefined): value is TabId {
-  return !!value && TAB_IDS.has(value as TabId)
+  return !!value && TAB_IDS.has(value as TabId);
 }
 
 function catalogSectionPath(section: TabId): string {
-  return `${ROUTES.dashboardCatalog}/${section}`
+  return `${ROUTES.dashboardCatalog}/${section}`;
 }
 
 /** Most frequent product category, used as real context for AI copy
  * generation instead of letting the model guess the store's segment. */
-function mostCommonProductCategory(products: { category: string | null }[]): string | undefined {
-  const counts = new Map<string, number>()
+function mostCommonProductCategory(
+  products: { category: string | null }[],
+): string | undefined {
+  const counts = new Map<string, number>();
   for (const p of products) {
-    if (!p.category) continue
-    counts.set(p.category, (counts.get(p.category) ?? 0) + 1)
+    if (!p.category) continue;
+    counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
   }
-  let best: string | undefined
-  let bestCount = 0
+  let best: string | undefined;
+  let bestCount = 0;
   for (const [category, count] of counts) {
     if (count > bestCount) {
-      best = category
-      bestCount = count
+      best = category;
+      bestCount = count;
     }
   }
-  return best
+  return best;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -119,92 +160,103 @@ function mostCommonProductCategory(products: { category: string | null }[]): str
 /* -------------------------------------------------------------------------- */
 
 type CategoryModalState =
-  | { mode: 'create'; parentId: string | null }
-  | { mode: 'edit'; category: Category }
+  | { mode: "create"; parentId: string | null }
+  | { mode: "edit"; category: Category };
 
 function CategoriesTab({ storeId }: { storeId: string }) {
-  const products = useProducts(storeId)
-  const categoriesQuery = useCategories(storeId)
-  const createCategory = useCreateCategory()
-  const updateCategory = useUpdateCategory(storeId)
-  const deleteCategory = useDeleteCategory(storeId)
+  const products = useProducts(storeId);
+  const categoriesQuery = useCategories(storeId);
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory(storeId);
+  const deleteCategory = useDeleteCategory(storeId);
 
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
-  const [modal, setModal] = useState<CategoryModalState | null>(null)
-  const [modalName, setModalName] = useState('')
-  const [modalError, setModalError] = useState<string | null>(null)
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [modal, setModal] = useState<CategoryModalState | null>(null);
+  const [modalName, setModalName] = useState("");
+  const [modalError, setModalError] = useState<string | null>(null);
 
-  const productList = products.data ?? []
-  const categories = categoriesQuery.data ?? []
-  const topLevel = categories.filter((c) => !c.parent_id)
-  const childrenOf = (parentId: string) => categories.filter((c) => c.parent_id === parentId)
+  const productList = products.data ?? [];
+  const categories = categoriesQuery.data ?? [];
+  const topLevel = categories.filter((c) => !c.parent_id);
+  const childrenOf = (parentId: string) =>
+    categories.filter((c) => c.parent_id === parentId);
   const productCountFor = (name: string) =>
-    productList.filter((p) => p.category === name || p.subcategory === name).length
-  const uncategorizedCount = productList.filter((p) => !p.category).length
+    productList.filter((p) => p.category === name || p.subcategory === name)
+      .length;
+  const uncategorizedCount = productList.filter((p) => !p.category).length;
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const openCreateModal = (parentId: string | null) => {
-    setModal({ mode: 'create', parentId })
-    setModalName('')
-    setModalError(null)
-  }
+    setModal({ mode: "create", parentId });
+    setModalName("");
+    setModalError(null);
+  };
 
   const openEditModal = (category: Category) => {
-    setModal({ mode: 'edit', category })
-    setModalName(category.name)
-    setModalError(null)
-  }
+    setModal({ mode: "edit", category });
+    setModalName(category.name);
+    setModalError(null);
+  };
 
   const closeModal = () => {
-    setModal(null)
-    setModalName('')
-    setModalError(null)
-  }
+    setModal(null);
+    setModalName("");
+    setModalError(null);
+  };
 
-  const isSaving = createCategory.isPending || updateCategory.isPending
+  const isSaving = createCategory.isPending || updateCategory.isPending;
 
   const handleSaveModal = async () => {
-    const name = modalName.trim()
+    const name = modalName.trim();
     if (!name) {
-      setModalError('Informe um nome.')
-      return
+      setModalError("Informe um nome.");
+      return;
     }
     try {
-      if (modal?.mode === 'create') {
-        await createCategory.mutateAsync({ store_id: storeId, name, parent_id: modal.parentId })
-        if (modal.parentId) setExpandedIds((prev) => new Set(prev).add(modal.parentId!))
-      } else if (modal?.mode === 'edit') {
-        await updateCategory.mutateAsync({ id: modal.category.id, name })
+      if (modal?.mode === "create") {
+        await createCategory.mutateAsync({
+          store_id: storeId,
+          name,
+          parent_id: modal.parentId,
+        });
+        if (modal.parentId)
+          setExpandedIds((prev) => new Set(prev).add(modal.parentId!));
+      } else if (modal?.mode === "edit") {
+        await updateCategory.mutateAsync({ id: modal.category.id, name });
       }
-      closeModal()
+      closeModal();
     } catch {
-      setModalError('Não foi possível salvar. Tente novamente.')
+      setModalError("Não foi possível salvar. Tente novamente.");
     }
-  }
+  };
 
   const handleDelete = async (category: Category) => {
-    const subs = childrenOf(category.id)
+    const subs = childrenOf(category.id);
     const message =
       subs.length > 0
         ? `Excluir "${category.name}" e suas ${subs.length} subcategoria(s)?`
-        : `Excluir a categoria "${category.name}"?`
-    if (!confirm(message)) return
-    await deleteCategory.mutateAsync(category.id)
-  }
+        : `Excluir a categoria "${category.name}"?`;
+    if (!confirm(message)) return;
+    await deleteCategory.mutateAsync(category.id);
+  };
 
   return (
     <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <HugeiconsIcon icon={LockedIcon} size={20} className="text-z-text-muted" />
+          <HugeiconsIcon
+            icon={LockedIcon}
+            size={20}
+            className="text-z-text-muted"
+          />
           <h2 className="text-lg font-semibold">Categorias do catálogo</h2>
         </div>
         <Button type="button" size="sm" onClick={() => openCreateModal(null)}>
@@ -215,19 +267,28 @@ function CategoriesTab({ storeId }: { storeId: string }) {
 
       <div className="flex flex-col gap-4 ml-7">
         <p className="-mt-2 text-sm text-z-text-muted">
-          Organize seus produtos em categorias e subcategorias. Elas aparecem na tela inicial do
-          catálogo, em ordem alfabética, e seus clientes podem filtrar os produtos usando elas.
+          Organize seus produtos em categorias e subcategorias. Elas aparecem na
+          tela inicial do catálogo, em ordem alfabética, e seus clientes podem
+          filtrar os produtos usando elas.
         </p>
 
         {categoriesQuery.isLoading ? (
           <p className="text-sm text-z-text-muted">Carregando categorias...</p>
         ) : topLevel.length === 0 ? (
           <div className="rounded-xl border border-dashed border-z-border p-6 text-center">
-            <p className="text-sm font-medium text-z-text">Nenhuma categoria cadastrada</p>
-            <p className="mt-1 text-xs text-z-text-hint">
-              Crie categorias para organizar seus produtos e facilitar a busca no catálogo.
+            <p className="text-sm font-medium text-z-text">
+              Nenhuma categoria cadastrada
             </p>
-            <Button type="button" size="sm" className="mt-3" onClick={() => openCreateModal(null)}>
+            <p className="mt-1 text-xs text-z-text-hint">
+              Crie categorias para organizar seus produtos e facilitar a busca
+              no catálogo.
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              className="mt-3"
+              onClick={() => openCreateModal(null)}
+            >
               <HugeiconsIcon icon={Add01Icon} size={14} />
               Adicionar categoria
             </Button>
@@ -235,12 +296,15 @@ function CategoriesTab({ storeId }: { storeId: string }) {
         ) : (
           <div className="flex flex-col gap-2">
             {topLevel.map((cat) => {
-              const subs = childrenOf(cat.id)
-              const isExpanded = expandedIds.has(cat.id)
-              const count = productCountFor(cat.name)
+              const subs = childrenOf(cat.id);
+              const isExpanded = expandedIds.has(cat.id);
+              const count = productCountFor(cat.name);
 
               return (
-                <div key={cat.id} className="rounded-xl border border-z-border bg-z-bg">
+                <div
+                  key={cat.id}
+                  className="rounded-xl border border-z-border bg-z-bg"
+                >
                   <div className="flex items-center gap-2 px-4 py-3">
                     <button
                       type="button"
@@ -248,19 +312,24 @@ function CategoriesTab({ storeId }: { storeId: string }) {
                       disabled={subs.length === 0}
                       className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-z-text-muted hover:bg-z-bg2 disabled:opacity-30"
                     >
-                      <HugeiconsIcon icon={isExpanded ? ArrowDown01Icon : ArrowRight02Icon} size={14} />
+                      <HugeiconsIcon
+                        icon={isExpanded ? ArrowDown01Icon : ArrowRight02Icon}
+                        size={14}
+                      />
                     </button>
 
-                    <span className="flex-1 font-medium text-z-text">{cat.name}</span>
+                    <span className="flex-1 font-medium text-z-text">
+                      {cat.name}
+                    </span>
 
                     {count > 0 && (
                       <span className="rounded-full bg-z-border px-2 py-0.5 text-[11px] text-z-text-muted">
-                        {count} {count === 1 ? 'produto' : 'produtos'}
+                        {count} {count === 1 ? "produto" : "produtos"}
                       </span>
                     )}
                     {subs.length > 0 && (
                       <span className="rounded-full bg-z-border px-2 py-0.5 text-[11px] text-z-text-muted">
-                        {subs.length} {subs.length === 1 ? 'sub' : 'subs'}
+                        {subs.length} {subs.length === 1 ? "sub" : "subs"}
                       </span>
                     )}
 
@@ -294,17 +363,20 @@ function CategoriesTab({ storeId }: { storeId: string }) {
                   {isExpanded && subs.length > 0 && (
                     <div className="flex flex-col gap-1.5 border-t border-z-border bg-white px-4 py-3">
                       {subs.map((sub) => {
-                        const subCount = productCountFor(sub.name)
+                        const subCount = productCountFor(sub.name);
                         return (
                           <div
                             key={sub.id}
                             className="flex items-center gap-2 rounded-lg border border-z-border bg-z-bg px-3 py-2"
                           >
                             <span className="text-z-text-hint">└</span>
-                            <span className="flex-1 text-sm text-z-text">{sub.name}</span>
+                            <span className="flex-1 text-sm text-z-text">
+                              {sub.name}
+                            </span>
                             {subCount > 0 && (
                               <span className="rounded-full bg-z-border px-2 py-0.5 text-[11px] text-z-text-muted">
-                                {subCount} {subCount === 1 ? 'produto' : 'produtos'}
+                                {subCount}{" "}
+                                {subCount === 1 ? "produto" : "produtos"}
                               </span>
                             )}
                             <button
@@ -324,19 +396,20 @@ function CategoriesTab({ storeId }: { storeId: string }) {
                               <HugeiconsIcon icon={Delete02Icon} size={12} />
                             </button>
                           </div>
-                        )
+                        );
                       })}
                     </div>
                   )}
                 </div>
-              )
+              );
             })}
 
             {uncategorizedCount > 0 && (
               <div className="flex items-center justify-between rounded-xl border border-dashed border-z-border px-4 py-3">
                 <span className="text-sm text-z-text-muted">Sem categoria</span>
                 <span className="rounded-full bg-z-border px-2 py-0.5 text-xs text-z-text-hint">
-                  {uncategorizedCount} {uncategorizedCount === 1 ? 'produto' : 'produtos'}
+                  {uncategorizedCount}{" "}
+                  {uncategorizedCount === 1 ? "produto" : "produtos"}
                 </span>
               </div>
             )}
@@ -348,43 +421,54 @@ function CategoriesTab({ storeId }: { storeId: string }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/80 p-4 backdrop-blur-sm">
           <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-white p-6 shadow-2xl">
             <h3 className="text-base font-semibold">
-              {modal.mode === 'edit'
-                ? 'Editar categoria'
+              {modal.mode === "edit"
+                ? "Editar categoria"
                 : modal.parentId
-                  ? 'Nova subcategoria'
-                  : 'Nova categoria'}
+                  ? "Nova subcategoria"
+                  : "Nova categoria"}
             </h3>
             <Field
               label="Nome"
               placeholder="Ex.: Bebidas"
               value={modalName}
               onChange={(e) => {
-                setModalName(e.target.value)
-                setModalError(null)
+                setModalName(e.target.value);
+                setModalError(null);
               }}
               maxLength={60}
               autoFocus
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  handleSaveModal()
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSaveModal();
                 }
               }}
             />
-            {modalError && <p className="text-xs text-destructive">{modalError}</p>}
+            {modalError && (
+              <p className="text-xs text-destructive">{modalError}</p>
+            )}
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="ghost" onClick={closeModal} disabled={isSaving}>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={closeModal}
+                disabled={isSaving}
+              >
                 Cancelar
               </Button>
-              <Button type="button" onClick={handleSaveModal} disabled={isSaving}>
-                {isSaving ? 'Salvando...' : 'Salvar'}
+              <Button
+                type="button"
+                onClick={handleSaveModal}
+                disabled={isSaving}
+              >
+                {isSaving ? "Salvando..." : "Salvar"}
               </Button>
             </div>
           </div>
         </div>
       )}
     </section>
-  )
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -397,21 +481,27 @@ function MobileCatalogCard({
   onToggle,
   children,
 }: {
-  icon: typeof Settings01Icon
-  title: string
-  subtitle: string
-  open: boolean
-  onToggle: () => void
-  children: ReactNode
+  icon: typeof Settings01Icon;
+  title: string;
+  subtitle: string;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
 }) {
   return (
     <section className="rounded-[22px] border border-z-border bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-      <button type="button" onClick={onToggle} className="flex w-full items-center gap-4 text-left">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center gap-4 text-left"
+      >
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f4efe7] text-z-text">
           <HugeiconsIcon icon={icon} size={25} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-xl font-extrabold leading-tight text-z-text">{title}</span>
+          <span className="block text-xl font-extrabold leading-tight text-z-text">
+            {title}
+          </span>
           <span className="block truncate text-base font-medium leading-tight text-z-text-hint">
             {subtitle}
           </span>
@@ -419,24 +509,46 @@ function MobileCatalogCard({
         <HugeiconsIcon
           icon={open ? ArrowDown01Icon : ArrowRight02Icon}
           size={22}
-          className={cn('shrink-0 text-z-text-hint transition-transform', open && 'rotate-180')}
+          className={cn(
+            "shrink-0 text-z-text-hint transition-transform",
+            open && "rotate-180",
+          )}
         />
       </button>
-      {open && <div className="mt-5 flex flex-col gap-4 border-t border-z-border pt-5">{children}</div>}
+      {open && (
+        <div className="mt-5 flex flex-col gap-4 border-t border-z-border pt-5">
+          {children}
+        </div>
+      )}
     </section>
-  )
+  );
 }
 
-function InfoValue({ label, value, swatch }: { label: string; value: string; swatch?: string }) {
+function InfoValue({
+  label,
+  value,
+  swatch,
+}: {
+  label: string;
+  value: string;
+  swatch?: string;
+}) {
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-base font-extrabold text-z-text-muted">{label}</span>
+      <span className="text-base font-extrabold text-z-text-muted">
+        {label}
+      </span>
       <div className="flex min-h-12 items-center gap-3 rounded-xl border border-z-border bg-z-bg2 px-4 text-base font-extrabold text-z-text">
-        {swatch && <span className="h-5 w-5 shrink-0 rounded-full" style={{ backgroundColor: swatch }} />}
+        {swatch && (
+          <span
+            className="h-5 w-5 shrink-0 rounded-full"
+            style={{ backgroundColor: swatch }}
+          />
+        )}
         <span className="min-w-0 truncate">{value}</span>
       </div>
     </div>
-  )
+  );
 }
 
 function BottomSheet({
@@ -445,15 +557,20 @@ function BottomSheet({
   onClose,
   children,
 }: {
-  title: string
-  open: boolean
-  onClose: () => void
-  children: ReactNode
+  title: string;
+  open: boolean;
+  onClose: () => void;
+  children: ReactNode;
 }) {
-  if (!open) return null
+  if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-slate-50/80 backdrop-blur-[1px] lg:hidden">
-      <button type="button" aria-label="Fechar" className="absolute inset-0" onClick={onClose} />
+      <button
+        type="button"
+        aria-label="Fechar"
+        className="absolute inset-0"
+        onClick={onClose}
+      />
       <div className="relative max-h-[88dvh] w-full overflow-y-auto rounded-t-[28px] bg-white px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4 shadow-2xl">
         <div className="mx-auto mb-5 h-1.5 w-16 rounded-full bg-z-border" />
         <div className="mb-5 flex items-center justify-between">
@@ -470,231 +587,270 @@ function BottomSheet({
         {children}
       </div>
     </div>
-  )
+  );
 }
 
 /* -------------------------------------------------------------------------- */
 
 export default function CatalogPage() {
-  const { section } = useParams<{ section?: string }>()
-  const { store } = useActiveStore()
-  const updateStore = useUpdateStore()
-  const limits = usePlanLimits(store?.id)
-  const canTheme = limits.canUse('theme')
-  const canPdf = limits.canUse('pdf')
-  const canGallery = limits.canUse('gallery')
-  const canAi = limits.canUse('ai')
-  const products = useProducts(store?.id)
-  const categoriesQuery = useCategories(store?.id)
-  const createCategory = useCreateCategory()
-  const { download: downloadPdf, isGenerating: isGeneratingPdf } = useCatalogPdf()
-  const { generate: generateStoreCopy } = useGenerateStoreCopy()
-  const [generatingKind, setGeneratingKind] = useState<StoreCopyKind | null>(null)
-  const [mobileOpenCard, setMobileOpenCard] = useState<'gerais' | 'visual' | 'contato' | 'pagamento' | 'categorias'>('gerais')
-  const [visualModalOpen, setVisualModalOpen] = useState(false)
-  const [paymentDeliveryModalOpen, setPaymentDeliveryModalOpen] = useState(false)
-  const [mobileCategoryModalOpen, setMobileCategoryModalOpen] = useState(false)
-  const [mobileCategoryName, setMobileCategoryName] = useState('')
-  const [mobileSubcategoryName, setMobileSubcategoryName] = useState('')
-  const activeTab = isTabId(section) ? section : 'gerais'
+  const { section } = useParams<{ section?: string }>();
+  const { store } = useActiveStore();
+  const updateStore = useUpdateStore();
+  const limits = usePlanLimits(store?.id);
+  const canTheme = limits.canUse("theme");
+  const canPdf = limits.canUse("pdf");
+  const canGallery = limits.canUse("gallery");
+  const canAi = limits.canUse("ai");
+  const products = useProducts(store?.id);
+  const categoriesQuery = useCategories(store?.id);
+  const createCategory = useCreateCategory();
+  const { download: downloadPdf, isGenerating: isGeneratingPdf } =
+    useCatalogPdf();
+  const { generate: generateStoreCopy } = useGenerateStoreCopy();
+  const [generatingKind, setGeneratingKind] = useState<StoreCopyKind | null>(
+    null,
+  );
+  const [mobileOpenCard, setMobileOpenCard] = useState<
+    "gerais" | "visual" | "contato" | "pagamento" | "categorias"
+  >("gerais");
+  const [visualModalOpen, setVisualModalOpen] = useState(false);
+  const [paymentDeliveryModalOpen, setPaymentDeliveryModalOpen] =
+    useState(false);
+  const [mobileCategoryModalOpen, setMobileCategoryModalOpen] = useState(false);
+  const [mobileCategoryName, setMobileCategoryName] = useState("");
+  const [mobileSubcategoryName, setMobileSubcategoryName] = useState("");
+  const activeTab = isTabId(section) ? section : "gerais";
 
   const form = useForm<UpdateStoreInput>({
     resolver: zodResolver(updateStoreSchema),
     defaultValues: {
-      slug: '',
-      name: '',
-      primary_color: '#25D366',
-      slogan: '',
-      whatsapp_phone: '',
-      logo_url: '',
-      banner_url: '',
-      contact_email: '',
-      contact_phone: '',
-      address_cep: '',
-      address_street: '',
-      address_neighborhood: '',
-      address_number: '',
-      address_state: '',
-      address_city: '',
+      slug: "",
+      name: "",
+      primary_color: "#25D366",
+      slogan: "",
+      whatsapp_phone: "",
+      logo_url: "",
+      banner_url: "",
+      contact_email: "",
+      contact_phone: "",
+      address_cep: "",
+      address_street: "",
+      address_neighborhood: "",
+      address_number: "",
+      address_state: "",
+      address_city: "",
       cart_enabled: true,
       require_shipping_choice: false,
       require_cpf: false,
       require_payment_choice: false,
-      payment_instructions_title: '',
-      payment_instructions_message: '',
+      payment_instructions_title: "",
+      payment_instructions_message: "",
       whatsapp_button_enabled: true,
-      accepted_payment_methods: ['cash', 'pix', 'credit_card', 'debit_card'],
-      accepted_shipping_methods: ['delivery', 'pickup_in_store'],
+      accepted_payment_methods: ["cash", "pix", "credit_card", "debit_card"],
+      accepted_shipping_methods: ["delivery", "pickup_in_store"],
       delivery_hours: [],
-      delivery_area_scope: 'city_only',
+      delivery_area_scope: "city_only",
       delivery_area_custom_locations: [],
       custom_links: [],
       gallery_images: [],
-      social_instagram: '',
-      social_facebook: '',
-      social_x: '',
-      social_youtube: '',
-      social_kwai: '',
-      social_tiktok: '',
-      about_us: '',
+      social_instagram: "",
+      social_facebook: "",
+      social_x: "",
+      social_youtube: "",
+      social_kwai: "",
+      social_tiktok: "",
+      about_us: "",
       age_restricted: false,
       show_out_of_stock: false,
-      product_sort: 'recent',
-      home_view: 'catalog',
-      cnpj: '',
-      gtm_id: '',
+      product_sort: "recent",
+      home_view: "catalog",
+      cnpj: "",
+      gtm_id: "",
     },
-  })
+  });
 
-  const slugAvailability = useSlugAvailability(form.watch('slug') ?? '', store?.slug ?? '')
-  const selectedState = form.watch('address_state')
-  const { data: cityOptions = [], isLoading: loadingCities } = useCities(selectedState || null)
+  const slugAvailability = useSlugAvailability(
+    form.watch("slug") ?? "",
+    store?.slug ?? "",
+  );
+  const selectedState = form.watch("address_state");
+  const { data: cityOptions = [], isLoading: loadingCities } = useCities(
+    selectedState || null,
+  );
 
   useEffect(() => {
-    if (!store) return
+    if (!store) return;
     form.reset({
       slug: store.slug,
       name: store.name,
       primary_color: store.primary_color,
-      slogan: store.slogan ?? '',
-      whatsapp_phone: store.whatsapp_phone ? fromE164BR(store.whatsapp_phone) : '',
-      logo_url: store.logo_url ?? '',
-      banner_url: store.banner_url ?? '',
-      contact_email: store.contact_email ?? '',
-      contact_phone: store.contact_phone ? fromE164BR(store.contact_phone) : '',
-      address_cep: store.address_cep ?? '',
-      address_street: store.address_street ?? '',
-      address_neighborhood: store.address_neighborhood ?? '',
-      address_number: store.address_number ?? '',
-      address_state: store.address_state ?? '',
-      address_city: store.address_city ?? '',
+      slogan: store.slogan ?? "",
+      whatsapp_phone: store.whatsapp_phone
+        ? fromE164BR(store.whatsapp_phone)
+        : "",
+      logo_url: store.logo_url ?? "",
+      banner_url: store.banner_url ?? "",
+      contact_email: store.contact_email ?? "",
+      contact_phone: store.contact_phone ? fromE164BR(store.contact_phone) : "",
+      address_cep: store.address_cep ?? "",
+      address_street: store.address_street ?? "",
+      address_neighborhood: store.address_neighborhood ?? "",
+      address_number: store.address_number ?? "",
+      address_state: store.address_state ?? "",
+      address_city: store.address_city ?? "",
       cart_enabled: store.cart_enabled ?? true,
       require_shipping_choice: store.require_shipping_choice ?? false,
       require_cpf: store.require_cpf ?? false,
       require_payment_choice: store.require_payment_choice ?? false,
-      payment_instructions_title: store.payment_instructions_title ?? '',
-      payment_instructions_message: store.payment_instructions_message ?? '',
+      payment_instructions_title: store.payment_instructions_title ?? "",
+      payment_instructions_message: store.payment_instructions_message ?? "",
       whatsapp_button_enabled: store.whatsapp_button_enabled ?? true,
-      accepted_payment_methods: store.accepted_payment_methods ?? ['cash', 'pix', 'credit_card', 'debit_card'],
-      accepted_shipping_methods: store.accepted_shipping_methods ?? ['delivery', 'pickup_in_store'],
+      accepted_payment_methods: store.accepted_payment_methods ?? [
+        "cash",
+        "pix",
+        "credit_card",
+        "debit_card",
+      ],
+      accepted_shipping_methods: store.accepted_shipping_methods ?? [
+        "delivery",
+        "pickup_in_store",
+      ],
       delivery_hours: store.delivery_hours ?? [],
-      delivery_area_scope: store.delivery_area_scope ?? 'city_only',
-      delivery_area_custom_locations: store.delivery_area_custom_locations ?? [],
-      custom_links: (store.custom_links ?? []) as { label: string; url: string }[],
+      delivery_area_scope: store.delivery_area_scope ?? "city_only",
+      delivery_area_custom_locations:
+        store.delivery_area_custom_locations ?? [],
+      custom_links: (store.custom_links ?? []) as {
+        label: string;
+        url: string;
+      }[],
       gallery_images: (store.gallery_images ?? []) as string[],
-      social_instagram: store.social_links?.instagram ?? '',
-      social_facebook: store.social_links?.facebook ?? '',
-      social_x: store.social_links?.x ?? '',
-      social_youtube: store.social_links?.youtube ?? '',
-      social_kwai: store.social_links?.kwai ?? '',
-      social_tiktok: store.social_links?.tiktok ?? '',
-      about_us: store.about_us ?? '',
+      social_instagram: store.social_links?.instagram ?? "",
+      social_facebook: store.social_links?.facebook ?? "",
+      social_x: store.social_links?.x ?? "",
+      social_youtube: store.social_links?.youtube ?? "",
+      social_kwai: store.social_links?.kwai ?? "",
+      social_tiktok: store.social_links?.tiktok ?? "",
+      about_us: store.about_us ?? "",
       age_restricted: store.age_restricted ?? false,
       show_out_of_stock: store.show_out_of_stock ?? false,
-      product_sort: store.product_sort ?? 'recent',
-      home_view: store.home_view ?? 'catalog',
-      cnpj: store.cnpj ?? '',
-      gtm_id: store.gtm_id ?? '',
-    })
-  }, [store, form])
+      product_sort: store.product_sort ?? "recent",
+      home_view: store.home_view ?? "catalog",
+      cnpj: store.cnpj ?? "",
+      gtm_id: store.gtm_id ?? "",
+    });
+  }, [store, form]);
 
   if (!store) {
-    return <p className="text-sm text-z-text-muted">Carregando...</p>
+    return <p className="text-sm text-z-text-muted">Carregando...</p>;
   }
 
   const slugLocked = !!(
     store.slug_last_updated_at &&
-    new Date().getTime() - new Date(store.slug_last_updated_at).getTime() < 90 * 24 * 60 * 60 * 1000
-  )
+    new Date().getTime() - new Date(store.slug_last_updated_at).getTime() <
+      90 * 24 * 60 * 60 * 1000
+  );
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      const input = { ...values }
+      const input = { ...values };
       if (input.slug === store.slug) {
-        delete input.slug
+        delete input.slug;
       }
-      await updateStore.mutateAsync({ storeId: store.id, input })
-      form.reset(values)
+      await updateStore.mutateAsync({ storeId: store.id, input });
+      form.reset(values);
     } catch {
-      form.setError('root', {
-        message: 'Não foi possível salvar as alterações. Tente novamente.',
-      })
+      form.setError("root", {
+        message: "Não foi possível salvar as alterações. Tente novamente.",
+      });
     }
-  })
+  });
 
   const handleGenerateCopy = async (kind: StoreCopyKind) => {
-    setGeneratingKind(kind)
+    setGeneratingKind(kind);
     try {
       const text = await generateStoreCopy({
         storeId: store.id,
         kind,
-        name: form.getValues('name') || store.name,
+        name: form.getValues("name") || store.name,
         category: mostCommonProductCategory(products.data ?? []),
-        slogan: form.getValues('slogan') || undefined,
-        aboutUs: form.getValues('about_us') || undefined,
-      })
-      form.setValue(kind === 'slogan' ? 'slogan' : 'about_us', text, {
+        slogan: form.getValues("slogan") || undefined,
+        aboutUs: form.getValues("about_us") || undefined,
+      });
+      form.setValue(kind === "slogan" ? "slogan" : "about_us", text, {
         shouldDirty: true,
         shouldValidate: true,
-      })
+      });
     } catch {
-      toast.error('Não foi possível gerar o texto. Tente novamente.')
+      toast.error("Não foi possível gerar o texto. Tente novamente.");
     } finally {
-      setGeneratingKind(null)
+      setGeneratingKind(null);
     }
-  }
+  };
 
-  const logoPreview = form.watch('logo_url')
-  const primaryColor = form.watch('primary_color')
-  const isPresetColor = (c: string) => COLOR_PRESETS.some((p) => p.toLowerCase() === c?.toLowerCase())
-  const categories = categoriesQuery.data ?? []
-  const topLevelCategories = categories.filter((category) => !category.parent_id)
-  const subcategories = categories.filter((category) => category.parent_id)
-  const categoryPreview = topLevelCategories.map((category) => category.name).slice(0, 3).join(', ')
-  const subcategoryPreview = subcategories.map((category) => category.name).slice(0, 3).join(', ')
+  const logoPreview = form.watch("logo_url");
+  const primaryColor = form.watch("primary_color");
+  const isPresetColor = (c: string) =>
+    COLOR_PRESETS.some((p) => p.toLowerCase() === c?.toLowerCase());
+  const categories = categoriesQuery.data ?? [];
+  const topLevelCategories = categories.filter(
+    (category) => !category.parent_id,
+  );
+  const subcategories = categories.filter((category) => category.parent_id);
+  const categoryPreview = topLevelCategories
+    .map((category) => category.name)
+    .slice(0, 3)
+    .join(", ");
+  const subcategoryPreview = subcategories
+    .map((category) => category.name)
+    .slice(0, 3)
+    .join(", ");
   const deliveryAreaLabel =
-    form.watch('delivery_area_scope') === 'city_only'
-      ? form.watch('address_city')
-        ? `Apenas na cidade (${form.watch('address_city')})`
-        : 'Apenas na cidade'
+    form.watch("delivery_area_scope") === "city_only"
+      ? form.watch("address_city")
+        ? `Apenas na cidade (${form.watch("address_city")})`
+        : "Apenas na cidade"
       : {
-          city_only: 'Apenas na cidade',
-          state_only: 'Apenas meu estado',
-          brazil: 'Brasil inteiro',
-          worldwide: 'Mundo inteiro',
-          digital_only: 'Apenas digital',
-          custom: 'Personalizado',
-        }[form.watch('delivery_area_scope') ?? 'city_only']
+          city_only: "Apenas na cidade",
+          state_only: "Apenas meu estado",
+          brazil: "Brasil inteiro",
+          worldwide: "Mundo inteiro",
+          digital_only: "Apenas digital",
+          custom: "Personalizado",
+        }[form.watch("delivery_area_scope") ?? "city_only"];
 
   const handleCreateMobileCategory = async () => {
-    const categoryName = mobileCategoryName.trim()
-    const subcategoryName = mobileSubcategoryName.trim()
-    if (!categoryName) return
+    const categoryName = mobileCategoryName.trim();
+    const subcategoryName = mobileSubcategoryName.trim();
+    if (!categoryName) return;
 
     try {
       const category = await createCategory.mutateAsync({
         store_id: store.id,
         name: categoryName,
         parent_id: null,
-      })
+      });
       if (subcategoryName) {
         await createCategory.mutateAsync({
           store_id: store.id,
           name: subcategoryName,
           parent_id: category.id,
-        })
+        });
       }
-      setMobileCategoryName('')
-      setMobileSubcategoryName('')
-      setMobileCategoryModalOpen(false)
+      setMobileCategoryName("");
+      setMobileSubcategoryName("");
+      setMobileCategoryModalOpen(false);
     } catch {
-      toast.error('Não foi possível salvar a categoria. Tente novamente.')
+      toast.error("Não foi possível salvar a categoria. Tente novamente.");
     }
-  }
+  };
 
   return (
     <div className="flex w-full flex-col gap-6 lg:max-w-6xl">
-      <form id="catalog-mobile-form" onSubmit={onSubmit} className="flex flex-col gap-4 lg:hidden">
+      <form
+        id="catalog-mobile-form"
+        onSubmit={onSubmit}
+        className="flex flex-col gap-4 lg:hidden"
+      >
         <div className="mb-3 flex items-center gap-4">
           <Link
             to={ROUTES.dashboardMore}
@@ -711,21 +867,27 @@ export default function CatalogPage() {
         <button
           type="button"
           onClick={() => {
-            navigator.clipboard.writeText(buildStoreUrl(store.slug))
-            track('share_link_copied', {
+            navigator.clipboard.writeText(buildStoreUrl(store.slug));
+            track("share_link_copied", {
               store_id: store.id,
-              link_type: 'store',
+              link_type: "store",
               item_id: store.id,
-            })
+            });
           }}
           className="flex items-center gap-3 rounded-[22px] bg-z-ink px-5 py-4 text-left text-white"
         >
-          <HugeiconsIcon icon={Globe02Icon} size={22} className="shrink-0 text-z-green" />
+          <HugeiconsIcon
+            icon={Globe02Icon}
+            size={22}
+            className="shrink-0 text-z-green"
+          />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-lg font-extrabold leading-tight">
-              {buildStoreUrl(store.slug).replace(/^https?:\/\//, '')}
+              {buildStoreUrl(store.slug).replace(/^https?:\/\//, "")}
             </span>
-            <span className="block text-sm font-medium text-white/55">Toque para copiar o link</span>
+            <span className="block text-sm font-medium text-white/55">
+              Toque para copiar o link
+            </span>
           </span>
         </button>
 
@@ -733,17 +895,27 @@ export default function CatalogPage() {
           icon={Settings01Icon}
           title="Informações gerais"
           subtitle="Nome, slogan, sobre"
-          open={mobileOpenCard === 'gerais'}
-          onToggle={() => setMobileOpenCard(mobileOpenCard === 'gerais' ? 'visual' : 'gerais')}
+          open={mobileOpenCard === "gerais"}
+          onToggle={() =>
+            setMobileOpenCard(mobileOpenCard === "gerais" ? "visual" : "gerais")
+          }
         >
-          <Field label="Nome da loja" error={form.formState.errors.name?.message} {...form.register('name')} />
-          <Field label="Slogan" error={form.formState.errors.slogan?.message} {...form.register('slogan')} />
+          <Field
+            label="Nome da loja"
+            error={form.formState.errors.name?.message}
+            {...form.register("name")}
+          />
+          <Field
+            label="Slogan"
+            error={form.formState.errors.slogan?.message}
+            {...form.register("slogan")}
+          />
           <div className="flex flex-col gap-1.5">
             <Label>Sobre</Label>
             <Textarea
               placeholder="Conte um pouco sobre a sua loja..."
               className="min-h-[92px]"
-              {...form.register('about_us')}
+              {...form.register("about_us")}
             />
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -755,10 +927,10 @@ export default function CatalogPage() {
                 render={({ field }) => (
                   <Combobox
                     options={STATE_OPTIONS}
-                    value={field.value ?? ''}
+                    value={field.value ?? ""}
                     onChange={(value) => {
-                      field.onChange(value)
-                      form.setValue('address_city', '', { shouldDirty: true })
+                      field.onChange(value);
+                      form.setValue("address_city", "", { shouldDirty: true });
                     }}
                     placeholder="Digite para buscar..."
                     emptyMessage="Estado não encontrado"
@@ -774,11 +946,15 @@ export default function CatalogPage() {
                 render={({ field }) => (
                   <Combobox
                     options={cityOptions}
-                    value={field.value ?? ''}
+                    value={field.value ?? ""}
                     onChange={field.onChange}
                     disabled={!selectedState}
                     loading={loadingCities}
-                    placeholder={!selectedState ? 'Selecione o estado' : 'Digite para buscar...'}
+                    placeholder={
+                      !selectedState
+                        ? "Selecione o estado"
+                        : "Digite para buscar..."
+                    }
                     emptyMessage="Cidade não encontrada"
                   />
                 )}
@@ -786,8 +962,16 @@ export default function CatalogPage() {
             </div>
           </div>
           <div className="grid grid-cols-[minmax(0,1fr)_96px] gap-3">
-            <Field label="Endereço" error={form.formState.errors.address_street?.message} {...form.register('address_street')} />
-            <Field label="Número" error={form.formState.errors.address_number?.message} {...form.register('address_number')} />
+            <Field
+              label="Endereço"
+              error={form.formState.errors.address_street?.message}
+              {...form.register("address_street")}
+            />
+            <Field
+              label="Número"
+              error={form.formState.errors.address_number?.message}
+              {...form.register("address_number")}
+            />
           </div>
         </MobileCatalogCard>
 
@@ -795,15 +979,29 @@ export default function CatalogPage() {
           icon={PaintBrush01Icon}
           title="Logo, banner e cores"
           subtitle="Identidade visual"
-          open={mobileOpenCard === 'visual'}
-          onToggle={() => setMobileOpenCard(mobileOpenCard === 'visual' ? 'gerais' : 'visual')}
+          open={mobileOpenCard === "visual"}
+          onToggle={() =>
+            setMobileOpenCard(mobileOpenCard === "visual" ? "gerais" : "visual")
+          }
         >
-          <InfoValue label="Cor primária" value={`Cor selecionada (${primaryColor})`} swatch={primaryColor} />
+          <InfoValue
+            label="Cor primária"
+            value={`Cor selecionada (${primaryColor})`}
+            swatch={primaryColor}
+          />
           <div className="grid grid-cols-2 gap-3">
-            <button type="button" onClick={() => setVisualModalOpen(true)} className="h-11 rounded-xl border border-z-border bg-z-bg2 text-sm font-semibold text-z-text">
+            <button
+              type="button"
+              onClick={() => setVisualModalOpen(true)}
+              className="h-11 rounded-xl border border-z-border bg-z-bg2 text-sm font-semibold text-z-text"
+            >
               Adicionar logo
             </button>
-            <button type="button" onClick={() => setVisualModalOpen(true)} className="h-11 rounded-xl border border-z-border bg-z-bg2 text-sm font-semibold text-z-text">
+            <button
+              type="button"
+              onClick={() => setVisualModalOpen(true)}
+              className="h-11 rounded-xl border border-z-border bg-z-bg2 text-sm font-semibold text-z-text"
+            >
               Adicionar banner
             </button>
           </div>
@@ -820,31 +1018,67 @@ export default function CatalogPage() {
           icon={ContactIcon}
           title="WhatsApp e contatos"
           subtitle="Onde os pedidos chegam"
-          open={mobileOpenCard === 'contato'}
-          onToggle={() => setMobileOpenCard(mobileOpenCard === 'contato' ? 'gerais' : 'contato')}
+          open={mobileOpenCard === "contato"}
+          onToggle={() =>
+            setMobileOpenCard(
+              mobileOpenCard === "contato" ? "gerais" : "contato",
+            )
+          }
         >
           <div className="flex flex-col gap-1.5">
             <Label>WhatsApp de pedidos</Label>
             <PhoneInput
               className="h-12 w-full rounded-xl border border-z-border bg-z-bg2 px-4 text-base font-semibold"
-              value={form.watch('whatsapp_phone') ?? ''}
-              onChange={(masked) => form.setValue('whatsapp_phone', masked, { shouldDirty: true, shouldValidate: true })}
+              value={form.watch("whatsapp_phone") ?? ""}
+              onChange={(masked) =>
+                form.setValue("whatsapp_phone", masked, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
             />
           </div>
-          <Field label="E-mail de contato" type="email" {...form.register('contact_email')} />
+          <Field
+            label="E-mail de contato"
+            type="email"
+            {...form.register("contact_email")}
+          />
         </MobileCatalogCard>
 
         <MobileCatalogCard
           icon={CreditCardIcon}
           title="Pagamento e entrega"
           subtitle="Métodos aceitos"
-          open={mobileOpenCard === 'pagamento'}
-          onToggle={() => setMobileOpenCard(mobileOpenCard === 'pagamento' ? 'gerais' : 'pagamento')}
+          open={mobileOpenCard === "pagamento"}
+          onToggle={() =>
+            setMobileOpenCard(
+              mobileOpenCard === "pagamento" ? "gerais" : "pagamento",
+            )
+          }
         >
-          <InfoValue label="Pagamento" value={labelsFor(form.watch('accepted_payment_methods'), PAYMENT_OPTIONS)} />
-          <InfoValue label="Entrega" value={labelsFor(form.watch('accepted_shipping_methods'), SHIPPING_OPTIONS)} />
+          <InfoValue
+            label="Pagamento"
+            value={labelsFor(
+              form.watch("accepted_payment_methods"),
+              PAYMENT_OPTIONS,
+            )}
+          />
+          <InfoValue
+            label="Entrega"
+            value={labelsFor(
+              form.watch("accepted_shipping_methods"),
+              SHIPPING_OPTIONS,
+            )}
+          />
           <InfoValue label="Região de entrega" value={deliveryAreaLabel} />
-          <InfoValue label="Horário de funcionamento" value={(form.watch('delivery_hours') ?? []).length > 0 ? `${(form.watch('delivery_hours') ?? []).length} faixa(s) configurada(s)` : 'Não configurado'} />
+          <InfoValue
+            label="Horário de funcionamento"
+            value={
+              (form.watch("delivery_hours") ?? []).length > 0
+                ? `${(form.watch("delivery_hours") ?? []).length} faixa(s) configurada(s)`
+                : "Não configurado"
+            }
+          />
           <button
             type="button"
             onClick={() => setPaymentDeliveryModalOpen(true)}
@@ -858,11 +1092,21 @@ export default function CatalogPage() {
           icon={LockedIcon}
           title="Categorias"
           subtitle={`${topLevelCategories.length} categorias ativas`}
-          open={mobileOpenCard === 'categorias'}
-          onToggle={() => setMobileOpenCard(mobileOpenCard === 'categorias' ? 'gerais' : 'categorias')}
+          open={mobileOpenCard === "categorias"}
+          onToggle={() =>
+            setMobileOpenCard(
+              mobileOpenCard === "categorias" ? "gerais" : "categorias",
+            )
+          }
         >
-          <InfoValue label="Categorias" value={categoryPreview || 'Nenhuma categoria cadastrada'} />
-          <InfoValue label="Subcategorias" value={subcategoryPreview || 'Nenhuma subcategoria cadastrada'} />
+          <InfoValue
+            label="Categorias"
+            value={categoryPreview || "Nenhuma categoria cadastrada"}
+          />
+          <InfoValue
+            label="Subcategorias"
+            value={subcategoryPreview || "Nenhuma subcategoria cadastrada"}
+          />
           <button
             type="button"
             onClick={() => setMobileCategoryModalOpen(true)}
@@ -881,14 +1125,16 @@ export default function CatalogPage() {
               key={tab.id}
               to={catalogSectionPath(tab.id)}
               className={cn(
-                'flex flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-xs font-medium transition-colors',
-                'lg:flex-row lg:w-full lg:gap-2 lg:px-4 lg:py-2.5 lg:text-sm lg:text-left',
+                "flex flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-xs font-medium transition-colors",
+                "lg:flex-row lg:w-full lg:gap-2 lg:px-4 lg:py-2.5 lg:text-sm lg:text-left",
                 activeTab === tab.id
-                  ? 'bg-z-text text-white'
-                  : 'text-z-text-muted hover:bg-z-bg2 hover:text-z-text',
+                  ? "bg-z-text text-white"
+                  : "text-z-text-muted hover:bg-z-bg2 hover:text-z-text",
               )}
             >
-              {tab.icon && <HugeiconsIcon icon={tab.icon} size={15} className="shrink-0" />}
+              {tab.icon && (
+                <HugeiconsIcon icon={tab.icon} size={15} className="shrink-0" />
+              )}
               <span className="lg:hidden">{tab.label}</span>
               <span className="hidden lg:inline">{tab.label}</span>
             </Link>
@@ -896,28 +1142,45 @@ export default function CatalogPage() {
         </nav>
 
         <main className="flex-1">
-          {activeTab === 'categorias' && <CategoriesTab storeId={store.id} />}
-          <form id="catalog-form" onSubmit={onSubmit} className={cn('flex flex-col gap-4', activeTab === 'categorias' && 'hidden')}>
+          {activeTab === "categorias" && <CategoriesTab storeId={store.id} />}
+          <form
+            id="catalog-form"
+            onSubmit={onSubmit}
+            className={cn(
+              "flex flex-col gap-4",
+              activeTab === "categorias" && "hidden",
+            )}
+          >
             {/* INFORMAÇÕES GERAIS */}
-            {activeTab === 'gerais' && (
+            {activeTab === "gerais" && (
               <div className="flex flex-col gap-6">
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <HugeiconsIcon icon={StoreLocationIcon} size={20} className="text-z-text-muted" />
-                      <h2 className="text-base font-semibold">Dados da empresa</h2>
+                      <HugeiconsIcon
+                        icon={StoreLocationIcon}
+                        size={20}
+                        className="text-z-text-muted"
+                      />
+                      <h2 className="text-base font-semibold">
+                        Dados da empresa
+                      </h2>
                     </div>
                     {canPdf ? (
                       <button
                         type="button"
                         disabled={isGeneratingPdf || products.isLoading}
                         onClick={() =>
-                          downloadPdf(store, products.data ?? [], buildStoreUrl(store.slug))
+                          downloadPdf(
+                            store,
+                            products.data ?? [],
+                            buildStoreUrl(store.slug),
+                          )
                         }
                         className="flex items-center gap-2 rounded-lg border border-z-border bg-white px-4 py-2 text-sm font-medium text-z-text transition-colors hover:border-z-green hover:text-[#0bfeda] disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <HugeiconsIcon icon={FileDownloadIcon} size={16} />
-                        {isGeneratingPdf ? 'Gerando...' : 'Baixar PDF'}
+                        {isGeneratingPdf ? "Gerando..." : "Baixar PDF"}
                       </button>
                     ) : (
                       <div
@@ -934,29 +1197,31 @@ export default function CatalogPage() {
                     <Field
                       label="Nome da loja"
                       error={form.formState.errors.name?.message}
-                      {...form.register('name')}
+                      {...form.register("name")}
                     />
                     <Field
                       label="CNPJ"
                       placeholder="00.000.000/0001-00"
                       error={form.formState.errors.cnpj?.message}
-                      {...form.register('cnpj')}
+                      {...form.register("cnpj")}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-z-text">Slogan da loja</span>
+                      <span className="text-sm font-medium text-z-text">
+                        Slogan da loja
+                      </span>
                       <AiGenerateButton
                         canUse={canAi}
-                        isLoading={generatingKind === 'slogan'}
-                        onClick={() => handleGenerateCopy('slogan')}
+                        isLoading={generatingKind === "slogan"}
+                        onClick={() => handleGenerateCopy("slogan")}
                       />
                     </div>
                     <Field
                       placeholder="Produtos que encantam, feitos para você!"
                       error={form.formState.errors.slogan?.message}
-                      {...form.register('slogan')}
+                      {...form.register("slogan")}
                     />
                   </div>
 
@@ -965,18 +1230,19 @@ export default function CatalogPage() {
                       <Label htmlFor="sobre">Sobre nós</Label>
                       <AiGenerateButton
                         canUse={canAi}
-                        isLoading={generatingKind === 'about'}
-                        onClick={() => handleGenerateCopy('about')}
+                        isLoading={generatingKind === "about"}
+                        onClick={() => handleGenerateCopy("about")}
                       />
                     </div>
                     <Textarea
                       id="sobre"
                       placeholder="Conte um pouco sobre a sua loja..."
                       className="min-h-[100px]"
-                      {...form.register('about_us')}
+                      {...form.register("about_us")}
                     />
                     <p className="text-xs text-z-text-hint">
-                      Esta descrição aparecerá na página "Sobre Nós" do seu catálogo.
+                      Esta descrição aparecerá na página "Sobre Nós" do seu
+                      catálogo.
                     </p>
                   </div>
                 </section>
@@ -984,31 +1250,45 @@ export default function CatalogPage() {
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-6 w-8 items-center justify-center rounded border border-z-border text-xs font-bold text-z-text-muted">18+</div>
-                      <h2 className="text-base font-semibold">Indicação de idade</h2>
+                      <div className="flex h-6 w-8 items-center justify-center rounded border border-z-border text-xs font-bold text-z-text-muted">
+                        18+
+                      </div>
+                      <h2 className="text-base font-semibold">
+                        Indicação de idade
+                      </h2>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-3 ml-11">
-                    <span className="text-sm text-z-text-muted">Seus produtos são restritos a adultos?</span>
+                    <span className="text-sm text-z-text-muted">
+                      Seus produtos são restritos a adultos?
+                    </span>
                     <div className="flex items-center gap-6 mt-1">
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input 
-                          type="radio" 
+                        <input
+                          type="radio"
                           value="true"
-                          checked={form.watch('age_restricted') === true}
-                          onChange={() => form.setValue('age_restricted', true, { shouldDirty: true })}
-                          className="text-[#0bfeda] focus:ring-z-green h-4 w-4" 
+                          checked={form.watch("age_restricted") === true}
+                          onChange={() =>
+                            form.setValue("age_restricted", true, {
+                              shouldDirty: true,
+                            })
+                          }
+                          className="text-[#0bfeda] focus:ring-z-green h-4 w-4"
                         />
                         <span className="text-sm">Sim</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input 
-                          type="radio" 
+                        <input
+                          type="radio"
                           value="false"
-                          checked={form.watch('age_restricted') === false}
-                          onChange={() => form.setValue('age_restricted', false, { shouldDirty: true })}
-                          className="text-[#0bfeda] focus:ring-z-green h-4 w-4" 
+                          checked={form.watch("age_restricted") === false}
+                          onChange={() =>
+                            form.setValue("age_restricted", false, {
+                              shouldDirty: true,
+                            })
+                          }
+                          className="text-[#0bfeda] focus:ring-z-green h-4 w-4"
                         />
                         <span className="text-sm">Não</span>
                       </label>
@@ -1019,18 +1299,33 @@ export default function CatalogPage() {
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <HugeiconsIcon icon={EyeIcon} size={20} className="text-z-text-muted" />
-                      <h2 className="text-base font-semibold">Mostrar produtos fora de estoque no catálogo</h2>
+                      <HugeiconsIcon
+                        icon={EyeIcon}
+                        size={20}
+                        className="text-z-text-muted"
+                      />
+                      <h2 className="text-base font-semibold">
+                        Mostrar produtos fora de estoque no catálogo
+                      </h2>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-4 ml-7">
-                    <p className="text-sm text-z-text-muted">Produtos que estão fora de estoque não serão exibidos em seu catálogo.</p>
+                    <p className="text-sm text-z-text-muted">
+                      Produtos que estão fora de estoque não serão exibidos em
+                      seu catálogo.
+                    </p>
 
                     <label className="flex items-center justify-between gap-3 rounded-xl border border-z-border bg-z-bg p-4 cursor-pointer transition-colors hover:bg-z-bg2">
-                      <span className="text-sm font-medium">Habilitar a exibição de produtos fora de estoque</span>
+                      <span className="text-sm font-medium">
+                        Habilitar a exibição de produtos fora de estoque
+                      </span>
                       <div className="relative inline-flex items-center">
-                        <input type="checkbox" className="peer sr-only" {...form.register('show_out_of_stock')} />
+                        <input
+                          type="checkbox"
+                          className="peer sr-only"
+                          {...form.register("show_out_of_stock")}
+                        />
                         <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                       </div>
                     </label>
@@ -1040,18 +1335,25 @@ export default function CatalogPage() {
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-6 w-8 items-center justify-center rounded border border-z-border text-xs font-bold text-z-text-muted">A Z</div>
-                      <h2 className="text-base font-semibold">Ordem de exibição dos produtos</h2>
+                      <div className="flex h-6 w-8 items-center justify-center rounded border border-z-border text-xs font-bold text-z-text-muted">
+                        A Z
+                      </div>
+                      <h2 className="text-base font-semibold">
+                        Ordem de exibição dos produtos
+                      </h2>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-4 ml-11">
-                    <p className="text-sm text-z-text-muted">Defina como deve ser a ordem de exibição dos seus produtos no seu catálogo</p>
+                    <p className="text-sm text-z-text-muted">
+                      Defina como deve ser a ordem de exibição dos seus produtos
+                      no seu catálogo
+                    </p>
 
                     <div className="max-w-md">
-                      <select 
+                      <select
                         className="w-full rounded-lg border border-z-border bg-white px-3 py-2 text-sm text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                        {...form.register('product_sort')}
+                        {...form.register("product_sort")}
                       >
                         <option value="recent">Mais recentes primeiro</option>
                         <option value="name_asc">Nome: A a Z</option>
@@ -1066,28 +1368,35 @@ export default function CatalogPage() {
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <HugeiconsIcon icon={StoreLocationIcon} size={20} className="text-z-text-muted" />
-                      <h2 className="text-base font-semibold">Página inicial do catálogo</h2>
+                      <HugeiconsIcon
+                        icon={StoreLocationIcon}
+                        size={20}
+                        className="text-z-text-muted"
+                      />
+                      <h2 className="text-base font-semibold">
+                        Página inicial do catálogo
+                      </h2>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-3 ml-7">
                     <p className="text-sm text-z-text-muted">
-                      Escolha o que seus clientes verão ao abrir o link da sua loja. A outra opção
-                      continua disponível em sua própria página.
+                      Escolha o que seus clientes verão ao abrir o link da sua
+                      loja. A outra opção continua disponível em sua própria
+                      página.
                     </p>
 
                     <div className="max-w-md">
                       <RoundSingleCheck
                         options={[
-                          { value: 'catalog', label: 'Catálogo' },
-                          { value: 'about', label: 'Sobre' },
+                          { value: "catalog", label: "Catálogo" },
+                          { value: "about", label: "Sobre" },
                         ]}
-                        value={form.watch('home_view') ?? 'catalog'}
+                        value={form.watch("home_view") ?? "catalog"}
                         onChange={(next) =>
                           form.setValue(
-                            'home_view',
-                            next as UpdateStoreInput['home_view'],
+                            "home_view",
+                            next as UpdateStoreInput["home_view"],
                             { shouldDirty: true },
                           )
                         }
@@ -1099,7 +1408,7 @@ export default function CatalogPage() {
             )}
 
             {/* LOGO, BANNER E CORES */}
-            {activeTab === 'aparencia' && (
+            {activeTab === "aparencia" && (
               <section className="flex flex-col gap-6">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-1 rounded-2xl border border-z-border bg-white p-6">
@@ -1111,7 +1420,7 @@ export default function CatalogPage() {
                       aspect={1}
                       value={logoPreview || null}
                       onChange={(url) =>
-                        form.setValue('logo_url', url ?? '', {
+                        form.setValue("logo_url", url ?? "", {
                           shouldDirty: true,
                           shouldValidate: true,
                         })
@@ -1126,15 +1435,17 @@ export default function CatalogPage() {
                   </div>
 
                   <div className="flex flex-col gap-1 rounded-2xl border border-z-border bg-white p-6">
-                    <h2 className="text-lg font-semibold">Banner do catálogo</h2>
+                    <h2 className="text-lg font-semibold">
+                      Banner do catálogo
+                    </h2>
                     <ImageCropUploader
                       bucket="store-logos"
                       storeId={store.id}
                       label="Banner (hero do catálogo)"
                       aspect={16 / 10}
-                      value={form.watch('banner_url') || null}
+                      value={form.watch("banner_url") || null}
                       onChange={(url) =>
-                        form.setValue('banner_url', url ?? '', {
+                        form.setValue("banner_url", url ?? "", {
                           shouldDirty: true,
                           shouldValidate: true,
                         })
@@ -1151,7 +1462,9 @@ export default function CatalogPage() {
 
                 <div className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">Cor do tema do catálogo</h2>
+                    <h2 className="text-lg font-semibold">
+                      Cor do tema do catálogo
+                    </h2>
                     {!canTheme && (
                       <Link
                         to={ROUTES.dashboardBilling}
@@ -1165,42 +1478,59 @@ export default function CatalogPage() {
 
                   <fieldset
                     disabled={!canTheme}
-                    className={cn('flex flex-col gap-4', !canTheme && 'opacity-60')}
+                    className={cn(
+                      "flex flex-col gap-4",
+                      !canTheme && "opacity-60",
+                    )}
                   >
                     {/* Current color */}
                     <div className="flex items-center gap-3">
                       <div
                         className="h-12 w-12 shrink-0 rounded-full border border-z-border shadow-sm"
-                        style={{ backgroundColor: primaryColor ?? '#000000' }}
+                        style={{ backgroundColor: primaryColor ?? "#000000" }}
                       />
                       <div className="flex flex-col">
-                        <span className="text-xs text-z-text-hint">Cor atual</span>
+                        <span className="text-xs text-z-text-hint">
+                          Cor atual
+                        </span>
                         <span className="text-sm font-mono font-medium text-z-text">
-                          {(primaryColor ?? '').toUpperCase()}
+                          {(primaryColor ?? "").toUpperCase()}
                         </span>
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <span className="text-sm font-medium text-z-text">Escolher nova cor:</span>
+                      <span className="text-sm font-medium text-z-text">
+                        Escolher nova cor:
+                      </span>
                       <div className="flex flex-wrap items-center gap-2">
                         {COLOR_PRESETS.map((c) => (
                           <button
                             key={c}
                             type="button"
-                            onClick={() => form.setValue('primary_color', c, { shouldDirty: true, shouldValidate: true })}
+                            onClick={() =>
+                              form.setValue("primary_color", c, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              })
+                            }
                             aria-label={`Cor ${c}`}
                             className={cn(
-                              'relative h-[18px] w-[18px] rounded-full transition-transform hover:scale-110 disabled:cursor-not-allowed disabled:hover:scale-100',
-                              isPresetColor(primaryColor ?? '') && primaryColor?.toLowerCase() === c.toLowerCase()
-                                ? 'ring-2 ring-z-ink ring-offset-2'
-                                : '',
+                              "relative h-[18px] w-[18px] rounded-full transition-transform hover:scale-110 disabled:cursor-not-allowed disabled:hover:scale-100",
+                              isPresetColor(primaryColor ?? "") &&
+                                primaryColor?.toLowerCase() === c.toLowerCase()
+                                ? "ring-2 ring-z-ink ring-offset-2"
+                                : "",
                             )}
                             style={{ background: c }}
                           >
-                            {isPresetColor(primaryColor ?? '') && primaryColor?.toLowerCase() === c.toLowerCase() && (
-                              <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-white">✓</span>
-                            )}
+                            {isPresetColor(primaryColor ?? "") &&
+                              primaryColor?.toLowerCase() ===
+                                c.toLowerCase() && (
+                                <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-white">
+                                  ✓
+                                </span>
+                              )}
                           </button>
                         ))}
                       </div>
@@ -1225,13 +1555,18 @@ export default function CatalogPage() {
                   {canGallery ? (
                     <GalleryUploader
                       storeId={store.id}
-                      value={(form.watch('gallery_images') ?? []) as string[]}
-                      onChange={(urls) => form.setValue('gallery_images', urls, { shouldDirty: true })}
+                      value={(form.watch("gallery_images") ?? []) as string[]}
+                      onChange={(urls) =>
+                        form.setValue("gallery_images", urls, {
+                          shouldDirty: true,
+                        })
+                      }
                     />
                   ) : (
                     <div className="flex flex-col gap-2 rounded-xl border border-dashed border-z-border bg-z-bg2 p-6 text-center">
                       <p className="text-sm text-z-text-muted">
-                        Adicione até 10 fotos da sua loja para exibir na página "Sobre".
+                        Adicione até 10 fotos da sua loja para exibir na página
+                        "Sobre".
                       </p>
                       <Link
                         to={ROUTES.dashboardBilling}
@@ -1246,16 +1581,22 @@ export default function CatalogPage() {
             )}
 
             {/* WHATSAPP E CONTATOS */}
-            {activeTab === 'contato' && (
+            {activeTab === "contato" && (
               <div className="flex flex-col gap-6">
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#25D366]">
-                      <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.487-1.761-1.66-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+                      <svg
+                        className="h-5 w-5 text-white"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.487-1.761-1.66-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
                       </svg>
                     </div>
-                    <h2 className="text-base font-semibold">WhatsApp para receber pedidos</h2>
+                    <h2 className="text-base font-semibold">
+                      WhatsApp para receber pedidos
+                    </h2>
                   </div>
 
                   <div className="flex flex-col gap-1.5 ml-11">
@@ -1263,14 +1604,17 @@ export default function CatalogPage() {
                       Os pedidos e perguntas chegarão neste número
                     </span>
                     <div className="flex items-center gap-2 max-w-sm mt-1">
-                      <select disabled className="h-11 rounded-lg border border-z-border bg-white px-3 text-sm focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 w-24">
+                      <select
+                        disabled
+                        className="h-11 rounded-lg border border-z-border bg-white px-3 text-sm focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 w-24"
+                      >
                         <option>+55</option>
                       </select>
                       <PhoneInput
                         className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                        value={form.watch('whatsapp_phone') ?? ''}
+                        value={form.watch("whatsapp_phone") ?? ""}
                         onChange={(masked) =>
-                          form.setValue('whatsapp_phone', masked, {
+                          form.setValue("whatsapp_phone", masked, {
                             shouldValidate: true,
                             shouldDirty: true,
                           })
@@ -1288,38 +1632,48 @@ export default function CatalogPage() {
                         <span className="text-lg">💡</span>
                       </div>
                       <p>
-                        <strong>Importante:</strong> Esse é o número que seus clientes vão usar para falar com você e fazer pedidos no WhatsApp 📲
+                        <strong>Importante:</strong> Esse é o número que seus
+                        clientes vão usar para falar com você e fazer pedidos no
+                        WhatsApp 📲
                       </p>
                     </div>
                   </div>
                 </section>
 
-
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <HugeiconsIcon icon={StoreLocationIcon} size={20} className="text-z-text-muted" />
-                      <h2 className="text-base font-semibold">Endereço da loja (opcional)</h2>
+                      <HugeiconsIcon
+                        icon={StoreLocationIcon}
+                        size={20}
+                        className="text-z-text-muted"
+                      />
+                      <h2 className="text-base font-semibold">
+                        Endereço da loja (opcional)
+                      </h2>
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col gap-4 ml-7">
                     <p className="text-sm text-z-text-muted">
-                      Rua e bairro que seus clientes verão no catálogo (Bom Jesus da Lapa - BA).
+                      Rua e bairro que seus clientes verão no catálogo (Bom
+                      Jesus da Lapa - BA).
                     </p>
-                    
+
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <Field 
-                        label="Endereço (Rua)" 
-                        placeholder="Ex: Rua das Flores, 123" 
+                      <Field
+                        label="Endereço (Rua)"
+                        placeholder="Ex: Rua das Flores, 123"
                         error={form.formState.errors.address_street?.message}
-                        {...form.register('address_street')}
+                        {...form.register("address_street")}
                       />
-                      <Field 
-                        label="Bairro" 
-                        placeholder="Ex: Centro" 
-                        error={form.formState.errors.address_neighborhood?.message}
-                        {...form.register('address_neighborhood')}
+                      <Field
+                        label="Bairro"
+                        placeholder="Ex: Centro"
+                        error={
+                          form.formState.errors.address_neighborhood?.message
+                        }
+                        {...form.register("address_neighborhood")}
                       />
                     </div>
                   </div>
@@ -1328,23 +1682,36 @@ export default function CatalogPage() {
             )}
 
             {/* PEDIDOS E CARRINHO */}
-            {activeTab === 'pedidos' && (
+            {activeTab === "pedidos" && (
               <div className="flex flex-col gap-6">
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center gap-2">
-                    <HugeiconsIcon icon={ShoppingCart01Icon} size={20} className="text-z-text-muted" />
-                    <h2 className="text-base font-semibold">Carrinho de pedidos</h2>
+                    <HugeiconsIcon
+                      icon={ShoppingCart01Icon}
+                      size={20}
+                      className="text-z-text-muted"
+                    />
+                    <h2 className="text-base font-semibold">
+                      Carrinho de pedidos
+                    </h2>
                   </div>
-                  
+
                   <div className="flex flex-col gap-4 ml-7">
                     <p className="text-sm text-z-text-muted -mt-2">
-                      Defina se você quer usar ou não um carrinho de comprar no seu catálogo
+                      Defina se você quer usar ou não um carrinho de comprar no
+                      seu catálogo
                     </p>
 
                     <label className="flex items-center justify-between rounded-xl border border-z-border p-4 cursor-pointer bg-z-bg transition-colors hover:bg-z-bg2">
-                      <span className="font-medium text-z-text">Ativar o carrinho</span>
+                      <span className="font-medium text-z-text">
+                        Ativar o carrinho
+                      </span>
                       <div className="relative inline-flex items-center">
-                        <input type="checkbox" className="peer sr-only" {...form.register('cart_enabled')} />
+                        <input
+                          type="checkbox"
+                          className="peer sr-only"
+                          {...form.register("cart_enabled")}
+                        />
                         <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                       </div>
                     </label>
@@ -1354,36 +1721,59 @@ export default function CatalogPage() {
                         <span className="text-lg">💡</span>
                       </div>
                       <p>
-                        <strong>Importante:</strong> Com o carrinho ativado, seus clientes poderão montar um pedido com vários produtos e enviá-lo para o WhatsApp da loja.
+                        <strong>Importante:</strong> Com o carrinho ativado,
+                        seus clientes poderão montar um pedido com vários
+                        produtos e enviá-lo para o WhatsApp da loja.
                       </p>
                     </div>
 
                     <div className="my-2 h-px w-full bg-z-border" />
 
-                    <h3 className="text-base font-semibold">Dados obrigatórios para finalizar um pedido</h3>
+                    <h3 className="text-base font-semibold">
+                      Dados obrigatórios para finalizar um pedido
+                    </h3>
                     <p className="text-sm text-z-text-muted -mt-2">
-                      Defina quais informações obrigatórias seus clientes deverão fornecer para finalizar um pedido
+                      Defina quais informações obrigatórias seus clientes
+                      deverão fornecer para finalizar um pedido
                     </p>
 
                     <div className="flex flex-col gap-3">
                       <label className="flex items-center justify-between rounded-xl border border-z-border p-4 cursor-pointer bg-z-bg transition-colors hover:bg-z-bg2">
-                        <span className="font-medium text-z-text">Solicitar forma de entrega</span>
+                        <span className="font-medium text-z-text">
+                          Solicitar forma de entrega
+                        </span>
                         <div className="relative inline-flex items-center">
-                          <input type="checkbox" className="peer sr-only" {...form.register('require_shipping_choice')} />
+                          <input
+                            type="checkbox"
+                            className="peer sr-only"
+                            {...form.register("require_shipping_choice")}
+                          />
                           <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                         </div>
                       </label>
                       <label className="flex items-center justify-between rounded-xl border border-z-border p-4 cursor-pointer bg-z-bg transition-colors hover:bg-z-bg2">
-                        <span className="font-medium text-z-text">Solicitar o CPF ou CNPJ do cliente</span>
+                        <span className="font-medium text-z-text">
+                          Solicitar o CPF ou CNPJ do cliente
+                        </span>
                         <div className="relative inline-flex items-center">
-                          <input type="checkbox" className="peer sr-only" {...form.register('require_cpf')} />
+                          <input
+                            type="checkbox"
+                            className="peer sr-only"
+                            {...form.register("require_cpf")}
+                          />
                           <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                         </div>
                       </label>
                       <label className="flex items-center justify-between rounded-xl border border-z-border p-4 cursor-pointer bg-z-bg transition-colors hover:bg-z-bg2">
-                        <span className="font-medium text-z-text">Solicitar forma de pagamento</span>
+                        <span className="font-medium text-z-text">
+                          Solicitar forma de pagamento
+                        </span>
                         <div className="relative inline-flex items-center">
-                          <input type="checkbox" className="peer sr-only" {...form.register('require_payment_choice')} />
+                          <input
+                            type="checkbox"
+                            className="peer sr-only"
+                            {...form.register("require_payment_choice")}
+                          />
                           <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                         </div>
                       </label>
@@ -1391,9 +1781,13 @@ export default function CatalogPage() {
 
                     <div className="my-2 h-px w-full bg-z-border" />
 
-                    <h3 className="text-base font-semibold">Instruções de pagamento</h3>
+                    <h3 className="text-base font-semibold">
+                      Instruções de pagamento
+                    </h3>
                     <p className="text-sm text-z-text-muted -mt-2">
-                      Esta é a mensagem exibida após o cliente concluir um pedido. Lembre-se que o botão "Combinar Pagamento" abre o WhatsApp da sua loja.
+                      Esta é a mensagem exibida após o cliente concluir um
+                      pedido. Lembre-se que o botão "Combinar Pagamento" abre o
+                      WhatsApp da sua loja.
                     </p>
 
                     <div className="flex flex-col gap-4">
@@ -1402,11 +1796,17 @@ export default function CatalogPage() {
                           label="Título da mensagem"
                           placeholder="Ex: Entraremos em contato em breve"
                           maxLength={120}
-                          error={form.formState.errors.payment_instructions_title?.message}
-                          {...form.register('payment_instructions_title')}
+                          error={
+                            form.formState.errors.payment_instructions_title
+                              ?.message
+                          }
+                          {...form.register("payment_instructions_title")}
                         />
                         <span className="text-xs text-z-text-hint mt-1">
-                          {120 - (form.watch('payment_instructions_title')?.length || 0)} caracteres restantes
+                          {120 -
+                            (form.watch("payment_instructions_title")?.length ||
+                              0)}{" "}
+                          caracteres restantes
                         </span>
                       </div>
                       <div className="flex flex-col gap-1.5">
@@ -1415,10 +1815,13 @@ export default function CatalogPage() {
                           placeholder="Ex: Se quiser agilizar o processo, entre em contato conosco para finalizar o pagamento e os detalhes da entrega:"
                           className="min-h-[100px]"
                           maxLength={300}
-                          {...form.register('payment_instructions_message')}
+                          {...form.register("payment_instructions_message")}
                         />
                         <span className="text-xs text-z-text-hint mt-1">
-                          {300 - (form.watch('payment_instructions_message')?.length || 0)} caracteres restantes
+                          {300 -
+                            (form.watch("payment_instructions_message")
+                              ?.length || 0)}{" "}
+                          caracteres restantes
                         </span>
                       </div>
                     </div>
@@ -1428,22 +1831,36 @@ export default function CatalogPage() {
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center gap-2">
                     <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#25D366]">
-                      <svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+                      <svg
+                        className="h-3 w-3 text-white"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
                       </svg>
                     </div>
-                    <h2 className="text-base font-semibold">Botão do WhatsApp</h2>
+                    <h2 className="text-base font-semibold">
+                      Botão do WhatsApp
+                    </h2>
                   </div>
-                  
+
                   <div className="flex flex-col gap-4 ml-7">
                     <p className="text-sm text-z-text-muted -mt-2">
-                      Habilite o botão "Pedir via WhatsApp" em seu catálogo, permitindo que os clientes enviem mensagens diretamente para o número cadastrado.
+                      Habilite o botão "Pedir via WhatsApp" em seu catálogo,
+                      permitindo que os clientes enviem mensagens diretamente
+                      para o número cadastrado.
                     </p>
 
                     <label className="flex items-center justify-between rounded-xl border border-z-border p-4 cursor-pointer bg-z-bg transition-colors hover:bg-z-bg2">
-                      <span className="font-medium text-z-text">Ativar o botão do WhatsApp</span>
+                      <span className="font-medium text-z-text">
+                        Ativar o botão do WhatsApp
+                      </span>
                       <div className="relative inline-flex items-center">
-                        <input type="checkbox" className="peer sr-only" {...form.register('whatsapp_button_enabled')} />
+                        <input
+                          type="checkbox"
+                          className="peer sr-only"
+                          {...form.register("whatsapp_button_enabled")}
+                        />
                         <div className="h-6 w-11 rounded-full bg-z-border after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#11b981] peer-checked:after:translate-x-full peer-focus:outline-none"></div>
                       </div>
                     </label>
@@ -1453,7 +1870,9 @@ export default function CatalogPage() {
                         <span className="text-lg">💡</span>
                       </div>
                       <p>
-                        <strong>Importante:</strong> Com o botão desativado, o contato via WhatsApp só estará disponível após o cliente concluir o pedido.
+                        <strong>Importante:</strong> Com o botão desativado, o
+                        contato via WhatsApp só estará disponível após o cliente
+                        concluir o pedido.
                       </p>
                     </div>
                   </div>
@@ -1462,30 +1881,41 @@ export default function CatalogPage() {
             )}
 
             {/* MÉTODOS DE PAGAMENTO */}
-            {activeTab === 'pagamento' && (
+            {activeTab === "pagamento" && (
               <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                 <div className="mb-2 flex items-center gap-2">
-                  <HugeiconsIcon icon={LockedIcon} size={20} className="text-z-text-muted" />
-                  <h2 className="text-base font-semibold">Formas de pagamento oferecidas por sua loja</h2>
+                  <HugeiconsIcon
+                    icon={LockedIcon}
+                    size={20}
+                    className="text-z-text-muted"
+                  />
+                  <h2 className="text-base font-semibold">
+                    Formas de pagamento oferecidas por sua loja
+                  </h2>
                 </div>
 
                 <div className="flex flex-col gap-4 ml-7">
                   <p className="text-sm text-z-text-muted -mt-2">
-                    Elas estarão disponíveis para os seus clientes escolherem como gostariam de pagar pelo pedido.
+                    Elas estarão disponíveis para os seus clientes escolherem
+                    como gostariam de pagar pelo pedido.
                   </p>
 
                   <RoundMultiCheck
                     options={[
-                      { value: 'pix',          label: 'PIX' },
-                      { value: 'cash',         label: 'Dinheiro' },
-                      { value: 'credit_card',  label: 'Cartão de crédito' },
-                      { value: 'debit_card',   label: 'Cartão de débito' },
-                      { value: 'bank_transfer',label: 'Transferência' },
-                      { value: 'boleto',       label: 'Boleto' },
-                      { value: 'payment_link', label: 'Link de pagamento' },
+                      { value: "pix", label: "PIX" },
+                      { value: "cash", label: "Dinheiro" },
+                      { value: "credit_card", label: "Cartão de crédito" },
+                      { value: "debit_card", label: "Cartão de débito" },
+                      { value: "bank_transfer", label: "Transferência" },
+                      { value: "boleto", label: "Boleto" },
+                      { value: "payment_link", label: "Link de pagamento" },
                     ]}
-                    value={form.watch('accepted_payment_methods') ?? []}
-                    onChange={(next) => form.setValue('accepted_payment_methods', next, { shouldDirty: true })}
+                    value={form.watch("accepted_payment_methods") ?? []}
+                    onChange={(next) =>
+                      form.setValue("accepted_payment_methods", next, {
+                        shouldDirty: true,
+                      })
+                    }
                   />
 
                   <div className="flex items-start gap-3 rounded-xl border border-[#FDE047] bg-[#FEF9C3] p-4 text-sm text-[#854D0E]">
@@ -1493,7 +1923,9 @@ export default function CatalogPage() {
                       <span className="text-lg">💡</span>
                     </div>
                     <p>
-                      <strong>Importante:</strong> Você deverá gerenciar o pagamento diretamente com o seu cliente. A Zapia não cobrará o seu cliente.
+                      <strong>Importante:</strong> Você deverá gerenciar o
+                      pagamento diretamente com o seu cliente. A Zapia não
+                      cobrará o seu cliente.
                     </p>
                   </div>
                 </div>
@@ -1501,26 +1933,35 @@ export default function CatalogPage() {
             )}
 
             {/* MÉTODOS DE ENTREGA */}
-            {activeTab === 'entrega' && (
+            {activeTab === "entrega" && (
               <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                 <div className="mb-2 flex items-center gap-2">
-                  <HugeiconsIcon icon={StoreLocationIcon} size={20} className="text-z-text-muted" />
+                  <HugeiconsIcon
+                    icon={StoreLocationIcon}
+                    size={20}
+                    className="text-z-text-muted"
+                  />
                   <h2 className="text-base font-semibold">Formas de entrega</h2>
                 </div>
 
                 <div className="flex flex-col gap-6 ml-7">
                   <div className="flex flex-col gap-3">
                     <p className="text-sm text-z-text-muted -mt-2">
-                      Selecione quais métodos de entrega que você oferece aos seus clientes
+                      Selecione quais métodos de entrega que você oferece aos
+                      seus clientes
                     </p>
                     <RoundMultiCheck
                       options={[
-                        { value: 'delivery',        label: 'Entrega em domicílio' },
-                        { value: 'pickup_in_store',  label: 'Retirada na loja' },
-                        { value: 'digital',          label: 'Entrega digital' },
+                        { value: "delivery", label: "Entrega em domicílio" },
+                        { value: "pickup_in_store", label: "Retirada na loja" },
+                        { value: "digital", label: "Entrega digital" },
                       ]}
-                      value={form.watch('accepted_shipping_methods') ?? []}
-                      onChange={(next) => form.setValue('accepted_shipping_methods', next, { shouldDirty: true })}
+                      value={form.watch("accepted_shipping_methods") ?? []}
+                      onChange={(next) =>
+                        form.setValue("accepted_shipping_methods", next, {
+                          shouldDirty: true,
+                        })
+                      }
                     />
                   </div>
 
@@ -1528,14 +1969,21 @@ export default function CatalogPage() {
 
                   <div className="flex flex-col gap-3">
                     <div>
-                      <p className="text-sm font-medium text-z-text">Horários de atendimento</p>
+                      <p className="text-sm font-medium text-z-text">
+                        Horários de atendimento
+                      </p>
                       <p className="mt-0.5 text-xs text-z-text-muted">
-                        Informe os horários em que seus clientes podem fazer pedidos.
+                        Informe os horários em que seus clientes podem fazer
+                        pedidos.
                       </p>
                     </div>
                     <DeliveryHoursEditor
-                      value={form.watch('delivery_hours') ?? []}
-                      onChange={(next) => form.setValue('delivery_hours', next, { shouldDirty: true })}
+                      value={form.watch("delivery_hours") ?? []}
+                      onChange={(next) =>
+                        form.setValue("delivery_hours", next, {
+                          shouldDirty: true,
+                        })
+                      }
                     />
                   </div>
 
@@ -1543,40 +1991,49 @@ export default function CatalogPage() {
 
                   <div className="flex flex-col gap-3">
                     <div>
-                      <p className="text-sm font-medium text-z-text">Local de entrega</p>
+                      <p className="text-sm font-medium text-z-text">
+                        Local de entrega
+                      </p>
                       <p className="mt-0.5 text-xs text-z-text-muted">
-                        Escolha a área para onde você entrega os pedidos da sua loja.
+                        Escolha a área para onde você entrega os pedidos da sua
+                        loja.
                       </p>
                     </div>
                     <RoundSingleCheck
                       options={[
                         {
-                          value: 'city_only',
-                          label: form.watch('address_city')
-                            ? `Apenas na cidade (${form.watch('address_city')})`
-                            : 'Apenas na cidade',
+                          value: "city_only",
+                          label: form.watch("address_city")
+                            ? `Apenas na cidade (${form.watch("address_city")})`
+                            : "Apenas na cidade",
                         },
-                        { value: 'state_only', label: 'Apenas meu estado' },
-                        { value: 'brazil', label: 'Brasil inteiro' },
-                        { value: 'worldwide', label: 'Mundo inteiro' },
-                        { value: 'digital_only', label: 'Apenas digital' },
-                        { value: 'custom', label: 'Personalizado' },
+                        { value: "state_only", label: "Apenas meu estado" },
+                        { value: "brazil", label: "Brasil inteiro" },
+                        { value: "worldwide", label: "Mundo inteiro" },
+                        { value: "digital_only", label: "Apenas digital" },
+                        { value: "custom", label: "Personalizado" },
                       ]}
-                      value={form.watch('delivery_area_scope') ?? 'city_only'}
+                      value={form.watch("delivery_area_scope") ?? "city_only"}
                       onChange={(next) =>
                         form.setValue(
-                          'delivery_area_scope',
-                          next as UpdateStoreInput['delivery_area_scope'],
+                          "delivery_area_scope",
+                          next as UpdateStoreInput["delivery_area_scope"],
                           { shouldDirty: true },
                         )
                       }
                     />
 
-                    {form.watch('delivery_area_scope') === 'custom' && (
+                    {form.watch("delivery_area_scope") === "custom" && (
                       <DeliveryAreaCustomLocations
-                        value={form.watch('delivery_area_custom_locations') ?? []}
+                        value={
+                          form.watch("delivery_area_custom_locations") ?? []
+                        }
                         onChange={(next) =>
-                          form.setValue('delivery_area_custom_locations', next, { shouldDirty: true })
+                          form.setValue(
+                            "delivery_area_custom_locations",
+                            next,
+                            { shouldDirty: true },
+                          )
                         }
                       />
                     )}
@@ -1586,103 +2043,144 @@ export default function CatalogPage() {
             )}
 
             {/* LINKS SOCIAIS */}
-            {activeTab === 'links' && (
+            {activeTab === "links" && (
               <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                 <div className="mb-2 flex items-center gap-2">
-                  <HugeiconsIcon icon={EyeIcon} size={20} className="text-z-text-muted" />
-                  <h2 className="text-base font-semibold">Links relevantes do seu negócio</h2>
+                  <HugeiconsIcon
+                    icon={EyeIcon}
+                    size={20}
+                    className="text-z-text-muted"
+                  />
+                  <h2 className="text-base font-semibold">
+                    Links relevantes do seu negócio
+                  </h2>
                 </div>
 
                 <div className="flex flex-col gap-4 ml-7">
                   <p className="text-sm text-z-text-muted -mt-2">
-                    Estes links ficarão visíveis na área "sobre nós" do seu catálogo.
+                    Estes links ficarão visíveis na área "sobre nós" do seu
+                    catálogo.
                   </p>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     {/* Instagram */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-z-text">Instagram</label>
+                      <label className="text-sm font-medium text-z-text">
+                        Instagram
+                      </label>
                       <div className="relative">
                         <input
                           className="h-11 w-full rounded-lg border border-z-border bg-white pl-3.5 pr-10 text-sm transition-colors placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                           placeholder="Seu @ ou link do perfil"
-                          {...form.register('social_instagram')}
+                          {...form.register("social_instagram")}
                         />
                         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-                          <HugeiconsIcon icon={InstagramIcon} size={18} className="text-[#E1306C]" />
+                          <HugeiconsIcon
+                            icon={InstagramIcon}
+                            size={18}
+                            className="text-[#E1306C]"
+                          />
                         </span>
                       </div>
                     </div>
 
                     {/* X (Twitter) */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-z-text">X (twitter)</label>
+                      <label className="text-sm font-medium text-z-text">
+                        X (twitter)
+                      </label>
                       <div className="relative">
                         <input
                           className="h-11 w-full rounded-lg border border-z-border bg-white pl-3.5 pr-10 text-sm transition-colors placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                           placeholder="Seu @ ou link para o seu X"
-                          {...form.register('social_x')}
+                          {...form.register("social_x")}
                         />
                         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-                          <HugeiconsIcon icon={NewTwitterIcon} size={18} className="text-z-text" />
+                          <HugeiconsIcon
+                            icon={NewTwitterIcon}
+                            size={18}
+                            className="text-z-text"
+                          />
                         </span>
                       </div>
                     </div>
 
                     {/* Facebook */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-z-text">Facebook</label>
+                      <label className="text-sm font-medium text-z-text">
+                        Facebook
+                      </label>
                       <div className="relative">
                         <input
                           className="h-11 w-full rounded-lg border border-z-border bg-white pl-3.5 pr-10 text-sm transition-colors placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                           placeholder="Seu usuário ou link do perfil"
-                          {...form.register('social_facebook')}
+                          {...form.register("social_facebook")}
                         />
                         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-                          <HugeiconsIcon icon={FacebookIcon} size={18} className="text-[#1877F2]" />
+                          <HugeiconsIcon
+                            icon={FacebookIcon}
+                            size={18}
+                            className="text-[#1877F2]"
+                          />
                         </span>
                       </div>
                     </div>
 
                     {/* YouTube */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-z-text">YouTube</label>
+                      <label className="text-sm font-medium text-z-text">
+                        YouTube
+                      </label>
                       <div className="relative">
                         <input
                           className="h-11 w-full rounded-lg border border-z-border bg-white pl-3.5 pr-10 text-sm transition-colors placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                           placeholder="Link para o seu canal"
-                          {...form.register('social_youtube')}
+                          {...form.register("social_youtube")}
                         />
                         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-                          <HugeiconsIcon icon={YoutubeIcon} size={18} className="text-[#FF0000]" />
+                          <HugeiconsIcon
+                            icon={YoutubeIcon}
+                            size={18}
+                            className="text-[#FF0000]"
+                          />
                         </span>
                       </div>
                     </div>
 
                     {/* Kwai */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-z-text">Kwai</label>
+                      <label className="text-sm font-medium text-z-text">
+                        Kwai
+                      </label>
                       <div className="relative">
                         <input
                           className="h-11 w-full rounded-lg border border-z-border bg-white pl-3.5 pr-10 text-sm transition-colors placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                           placeholder="Seu @ ou link para o seu Kwai"
-                          {...form.register('social_kwai')}
+                          {...form.register("social_kwai")}
                         />
-                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#FF6900] font-black text-[13px]">K</span>
+                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#FF6900] font-black text-[13px]">
+                          K
+                        </span>
                       </div>
                     </div>
 
                     {/* TikTok */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-z-text">TikTok</label>
+                      <label className="text-sm font-medium text-z-text">
+                        TikTok
+                      </label>
                       <div className="relative">
                         <input
                           className="h-11 w-full rounded-lg border border-z-border bg-white pl-3.5 pr-10 text-sm transition-colors placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                           placeholder="Seu @ ou link para o seu TikTok"
-                          {...form.register('social_tiktok')}
+                          {...form.register("social_tiktok")}
                         />
                         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-                          <HugeiconsIcon icon={TiktokIcon} size={18} className="text-z-text" />
+                          <HugeiconsIcon
+                            icon={TiktokIcon}
+                            size={18}
+                            className="text-z-text"
+                          />
                         </span>
                       </div>
                     </div>
@@ -1693,10 +2191,14 @@ export default function CatalogPage() {
 
                 <div className="flex flex-col gap-3 ml-7">
                   <div>
-                    <p className="text-sm font-medium text-z-text">Links adicionais</p>
-                    <p className="mt-0.5 text-xs text-z-text-muted">Aparecem na página "Sobre" do catálogo.</p>
+                    <p className="text-sm font-medium text-z-text">
+                      Links adicionais
+                    </p>
+                    <p className="mt-0.5 text-xs text-z-text-muted">
+                      Aparecem na página "Sobre" do catálogo.
+                    </p>
                   </div>
-                  {(form.watch('custom_links') ?? []).map((_, index) => (
+                  {(form.watch("custom_links") ?? []).map((_, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <input
                         className="h-10 w-32 shrink-0 rounded-lg border border-z-border bg-white px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
@@ -1711,8 +2213,12 @@ export default function CatalogPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          const links = form.getValues('custom_links') ?? []
-                          form.setValue('custom_links', links.filter((_, i) => i !== index), { shouldDirty: true })
+                          const links = form.getValues("custom_links") ?? [];
+                          form.setValue(
+                            "custom_links",
+                            links.filter((_, i) => i !== index),
+                            { shouldDirty: true },
+                          );
                         }}
                         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-z-text-hint hover:bg-z-primary/10 hover:text-z-primary"
                       >
@@ -1723,8 +2229,12 @@ export default function CatalogPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      const links = form.getValues('custom_links') ?? []
-                      form.setValue('custom_links', [...links, { label: '', url: '' }], { shouldDirty: true })
+                      const links = form.getValues("custom_links") ?? [];
+                      form.setValue(
+                        "custom_links",
+                        [...links, { label: "", url: "" }],
+                        { shouldDirty: true },
+                      );
                     }}
                     className="flex w-fit items-center gap-1.5 text-sm font-medium text-[#0bfeda] hover:underline"
                   >
@@ -1735,22 +2245,29 @@ export default function CatalogPage() {
             )}
 
             {/* SITE / URL */}
-            {activeTab === 'site' && (
+            {activeTab === "site" && (
               <div className="flex flex-col gap-6">
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center gap-2">
-                    <HugeiconsIcon icon={Globe02Icon} size={20} className="text-z-text-muted" />
-                    <h2 className="text-base font-semibold">Endereço do seu catálogo</h2>
+                    <HugeiconsIcon
+                      icon={Globe02Icon}
+                      size={20}
+                      className="text-z-text-muted"
+                    />
+                    <h2 className="text-base font-semibold">
+                      Endereço do seu catálogo
+                    </h2>
                   </div>
 
                   <div className="flex flex-col gap-4 ml-7">
                     <p className="text-sm text-z-text-muted -mt-2">
-                      Este é o link que você deve compartilhar com seus clientes para que eles acessem seu catálogo online.
+                      Este é o link que você deve compartilhar com seus clientes
+                      para que eles acessem seu catálogo online.
                     </p>
 
                     <div className="flex h-11 items-center gap-2 rounded-lg border border-z-border bg-z-bg px-3.5">
                       <div className="flex-1 truncate text-sm font-medium text-z-text">
-                        {buildStoreUrl(store.slug).replace(/^https?:\/\//, '')}
+                        {buildStoreUrl(store.slug).replace(/^https?:\/\//, "")}
                       </div>
                       <Button
                         type="button"
@@ -1758,12 +2275,14 @@ export default function CatalogPage() {
                         size="sm"
                         className="h-8 shrink-0 rounded-lg px-3 text-xs"
                         onClick={() => {
-                          navigator.clipboard.writeText(buildStoreUrl(store.slug))
-                          track('share_link_copied', {
+                          navigator.clipboard.writeText(
+                            buildStoreUrl(store.slug),
+                          );
+                          track("share_link_copied", {
                             store_id: store.id,
-                            link_type: 'store',
+                            link_type: "store",
                             item_id: store.id,
-                          })
+                          });
                         }}
                       >
                         Copiar link
@@ -1773,34 +2292,45 @@ export default function CatalogPage() {
                     <div className="my-2 h-px w-full bg-z-border" />
 
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-z-text">Alterar URL da loja</label>
+                      <label className="text-sm font-medium text-z-text">
+                        Alterar URL da loja
+                      </label>
                       <div className="flex items-center gap-2">
                         <input
                           className={cn(
                             "h-12 w-40 min-w-0 rounded-lg border bg-white px-3.5 text-sm transition-colors placeholder:text-z-text-hint focus:outline-none focus:ring-2",
-                            form.formState.errors.slug || slugAvailability === 'taken'
-                              ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                              : slugAvailability === 'available'
-                                ? 'border-[#10b981] focus:border-[#10b981] focus:ring-[#10b981]/20'
-                                : 'border-z-border focus:border-z-green focus:ring-z-green/20',
-                            slugLocked && "opacity-50 cursor-not-allowed bg-z-bg"
+                            form.formState.errors.slug ||
+                              slugAvailability === "taken"
+                              ? "border-red-400 focus:border-red-400 focus:ring-red-400/20"
+                              : slugAvailability === "available"
+                                ? "border-[#10b981] focus:border-[#10b981] focus:ring-[#10b981]/20"
+                                : "border-z-border focus:border-z-green focus:ring-z-green/20",
+                            slugLocked &&
+                              "opacity-50 cursor-not-allowed bg-z-bg",
                           )}
                           placeholder="seu-endereco"
                           disabled={slugLocked}
-                          {...form.register('slug')}
+                          {...form.register("slug")}
                         />
-                        <span className="shrink-0 text-sm text-z-text-hint">.{ROOT_DOMAIN}</span>
+                        <span className="shrink-0 text-sm text-z-text-hint">
+                          .{ROOT_DOMAIN}
+                        </span>
                       </div>
                       {form.formState.errors.slug ? (
-                        <span className="text-xs text-destructive">{form.formState.errors.slug.message}</span>
-                      ) : slugAvailability === 'taken' ? (
+                        <span className="text-xs text-destructive">
+                          {form.formState.errors.slug.message}
+                        </span>
+                      ) : slugAvailability === "taken" ? (
                         <span className="flex items-center gap-1 text-xs font-medium text-red-500">
                           <HugeiconsIcon icon={Cancel01Icon} size={13} />
                           Nome indisponível
                         </span>
-                      ) : slugAvailability === 'available' ? (
+                      ) : slugAvailability === "available" ? (
                         <span className="flex items-center gap-1 text-xs font-medium text-[#0bfeda]">
-                          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={13} />
+                          <HugeiconsIcon
+                            icon={CheckmarkCircle02Icon}
+                            size={13}
+                          />
                           Nome disponível
                         </span>
                       ) : null}
@@ -1809,13 +2339,19 @@ export default function CatalogPage() {
                         <div className="flex items-center gap-2 text-xs text-amber-600 font-medium bg-amber-50 p-2 rounded-lg mt-1 border border-amber-100">
                           <HugeiconsIcon icon={Alert01Icon} size={14} />
                           <span>
-                            Você alterou sua URL recentemente. Uma nova alteração será permitida em{' '}
-                            {new Date(new Date(store.slug_last_updated_at!).getTime() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')}.
+                            Você alterou sua URL recentemente. Uma nova
+                            alteração será permitida em{" "}
+                            {new Date(
+                              new Date(store.slug_last_updated_at!).getTime() +
+                                90 * 24 * 60 * 60 * 1000,
+                            ).toLocaleDateString("pt-BR")}
+                            .
                           </span>
                         </div>
                       ) : (
                         <p className="text-xs text-z-text-hint mt-1">
-                          Você pode alterar o endereço da sua loja apenas uma vez a cada 3 meses.
+                          Você pode alterar o endereço da sua loja apenas uma
+                          vez a cada 3 meses.
                         </p>
                       )}
                     </div>
@@ -1825,13 +2361,21 @@ export default function CatalogPage() {
                 {/* Google Tag Manager */}
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center gap-2">
-                    <HugeiconsIcon icon={GoogleIcon} size={20} className="text-z-text-muted" />
-                    <h2 className="text-base font-semibold">Google Tag Manager</h2>
+                    <HugeiconsIcon
+                      icon={GoogleIcon}
+                      size={20}
+                      className="text-z-text-muted"
+                    />
+                    <h2 className="text-base font-semibold">
+                      Google Tag Manager
+                    </h2>
                   </div>
 
                   <div className="flex flex-col gap-4 ml-7">
                     <p className="text-sm text-z-text-muted -mt-2">
-                      Adicione seu ID do GTM para gerenciar tags de analytics, pixel do Meta, conversão do Google Ads e muito mais — sem precisar mexer no código.
+                      Adicione seu ID do GTM para gerenciar tags de analytics,
+                      pixel do Meta, conversão do Google Ads e muito mais — sem
+                      precisar mexer no código.
                     </p>
 
                     <div className="flex flex-col gap-1.5">
@@ -1841,10 +2385,12 @@ export default function CatalogPage() {
                       <input
                         placeholder="GTM-XXXXXX"
                         className="h-11 w-full max-w-xs rounded-lg border border-z-border bg-white px-3.5 font-mono text-sm uppercase placeholder:normal-case placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                        {...form.register('gtm_id')}
+                        {...form.register("gtm_id")}
                         onChange={(e) => {
-                          const val = e.target.value.toUpperCase()
-                          form.setValue('gtm_id', val, { shouldValidate: true })
+                          const val = e.target.value.toUpperCase();
+                          form.setValue("gtm_id", val, {
+                            shouldValidate: true,
+                          });
                         }}
                       />
                       {form.formState.errors.gtm_id && (
@@ -1853,7 +2399,7 @@ export default function CatalogPage() {
                         </span>
                       )}
                       <p className="text-xs text-z-text-hint">
-                        Encontre seu ID no painel do{' '}
+                        Encontre seu ID no painel do{" "}
                         <a
                           href="https://tagmanager.google.com"
                           target="_blank"
@@ -1862,7 +2408,8 @@ export default function CatalogPage() {
                         >
                           Google Tag Manager
                         </a>
-                        . Ele começa com <span className="font-mono">GTM-</span>.
+                        . Ele começa com <span className="font-mono">GTM-</span>
+                        .
                       </p>
                     </div>
                   </div>
@@ -1871,11 +2418,30 @@ export default function CatalogPage() {
             )}
 
             {/* PLACEHOLDER PARA ABAS NÃO LISTADAS AINDA */}
-            {!['gerais', 'aparencia', 'contato', 'pedidos', 'pagamento', 'entrega', 'categorias', 'links', 'site'].includes(activeTab) && (
+            {![
+              "gerais",
+              "aparencia",
+              "contato",
+              "pedidos",
+              "pagamento",
+              "entrega",
+              "categorias",
+              "links",
+              "site",
+            ].includes(activeTab) && (
               <section className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-z-border bg-z-bg2 p-12 text-center">
-                <HugeiconsIcon icon={StoreLocationIcon} size={32} className="text-z-text-hint" />
-                <h2 className="text-lg font-semibold text-z-text">Em construção</h2>
-                <p className="text-sm text-z-text-muted">Esta seção será implementada em breve, seguindo o design do RediRedi.</p>
+                <HugeiconsIcon
+                  icon={StoreLocationIcon}
+                  size={32}
+                  className="text-z-text-hint"
+                />
+                <h2 className="text-lg font-semibold text-z-text">
+                  Em construção
+                </h2>
+                <p className="text-sm text-z-text-muted">
+                  Esta seção será implementada em breve, seguindo o design do
+                  RediRedi.
+                </p>
               </section>
             )}
 
@@ -1884,12 +2450,15 @@ export default function CatalogPage() {
                 {form.formState.errors.root.message}
               </p>
             )}
-
           </form>
         </main>
       </div>
 
-      <BottomSheet title="Logo, banner e cores" open={visualModalOpen} onClose={() => setVisualModalOpen(false)}>
+      <BottomSheet
+        title="Logo, banner e cores"
+        open={visualModalOpen}
+        onClose={() => setVisualModalOpen(false)}
+      >
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <Label>Cor primária</Label>
@@ -1898,10 +2467,16 @@ export default function CatalogPage() {
                 <button
                   key={preset}
                   type="button"
-                  onClick={() => form.setValue('primary_color', preset, { shouldDirty: true, shouldValidate: true })}
+                  onClick={() =>
+                    form.setValue("primary_color", preset, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
                   className={cn(
-                    'h-7 w-7 rounded-full transition-transform active:scale-95',
-                    primaryColor?.toLowerCase() === preset.toLowerCase() && 'ring-2 ring-z-ink ring-offset-1',
+                    "h-7 w-7 rounded-full transition-transform active:scale-95",
+                    primaryColor?.toLowerCase() === preset.toLowerCase() &&
+                      "ring-2 ring-z-ink ring-offset-1",
                   )}
                   style={{ backgroundColor: preset }}
                   aria-label={`Selecionar cor ${preset}`}
@@ -1917,8 +2492,13 @@ export default function CatalogPage() {
               storeId={store.id}
               label="Adicionar logo"
               aspect={1}
-              value={form.watch('logo_url') || null}
-              onChange={(url) => form.setValue('logo_url', url ?? '', { shouldDirty: true, shouldValidate: true })}
+              value={form.watch("logo_url") || null}
+              onChange={(url) =>
+                form.setValue("logo_url", url ?? "", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
               hint="JPG, PNG ou WEBP."
               compact
             />
@@ -1931,35 +2511,53 @@ export default function CatalogPage() {
               storeId={store.id}
               label="Adicionar banner"
               aspect={16 / 10}
-              value={form.watch('banner_url') || null}
-              onChange={(url) => form.setValue('banner_url', url ?? '', { shouldDirty: true, shouldValidate: true })}
+              value={form.watch("banner_url") || null}
+              onChange={(url) =>
+                form.setValue("banner_url", url ?? "", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
               hint="Proporção 16:10 recomendada."
               compact
             />
           </div>
 
-          <Button type="button" fullWidth className="h-11" onClick={() => setVisualModalOpen(false)}>
+          <Button
+            type="button"
+            fullWidth
+            className="h-11"
+            onClick={() => setVisualModalOpen(false)}
+          >
             Concluir
           </Button>
         </div>
       </BottomSheet>
 
-      <BottomSheet title="Pagamento e entrega" open={paymentDeliveryModalOpen} onClose={() => setPaymentDeliveryModalOpen(false)}>
+      <BottomSheet
+        title="Pagamento e entrega"
+        open={paymentDeliveryModalOpen}
+        onClose={() => setPaymentDeliveryModalOpen(false)}
+      >
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <Label>Pagamento</Label>
             <RoundMultiCheck
               options={[
-                { value: 'pix', label: 'PIX' },
-                { value: 'cash', label: 'Dinheiro' },
-                { value: 'credit_card', label: 'Cartão de crédito' },
-                { value: 'debit_card', label: 'Cartão de débito' },
-                { value: 'bank_transfer', label: 'Transferência' },
-                { value: 'boleto', label: 'Boleto' },
-                { value: 'payment_link', label: 'Link de pagamento' },
+                { value: "pix", label: "PIX" },
+                { value: "cash", label: "Dinheiro" },
+                { value: "credit_card", label: "Cartão de crédito" },
+                { value: "debit_card", label: "Cartão de débito" },
+                { value: "bank_transfer", label: "Transferência" },
+                { value: "boleto", label: "Boleto" },
+                { value: "payment_link", label: "Link de pagamento" },
               ]}
-              value={form.watch('accepted_payment_methods') ?? []}
-              onChange={(next) => form.setValue('accepted_payment_methods', next, { shouldDirty: true })}
+              value={form.watch("accepted_payment_methods") ?? []}
+              onChange={(next) =>
+                form.setValue("accepted_payment_methods", next, {
+                  shouldDirty: true,
+                })
+              }
             />
           </div>
 
@@ -1967,12 +2565,16 @@ export default function CatalogPage() {
             <Label>Entrega</Label>
             <RoundMultiCheck
               options={[
-                { value: 'delivery', label: 'Entrega em domicílio' },
-                { value: 'pickup_in_store', label: 'Retirada na loja' },
-                { value: 'digital', label: 'Entrega digital' },
+                { value: "delivery", label: "Entrega em domicílio" },
+                { value: "pickup_in_store", label: "Retirada na loja" },
+                { value: "digital", label: "Entrega digital" },
               ]}
-              value={form.watch('accepted_shipping_methods') ?? []}
-              onChange={(next) => form.setValue('accepted_shipping_methods', next, { shouldDirty: true })}
+              value={form.watch("accepted_shipping_methods") ?? []}
+              onChange={(next) =>
+                form.setValue("accepted_shipping_methods", next, {
+                  shouldDirty: true,
+                })
+              }
             />
           </div>
 
@@ -1981,28 +2583,36 @@ export default function CatalogPage() {
             <RoundSingleCheck
               options={[
                 {
-                  value: 'city_only',
-                  label: form.watch('address_city')
-                    ? `Apenas na cidade (${form.watch('address_city')})`
-                    : 'Apenas na cidade',
+                  value: "city_only",
+                  label: form.watch("address_city")
+                    ? `Apenas na cidade (${form.watch("address_city")})`
+                    : "Apenas na cidade",
                 },
-                { value: 'state_only', label: 'Apenas meu estado' },
-                { value: 'brazil', label: 'Brasil inteiro' },
-                { value: 'worldwide', label: 'Mundo inteiro' },
-                { value: 'digital_only', label: 'Apenas digital' },
-                { value: 'custom', label: 'Personalizado' },
+                { value: "state_only", label: "Apenas meu estado" },
+                { value: "brazil", label: "Brasil inteiro" },
+                { value: "worldwide", label: "Mundo inteiro" },
+                { value: "digital_only", label: "Apenas digital" },
+                { value: "custom", label: "Personalizado" },
               ]}
-              value={form.watch('delivery_area_scope') ?? 'city_only'}
+              value={form.watch("delivery_area_scope") ?? "city_only"}
               onChange={(next) =>
-                form.setValue('delivery_area_scope', next as UpdateStoreInput['delivery_area_scope'], {
-                  shouldDirty: true,
-                })
+                form.setValue(
+                  "delivery_area_scope",
+                  next as UpdateStoreInput["delivery_area_scope"],
+                  {
+                    shouldDirty: true,
+                  },
+                )
               }
             />
-            {form.watch('delivery_area_scope') === 'custom' && (
+            {form.watch("delivery_area_scope") === "custom" && (
               <DeliveryAreaCustomLocations
-                value={form.watch('delivery_area_custom_locations') ?? []}
-                onChange={(next) => form.setValue('delivery_area_custom_locations', next, { shouldDirty: true })}
+                value={form.watch("delivery_area_custom_locations") ?? []}
+                onChange={(next) =>
+                  form.setValue("delivery_area_custom_locations", next, {
+                    shouldDirty: true,
+                  })
+                }
               />
             )}
           </div>
@@ -2010,18 +2620,28 @@ export default function CatalogPage() {
           <div className="flex flex-col gap-3">
             <Label>Horário de funcionamento</Label>
             <DeliveryHoursEditor
-              value={form.watch('delivery_hours') ?? []}
-              onChange={(next) => form.setValue('delivery_hours', next, { shouldDirty: true })}
+              value={form.watch("delivery_hours") ?? []}
+              onChange={(next) =>
+                form.setValue("delivery_hours", next, { shouldDirty: true })
+              }
             />
           </div>
 
-          <Button type="button" fullWidth onClick={() => setPaymentDeliveryModalOpen(false)}>
+          <Button
+            type="button"
+            fullWidth
+            onClick={() => setPaymentDeliveryModalOpen(false)}
+          >
             Concluir
           </Button>
         </div>
       </BottomSheet>
 
-      <BottomSheet title="Nova categoria" open={mobileCategoryModalOpen} onClose={() => setMobileCategoryModalOpen(false)}>
+      <BottomSheet
+        title="Nova categoria"
+        open={mobileCategoryModalOpen}
+        onClose={() => setMobileCategoryModalOpen(false)}
+      >
         <div className="flex flex-col gap-4">
           <Field
             label="Categoria"
@@ -2041,33 +2661,43 @@ export default function CatalogPage() {
             disabled={!mobileCategoryName.trim() || createCategory.isPending}
             onClick={handleCreateMobileCategory}
           >
-            {createCategory.isPending ? 'Salvando...' : 'Adicionar'}
+            {createCategory.isPending ? "Salvando..." : "Adicionar"}
           </Button>
         </div>
       </BottomSheet>
 
       {form.formState.isDirty && (
         <div className="sticky bottom-16 z-40 flex items-center justify-between gap-3 rounded-2xl border border-z-border bg-white/95 px-4 py-3 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
-          <span className="text-sm font-medium text-z-text-muted">Alterações não salvas.</span>
-          <Button type="submit" form="catalog-mobile-form" disabled={updateStore.isPending} className="rounded-full px-6">
-            {updateStore.isPending ? 'Salvando...' : 'Salvar'}
+          <span className="text-sm font-medium text-z-text-muted">
+            Alterações não salvas.
+          </span>
+          <Button
+            type="submit"
+            form="catalog-mobile-form"
+            disabled={updateStore.isPending}
+            className="rounded-full px-6"
+          >
+            {updateStore.isPending ? "Salvando..." : "Salvar"}
           </Button>
         </div>
       )}
 
-      {activeTab !== 'categorias' && (form.formState.isDirty || updateStore.isPending) && (
-        <div className="sticky bottom-16 z-40 mt-2 hidden items-center justify-between gap-4 rounded-2xl border border-z-border bg-white/90 px-5 py-3 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:bottom-0 lg:flex">
-          <span className="text-sm text-z-text-muted">Você tem alterações não salvas.</span>
-          <Button
-            type="submit"
-            form="catalog-form"
-            disabled={updateStore.isPending}
-            className="rounded-full px-8"
-          >
-            {updateStore.isPending ? 'Salvando...' : 'Salvar alterações'}
-          </Button>
-        </div>
-      )}
+      {activeTab !== "categorias" &&
+        (form.formState.isDirty || updateStore.isPending) && (
+          <div className="sticky bottom-16 z-40 mt-2 hidden items-center justify-between gap-4 rounded-2xl border border-z-border bg-white/90 px-5 py-3 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:bottom-0 lg:flex">
+            <span className="text-sm text-z-text-muted">
+              Você tem alterações não salvas.
+            </span>
+            <Button
+              type="submit"
+              form="catalog-form"
+              disabled={updateStore.isPending}
+              className="rounded-full px-8"
+            >
+              {updateStore.isPending ? "Salvando..." : "Salvar alterações"}
+            </Button>
+          </div>
+        )}
     </div>
-  )
+  );
 }

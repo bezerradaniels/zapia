@@ -1,62 +1,70 @@
 // Sends email notification to admin when trial ends or subscription is created/updated
-import { adminClient } from '../_shared/auth.ts'
+import { adminClient } from "../_shared/auth.ts";
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
-const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'daniel.ddsb@gmail.com'
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
+const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") || "daniel.ddsb@gmail.com";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://zapia.app',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+  "Access-Control-Allow-Origin": "https://zapia.app",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
 
 function escapeHtml(str: string): string {
   return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 interface BillingNotificationRequest {
-  type: 'trial_ended' | 'subscription_created' | 'subscription_updated' | 'subscription_canceled'
-  storeId: string
-  storeName?: string
-  ownerEmail?: string
-  ownerName?: string
-  planId?: string
-  status?: string
+  type:
+    | "trial_ended"
+    | "subscription_created"
+    | "subscription_updated"
+    | "subscription_canceled";
+  storeId: string;
+  storeName?: string;
+  ownerEmail?: string;
+  ownerName?: string;
+  planId?: string;
+  status?: string;
 }
 
 async function sendEmail(subject: string, htmlContent: string) {
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: 'Zapia <noreply@zapia.app>',
+      from: "Zapia <noreply@zapia.app>",
       to: [ADMIN_EMAIL],
       subject,
       html: htmlContent,
     }),
-  })
+  });
 
   if (!res.ok) {
-    const error = await res.text()
-    console.error('Resend API error:', error)
-    throw new Error('email_send_failed')
+    const error = await res.text();
+    console.error("Resend API error:", error);
+    throw new Error("email_send_failed");
   }
 }
 
-function getTrialEndedEmail(data: BillingNotificationRequest): { subject: string; html: string } {
-  const safeStoreName = escapeHtml(data.storeName || 'Loja sem nome')
-  const safeOwnerEmail = escapeHtml(data.ownerEmail || 'N/A')
-  const safeOwnerName = escapeHtml(data.ownerName || 'N/A')
+function getTrialEndedEmail(data: BillingNotificationRequest): {
+  subject: string;
+  html: string;
+} {
+  const safeStoreName = escapeHtml(data.storeName || "Loja sem nome");
+  const safeOwnerEmail = escapeHtml(data.ownerEmail || "N/A");
+  const safeOwnerName = escapeHtml(data.ownerName || "N/A");
 
   return {
-    subject: '⚠️ Trial finalizado - Zapia',
+    subject: "⚠️ Trial finalizado - Zapia",
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
         <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #f59e0b;">
@@ -74,17 +82,20 @@ function getTrialEndedEmail(data: BillingNotificationRequest): { subject: string
         </div>
       </div>
     `,
-  }
+  };
 }
 
-function getSubscriptionCreatedEmail(data: BillingNotificationRequest): { subject: string; html: string } {
-  const safeStoreName = escapeHtml(data.storeName || 'Loja sem nome')
-  const safeOwnerEmail = escapeHtml(data.ownerEmail || 'N/A')
-  const safeOwnerName = escapeHtml(data.ownerName || 'N/A')
-  const safePlanId = escapeHtml(data.planId || 'N/A')
+function getSubscriptionCreatedEmail(data: BillingNotificationRequest): {
+  subject: string;
+  html: string;
+} {
+  const safeStoreName = escapeHtml(data.storeName || "Loja sem nome");
+  const safeOwnerEmail = escapeHtml(data.ownerEmail || "N/A");
+  const safeOwnerName = escapeHtml(data.ownerName || "N/A");
+  const safePlanId = escapeHtml(data.planId || "N/A");
 
   return {
-    subject: '🎉 Nova assinatura - Zapia',
+    subject: "🎉 Nova assinatura - Zapia",
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
         <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #10b981;">
@@ -103,18 +114,21 @@ function getSubscriptionCreatedEmail(data: BillingNotificationRequest): { subjec
         </div>
       </div>
     `,
-  }
+  };
 }
 
-function getSubscriptionUpdatedEmail(data: BillingNotificationRequest): { subject: string; html: string } {
-  const safeStoreName = escapeHtml(data.storeName || 'Loja sem nome')
-  const safeOwnerEmail = escapeHtml(data.ownerEmail || 'N/A')
-  const safeOwnerName = escapeHtml(data.ownerName || 'N/A')
-  const safePlanId = escapeHtml(data.planId || 'N/A')
-  const safeStatus = escapeHtml(data.status || 'N/A')
+function getSubscriptionUpdatedEmail(data: BillingNotificationRequest): {
+  subject: string;
+  html: string;
+} {
+  const safeStoreName = escapeHtml(data.storeName || "Loja sem nome");
+  const safeOwnerEmail = escapeHtml(data.ownerEmail || "N/A");
+  const safeOwnerName = escapeHtml(data.ownerName || "N/A");
+  const safePlanId = escapeHtml(data.planId || "N/A");
+  const safeStatus = escapeHtml(data.status || "N/A");
 
   return {
-    subject: '📝 Assinatura atualizada - Zapia',
+    subject: "📝 Assinatura atualizada - Zapia",
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
         <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #3b82f6;">
@@ -134,17 +148,20 @@ function getSubscriptionUpdatedEmail(data: BillingNotificationRequest): { subjec
         </div>
       </div>
     `,
-  }
+  };
 }
 
-function getSubscriptionCanceledEmail(data: BillingNotificationRequest): { subject: string; html: string } {
-  const safeStoreName = escapeHtml(data.storeName || 'Loja sem nome')
-  const safeOwnerEmail = escapeHtml(data.ownerEmail || 'N/A')
-  const safeOwnerName = escapeHtml(data.ownerName || 'N/A')
-  const safePlanId = escapeHtml(data.planId || 'N/A')
+function getSubscriptionCanceledEmail(data: BillingNotificationRequest): {
+  subject: string;
+  html: string;
+} {
+  const safeStoreName = escapeHtml(data.storeName || "Loja sem nome");
+  const safeOwnerEmail = escapeHtml(data.ownerEmail || "N/A");
+  const safeOwnerName = escapeHtml(data.ownerName || "N/A");
+  const safePlanId = escapeHtml(data.planId || "N/A");
 
   return {
-    subject: '❌ Assinatura cancelada - Zapia',
+    subject: "❌ Assinatura cancelada - Zapia",
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
         <div style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #ef4444;">
@@ -163,69 +180,81 @@ function getSubscriptionCanceledEmail(data: BillingNotificationRequest): { subje
         </div>
       </div>
     `,
-  }
+  };
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
-  if (req.method !== 'POST') {
-    return new Response('method_not_allowed', { status: 405, headers: corsHeaders })
+  if (req.method !== "POST") {
+    return new Response("method_not_allowed", {
+      status: 405,
+      headers: corsHeaders,
+    });
   }
 
   try {
-    const data: BillingNotificationRequest = await req.json()
+    const data: BillingNotificationRequest = await req.json();
 
     if (!data.type || !data.storeId) {
-      return new Response('missing_fields', { status: 400, headers: corsHeaders })
+      return new Response("missing_fields", {
+        status: 400,
+        headers: corsHeaders,
+      });
     }
 
     // Fetch store, then owner profile. There is no direct FK between `stores`
     // and `profiles` (both reference auth.users), so we resolve in two steps.
-    const admin = adminClient()
+    const admin = adminClient();
     const { data: storeData } = await admin
-      .from('stores')
-      .select('name, owner_id')
-      .eq('id', data.storeId)
-      .single()
+      .from("stores")
+      .select("name, owner_id")
+      .eq("id", data.storeId)
+      .single();
 
     if (storeData) {
-      data.storeName = storeData.name
+      data.storeName = storeData.name;
       const { data: profile } = await admin
-        .from('profiles')
-        .select('email, name')
-        .eq('id', storeData.owner_id)
-        .maybeSingle()
-      data.ownerEmail = profile?.email ?? undefined
-      data.ownerName = profile?.name ?? undefined
+        .from("profiles")
+        .select("email, name")
+        .eq("id", storeData.owner_id)
+        .maybeSingle();
+      data.ownerEmail = profile?.email ?? undefined;
+      data.ownerName = profile?.name ?? undefined;
     }
 
-    let emailContent: { subject: string; html: string }
+    let emailContent: { subject: string; html: string };
 
     switch (data.type) {
-      case 'trial_ended':
-        emailContent = getTrialEndedEmail(data)
-        break
-      case 'subscription_created':
-        emailContent = getSubscriptionCreatedEmail(data)
-        break
-      case 'subscription_updated':
-        emailContent = getSubscriptionUpdatedEmail(data)
-        break
-      case 'subscription_canceled':
-        emailContent = getSubscriptionCanceledEmail(data)
-        break
+      case "trial_ended":
+        emailContent = getTrialEndedEmail(data);
+        break;
+      case "subscription_created":
+        emailContent = getSubscriptionCreatedEmail(data);
+        break;
+      case "subscription_updated":
+        emailContent = getSubscriptionUpdatedEmail(data);
+        break;
+      case "subscription_canceled":
+        emailContent = getSubscriptionCanceledEmail(data);
+        break;
       default:
-        return new Response('invalid_type', { status: 400, headers: corsHeaders })
+        return new Response("invalid_type", {
+          status: 400,
+          headers: corsHeaders,
+        });
     }
 
-    await sendEmail(emailContent.subject, emailContent.html)
+    await sendEmail(emailContent.subject, emailContent.html);
 
-    return new Response('ok', { status: 200, headers: corsHeaders })
+    return new Response("ok", { status: 200, headers: corsHeaders });
   } catch (err) {
-    console.error('billing notification error:', err)
-    return new Response('internal_error', { status: 500, headers: corsHeaders })
+    console.error("billing notification error:", err);
+    return new Response("internal_error", {
+      status: 500,
+      headers: corsHeaders,
+    });
   }
-})
+});

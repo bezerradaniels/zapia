@@ -1,76 +1,76 @@
-import { lazy, Suspense, useRef, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import ArrowRight02Icon from '@hugeicons/core-free-icons/ArrowRight02Icon'
-import StoreLocation01Icon from '@hugeicons/core-free-icons/StoreLocation01Icon'
-import PackageIcon from '@hugeicons/core-free-icons/PackageIcon'
-import WhatsappIcon from '@hugeicons/core-free-icons/WhatsappIcon'
-import DashboardSquare01Icon from '@hugeicons/core-free-icons/DashboardSquare01Icon'
-import AiMagicIcon from '@hugeicons/core-free-icons/AiMagicIcon'
-import PaintBrush02Icon from '@hugeicons/core-free-icons/PaintBrush02Icon'
-import CreditCardIcon from '@hugeicons/core-free-icons/CreditCardIcon'
-import Tick02Icon from '@hugeicons/core-free-icons/Tick02Icon'
-import HomeIcon from '@hugeicons/core-free-icons/Home01Icon'
-import ShoppingCart01Icon from '@hugeicons/core-free-icons/ShoppingCart01Icon'
-import UserGroupIcon from '@hugeicons/core-free-icons/UserGroupIcon'
-import UserIcon from '@hugeicons/core-free-icons/UserIcon'
-import InvoiceIcon from '@hugeicons/core-free-icons/InvoiceIcon'
-import Money02Icon from '@hugeicons/core-free-icons/Money02Icon'
-import CustomerSupportIcon from '@hugeicons/core-free-icons/CustomerSupportIcon'
-import Search01Icon from '@hugeicons/core-free-icons/Search01Icon'
-import Notification02Icon from '@hugeicons/core-free-icons/Notification02Icon'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { ROUTES } from '@/config/routes'
-import { useDocumentMeta } from '@/hooks/useDocumentMeta'
-import { MarketingNavbar } from './_shared/MarketingNavbar'
+import { lazy, Suspense, useRef, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import ArrowRight02Icon from "@hugeicons/core-free-icons/ArrowRight02Icon";
+import StoreLocation01Icon from "@hugeicons/core-free-icons/StoreLocation01Icon";
+import PackageIcon from "@hugeicons/core-free-icons/PackageIcon";
+import WhatsappIcon from "@hugeicons/core-free-icons/WhatsappIcon";
+import DashboardSquare01Icon from "@hugeicons/core-free-icons/DashboardSquare01Icon";
+import AiMagicIcon from "@hugeicons/core-free-icons/AiMagicIcon";
+import PaintBrush02Icon from "@hugeicons/core-free-icons/PaintBrush02Icon";
+import CreditCardIcon from "@hugeicons/core-free-icons/CreditCardIcon";
+import Tick02Icon from "@hugeicons/core-free-icons/Tick02Icon";
+import HomeIcon from "@hugeicons/core-free-icons/Home01Icon";
+import ShoppingCart01Icon from "@hugeicons/core-free-icons/ShoppingCart01Icon";
+import UserGroupIcon from "@hugeicons/core-free-icons/UserGroupIcon";
+import UserIcon from "@hugeicons/core-free-icons/UserIcon";
+import InvoiceIcon from "@hugeicons/core-free-icons/InvoiceIcon";
+import Money02Icon from "@hugeicons/core-free-icons/Money02Icon";
+import CustomerSupportIcon from "@hugeicons/core-free-icons/CustomerSupportIcon";
+import Search01Icon from "@hugeicons/core-free-icons/Search01Icon";
+import Notification02Icon from "@hugeicons/core-free-icons/Notification02Icon";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { ROUTES } from "@/config/routes";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import { MarketingNavbar } from "./_shared/MarketingNavbar";
 
 const MarketingFooter = lazy(() =>
-  import('./_shared/MarketingFooter').then((module) => ({
+  import("./_shared/MarketingFooter").then((module) => ({
     default: module.MarketingFooter,
   })),
-)
+);
 
 const PricingTable = lazy(() =>
-  import('./_shared/PricingTable').then((module) => ({
+  import("./_shared/PricingTable").then((module) => ({
     default: module.PricingTable,
   })),
-)
+);
 
 /* ─── Scroll-reveal hook ─────────────────────────────────────────────────── */
 function useReveal(threshold = 0.1) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
+    const el = ref.current;
+    if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisible(true)
-          obs.disconnect()
+          setVisible(true);
+          obs.disconnect();
         }
       },
       { threshold },
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [threshold])
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
 
-  return { ref, visible }
+  return { ref, visible };
 }
 
 function revealStyle(visible: boolean, delay = 0): React.CSSProperties {
   return {
-    transitionProperty: 'opacity, transform',
-    transitionDuration: '680ms',
-    transitionTimingFunction: 'cubic-bezier(0.16,1,0.3,1)',
-    transitionDelay: visible ? `${delay}ms` : '0ms',
+    transitionProperty: "opacity, transform",
+    transitionDuration: "680ms",
+    transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)",
+    transitionDelay: visible ? `${delay}ms` : "0ms",
     opacity: visible ? 1 : 0,
-    transform: visible ? 'translateY(0)' : 'translateY(26px)',
-  }
+    transform: visible ? "translateY(0)" : "translateY(26px)",
+  };
 }
 
 /* ─── Shared components ──────────────────────────────────────────────────── */
@@ -79,17 +79,47 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     <div className="text-[11px] font-bold uppercase tracking-[2.5px] text-[#10b981]">
       {children}
     </div>
-  )
+  );
 }
 
 /* ─── Hero Mockup (dashboard + phone + floating cards) ───────────────────── */
 const HERO_PRODUCTS = [
-  { pos: 1, name: 'Kit Skincare Completo', price: 'R$ 89,90', sold: '142 vendas', bg: 'from-pink-100 to-rose-200' },
-  { pos: 2, name: 'Sérum Facial Anti-idade', price: 'R$ 69,90', sold: '98 vendas', bg: 'from-purple-100 to-violet-200' },
-  { pos: 3, name: 'Protetor Solar FPS 50', price: 'R$ 45,90', sold: '76 vendas', bg: 'from-amber-100 to-orange-200' },
-  { pos: 4, name: 'Creme Hidratante 200ml', price: 'R$ 34,90', sold: '61 vendas', bg: 'from-emerald-100 to-green-200' },
-  { pos: 5, name: 'Máscara Revitalizante', price: 'R$ 29,90', sold: '54 vendas', bg: 'from-blue-100 to-indigo-200' },
-]
+  {
+    pos: 1,
+    name: "Kit Skincare Completo",
+    price: "R$ 89,90",
+    sold: "142 vendas",
+    bg: "from-pink-100 to-rose-200",
+  },
+  {
+    pos: 2,
+    name: "Sérum Facial Anti-idade",
+    price: "R$ 69,90",
+    sold: "98 vendas",
+    bg: "from-purple-100 to-violet-200",
+  },
+  {
+    pos: 3,
+    name: "Protetor Solar FPS 50",
+    price: "R$ 45,90",
+    sold: "76 vendas",
+    bg: "from-amber-100 to-orange-200",
+  },
+  {
+    pos: 4,
+    name: "Creme Hidratante 200ml",
+    price: "R$ 34,90",
+    sold: "61 vendas",
+    bg: "from-emerald-100 to-green-200",
+  },
+  {
+    pos: 5,
+    name: "Máscara Revitalizante",
+    price: "R$ 29,90",
+    sold: "54 vendas",
+    bg: "from-blue-100 to-indigo-200",
+  },
+];
 
 function HeroMobileMockup() {
   return (
@@ -117,8 +147,10 @@ function HeroMobileMockup() {
               <div
                 key={i}
                 className={cn(
-                  'flex h-5 w-5 items-center justify-center rounded-md',
-                  i === 0 ? 'bg-emerald-500/15 text-emerald-400' : 'text-white/20',
+                  "flex h-5 w-5 items-center justify-center rounded-md",
+                  i === 0
+                    ? "bg-emerald-500/15 text-emerald-400"
+                    : "text-white/20",
                 )}
               >
                 <HugeiconsIcon icon={Icon} size={10} />
@@ -131,7 +163,9 @@ function HeroMobileMockup() {
             <div className="mb-1.5 flex items-center justify-between">
               <div>
                 <p className="text-[6px] text-gray-400">Bem-vinda,</p>
-                <p className="text-[10px] font-bold text-gray-900">Loja da Juliana</p>
+                <p className="text-[10px] font-bold text-gray-900">
+                  Loja da Juliana
+                </p>
               </div>
               <div className="relative">
                 <div className="flex h-5 w-5 items-center justify-center rounded-md bg-gray-100 text-gray-500">
@@ -145,27 +179,43 @@ function HeroMobileMockup() {
 
             <div className="mb-1.5 grid grid-cols-2 gap-1">
               {[
-                { label: 'Vendas do mês', value: 'R$ 8.450', delta: '+12%' },
-                { label: 'Pedidos', value: '256', delta: '+15%' },
-                { label: 'Ticket médio', value: 'R$ 228', delta: '+8%' },
-                { label: 'Produtos ativos', value: '48', delta: '6 novos' },
+                { label: "Vendas do mês", value: "R$ 8.450", delta: "+12%" },
+                { label: "Pedidos", value: "256", delta: "+15%" },
+                { label: "Ticket médio", value: "R$ 228", delta: "+8%" },
+                { label: "Produtos ativos", value: "48", delta: "6 novos" },
               ].map((s) => (
-                <div key={s.label} className="rounded-lg bg-white p-1.5 shadow-sm">
+                <div
+                  key={s.label}
+                  className="rounded-lg bg-white p-1.5 shadow-sm"
+                >
                   <p className="text-[6px] text-gray-400">{s.label}</p>
-                  <p className="text-[10px] font-bold leading-tight text-gray-900">{s.value}</p>
+                  <p className="text-[10px] font-bold leading-tight text-gray-900">
+                    {s.value}
+                  </p>
                   <p className="text-[6px] text-emerald-500">{s.delta}</p>
                 </div>
               ))}
             </div>
 
             <div className="rounded-lg bg-white p-1.5 shadow-sm">
-              <p className="mb-1 text-[6px] font-semibold text-gray-400">Produtos mais vendidos</p>
+              <p className="mb-1 text-[6px] font-semibold text-gray-400">
+                Produtos mais vendidos
+              </p>
               {HERO_PRODUCTS.slice(0, 3).map((p) => (
                 <div key={p.name} className="mb-0.5 flex items-center gap-1">
                   <span className="w-2 text-[6px] text-gray-300">{p.pos}</span>
-                  <div className={cn('h-3 w-3 flex-shrink-0 rounded bg-gradient-to-br', p.bg)} />
-                  <span className="flex-1 truncate text-[7px] text-gray-600">{p.name}</span>
-                  <span className="text-[7px] font-semibold text-gray-800">{p.price}</span>
+                  <div
+                    className={cn(
+                      "h-3 w-3 flex-shrink-0 rounded bg-gradient-to-br",
+                      p.bg,
+                    )}
+                  />
+                  <span className="flex-1 truncate text-[7px] text-gray-600">
+                    {p.name}
+                  </span>
+                  <span className="text-[7px] font-semibold text-gray-800">
+                    {p.price}
+                  </span>
                 </div>
               ))}
             </div>
@@ -174,9 +224,8 @@ function HeroMobileMockup() {
       </div>
 
       {/* iPhone catalog mockup — sobreposição à direita */}
-
     </div>
-  )
+  );
 }
 
 function HeroSalesMockup() {
@@ -205,7 +254,6 @@ function HeroSalesMockup() {
 
       {/* Desktop: floating cards + phone */}
       <div className="relative mx-auto mt-14 hidden max-w-5xl md:block">
-
         {/* ── Float A: novo pedido (top-left) ── */}
         <div className="hero-float-a absolute -left-3 top-14 z-20 hidden w-[172px] rounded-2xl border border-black/6 bg-white p-3 shadow-[0_16px_48px_rgba(0,0,0,0.14)] md:block">
           <div className="mb-2.5 flex items-center gap-2">
@@ -213,14 +261,18 @@ function HeroSalesMockup() {
               <HugeiconsIcon icon={ShoppingCart01Icon} size={15} />
             </div>
             <div>
-              <p className="text-[11px] font-bold text-gray-900">Novo pedido!</p>
+              <p className="text-[11px] font-bold text-gray-900">
+                Novo pedido!
+              </p>
               <p className="text-[9px] text-gray-400">#1042 · há 2 min</p>
             </div>
           </div>
           <div className="flex items-center gap-2 rounded-xl bg-gray-50 p-2">
             <div className="h-8 w-8 flex-shrink-0 rounded-lg bg-gradient-to-br from-pink-100 to-rose-200" />
             <div>
-              <p className="text-[10px] font-medium text-gray-600">Kit Skincare</p>
+              <p className="text-[10px] font-medium text-gray-600">
+                Kit Skincare
+              </p>
               <p className="text-[12px] font-bold text-emerald-600">R$ 89,90</p>
             </div>
           </div>
@@ -230,9 +282,13 @@ function HeroSalesMockup() {
         <div className="hero-float-b absolute -right-3 top-12 z-20 hidden w-[152px] rounded-2xl border border-black/6 bg-white p-3.5 shadow-[0_16px_48px_rgba(0,0,0,0.14)] md:block">
           <div className="mb-1 flex items-center gap-1.5">
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-            <p className="text-[10px] font-semibold text-gray-400">Ao vivo agora</p>
+            <p className="text-[10px] font-semibold text-gray-400">
+              Ao vivo agora
+            </p>
           </div>
-          <p className="text-[32px] font-black leading-none text-gray-900">24</p>
+          <p className="text-[32px] font-black leading-none text-gray-900">
+            24
+          </p>
           <p className="mt-0.5 text-[10px] text-gray-400">no catálogo agora</p>
           <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-gray-100">
             <div className="h-full w-[68%] rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500" />
@@ -245,10 +301,13 @@ function HeroSalesMockup() {
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366] text-white">
               <HugeiconsIcon icon={WhatsappIcon} size={13} />
             </div>
-            <p className="text-[10px] font-semibold text-gray-500">Pedido via WhatsApp</p>
+            <p className="text-[10px] font-semibold text-gray-500">
+              Pedido via WhatsApp
+            </p>
           </div>
           <div className="rounded-xl bg-[#dcf8c6] px-2.5 py-2 text-[10px] leading-relaxed text-gray-700">
-            Olá! Quero o <strong>Sérum Facial</strong> (tam. P). Pode confirmar? 😊
+            Olá! Quero o <strong>Sérum Facial</strong> (tam. P). Pode confirmar?
+            😊
           </div>
         </div>
 
@@ -276,8 +335,10 @@ function HeroSalesMockup() {
                 <div
                   key={i}
                   className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-lg',
-                    i === 0 ? 'bg-emerald-500/15 text-emerald-400' : 'text-white/25',
+                    "flex h-8 w-8 items-center justify-center rounded-lg",
+                    i === 0
+                      ? "bg-emerald-500/15 text-emerald-400"
+                      : "text-white/25",
                   )}
                 >
                   <HugeiconsIcon icon={Icon} size={15} />
@@ -290,8 +351,12 @@ function HeroSalesMockup() {
               {/* Header */}
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <p className="text-[11px] text-gray-400">Bem-vinda de volta,</p>
-                  <h3 className="text-base font-bold text-gray-900">Loja da Juliana</h3>
+                  <p className="text-[11px] text-gray-400">
+                    Bem-vinda de volta,
+                  </p>
+                  <h3 className="text-base font-bold text-gray-900">
+                    Loja da Juliana
+                  </h3>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="relative">
@@ -311,15 +376,24 @@ function HeroSalesMockup() {
               {/* Stat cards */}
               <div className="mb-4 grid grid-cols-2 gap-2.5 md:grid-cols-4">
                 {[
-                  { label: 'Vendas do mês', value: 'R$ 8.450', delta: '+12%' },
-                  { label: 'Pedidos', value: '256', delta: '+15%' },
-                  { label: 'Ticket médio', value: 'R$ 228', delta: '+8%' },
-                  { label: 'Produtos ativos', value: '48', delta: '6 novos' },
+                  { label: "Vendas do mês", value: "R$ 8.450", delta: "+12%" },
+                  { label: "Pedidos", value: "256", delta: "+15%" },
+                  { label: "Ticket médio", value: "R$ 228", delta: "+8%" },
+                  { label: "Produtos ativos", value: "48", delta: "6 novos" },
                 ].map((stat) => (
-                  <div key={stat.label} className="rounded-xl bg-white p-3 shadow-sm">
-                    <div className="mb-0.5 text-[9px] font-medium text-gray-400">{stat.label}</div>
-                    <div className="text-[15px] font-bold text-gray-900 md:text-lg">{stat.value}</div>
-                    <div className="mt-0.5 text-[9px] text-emerald-500">{stat.delta}</div>
+                  <div
+                    key={stat.label}
+                    className="rounded-xl bg-white p-3 shadow-sm"
+                  >
+                    <div className="mb-0.5 text-[9px] font-medium text-gray-400">
+                      {stat.label}
+                    </div>
+                    <div className="text-[15px] font-bold text-gray-900 md:text-lg">
+                      {stat.value}
+                    </div>
+                    <div className="mt-0.5 text-[9px] text-emerald-500">
+                      {stat.delta}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -337,12 +411,25 @@ function HeroSalesMockup() {
                         key={product.name}
                         className="flex items-center gap-2 border-b border-gray-50 pb-1.5 last:border-0 last:pb-0"
                       >
-                        <span className="w-3 text-[9px] text-gray-300">{product.pos}</span>
-                        <div className={cn('h-6 w-6 flex-shrink-0 rounded-lg bg-gradient-to-br', product.bg)} />
-                        <span className="flex-1 truncate text-[10px] text-gray-600">{product.name}</span>
+                        <span className="w-3 text-[9px] text-gray-300">
+                          {product.pos}
+                        </span>
+                        <div
+                          className={cn(
+                            "h-6 w-6 flex-shrink-0 rounded-lg bg-gradient-to-br",
+                            product.bg,
+                          )}
+                        />
+                        <span className="flex-1 truncate text-[10px] text-gray-600">
+                          {product.name}
+                        </span>
                         <div className="text-right">
-                          <div className="text-[10px] font-semibold text-gray-800">{product.price}</div>
-                          <div className="text-[8px] text-emerald-500">{product.sold}</div>
+                          <div className="text-[10px] font-semibold text-gray-800">
+                            {product.price}
+                          </div>
+                          <div className="text-[8px] text-emerald-500">
+                            {product.sold}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -355,11 +442,29 @@ function HeroSalesMockup() {
                     <div className="mb-1 text-[10px] font-semibold text-gray-500">
                       Vendas nos últimos 7 dias
                     </div>
-                    <svg viewBox="0 0 260 65" className="w-full" style={{ overflow: 'visible' }}>
+                    <svg
+                      viewBox="0 0 260 65"
+                      className="w-full"
+                      style={{ overflow: "visible" }}
+                    >
                       <defs>
-                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.18" />
-                          <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
+                        <linearGradient
+                          id="chartGrad"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#7c3aed"
+                            stopOpacity="0.18"
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor="#7c3aed"
+                            stopOpacity="0"
+                          />
                         </linearGradient>
                       </defs>
                       <polygon
@@ -374,21 +479,36 @@ function HeroSalesMockup() {
                         strokeLinecap="round"
                         points="10,52 50,58 90,36 130,46 170,16 210,32 250,20"
                       />
-                      {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((day, i) => (
-                        <text key={day} x={10 + i * 40} y={64} fontSize="7" fill="#9ca3af" textAnchor="middle">
-                          {day}
-                        </text>
-                      ))}
+                      {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"].map(
+                        (day, i) => (
+                          <text
+                            key={day}
+                            x={10 + i * 40}
+                            y={64}
+                            fontSize="7"
+                            fill="#9ca3af"
+                            textAnchor="middle"
+                          >
+                            {day}
+                          </text>
+                        ),
+                      )}
                     </svg>
                   </div>
 
                   <div className="rounded-xl bg-white p-3 shadow-sm">
-                    <div className="text-[9px] font-medium text-gray-400">Receita do mês</div>
-                    <div className="mt-0.5 text-xl font-bold text-gray-900">R$ 8.450,00</div>
+                    <div className="text-[9px] font-medium text-gray-400">
+                      Receita do mês
+                    </div>
+                    <div className="mt-0.5 text-xl font-bold text-gray-900">
+                      R$ 8.450,00
+                    </div>
                     <span className="mt-0.5 inline-block rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-600">
                       +12% vs mês anterior
                     </span>
-                    <div className="mt-2 text-[10px] font-medium text-violet-500">Ver relatório</div>
+                    <div className="mt-2 text-[10px] font-medium text-violet-500">
+                      Ver relatório
+                    </div>
                   </div>
                 </div>
               </div>
@@ -401,14 +521,20 @@ function HeroSalesMockup() {
           <div className="absolute left-1/2 top-0 z-10 h-4 w-20 -translate-x-1/2 rounded-b-2xl bg-gray-800" />
           <div className="bg-violet-600 px-3 pb-3 pt-5 text-center">
             <div className="text-[8px] text-white/70">Catálogo de</div>
-            <div className="mt-0.5 text-[13px] font-bold text-white">Loja da Juliana</div>
+            <div className="mt-0.5 text-[13px] font-bold text-white">
+              Loja da Juliana
+            </div>
             <div className="mt-2 rounded-full bg-violet-500 py-1.5 text-[9px] font-semibold text-white">
               Compartilhar catálogo
             </div>
           </div>
           <div className="bg-white p-2.5">
             <div className="mb-2 flex items-center gap-1.5 rounded-xl bg-gray-50 px-2.5 py-2">
-              <HugeiconsIcon icon={Search01Icon} size={10} className="text-gray-400" />
+              <HugeiconsIcon
+                icon={Search01Icon}
+                size={10}
+                className="text-gray-400"
+              />
               <span className="text-[9px] text-gray-400">Buscar produtos</span>
             </div>
             <div className="mb-2.5 flex gap-1.5">
@@ -421,23 +547,36 @@ function HeroSalesMockup() {
             </div>
             {HERO_PRODUCTS.slice(0, 2).map((p) => (
               <div key={p.name} className="mb-2 flex items-center gap-2.5">
-                <div className={cn('h-10 w-10 flex-shrink-0 rounded-xl bg-gradient-to-br', p.bg)} />
+                <div
+                  className={cn(
+                    "h-10 w-10 flex-shrink-0 rounded-xl bg-gradient-to-br",
+                    p.bg,
+                  )}
+                />
                 <div>
-                  <div className="text-[10px] font-semibold text-gray-800">{p.name.split(' ').slice(0, 2).join(' ')}</div>
-                  <div className="text-[10px] font-bold text-violet-600">{p.price}</div>
+                  <div className="text-[10px] font-semibold text-gray-800">
+                    {p.name.split(" ").slice(0, 2).join(" ")}
+                  </div>
+                  <div className="text-[10px] font-bold text-violet-600">
+                    {p.price}
+                  </div>
                 </div>
               </div>
             ))}
             <div className="mt-1 flex justify-end">
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366] shadow-lg">
-                <HugeiconsIcon icon={WhatsappIcon} size={14} className="text-white" />
+                <HugeiconsIcon
+                  icon={WhatsappIcon}
+                  size={14}
+                  className="text-white"
+                />
               </div>
             </div>
           </div>
         </div>
       </div>
     </>
-  )
+  );
 }
 
 /* ─── Hero ───────────────────────────────────────────────────────────────── */
@@ -452,10 +591,12 @@ function Hero() {
         </div>
 
         <h1 className="text-[36px] font-black leading-[1.08] tracking-tighter text-z-ink md:text-[54px] lg:text-[60px]">
-          Seus produtos no WhatsApp dos clientes de <span className="text-emerald-600">Bom Jesus da Lapa</span>
+          Seus produtos no WhatsApp dos clientes de{" "}
+          <span className="text-emerald-600">Bom Jesus da Lapa</span>
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-z-text-muted md:text-[20px]">
-          Crie seu catálogo online em menos de 5 minutos, envie seu link exclusivo e receba pedidos estruturados direto no WhatsApp.
+          Crie seu catálogo online em menos de 5 minutos, envie seu link
+          exclusivo e receba pedidos estruturados direto no WhatsApp.
         </p>
 
         {/* CTAs */}
@@ -470,46 +611,48 @@ function Hero() {
               <HugeiconsIcon icon={ArrowRight02Icon} size={18} />
             </Link>
           </Button>
-          <span className="text-xs text-z-text-hint">Sem complicação · Rápido no celular · Feito para o comércio local</span>
+          <span className="text-xs text-z-text-hint">
+            Sem complicação · Rápido no celular · Feito para o comércio local
+          </span>
         </div>
       </div>
 
       {/* Mockup */}
       <HeroSalesMockup />
     </section>
-  )
+  );
 }
 
 /* ─── Stats strip ────────────────────────────────────────────────────────── */
 const STATS = [
-  { 
-    icon: StoreLocation01Icon, 
-    value: '< 5 minutos', 
-    label: 'para ter o catálogo no ar',
-    bg: 'bg-z-primary',
+  {
+    icon: StoreLocation01Icon,
+    value: "< 5 minutos",
+    label: "para ter o catálogo no ar",
+    bg: "bg-z-primary",
   },
-  { 
-    icon: ShoppingCart01Icon, 
-    value: 'Link próprio', 
-    label: 'da sua loja online',
-    bg: 'bg-violet-500',
+  {
+    icon: ShoppingCart01Icon,
+    value: "Link próprio",
+    label: "da sua loja online",
+    bg: "bg-violet-500",
   },
-  { 
-    icon: WhatsappIcon, 
-    value: 'WhatsApp', 
-    label: 'como canal de pedidos',
-    bg: 'bg-z-green',
+  {
+    icon: WhatsappIcon,
+    value: "WhatsApp",
+    label: "como canal de pedidos",
+    bg: "bg-z-green",
   },
-  { 
-    icon: DashboardSquare01Icon, 
-    value: 'Dashboard', 
-    label: 'tudo em um único lugar',
-    bg: 'bg-violet-500',
+  {
+    icon: DashboardSquare01Icon,
+    value: "Dashboard",
+    label: "tudo em um único lugar",
+    bg: "bg-violet-500",
   },
-]
+];
 
 function StatsStrip() {
-  const { ref, visible } = useReveal()
+  const { ref, visible } = useReveal();
   return (
     <section className="bg-z-bg px-6 py-16 sm:py-24" ref={ref}>
       <div className="mx-auto max-w-6xl">
@@ -520,42 +663,51 @@ function StatsStrip() {
               className="group flex flex-col items-center gap-5 rounded-[2rem] border border-black/[0.04] bg-white p-8 text-center transition-all duration-300 hover:-translate-y-1.5"
               style={revealStyle(visible, i * 90)}
             >
-              <div className={cn("flex h-16 w-16 items-center justify-center rounded-[1.25rem] text-white transition-transform duration-500 group-hover:scale-110", s.bg)}>
+              <div
+                className={cn(
+                  "flex h-16 w-16 items-center justify-center rounded-[1.25rem] text-white transition-transform duration-500 group-hover:scale-110",
+                  s.bg,
+                )}
+              >
                 <HugeiconsIcon icon={s.icon} size={30} />
               </div>
               <div className="flex flex-col gap-1.5">
-                <div className="text-[1.125rem] font-bold text-z-text">{s.value}</div>
-                <div className="text-[0.9375rem] font-medium leading-relaxed text-z-text-muted">{s.label}</div>
+                <div className="text-[1.125rem] font-bold text-z-text">
+                  {s.value}
+                </div>
+                <div className="text-[0.9375rem] font-medium leading-relaxed text-z-text-muted">
+                  {s.label}
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 /* ─── How it works ───────────────────────────────────────────────────────── */
 const STEPS = [
   {
     icon: StoreLocation01Icon,
-    title: 'Crie sua loja',
-    desc: 'Cadastre-se, adicione logo, cores da sua marca e personalize o catálogo em poucos minutos.',
+    title: "Crie sua loja",
+    desc: "Cadastre-se, adicione logo, cores da sua marca e personalize o catálogo em poucos minutos.",
   },
   {
     icon: PackageIcon,
-    title: 'Adicione seus produtos',
-    desc: 'Cadastre produtos com fotos, variações e preços. Use IA para gerar descrições automaticamente.',
+    title: "Adicione seus produtos",
+    desc: "Cadastre produtos com fotos, variações e preços. Use IA para gerar descrições automaticamente.",
   },
   {
     icon: WhatsappIcon,
-    title: 'Compartilhe e venda',
-    desc: 'Envie o link pelo WhatsApp. Os pedidos chegam no dashboard em tempo real, formatados e prontos.',
+    title: "Compartilhe e venda",
+    desc: "Envie o link pelo WhatsApp. Os pedidos chegam no dashboard em tempo real, formatados e prontos.",
   },
-]
+];
 
 function HowItWorks() {
-  const { ref, visible } = useReveal()
+  const { ref, visible } = useReveal();
   return (
     <section id="como-funciona" className="bg-white px-6 py-24">
       <div className="mx-auto max-w-5xl">
@@ -595,11 +747,11 @@ function HowItWorks() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function StepsGrid() {
-  const { ref, visible } = useReveal()
+  const { ref, visible } = useReveal();
   return (
     <div className="relative grid gap-6 md:grid-cols-3" ref={ref}>
       {/* Connector line */}
@@ -621,51 +773,51 @@ function StepsGrid() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 /* ─── Features ───────────────────────────────────────────────────────────── */
 const FEATURES = [
   {
     icon: ShoppingCart01Icon,
-    title: 'Catálogo online',
-    desc: 'URL exclusiva, busca inteligente, categorias e grid otimizado para converter visitantes em clientes.',
-    color: 'bg-emerald-500',
+    title: "Catálogo online",
+    desc: "URL exclusiva, busca inteligente, categorias e grid otimizado para converter visitantes em clientes.",
+    color: "bg-emerald-500",
   },
   {
     icon: WhatsappIcon,
-    title: 'Pedidos via WhatsApp',
-    desc: 'Cada pedido vira uma mensagem formatada que chega direto no seu WhatsApp, pronta para atender.',
-    color: 'bg-[#25D366]',
+    title: "Pedidos via WhatsApp",
+    desc: "Cada pedido vira uma mensagem formatada que chega direto no seu WhatsApp, pronta para atender.",
+    color: "bg-[#25D366]",
   },
   {
     icon: DashboardSquare01Icon,
-    title: 'Dashboard completo',
-    desc: 'Acompanhe pedidos, clientes e receita em tempo real, de qualquer dispositivo, a qualquer hora.',
-    color: 'bg-emerald-500',
+    title: "Dashboard completo",
+    desc: "Acompanhe pedidos, clientes e receita em tempo real, de qualquer dispositivo, a qualquer hora.",
+    color: "bg-emerald-500",
   },
   {
     icon: AiMagicIcon,
-    title: 'IA integrada',
-    desc: 'Gemini gera descrições de produtos, analisa perfis de clientes e sugere melhorias para o catálogo.',
-    color: 'bg-violet-500',
+    title: "IA integrada",
+    desc: "Gemini gera descrições de produtos, analisa perfis de clientes e sugere melhorias para o catálogo.",
+    color: "bg-violet-500",
   },
   {
     icon: PaintBrush02Icon,
-    title: 'Personalização total',
-    desc: 'Logo, banner, cores e slogan. Sua loja com a identidade visual da sua marca.',
-    color: 'bg-emerald-500',
+    title: "Personalização total",
+    desc: "Logo, banner, cores e slogan. Sua loja com a identidade visual da sua marca.",
+    color: "bg-emerald-500",
   },
   {
     icon: CreditCardIcon,
-    title: 'Planos acessíveis',
-    desc: 'A partir de R$ 9,90/mês. Cresça no seu ritmo sem surpresas na fatura.',
-    color: 'bg-emerald-500',
+    title: "Planos acessíveis",
+    desc: "A partir de R$ 9,90/mês. Cresça no seu ritmo sem surpresas na fatura.",
+    color: "bg-emerald-500",
   },
-]
+];
 
 function Features() {
-  const { ref, visible } = useReveal()
+  const { ref, visible } = useReveal();
   return (
     <section id="funcionalidades" className="bg-z-bg px-6 py-24">
       <div className="mx-auto max-w-5xl">
@@ -701,11 +853,11 @@ function Features() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function FeaturesGrid() {
-  const { ref, visible } = useReveal()
+  const { ref, visible } = useReveal();
   return (
     <div className="grid gap-4 md:grid-cols-3" ref={ref}>
       {FEATURES.map((f, i) => (
@@ -716,7 +868,7 @@ function FeaturesGrid() {
         >
           <div
             className={cn(
-              'mb-4 flex h-11 w-11 items-center justify-center rounded-xl text-white',
+              "mb-4 flex h-11 w-11 items-center justify-center rounded-xl text-white",
               f.color,
             )}
           >
@@ -729,7 +881,7 @@ function FeaturesGrid() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 /* ─── Product preview ────────────────────────────────────────────────────── */
@@ -742,10 +894,10 @@ const SIDEBAR_ICONS = [
   DashboardSquare01Icon,
   Money02Icon,
   CustomerSupportIcon,
-]
+];
 
 function ProductPreview() {
-  const { ref, visible } = useReveal()
+  const { ref, visible } = useReveal();
   return (
     <section className="overflow-hidden bg-gradient-to-br from-emerald-50 to-green-50 px-6 py-24">
       <div className="mx-auto max-w-6xl">
@@ -784,7 +936,7 @@ function ProductPreview() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function PreviewMockups({ visible }: { visible: boolean }) {
@@ -809,8 +961,8 @@ function PreviewMockups({ visible }: { visible: boolean }) {
               <div
                 key={i}
                 className={cn(
-                  'flex h-8 w-8 items-center justify-center rounded-lg',
-                  i === 0 ? 'bg-z-green text-z-ink' : 'text-white/40',
+                  "flex h-8 w-8 items-center justify-center rounded-lg",
+                  i === 0 ? "bg-z-green text-z-ink" : "text-white/40",
                 )}
               >
                 <HugeiconsIcon icon={Ic} size={16} />
@@ -820,8 +972,8 @@ function PreviewMockups({ visible }: { visible: boolean }) {
           <div className="flex flex-1 flex-col gap-2.5 p-4">
             <div className="grid grid-cols-2 gap-2">
               {[
-                ['Pedidos hoje', '14', '+3 ↑'],
-                ['Receita', 'R$ 4.820', '↑ 18%'],
+                ["Pedidos hoje", "14", "+3 ↑"],
+                ["Receita", "R$ 4.820", "↑ 18%"],
               ].map(([l, v, s]) => (
                 <div key={l} className="rounded-lg bg-[#252525] px-3 py-2.5">
                   <div className="text-[9px] text-white/40">{l}</div>
@@ -835,9 +987,9 @@ function PreviewMockups({ visible }: { visible: boolean }) {
                 Últimos pedidos
               </div>
               {[
-                ['#1041', 'Ana Souza', 'R$ 89,90', 'Pago', 'text-[#10b981]'],
-                ['#1040', 'Carlos Lima', 'R$ 147,00', 'Novo', 'text-z-lilac'],
-                ['#1039', 'Bruna M.', 'R$ 62,50', 'Preparo', 'text-yellow-400'],
+                ["#1041", "Ana Souza", "R$ 89,90", "Pago", "text-[#10b981]"],
+                ["#1040", "Carlos Lima", "R$ 147,00", "Novo", "text-z-lilac"],
+                ["#1039", "Bruna M.", "R$ 62,50", "Preparo", "text-yellow-400"],
               ].map(([id, n, v, st]) => (
                 <div
                   key={id}
@@ -852,11 +1004,11 @@ function PreviewMockups({ visible }: { visible: boolean }) {
                   </span>
                   <Badge
                     tone={
-                      st === 'Pago'
-                        ? 'green'
-                        : st === 'Novo'
-                          ? 'lilac'
-                          : 'amber'
+                      st === "Pago"
+                        ? "green"
+                        : st === "Novo"
+                          ? "lilac"
+                          : "amber"
                     }
                     className="text-[8px]"
                   >
@@ -871,51 +1023,54 @@ function PreviewMockups({ visible }: { visible: boolean }) {
 
       {/* iPhone catalog mockup — sobreposição à direita */}
     </div>
-  )
+  );
 }
 
 /* ─── Pricing ────────────────────────────────────────────────────────────── */
 function PricingTableFallback() {
-  return <div className="min-h-[520px]" aria-hidden="true" />
+  return <div className="min-h-[520px]" aria-hidden="true" />;
 }
 
 function DeferredMarketingFooter() {
-  const [canLoad, setCanLoad] = useState(false)
+  const [canLoad, setCanLoad] = useState(false);
 
   useEffect(() => {
     const idleWindow = window as Window & {
-      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number
-      cancelIdleCallback?: (handle: number) => void
-    }
-    let idleId: number | undefined
-    let timeoutId: number | undefined
-    const load = () => setCanLoad(true)
+      requestIdleCallback?: (
+        callback: () => void,
+        options?: { timeout: number },
+      ) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+    const load = () => setCanLoad(true);
 
     if (idleWindow.requestIdleCallback) {
-      idleId = idleWindow.requestIdleCallback(load, { timeout: 2500 })
+      idleId = idleWindow.requestIdleCallback(load, { timeout: 2500 });
     } else {
-      timeoutId = window.setTimeout(load, 1600)
+      timeoutId = window.setTimeout(load, 1600);
     }
 
     return () => {
       if (idleId !== undefined && idleWindow.cancelIdleCallback) {
-        idleWindow.cancelIdleCallback(idleId)
+        idleWindow.cancelIdleCallback(idleId);
       }
-      if (timeoutId !== undefined) window.clearTimeout(timeoutId)
-    }
-  }, [])
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
+  }, []);
 
-  if (!canLoad) return null
+  if (!canLoad) return null;
 
   return (
     <Suspense fallback={null}>
       <MarketingFooter />
     </Suspense>
-  )
+  );
 }
 
 function PricingSection() {
-  const { ref, visible } = useReveal()
+  const { ref, visible } = useReveal();
   return (
     <section id="precos" className="bg-z-bg px-6 py-24">
       <div className="mx-auto max-w-5xl">
@@ -951,7 +1106,7 @@ function PricingSection() {
           className="mt-10 text-center text-sm text-z-text-muted"
           style={revealStyle(visible, 350)}
         >
-          Dúvidas sobre qual plano escolher?{' '}
+          Dúvidas sobre qual plano escolher?{" "}
           <a
             id="lp-pricing-link-faq"
             href="#faq"
@@ -962,40 +1117,40 @@ function PricingSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 /* ─── FAQ ────────────────────────────────────────────────────────────────── */
 const FAQ_ITEMS = [
   {
-    q: 'Preciso saber de tecnologia para usar o Zapia?',
-    a: 'Não. O Zapia foi criado para ser simples. Se você consegue usar o WhatsApp, consegue usar o Zapia. O cadastro leva menos de 5 minutos e o catálogo já fica disponível para seus clientes.',
+    q: "Preciso saber de tecnologia para usar o Zapia?",
+    a: "Não. O Zapia foi criado para ser simples. Se você consegue usar o WhatsApp, consegue usar o Zapia. O cadastro leva menos de 5 minutos e o catálogo já fica disponível para seus clientes.",
   },
   {
-    q: 'Como meus clientes fazem pedidos?',
-    a: 'Seu cliente acessa o catálogo pelo link exclusivo da sua loja, escolhe os produtos e finaliza o pedido. Uma mensagem formatada é enviada direto para o seu WhatsApp com todos os detalhes do pedido.',
+    q: "Como meus clientes fazem pedidos?",
+    a: "Seu cliente acessa o catálogo pelo link exclusivo da sua loja, escolhe os produtos e finaliza o pedido. Uma mensagem formatada é enviada direto para o seu WhatsApp com todos os detalhes do pedido.",
   },
   {
-    q: 'O que acontece após o período de teste?',
-    a: 'Se você não adicionar um método de pagamento, o catálogo público fica suspenso temporariamente — mas você mantém acesso ao dashboard para configurar o plano. Seus dados e produtos ficam salvos.',
+    q: "O que acontece após o período de teste?",
+    a: "Se você não adicionar um método de pagamento, o catálogo público fica suspenso temporariamente — mas você mantém acesso ao dashboard para configurar o plano. Seus dados e produtos ficam salvos.",
   },
   {
-    q: 'Posso trocar de plano ou cancelar quando quiser?',
-    a: 'Sim. Upgrade acontece na hora. Downgrade e cancelamento têm efeito no final do período já pago. Sem multas, sem burocracia.',
+    q: "Posso trocar de plano ou cancelar quando quiser?",
+    a: "Sim. Upgrade acontece na hora. Downgrade e cancelamento têm efeito no final do período já pago. Sem multas, sem burocracia.",
   },
   {
-    q: 'A loja fica acessível pelo celular?',
-    a: 'Sim. O catálogo é totalmente responsivo e otimizado para mobile, que é como a maioria dos clientes de lojistas brasileiros acessa o link.',
+    q: "A loja fica acessível pelo celular?",
+    a: "Sim. O catálogo é totalmente responsivo e otimizado para mobile, que é como a maioria dos clientes de lojistas brasileiros acessa o link.",
   },
   {
-    q: 'Quais formas de pagamento são aceitas para o plano?',
-    a: 'Cartão de crédito (com recorrência automática), PIX e boleto bancário — todos em reais (BRL). Aceitamos os principais cartões do mercado.',
+    q: "Quais formas de pagamento são aceitas para o plano?",
+    a: "Cartão de crédito (com recorrência automática), PIX e boleto bancário — todos em reais (BRL). Aceitamos os principais cartões do mercado.",
   },
-]
+];
 
 function FAQ() {
-  const { ref, visible } = useReveal()
-  const [open, setOpen] = useState<number | null>(null)
+  const { ref, visible } = useReveal();
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
     <section id="faq" className="bg-white px-6 py-24">
@@ -1035,7 +1190,7 @@ function FAQ() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function FaqList({
@@ -1044,15 +1199,15 @@ function FaqList({
   setOpen,
   visible,
 }: {
-  items: (typeof FAQ_ITEMS)[number][]
-  open: number | null
-  setOpen: (i: number | null) => void
-  visible: boolean
+  items: (typeof FAQ_ITEMS)[number][];
+  open: number | null;
+  setOpen: (i: number | null) => void;
+  visible: boolean;
 }) {
   return (
     <div className="flex flex-col divide-y divide-z-border overflow-hidden rounded-2xl border border-z-border">
       {items.map((item, i) => {
-        const isOpen = open === i
+        const isOpen = open === i;
         return (
           <div
             key={i}
@@ -1071,29 +1226,29 @@ function FaqList({
               </span>
               <span
                 className="shrink-0 text-lg font-light leading-none text-z-text-muted transition-transform duration-300"
-                style={{ transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)' }}
+                style={{ transform: isOpen ? "rotate(45deg)" : "rotate(0deg)" }}
               >
                 +
               </span>
             </button>
             <div
               className="overflow-hidden transition-all duration-300 ease-out"
-              style={{ maxHeight: isOpen ? '300px' : '0px' }}
+              style={{ maxHeight: isOpen ? "300px" : "0px" }}
             >
               <p className="px-6 pb-5 text-sm leading-relaxed text-z-text-muted">
                 {item.a}
               </p>
             </div>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
 
 /* ─── Final CTA ──────────────────────────────────────────────────────────── */
 function FinalCTA() {
-  const { ref, visible } = useReveal()
+  const { ref, visible } = useReveal();
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-emerald-100 via-green-50 to-lime-100 px-6 py-28 text-center">
       {/* Subtle radial accent */}
@@ -1101,7 +1256,7 @@ function FinalCTA() {
         className="pointer-events-none absolute inset-x-0 top-0 h-full"
         style={{
           background:
-            'radial-gradient(ellipse 70% 60% at 50% 100%, rgba(52,211,153,0.15) 0%, transparent 100%)',
+            "radial-gradient(ellipse 70% 60% at 50% 100%, rgba(52,211,153,0.15) 0%, transparent 100%)",
         }}
       />
 
@@ -1121,8 +1276,7 @@ function FinalCTA() {
           className="mt-4 text-base text-z-text-muted"
           style={revealStyle(visible, 140)}
         >
-          Configure em menos de 5 minutos.{' '}
-          <br className="hidden md:block" />
+          Configure em menos de 5 minutos. <br className="hidden md:block" />
           Sem cartão de crédito.
         </p>
 
@@ -1140,9 +1294,9 @@ function FinalCTA() {
           style={revealStyle(visible, 260)}
         >
           {[
-            'Sem cartão de crédito',
-            'Cancele quando quiser',
-            'Suporte em português',
+            "Sem cartão de crédito",
+            "Cancele quando quiser",
+            "Suporte em português",
           ].map((t) => (
             <div
               key={t}
@@ -1160,12 +1314,12 @@ function FinalCTA() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 /* ─── Page ───────────────────────────────────────────────────────────────── */
 export default function LandingPage() {
-  useDocumentMeta({ title: 'Zapia Catálogos Digitais' })
+  useDocumentMeta({ title: "Zapia Catálogos Digitais" });
 
   return (
     <div className="min-h-screen bg-white">
@@ -1180,5 +1334,5 @@ export default function LandingPage() {
       <FinalCTA />
       <DeferredMarketingFooter />
     </div>
-  )
+  );
 }

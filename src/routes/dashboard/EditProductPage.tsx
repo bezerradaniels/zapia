@@ -1,26 +1,22 @@
-import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
-import { buildStoreUrl, useActiveStore } from '@/lib/tenant'
-import {
-  ProductForm,
-  useProduct,
-  useUpdateProduct,
-} from '@/features/products'
-import { ROUTES } from '@/config/routes'
+import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { buildStoreUrl, useActiveStore } from "@/lib/tenant";
+import { ProductForm, useProduct, useUpdateProduct } from "@/features/products";
+import { ROUTES } from "@/config/routes";
 
 export default function EditProductPage() {
-  const { id } = useParams<{ id: string }>()
-  const [searchParams] = useSearchParams()
-  const justPublished = searchParams.get('published') === 'true'
-  const { store, isLoading: storeLoading } = useActiveStore()
-  const product = useProduct(id)
-  const update = useUpdateProduct(store?.id ?? '', id ?? '')
+  const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const justPublished = searchParams.get("published") === "true";
+  const { store, isLoading: storeLoading } = useActiveStore();
+  const product = useProduct(id);
+  const update = useUpdateProduct(store?.id ?? "", id ?? "");
 
   if (storeLoading || product.isLoading) {
-    return <p className="text-sm text-z-text-muted">Carregando...</p>
+    return <p className="text-sm text-z-text-muted">Carregando...</p>;
   }
-  if (!store) return <Navigate to={ROUTES.onboarding} replace />
+  if (!store) return <Navigate to={ROUTES.onboarding} replace />;
   if (!product.data) {
     return (
       <div className="flex flex-col gap-3">
@@ -32,10 +28,10 @@ export default function EditProductPage() {
           Voltar
         </Link>
       </div>
-    )
+    );
   }
 
-  const p = product.data
+  const p = product.data;
   const initial = {
     name: p.name,
     description: p.description ?? undefined,
@@ -63,9 +59,9 @@ export default function EditProductPage() {
     variation_type: p.variation_type ?? null,
     variation_label: p.variation_label ?? null,
     variation_options: p.variation_options ?? null,
-  }
+  };
 
-  const catalogUrl = store.slug ? buildStoreUrl(store.slug) : undefined
+  const catalogUrl = store.slug ? buildStoreUrl(store.slug) : undefined;
 
   return (
     <div className="flex flex-col gap-4">
@@ -90,9 +86,9 @@ export default function EditProductPage() {
         isSubmitting={update.isPending}
         justPublished={justPublished}
         onSubmit={async (values) => {
-          await update.mutateAsync(values)
+          await update.mutateAsync(values);
         }}
       />
     </div>
-  )
+  );
 }

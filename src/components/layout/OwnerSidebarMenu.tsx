@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { Link, useNavigate } from 'react-router-dom'
-import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
+import { useState } from "react";
+import { createPortal } from "react-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
   HomeIcon,
   PlusSignIcon,
@@ -9,57 +9,77 @@ import {
   StoreLocationIcon,
   Cancel01Icon,
   Menu01Icon,
-} from '@hugeicons/core-free-icons'
-import { ROUTES } from '@/config/routes'
-import { Logo } from '@/components/ui/Logo'
-import { buildStoreUrl } from '@/lib/tenant'
+} from "@hugeicons/core-free-icons";
+import { ROUTES } from "@/config/routes";
+import { Logo } from "@/components/ui/Logo";
+import { buildStoreUrl } from "@/lib/tenant";
 
 type Props = {
-  storeSlug?: string | null
-  triggerClassName?: string
-  triggerLabel?: string
-}
+  storeSlug?: string | null;
+  triggerClassName?: string;
+  triggerLabel?: string;
+};
 
 type MenuItem = {
-  icon: IconSvgElement
-  label: string
-  onClick: () => void
-}
+  icon: IconSvgElement;
+  label: string;
+  onClick: () => void;
+};
 
-export function OwnerSidebarMenu({ storeSlug, triggerClassName, triggerLabel }: Props) {
-  const [open, setOpen] = useState(false)
-  const navigate = useNavigate()
+export function OwnerSidebarMenu({
+  storeSlug,
+  triggerClassName,
+  triggerLabel,
+}: Props) {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   function close() {
-    setOpen(false)
+    setOpen(false);
   }
 
   function go(to: string) {
-    close()
-    navigate(to)
+    close();
+    navigate(to);
   }
 
   function visitStore() {
-    close()
+    close();
     if (storeSlug) {
-      window.location.href = buildStoreUrl(storeSlug)
+      window.location.href = buildStoreUrl(storeSlug);
     } else {
-      navigate(ROUTES.dashboard)
+      navigate(ROUTES.dashboard);
     }
   }
 
   const items: MenuItem[] = [
-    { icon: HomeIcon, label: 'Ir para o dashboard', onClick: () => go(ROUTES.dashboard) },
-    { icon: PlusSignIcon, label: 'Adicionar produto', onClick: () => go(ROUTES.dashboardProducts) },
-    { icon: PaintBrush01Icon, label: 'Personalizar catálogo', onClick: () => go(ROUTES.dashboardCatalog) },
-    { icon: StoreLocationIcon, label: 'Visitar minha loja', onClick: visitStore },
-  ]
+    {
+      icon: HomeIcon,
+      label: "Ir para o dashboard",
+      onClick: () => go(ROUTES.dashboard),
+    },
+    {
+      icon: PlusSignIcon,
+      label: "Adicionar produto",
+      onClick: () => go(ROUTES.dashboardProducts),
+    },
+    {
+      icon: PaintBrush01Icon,
+      label: "Personalizar catálogo",
+      onClick: () => go(ROUTES.dashboardCatalog),
+    },
+    {
+      icon: StoreLocationIcon,
+      label: "Visitar minha loja",
+      onClick: visitStore,
+    },
+  ];
 
   const defaultTriggerClass =
-    'flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-black/5'
+    "flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-black/5";
 
   const drawer =
-    open && typeof document !== 'undefined'
+    open && typeof document !== "undefined"
       ? createPortal(
           <>
             <div
@@ -94,7 +114,11 @@ export function OwnerSidebarMenu({ storeSlug, triggerClassName, triggerLabel }: 
                     onClick={item.onClick}
                     className="flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-z-text transition-colors hover:bg-z-bg2"
                   >
-                    <HugeiconsIcon icon={item.icon} size={18} className="shrink-0 text-z-text-muted" />
+                    <HugeiconsIcon
+                      icon={item.icon}
+                      size={18}
+                      className="shrink-0 text-z-text-muted"
+                    />
                     {item.label}
                   </button>
                 ))}
@@ -106,14 +130,15 @@ export function OwnerSidebarMenu({ storeSlug, triggerClassName, triggerLabel }: 
                   aria-hidden="true"
                 />
                 <p className="relative text-[11px] text-z-text-hint">
-                  Painel do lojista · <span className="font-semibold text-[#10b981]">Zapia</span>
+                  Painel do lojista ·{" "}
+                  <span className="font-semibold text-[#10b981]">Zapia</span>
                 </p>
               </div>
             </div>
           </>,
           document.body,
         )
-      : null
+      : null;
 
   return (
     <>
@@ -129,5 +154,5 @@ export function OwnerSidebarMenu({ storeSlug, triggerClassName, triggerLabel }: 
 
       {drawer}
     </>
-  )
+  );
 }

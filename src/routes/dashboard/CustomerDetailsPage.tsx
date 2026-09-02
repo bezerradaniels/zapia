@@ -1,5 +1,5 @@
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft02Icon,
   Edit02Icon,
@@ -8,42 +8,45 @@ import {
   Location01Icon,
   PackageIcon,
   WhatsappIcon,
-} from '@hugeicons/core-free-icons'
-import { useActiveStore } from '@/lib/tenant'
-import { useCustomer, useCustomerOrders } from '@/features/customers'
-import { ROUTES } from '@/config/routes'
-import { formatDate, formatMoney } from '@/lib/format'
-import { fromE164BR } from '@/lib/br'
-import { Badge, Button, Skeleton } from '@/components/ui'
-import type { Order, OrderItem } from '@/types/domain'
+} from "@hugeicons/core-free-icons";
+import { useActiveStore } from "@/lib/tenant";
+import { useCustomer, useCustomerOrders } from "@/features/customers";
+import { ROUTES } from "@/config/routes";
+import { formatDate, formatMoney } from "@/lib/format";
+import { fromE164BR } from "@/lib/br";
+import { Badge, Button, Skeleton } from "@/components/ui";
+import type { Order, OrderItem } from "@/types/domain";
 
-const STATUS_LABEL: Record<Order['status'], string> = {
-  pending: 'Pendente',
-  confirmed: 'Confirmado',
-  completed: 'Concluído',
-  cancelled: 'Cancelado',
-}
+const STATUS_LABEL: Record<Order["status"], string> = {
+  pending: "Pendente",
+  confirmed: "Confirmado",
+  completed: "Concluído",
+  cancelled: "Cancelado",
+};
 
-const STATUS_TONE: Record<Order['status'], React.ComponentProps<typeof Badge>['tone']> = {
-  pending: 'amber',
-  confirmed: 'lilac',
-  completed: 'green',
-  cancelled: 'rose',
-}
+const STATUS_TONE: Record<
+  Order["status"],
+  React.ComponentProps<typeof Badge>["tone"]
+> = {
+  pending: "amber",
+  confirmed: "lilac",
+  completed: "green",
+  cancelled: "rose",
+};
 
 type ProductSummary = {
-  name: string
-  quantity: number
-  total: number
-}
+  name: string;
+  quantity: number;
+  total: number;
+};
 
 function initials(name: string) {
   return name
-    .split(' ')
+    .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((word) => word[0].toUpperCase())
-    .join('')
+    .join("");
 }
 
 function addressFromOrder(order: Order) {
@@ -53,43 +56,43 @@ function addressFromOrder(order: Order) {
     order.address_complement,
   ]
     .filter(Boolean)
-    .join(', ')
+    .join(", ");
   const city = [
     order.address_neighborhood,
     order.address_city,
     order.address_state,
   ]
     .filter(Boolean)
-    .join(' · ')
-  return [line, city, order.address_cep].filter(Boolean).join('\n')
+    .join(" · ");
+  return [line, city, order.address_cep].filter(Boolean).join("\n");
 }
 
 function summarizeProducts(items: OrderItem[]): ProductSummary[] {
-  const map = new Map<string, ProductSummary>()
+  const map = new Map<string, ProductSummary>();
   for (const item of items) {
     const current = map.get(item.product_name) ?? {
       name: item.product_name,
       quantity: 0,
       total: 0,
-    }
-    current.quantity += item.quantity
-    current.total += item.price_in_cents * item.quantity
-    map.set(item.product_name, current)
+    };
+    current.quantity += item.quantity;
+    current.total += item.price_in_cents * item.quantity;
+    map.set(item.product_name, current);
   }
-  return Array.from(map.values()).sort((a, b) => b.total - a.total)
+  return Array.from(map.values()).sort((a, b) => b.total - a.total);
 }
 
 export default function CustomerDetailsPage() {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
-  const { store, isLoading: storeLoading } = useActiveStore()
-  const customer = useCustomer(id)
-  const orders = useCustomerOrders(customer.data ?? undefined)
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { store, isLoading: storeLoading } = useActiveStore();
+  const customer = useCustomer(id);
+  const orders = useCustomerOrders(customer.data ?? undefined);
 
   if (storeLoading || customer.isLoading) {
-    return <p className="text-sm text-z-text-muted">Carregando...</p>
+    return <p className="text-sm text-z-text-muted">Carregando...</p>;
   }
-  if (!store) return <Navigate to={ROUTES.onboarding} replace />
+  if (!store) return <Navigate to={ROUTES.onboarding} replace />;
   if (!customer.data) {
     return (
       <div className="flex flex-col gap-3">
@@ -101,19 +104,27 @@ export default function CustomerDetailsPage() {
           Voltar
         </Link>
       </div>
-    )
+    );
   }
 
-  const waHref = `https://wa.me/${customer.data.whatsapp_phone.replace('+', '')}`
-  const orderList = orders.data ?? []
-  const billableOrders = orderList.filter((order) => order.status !== 'cancelled')
-  const totalSpent = billableOrders.reduce((sum, order) => sum + order.total_in_cents, 0)
-  const averageTicket = billableOrders.length > 0 ? Math.round(totalSpent / billableOrders.length) : 0
-  const allItems = orderList.flatMap((order) => order.items)
-  const products = summarizeProducts(allItems)
+  const waHref = `https://wa.me/${customer.data.whatsapp_phone.replace("+", "")}`;
+  const orderList = orders.data ?? [];
+  const billableOrders = orderList.filter(
+    (order) => order.status !== "cancelled",
+  );
+  const totalSpent = billableOrders.reduce(
+    (sum, order) => sum + order.total_in_cents,
+    0,
+  );
+  const averageTicket =
+    billableOrders.length > 0
+      ? Math.round(totalSpent / billableOrders.length)
+      : 0;
+  const allItems = orderList.flatMap((order) => order.items);
+  const products = summarizeProducts(allItems);
   const addresses = Array.from(
     new Set(orderList.map(addressFromOrder).filter(Boolean)),
-  )
+  );
 
   return (
     <div className="flex w-full min-w-0 max-w-full flex-col gap-5 overflow-x-hidden">
@@ -138,7 +149,10 @@ export default function CustomerDetailsPage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => customer.data && navigate(`${ROUTES.dashboardCustomers}/${customer.data.id}/editar`)}
+          onClick={() =>
+            customer.data &&
+            navigate(`${ROUTES.dashboardCustomers}/${customer.data.id}/editar`)
+          }
         >
           <HugeiconsIcon icon={Edit02Icon} size={15} />
           Editar
@@ -188,16 +202,27 @@ export default function CustomerDetailsPage() {
         <StatCard label="Ticket médio" value={formatMoney(averageTicket)} />
         <StatCard
           label="Última compra"
-          value={billableOrders[0] ? formatDate(billableOrders[0].created_at) : 'Nenhuma'}
+          value={
+            billableOrders[0]
+              ? formatDate(billableOrders[0].created_at)
+              : "Nenhuma"
+          }
         />
       </section>
 
       <div className="grid w-full min-w-0 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <InfoPanel title="Contatos" icon={Mail01Icon}>
-          <InfoLine label="WhatsApp" value={fromE164BR(customer.data.whatsapp_phone)} />
+          <InfoLine
+            label="WhatsApp"
+            value={fromE164BR(customer.data.whatsapp_phone)}
+          />
           <InfoLine
             label="Telefone secundário"
-            value={customer.data.secondary_phone ? fromE164BR(customer.data.secondary_phone) : null}
+            value={
+              customer.data.secondary_phone
+                ? fromE164BR(customer.data.secondary_phone)
+                : null
+            }
           />
           <InfoLine label="E-mail" value={customer.data.email} />
           {customer.data.social_links.map((link) => (
@@ -210,7 +235,9 @@ export default function CustomerDetailsPage() {
           {!customer.data.secondary_phone &&
             !customer.data.email &&
             customer.data.social_links.length === 0 && (
-              <p className="text-sm text-z-text-muted">Apenas WhatsApp cadastrado.</p>
+              <p className="text-sm text-z-text-muted">
+                Apenas WhatsApp cadastrado.
+              </p>
             )}
         </InfoPanel>
 
@@ -227,7 +254,9 @@ export default function CustomerDetailsPage() {
               </p>
             ))
           ) : (
-            <p className="text-sm text-z-text-muted">Nenhum endereço encontrado em pedidos.</p>
+            <p className="text-sm text-z-text-muted">
+              Nenhum endereço encontrado em pedidos.
+            </p>
           )}
         </InfoPanel>
       </div>
@@ -243,8 +272,12 @@ export default function CustomerDetailsPage() {
                 className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-z-border bg-white px-3 py-2"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-z-text">{product.name}</p>
-                  <p className="text-xs text-z-text-muted">{product.quantity} unidade(s)</p>
+                  <p className="truncate text-sm font-semibold text-z-text">
+                    {product.name}
+                  </p>
+                  <p className="text-xs text-z-text-muted">
+                    {product.quantity} unidade(s)
+                  </p>
                 </div>
                 <span className="shrink-0 whitespace-nowrap text-sm font-bold text-[#0bfeda]">
                   {formatMoney(product.total)}
@@ -252,7 +285,9 @@ export default function CustomerDetailsPage() {
               </div>
             ))
           ) : (
-            <p className="text-sm text-z-text-muted">Nenhum produto comprado ainda.</p>
+            <p className="text-sm text-z-text-muted">
+              Nenhum produto comprado ainda.
+            </p>
           )}
         </InfoPanel>
 
@@ -273,16 +308,24 @@ export default function CustomerDetailsPage() {
                   <p className="text-sm font-semibold text-z-text">
                     Pedido #{order.order_number}
                   </p>
-                  <p className="text-xs text-z-text-muted">{formatDate(order.created_at)}</p>
+                  <p className="text-xs text-z-text-muted">
+                    {formatDate(order.created_at)}
+                  </p>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
-                  <span className="text-sm font-bold">{formatMoney(order.total_in_cents)}</span>
-                  <Badge tone={STATUS_TONE[order.status]}>{STATUS_LABEL[order.status]}</Badge>
+                  <span className="text-sm font-bold">
+                    {formatMoney(order.total_in_cents)}
+                  </span>
+                  <Badge tone={STATUS_TONE[order.status]}>
+                    {STATUS_LABEL[order.status]}
+                  </Badge>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-sm text-z-text-muted">Nenhum pedido encontrado.</p>
+            <p className="text-sm text-z-text-muted">
+              Nenhum pedido encontrado.
+            </p>
           )}
         </InfoPanel>
       </div>
@@ -295,16 +338,18 @@ export default function CustomerDetailsPage() {
         </InfoPanel>
       )}
     </div>
-  )
+  );
 }
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 rounded-2xl border border-z-border bg-white p-4">
       <p className="text-xs font-semibold text-z-text-muted">{label}</p>
-      <p className="mt-2 break-words text-xl font-extrabold tracking-tight text-z-text">{value}</p>
+      <p className="mt-2 break-words text-xl font-extrabold tracking-tight text-z-text">
+        {value}
+      </p>
     </div>
-  )
+  );
 }
 
 function InfoPanel({
@@ -312,9 +357,9 @@ function InfoPanel({
   icon,
   children,
 }: {
-  title: string
-  icon: Parameters<typeof HugeiconsIcon>[0]['icon']
-  children: React.ReactNode
+  title: string;
+  icon: Parameters<typeof HugeiconsIcon>[0]["icon"];
+  children: React.ReactNode;
 }) {
   return (
     <section className="w-full min-w-0 overflow-hidden rounded-2xl border border-z-border bg-white p-5">
@@ -324,15 +369,23 @@ function InfoPanel({
       </div>
       <div className="flex min-w-0 flex-col gap-2">{children}</div>
     </section>
-  )
+  );
 }
 
-function InfoLine({ label, value }: { label: string; value: string | null | undefined }) {
-  if (!value) return null
+function InfoLine({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | null | undefined;
+}) {
+  if (!value) return null;
   return (
     <div className="flex min-w-0 flex-col gap-1 rounded-xl bg-z-bg px-3 py-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
       <span className="text-xs font-semibold text-z-text-muted">{label}</span>
-      <span className="min-w-0 break-words text-sm font-medium text-z-text sm:text-right">{value}</span>
+      <span className="min-w-0 break-words text-sm font-medium text-z-text sm:text-right">
+        {value}
+      </span>
     </div>
-  )
+  );
 }

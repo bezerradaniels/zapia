@@ -25,6 +25,7 @@ or compliance features without explicit discussion — international
 expansion is a post-MVP concern.
 
 **Primary users:**
+
 - **Store owner (lojista / owner):** creates and manages the catalog.
 - **Seller (vendedor):** scoped user tied to a store, handles assigned orders.
 - **End customer:** browses the catalog, adds to cart, checks out without
@@ -34,6 +35,7 @@ expansion is a post-MVP concern.
 (e.g. `danibezerra.zapia.app`), resolved client-side via wildcard DNS.
 
 **Regional defaults:**
+
 - Locale: `pt-BR` (single locale at launch).
 - Currency: `BRL` (R$), formatted via `Intl.NumberFormat('pt-BR', { currency: 'BRL' })`.
 - Timezone: `America/Sao_Paulo` for all user-facing dates.
@@ -45,24 +47,24 @@ expansion is a post-MVP concern.
 
 ## 2. Tech Stack
 
-| Layer          | Choice                                         |
-| -------------- | ---------------------------------------------- |
-| Framework      | Vite 5 + React 19 (SPA, **static build**)      |
-| Language       | TypeScript (strict mode)                       |
-| Routing        | React Router DOM v6                            |
-| UI kit         | Tailwind CSS + shadcn/ui                       |
-| State          | React Query (server state) + Zustand (UI state)|
-| Forms          | React Hook Form + Zod                          |
-| i18n           | i18next + react-i18next (pt-BR only at launch; structure ready for future locales) |
-| Backend/DB     | Supabase (Postgres, Auth, Storage, Realtime)   |
-| AI             | Google Gemini, called from Supabase Edge Fns   |
-| Billing        | Stripe (Subscriptions + Customer Portal)       |
-| Invoicing      | NFE.io (or Enotas) for automatic NFSe          |
-| Hosting        | Hostinger shared hosting (static artifact)     |
-| CI/CD          | GitHub Actions (build + FTP/SSH deploy)        |
-| Package mgr    | npm                                            |
-| Tests          | Vitest + Testing Library + Playwright (E2E)    |
-| Lint/format    | ESLint + Prettier                              |
+| Layer       | Choice                                                                             |
+| ----------- | ---------------------------------------------------------------------------------- |
+| Framework   | Vite 5 + React 19 (SPA, **static build**)                                          |
+| Language    | TypeScript (strict mode)                                                           |
+| Routing     | React Router DOM v6                                                                |
+| UI kit      | Tailwind CSS + shadcn/ui                                                           |
+| State       | React Query (server state) + Zustand (UI state)                                    |
+| Forms       | React Hook Form + Zod                                                              |
+| i18n        | i18next + react-i18next (pt-BR only at launch; structure ready for future locales) |
+| Backend/DB  | Supabase (Postgres, Auth, Storage, Realtime)                                       |
+| AI          | Google Gemini, called from Supabase Edge Fns                                       |
+| Billing     | Stripe (Subscriptions + Customer Portal)                                           |
+| Invoicing   | NFE.io (or Enotas) for automatic NFSe                                              |
+| Hosting     | Hostinger shared hosting (static artifact)                                         |
+| CI/CD       | GitHub Actions (build + FTP/SSH deploy)                                            |
+| Package mgr | npm                                                                                |
+| Tests       | Vitest + Testing Library + Playwright (E2E)                                        |
+| Lint/format | ESLint + Prettier                                                                  |
 
 **No custom backend server.** The client talks to Supabase directly using
 Row-Level Security (RLS). Only privileged operations (AI calls, any
@@ -254,21 +256,21 @@ explicit and refactorable.
 
 ## 5. Naming Conventions
 
-| Kind                         | Convention                | Example                                |
-| ---------------------------- | ------------------------- | -------------------------------------- |
-| Folders                      | `kebab-case`              | `product-form/`                        |
-| React components (files)     | `PascalCase.tsx`          | `ProductCard.tsx`                      |
-| React components (names)     | `PascalCase`              | `export function ProductCard()`        |
-| Hooks                        | `useCamelCase.ts`         | `useProducts.ts`                       |
-| Non-component TS files       | `camelCase.ts`            | `formatMoney.ts`                       |
-| Types / interfaces           | `PascalCase`              | `Order`, `OrderStatus`                 |
-| Constants                    | `SCREAMING_SNAKE_CASE`    | `MAX_PRODUCT_IMAGES`                   |
-| Zustand stores               | `useXStore`               | `useCartStore`                         |
-| React Query keys             | Factory                   | `productsKeys.list(storeId)`           |
-| Database tables              | `snake_case`, plural      | `products`, `order_items`              |
-| Database columns             | `snake_case`              | `created_at`, `store_id`               |
-| Edge functions               | `kebab-case`              | `ai-description/`                      |
-| Env vars                     | `SCREAMING_SNAKE_CASE`    | `VITE_SUPABASE_URL`                    |
+| Kind                     | Convention             | Example                         |
+| ------------------------ | ---------------------- | ------------------------------- |
+| Folders                  | `kebab-case`           | `product-form/`                 |
+| React components (files) | `PascalCase.tsx`       | `ProductCard.tsx`               |
+| React components (names) | `PascalCase`           | `export function ProductCard()` |
+| Hooks                    | `useCamelCase.ts`      | `useProducts.ts`                |
+| Non-component TS files   | `camelCase.ts`         | `formatMoney.ts`                |
+| Types / interfaces       | `PascalCase`           | `Order`, `OrderStatus`          |
+| Constants                | `SCREAMING_SNAKE_CASE` | `MAX_PRODUCT_IMAGES`            |
+| Zustand stores           | `useXStore`            | `useCartStore`                  |
+| React Query keys         | Factory                | `productsKeys.list(storeId)`    |
+| Database tables          | `snake_case`, plural   | `products`, `order_items`       |
+| Database columns         | `snake_case`           | `created_at`, `store_id`        |
+| Edge functions           | `kebab-case`           | `ai-description/`               |
+| Env vars                 | `SCREAMING_SNAKE_CASE` | `VITE_SUPABASE_URL`             |
 
 **Booleans** should start with `is`, `has`, `can`, or `should`
 (`isLoading`, `hasVariants`, `canEdit`).
@@ -366,6 +368,7 @@ at the top of each SQL file explaining the intent.
 Location: `supabase/functions/<name>/index.ts`.
 
 Current functions:
+
 - `ai-description` — generate product description via Gemini.
 - `ai-slogan` — improve store slogan.
 - `ai-customer-profile` — summarize a customer profile.
@@ -490,6 +493,7 @@ our table stores a copy for display and feature checks).
 ### 13.3 Payment Methods
 
 Accepted via Stripe Checkout:
+
 - Credit card (recurring; primary method).
 - PIX (one-off charge per cycle; recurring PIX is limited — the owner is
   reminded by email at each renewal).
@@ -663,6 +667,7 @@ npm run db:types    # regenerate src/types/database.ts
 Run `npm run lint && npm run typecheck && npm test` before every commit.
 
 **Install rules:**
+
 - Use `npm install <pkg>` for runtime deps, `npm install -D <pkg>` for dev deps.
 - Commit `package-lock.json` on every dependency change.
 - Never mix package managers — no `yarn.lock` or `pnpm-lock.yaml` in this repo.
@@ -702,7 +707,7 @@ Aim for confidence, not coverage %. Don't test implementation details.
   (standard Vite output).
 - **CI (GitHub Actions):** on push to `main`, run
   `lint → typecheck → test → build` and upload `dist/` via SSH/FTP to
-  Hostinger (public_html). 
+  Hostinger (public_html).
 - **SPA routing on Hostinger:** a `.htaccess` file at the root must rewrite
   all unknown paths to `/index.html` so React Router handles them:
   ```apache
@@ -725,6 +730,7 @@ Aim for confidence, not coverage %. Don't test implementation details.
 with Brazilian end customers.
 
 Shipped in MVP:
+
 - Public catalog with products, cart, checkout, order confirmation — in
   Portuguese (pt-BR), BRL, `America/Sao_Paulo`.
 - Dashboard: orders, products, customers, sellers, catalog personalization,
@@ -742,15 +748,16 @@ Shipped in MVP:
 - Real-time notifications (new order, low stock, support messages).
 - Own analytics (stored in Supabase).
 - Coupons — two independent systems:
-    - **Store coupons**: applied by the end customer at checkout (per
-      product/category/customer).
-    - **Subscription coupons**: applied by the store owner at Stripe
-      Checkout (managed via Stripe Coupons).
+  - **Store coupons**: applied by the end customer at checkout (per
+    product/category/customer).
+  - **Subscription coupons**: applied by the store owner at Stripe
+    Checkout (managed via Stripe Coupons).
 - LGPD compliance (privacy page in pt-BR, cookie consent, data export/delete,
   DPO contact).
 - PDF catalog export; QR code sharing.
 
 Explicitly **out** of MVP (do not add without discussion):
+
 - **International expansion of any kind** — no other locales (en/es/etc.),
   no other currencies, no non-Brazilian tax IDs, no non-Brazilian payment
   methods, no non-Brazilian address schemas. Post-MVP concern.
@@ -772,6 +779,7 @@ Explicitly **out** of MVP (do not add without discussion):
 ## 20. Do / Don't for Claude Code
 
 **Do**
+
 - Keep `src/routes/**` pages thin: read params, call a hook, render.
 - Put business logic in `features/<x>/api/` and `features/<x>/hooks/`.
 - When in doubt, follow the structure of the nearest existing feature.
@@ -787,6 +795,7 @@ Explicitly **out** of MVP (do not add without discussion):
 - Use `import.meta.env.VITE_*` for public env vars; never reference `process.env` (this is Vite, not Node).
 
 **Don't**
+
 - Don't import from `@/features/a/internals` from outside feature `a`.
   Go through `features/a/index.ts`.
 - Don't bypass RLS with the service role key from the browser — ever.
@@ -824,10 +833,11 @@ Explicitly **out** of MVP (do not add without discussion):
 13. Update this file if conventions change.
 
 **If the feature is paid or plan-gated:**
+
 - Add the capability to `plan_features` and read it through `usePlanLimits`.
 - Never inline plan-name checks in components — always go through the hook.
 - If it charges money, route it through Stripe Checkout + the `stripe-webhook` Edge Function.
 
 ---
 
-_Last updated: 2026-06-15 — Rebrand from **Zapable** (zapable.com.br) to **Zapia** (zapia.app). Admin email: manager@zapia.app. React bumped to **19** (estável, adotado pelo ecossistema, traz Actions/`useActionState`/`use()`/ref-as-prop). Stack migrated from Next.js 14+ to **Vite 5 + React 19** (SPA, `dist/` output, React Router DOM v6, i18next, `VITE_` env prefix)._
+_Last updated: 2026-06-15 — Rebrand from **Zapable** (zapable.com.br) to **Zapia** (zapia.app). Admin email: manager@zapia.app. React bumped to **19** (estável, adotado pelo ecossistema, traz Actions/`useActionState`/`use()`/ref-as-prop). Stack migrated from Next.js 14+ to **Vite 5 + React 19** (SPA, `dist/` output, React Router DOM v6, i18next, `VITE_` env prefix).\_

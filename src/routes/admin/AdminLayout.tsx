@@ -1,39 +1,39 @@
-import { Suspense } from 'react'
-import { Link, NavLink, Navigate, Outlet, useNavigate } from 'react-router-dom'
-import { Toaster } from 'sonner'
-import { useSession } from '@/features/auth'
-import { createBrowserClient } from '@/lib/supabase'
-import { ROUTES } from '@/config/routes'
-import { isAdminEmail, PRIMARY_ADMIN_EMAIL } from '@/config/admin'
+import { Suspense } from "react";
+import { Link, NavLink, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { useSession } from "@/features/auth";
+import { createBrowserClient } from "@/lib/supabase";
+import { ROUTES } from "@/config/routes";
+import { isAdminEmail, PRIMARY_ADMIN_EMAIL } from "@/config/admin";
 
 const navItems = [
-  { to: ROUTES.admin, label: 'Visão Geral', end: true },
-  { to: ROUTES.adminStores, label: 'Lojas' },
-]
+  { to: ROUTES.admin, label: "Visão Geral", end: true },
+  { to: ROUTES.adminStores, label: "Lojas" },
+];
 
 export default function AdminLayout() {
-  const { session, isLoading } = useSession()
-  const navigate = useNavigate()
+  const { session, isLoading } = useSession();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50 text-sm text-gray-500">
         Carregando...
       </div>
-    )
+    );
   }
 
   if (!session) {
-    return <Navigate to={ROUTES.login} replace />
+    return <Navigate to={ROUTES.login} replace />;
   }
 
   if (!isAdminEmail(session.user.email)) {
-    return <Navigate to={ROUTES.dashboard} replace />
+    return <Navigate to={ROUTES.dashboard} replace />;
   }
 
   async function handleSignOut() {
-    await createBrowserClient().auth.signOut()
-    navigate(ROUTES.login)
+    await createBrowserClient().auth.signOut();
+    navigate(ROUTES.login);
   }
 
   return (
@@ -59,8 +59,8 @@ export default function AdminLayout() {
               className={({ isActive }) =>
                 `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 }`
               }
             >
@@ -101,5 +101,5 @@ export default function AdminLayout() {
 
       <Toaster position="top-right" richColors closeButton />
     </div>
-  )
+  );
 }

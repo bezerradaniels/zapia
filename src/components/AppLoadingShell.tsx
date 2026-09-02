@@ -9,7 +9,9 @@ export function AppLoadingShell() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-z-bg">
       <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-z-border border-t-z-green" />
-      <span className="text-sm font-medium text-z-text-muted">Carregando...</span>
+      <span className="text-sm font-medium text-z-text-muted">
+        Carregando...
+      </span>
     </div>
-  )
+  );
 }

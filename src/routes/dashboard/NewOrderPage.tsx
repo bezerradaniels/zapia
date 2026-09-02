@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft02Icon,
   UserGroupIcon,
@@ -10,78 +10,82 @@ import {
   PlusSignIcon,
   Delete02Icon,
   MinusSignIcon,
-} from '@hugeicons/core-free-icons'
-import { useActiveStore } from '@/lib/tenant'
-import { useCustomers } from '@/features/customers'
-import { useSellerCatalogs } from '@/features/sellers'
-import { useProducts } from '@/features/products'
-import { useCreateManualOrder } from '@/features/orders'
-import { usePlanLimits } from '@/features/billing'
-import { ProductPickerModal } from '@/features/orders/components/ProductPickerModal'
-import type { PickedItem } from '@/features/orders/components/ProductPickerModal'
-import { formatMoney } from '@/lib/format'
-import { fromE164BR } from '@/lib/br'
-import { effectivePrice } from '@/features/products/utils/price'
-import { cn } from '@/lib/utils'
-import { ROUTES } from '@/config/routes'
+} from "@hugeicons/core-free-icons";
+import { useActiveStore } from "@/lib/tenant";
+import { useCustomers } from "@/features/customers";
+import { useSellerCatalogs } from "@/features/sellers";
+import { useProducts } from "@/features/products";
+import { useCreateManualOrder } from "@/features/orders";
+import { usePlanLimits } from "@/features/billing";
+import { ProductPickerModal } from "@/features/orders/components/ProductPickerModal";
+import type { PickedItem } from "@/features/orders/components/ProductPickerModal";
+import { formatMoney } from "@/lib/format";
+import { fromE164BR } from "@/lib/br";
+import { effectivePrice } from "@/features/products/utils/price";
+import { cn } from "@/lib/utils";
+import { ROUTES } from "@/config/routes";
 
-type CustomerType = 'registered' | 'new'
+type CustomerType = "registered" | "new";
 
 function avatarInitials(name: string): string {
   return name
-    .split(' ')
+    .split(" ")
     .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? '')
-    .join('')
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
 }
 
 const AVATAR_COLORS = [
-  'bg-emerald-100 text-emerald-700',
-  'bg-sky-100 text-sky-700',
-  'bg-violet-100 text-violet-700',
-  'bg-amber-100 text-amber-700',
-  'bg-rose-100 text-rose-700',
-  'bg-teal-100 text-teal-700',
-]
+  "bg-emerald-100 text-emerald-700",
+  "bg-sky-100 text-sky-700",
+  "bg-violet-100 text-violet-700",
+  "bg-amber-100 text-amber-700",
+  "bg-rose-100 text-rose-700",
+  "bg-teal-100 text-teal-700",
+];
 
 function avatarColor(name: string): string {
-  const code = name.charCodeAt(0) + (name.charCodeAt(1) ?? 0)
-  return AVATAR_COLORS[code % AVATAR_COLORS.length]
+  const code = name.charCodeAt(0) + (name.charCodeAt(1) ?? 0);
+  return AVATAR_COLORS[code % AVATAR_COLORS.length];
 }
 
 export default function NewOrderPage() {
-  const navigate = useNavigate()
-  const { store, isLoading } = useActiveStore()
+  const navigate = useNavigate();
+  const { store, isLoading } = useActiveStore();
 
-  const customers = useCustomers(store?.id)
-  const sellerCatalogs = useSellerCatalogs(store?.id)
-  const products = useProducts(store?.id)
-  const limits = usePlanLimits(store?.id)
-  const create = useCreateManualOrder(store?.id ?? '')
+  const customers = useCustomers(store?.id);
+  const sellerCatalogs = useSellerCatalogs(store?.id);
+  const products = useProducts(store?.id);
+  const limits = usePlanLimits(store?.id);
+  const create = useCreateManualOrder(store?.id ?? "");
 
-  const [customerType, setCustomerType] = useState<CustomerType>('registered')
-  const [selectedPhone, setSelectedPhone] = useState('')
-  const [newName, setNewName] = useState('')
-  const [newPhone, setNewPhone] = useState('')
-  const [selectedSellerId, setSelectedSellerId] = useState('')
-  const [orderItems, setOrderItems] = useState<PickedItem[]>([])
-  const [pickerOpen, setPickerOpen] = useState(false)
-  const [customerDropdownOpen, setCustomerDropdownOpen] = useState(false)
+  const [customerType, setCustomerType] = useState<CustomerType>("registered");
+  const [selectedPhone, setSelectedPhone] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [selectedSellerId, setSelectedSellerId] = useState("");
+  const [orderItems, setOrderItems] = useState<PickedItem[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [customerDropdownOpen, setCustomerDropdownOpen] = useState(false);
 
-  if (isLoading) return <p className="text-sm text-z-text-muted">Carregando...</p>
-  if (!store) return <Navigate to={ROUTES.onboarding} replace />
+  if (isLoading)
+    return <p className="text-sm text-z-text-muted">Carregando...</p>;
+  if (!store) return <Navigate to={ROUTES.onboarding} replace />;
 
-  const customerList = customers.data ?? []
-  const sellerList = (sellerCatalogs.data ?? []).filter((s) => s.linked_user_id)
-  const productList = (products.data ?? []).filter((p) => p.is_active)
+  const customerList = customers.data ?? [];
+  const sellerList = (sellerCatalogs.data ?? []).filter(
+    (s) => s.linked_user_id,
+  );
+  const productList = (products.data ?? []).filter((p) => p.is_active);
 
-  const selectedCustomer = customerList.find((c) => c.whatsapp_phone === selectedPhone) ?? null
-  const canAssignSeller = limits.sellerLimit !== 1 // Pro/Premium allow multiple sellers
+  const selectedCustomer =
+    customerList.find((c) => c.whatsapp_phone === selectedPhone) ?? null;
+  const canAssignSeller = limits.sellerLimit !== 1; // Pro/Premium allow multiple sellers
 
   const total = orderItems.reduce(
     (sum, i) => sum + effectivePrice(i.product) * i.quantity,
     0,
-  )
+  );
 
   const updateQty = (productId: string, delta: number) => {
     setOrderItems((prev) =>
@@ -92,32 +96,34 @@ export default function NewOrderPage() {
             : i,
         )
         .filter((i) => i.quantity > 0),
-    )
-  }
+    );
+  };
 
   const removeItem = (productId: string) =>
-    setOrderItems((prev) => prev.filter((i) => i.product.id !== productId))
+    setOrderItems((prev) => prev.filter((i) => i.product.id !== productId));
 
   const handleSubmit = async () => {
     const customerName =
-      customerType === 'registered'
-        ? (selectedCustomer?.name ?? '')
-        : newName.trim()
+      customerType === "registered"
+        ? (selectedCustomer?.name ?? "")
+        : newName.trim();
 
     const customerPhone =
-      customerType === 'registered' ? (selectedCustomer?.whatsapp_phone ?? '') : newPhone.trim()
+      customerType === "registered"
+        ? (selectedCustomer?.whatsapp_phone ?? "")
+        : newPhone.trim();
 
     if (!customerName) {
-      toast.error('Informe o nome do cliente.')
-      return
+      toast.error("Informe o nome do cliente.");
+      return;
     }
     if (!customerPhone) {
-      toast.error('Informe o telefone/WhatsApp do cliente.')
-      return
+      toast.error("Informe o telefone/WhatsApp do cliente.");
+      return;
     }
     if (orderItems.length === 0) {
-      toast.error('Adicione pelo menos um produto ao pedido.')
-      return
+      toast.error("Adicione pelo menos um produto ao pedido.");
+      return;
     }
 
     try {
@@ -132,13 +138,13 @@ export default function NewOrderPage() {
           priceInCents: effectivePrice(i.product),
           quantity: i.quantity,
         })),
-      })
-      toast.success('Pedido criado com sucesso!')
-      navigate(ROUTES.dashboardOrders)
+      });
+      toast.success("Pedido criado com sucesso!");
+      navigate(ROUTES.dashboardOrders);
     } catch {
-      toast.error('Erro ao criar o pedido. Tente novamente.')
+      toast.error("Erro ao criar o pedido. Tente novamente.");
     }
-  }
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -167,20 +173,27 @@ export default function NewOrderPage() {
           {/* ─── Cliente do pedido ─── */}
           <section className="px-6 py-6">
             <div className="mb-4 flex items-center gap-2">
-              <HugeiconsIcon icon={UserGroupIcon} size={18} className="text-z-text-muted" />
+              <HugeiconsIcon
+                icon={UserGroupIcon}
+                size={18}
+                className="text-z-text-muted"
+              />
               <h2 className="font-semibold text-z-text">Cliente do pedido</h2>
             </div>
 
             {/* Radio */}
             <div className="mb-4 flex gap-4">
-              {(['registered', 'new'] as const).map((type) => (
-                <label key={type} className="flex cursor-pointer items-center gap-2 text-sm">
+              {(["registered", "new"] as const).map((type) => (
+                <label
+                  key={type}
+                  className="flex cursor-pointer items-center gap-2 text-sm"
+                >
                   <span
                     className={cn(
-                      'flex h-4 w-4 items-center justify-center rounded-full border-2 transition-colors',
+                      "flex h-4 w-4 items-center justify-center rounded-full border-2 transition-colors",
                       customerType === type
-                        ? 'border-z-green bg-z-green'
-                        : 'border-z-border',
+                        ? "border-z-green bg-z-green"
+                        : "border-z-border",
                     )}
                   >
                     {customerType === type && (
@@ -192,13 +205,15 @@ export default function NewOrderPage() {
                     onClick={() => setCustomerType(type)}
                     className="font-medium text-z-text"
                   >
-                    {type === 'registered' ? 'Cliente cadastrado' : 'Novo cliente'}
+                    {type === "registered"
+                      ? "Cliente cadastrado"
+                      : "Novo cliente"}
                   </button>
                 </label>
               ))}
             </div>
 
-            {customerType === 'registered' ? (
+            {customerType === "registered" ? (
               <div className="max-w-xs">
                 <label className="mb-1.5 block text-xs font-semibold text-z-text-hint">
                   Selecione ou busque o cliente
@@ -208,29 +223,31 @@ export default function NewOrderPage() {
                     type="button"
                     onClick={() => setCustomerDropdownOpen((v) => !v)}
                     className={cn(
-                      'flex h-11 w-full items-center justify-between rounded-lg border px-3.5 text-sm transition-colors',
+                      "flex h-11 w-full items-center justify-between rounded-lg border px-3.5 text-sm transition-colors",
                       customerDropdownOpen
-                        ? 'border-z-green ring-2 ring-z-green/20'
-                        : 'border-z-border',
+                        ? "border-z-green ring-2 ring-z-green/20"
+                        : "border-z-border",
                     )}
                   >
                     {selectedCustomer ? (
                       <span className="flex items-center gap-2">
                         <span
                           className={cn(
-                            'flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold',
+                            "flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold",
                             avatarColor(selectedCustomer.name),
                           )}
                         >
                           {avatarInitials(selectedCustomer.name)}
                         </span>
                         <span className="text-z-text">
-                          {selectedCustomer.name} –{' '}
+                          {selectedCustomer.name} –{" "}
                           {fromE164BR(selectedCustomer.whatsapp_phone)}
                         </span>
                       </span>
                     ) : (
-                      <span className="text-z-text-hint">Clientes registrados</span>
+                      <span className="text-z-text-hint">
+                        Clientes registrados
+                      </span>
                     )}
                     <span className="text-rose-500">▾</span>
                   </button>
@@ -250,21 +267,21 @@ export default function NewOrderPage() {
                             key={c.whatsapp_phone}
                             type="button"
                             onClick={() => {
-                              setSelectedPhone(c.whatsapp_phone)
-                              setCustomerDropdownOpen(false)
+                              setSelectedPhone(c.whatsapp_phone);
+                              setCustomerDropdownOpen(false);
                             }}
                             className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm transition-colors hover:bg-z-bg2"
                           >
                             <span
                               className={cn(
-                                'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold',
+                                "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
                                 avatarColor(c.name),
                               )}
                             >
                               {avatarInitials(c.name)}
                             </span>
                             <span className="text-z-text">
-                              {c.name}{' '}
+                              {c.name}{" "}
                               <span className="text-z-text-muted">
                                 – {fromE164BR(c.whatsapp_phone)}
                               </span>
@@ -319,7 +336,11 @@ export default function NewOrderPage() {
           {/* ─── Vendedor ─── */}
           <section className="px-6 py-6">
             <div className="mb-4 flex items-center gap-2">
-              <HugeiconsIcon icon={UserCircleIcon} size={18} className="text-z-text-muted" />
+              <HugeiconsIcon
+                icon={UserCircleIcon}
+                size={18}
+                className="text-z-text-muted"
+              />
               <h2 className="font-semibold text-z-text">Vendedor</h2>
               {!canAssignSeller && (
                 <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
@@ -362,7 +383,9 @@ export default function NewOrderPage() {
                   size={18}
                   className="text-z-text-muted"
                 />
-                <h2 className="font-semibold text-z-text">Produtos do pedido</h2>
+                <h2 className="font-semibold text-z-text">
+                  Produtos do pedido
+                </h2>
               </div>
               {orderItems.length > 0 && (
                 <button
@@ -388,11 +411,37 @@ export default function NewOrderPage() {
                     className="h-10 w-10"
                     fill="none"
                   >
-                    <rect x="8" y="12" width="36" height="44" rx="4" fill="#fee2e2" />
-                    <rect x="14" y="20" width="24" height="4" rx="2" fill="#fca5a5" />
-                    <rect x="14" y="30" width="20" height="4" rx="2" fill="#fca5a5" />
+                    <rect
+                      x="8"
+                      y="12"
+                      width="36"
+                      height="44"
+                      rx="4"
+                      fill="#fee2e2"
+                    />
+                    <rect
+                      x="14"
+                      y="20"
+                      width="24"
+                      height="4"
+                      rx="2"
+                      fill="#fca5a5"
+                    />
+                    <rect
+                      x="14"
+                      y="30"
+                      width="20"
+                      height="4"
+                      rx="2"
+                      fill="#fca5a5"
+                    />
                     <circle cx="48" cy="48" r="12" fill="#f87171" />
-                    <path d="M44 48h8M48 44v8" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+                    <path
+                      d="M44 48h8M48 44v8"
+                      stroke="white"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    />
                   </svg>
                 </div>
                 <div>
@@ -400,8 +449,8 @@ export default function NewOrderPage() {
                     Ainda não há produtos neste pedido
                   </p>
                   <p className="mt-1 max-w-xs text-sm text-z-text-muted">
-                    Clique no botão "Adicionar produtos" abaixo para incluir produtos ao
-                    pedido
+                    Clique no botão "Adicionar produtos" abaixo para incluir
+                    produtos ao pedido
                   </p>
                 </div>
                 <button
@@ -417,8 +466,8 @@ export default function NewOrderPage() {
               <div className="overflow-hidden rounded-xl border border-z-border">
                 <ul className="divide-y divide-z-border">
                   {orderItems.map((item) => {
-                    const price = effectivePrice(item.product)
-                    const cover = item.product.images[0]
+                    const price = effectivePrice(item.product);
+                    const cover = item.product.images[0];
                     return (
                       <li
                         key={item.product.id}
@@ -442,8 +491,10 @@ export default function NewOrderPage() {
                             {item.product.name}
                           </p>
                           <p className="text-xs text-z-text-muted">
-                            {formatMoney(price)} × {item.quantity} ={' '}
-                            <strong>{formatMoney(price * item.quantity)}</strong>
+                            {formatMoney(price)} × {item.quantity} ={" "}
+                            <strong>
+                              {formatMoney(price * item.quantity)}
+                            </strong>
                           </p>
                         </div>
                         <div className="flex items-center gap-1">
@@ -473,7 +524,7 @@ export default function NewOrderPage() {
                           </button>
                         </div>
                       </li>
-                    )
+                    );
                   })}
                 </ul>
 
@@ -500,7 +551,7 @@ export default function NewOrderPage() {
           onClick={handleSubmit}
           className="rounded-full bg-z-green px-8 py-2.5 text-sm font-semibold text-z-ink transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          {create.isPending ? 'Criando...' : 'Criar novo pedido'}
+          {create.isPending ? "Criando..." : "Criar novo pedido"}
         </button>
       </div>
 
@@ -513,5 +564,5 @@ export default function NewOrderPage() {
         onClose={() => setPickerOpen(false)}
       />
     </div>
-  )
+  );
 }

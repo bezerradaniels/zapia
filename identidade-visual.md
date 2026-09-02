@@ -11,52 +11,54 @@
 
 ### Cores principais
 
-| Token             | Hex       | Uso                                              |
-|-------------------|-----------|--------------------------------------------------|
-| `--z-green`       | `#00a82d` | Cor principal: CTAs, links, estados ativos, logo |
-| `--z-lime`        | `#95e030` | Botões sobre fundo escuro, ícone dark mode       |
-| `--z-lilac`       | `#fad0f6` | Destaques, badges Premium, notificações          |
-| `--z-bg`          | `#f9f6f2` | Background principal (off-white quente)          |
-| `--z-bg2`         | `#f4eee5` | Background 2: cards, superfícies secundárias     |
-| `--z-text`        | `#141414` | Texto principal, sidebar escura                  |
+| Token       | Hex       | Uso                                              |
+| ----------- | --------- | ------------------------------------------------ |
+| `--z-green` | `#00a82d` | Cor principal: CTAs, links, estados ativos, logo |
+| `--z-lime`  | `#95e030` | Botões sobre fundo escuro, ícone dark mode       |
+| `--z-lilac` | `#fad0f6` | Destaques, badges Premium, notificações          |
+| `--z-bg`    | `#f9f6f2` | Background principal (off-white quente)          |
+| `--z-bg2`   | `#f4eee5` | Background 2: cards, superfícies secundárias     |
+| `--z-text`  | `#141414` | Texto principal, sidebar escura                  |
 
 ### Cores derivadas (uso em código)
 
-| Token             | Hex       | Uso                                              |
-|-------------------|-----------|--------------------------------------------------|
-| `--z-text-muted`  | `#5a5a5a` | Texto secundário, descrições                     |
-| `--z-text-hint`   | `#888888` | Labels, placeholders, captions                   |
-| `--z-border`      | `rgba(0,0,0,0.08)` | Bordas de cards e divisores              |
-| `--z-white`       | `#ffffff` | Superfície de cards sobre bg                     |
+| Token            | Hex                | Uso                            |
+| ---------------- | ------------------ | ------------------------------ |
+| `--z-text-muted` | `#5a5a5a`          | Texto secundário, descrições   |
+| `--z-text-hint`  | `#888888`          | Labels, placeholders, captions |
+| `--z-border`     | `rgba(0,0,0,0.08)` | Bordas de cards e divisores    |
+| `--z-white`      | `#ffffff`          | Superfície de cards sobre bg   |
 
 ### Cores semânticas
 
-| Situação          | Background  | Texto     | Uso                            |
-|-------------------|-------------|-----------|--------------------------------|
-| Sucesso / ativo   | `#00a82d`   | `#ffffff` | Badge "Ativo", pedido concluído|
-| Trial             | `#fad0f6`   | `#6b006b` | Badge "Trial", contador        |
-| Atenção           | `#fff3cd`   | `#7a5800` | Badge "Aguardando pagamento"   |
-| Erro / suspenso   | `#ffe0e0`   | `#8b0000` | Badge "Suspenso", falha        |
-| Neutro            | `#f4eee5`   | `#5a5a5a` | Badge "Básico", estados neutros|
+| Situação        | Background | Texto     | Uso                             |
+| --------------- | ---------- | --------- | ------------------------------- |
+| Sucesso / ativo | `#00a82d`  | `#ffffff` | Badge "Ativo", pedido concluído |
+| Trial           | `#fad0f6`  | `#6b006b` | Badge "Trial", contador         |
+| Atenção         | `#fff3cd`  | `#7a5800` | Badge "Aguardando pagamento"    |
+| Erro / suspenso | `#ffe0e0`  | `#8b0000` | Badge "Suspenso", falha         |
+| Neutro          | `#f4eee5`  | `#5a5a5a` | Badge "Básico", estados neutros |
 
 ---
 
 ## 2. Logo
 
 ### Anatomia
+
 - **Ícone:** balão de conversa (WhatsApp) com linhas horizontais (catálogo/lista), fundo verde `#00a82d`, linhas brancas.
 - **Wordmark:** "zap" em peso regular + "able" em verde `#00a82d`. Lettering: sistema sans-serif, tracking −3%.
 - **Separação mínima:** 1× altura do ícone de espaço ao redor em qualquer uso.
 
 ### Variações
 
-| Versão           | Fundo     | Ícone bg  | Texto "zap" | Texto "able" |
-|------------------|-----------|-----------|-------------|--------------|
-| Principal        | `#f9f6f2` | `#00a82d` | `#141414`   | `#00a82d`    |
-| Dark             | `#141414` | `#00a82d` | `#f9f6f2`   | `#95e030`    |
-| Ícone dark mode  | `#141414` | `#95e030` | —           | —            |
+| Versão          | Fundo     | Ícone bg  | Texto "zap" | Texto "able" |
+| --------------- | --------- | --------- | ----------- | ------------ |
+| Principal       | `#f9f6f2` | `#00a82d` | `#141414`   | `#00a82d`    |
+| Dark            | `#141414` | `#00a82d` | `#f9f6f2`   | `#95e030`    |
+| Ícone dark mode | `#141414` | `#95e030` | —           | —            |
 
 ### Tamanhos mínimos
+
 - Horizontal completo: 120px de largura mínima
 - Ícone isolado: 24px × 24px mínimo
 - Favicon: 32×32px (apenas ícone, sem wordmark)
@@ -68,24 +70,26 @@
 O produto usa a fonte do sistema operacional (system font stack) para máxima performance em static export — sem carregamento de fonte externa no MVP.
 
 ```css
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto,
-             Helvetica, Arial, sans-serif;
+font-family:
+  -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica,
+  Arial, sans-serif;
 ```
 
 ### Escala tipográfica
 
-| Nível       | Tamanho | Peso | Uso                                      |
-|-------------|---------|------|------------------------------------------|
-| Display     | 40px    | 700  | Hero da landing page                     |
-| H1          | 32px    | 700  | Títulos de página no dashboard           |
-| H2          | 24px    | 600  | Seções dentro de uma página              |
-| H3          | 18px    | 600  | Sub-seções, títulos de card              |
-| Body        | 16px    | 400  | Texto corrido, descrições                |
-| Body small  | 14px    | 400  | Textos de apoio, metadados               |
-| Label       | 12px    | 500  | Rótulos de campo, captions, badges       |
-| Caption     | 11px    | 500  | Tags, chips, micro-labels (uppercase)    |
+| Nível      | Tamanho | Peso | Uso                                   |
+| ---------- | ------- | ---- | ------------------------------------- |
+| Display    | 40px    | 700  | Hero da landing page                  |
+| H1         | 32px    | 700  | Títulos de página no dashboard        |
+| H2         | 24px    | 600  | Seções dentro de uma página           |
+| H3         | 18px    | 600  | Sub-seções, títulos de card           |
+| Body       | 16px    | 400  | Texto corrido, descrições             |
+| Body small | 14px    | 400  | Textos de apoio, metadados            |
+| Label      | 12px    | 500  | Rótulos de campo, captions, badges    |
+| Caption    | 11px    | 500  | Tags, chips, micro-labels (uppercase) |
 
 ### Regras
+
 - Tracking (letter-spacing): −0.03em em títulos grandes, 0 no corpo, +0.05em em labels uppercase.
 - Line-height: 1.2 em títulos, 1.6 em corpo.
 - Cor padrão de texto: `#141414`. Texto secundário: `#5a5a5a`. Hint: `#888`.
@@ -96,15 +100,16 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto,
 
 ### Variantes
 
-| Variante      | Background  | Texto     | Borda       | Contexto                         |
-|---------------|-------------|-----------|-------------|----------------------------------|
-| Primary       | `#00a82d`   | `#ffffff` | —           | CTA principal (fundo claro)      |
-| Lime          | `#95e030`   | `#1a3d00` | —           | CTA principal (fundo escuro)     |
-| Ghost         | `#f4eee5`   | `#141414` | —           | Ação secundária                  |
-| Outline       | transparent | `#141414` | `#141414` 1.5px | Cancelar, ação terciária    |
-| Dark ghost    | `rgba(255,255,255,0.08)` | `#f9f6f2` | — | Ações em áreas escuras     |
+| Variante   | Background               | Texto     | Borda           | Contexto                     |
+| ---------- | ------------------------ | --------- | --------------- | ---------------------------- |
+| Primary    | `#00a82d`                | `#ffffff` | —               | CTA principal (fundo claro)  |
+| Lime       | `#95e030`                | `#1a3d00` | —               | CTA principal (fundo escuro) |
+| Ghost      | `#f4eee5`                | `#141414` | —               | Ação secundária              |
+| Outline    | transparent              | `#141414` | `#141414` 1.5px | Cancelar, ação terciária     |
+| Dark ghost | `rgba(255,255,255,0.08)` | `#f9f6f2` | —               | Ações em áreas escuras       |
 
 ### Anatomia do botão
+
 - Border-radius: 8px
 - Padding: 10px 20px (default) / 8px 16px (small) / 12px 24px (large)
 - Font-size: 14px, font-weight: 500
@@ -133,6 +138,7 @@ Todos os badges usam `border-radius: 999px`, `font-size: 11px`, `font-weight: 60
 ## 6. Componentes principais
 
 ### Card de produto (catálogo público)
+
 - Background: `#ffffff`
 - Border: `0.5px solid rgba(0,0,0,0.08)`
 - Border-radius: 14px
@@ -143,6 +149,7 @@ Todos os badges usam `border-radius: 999px`, `font-size: 11px`, `font-weight: 60
 - Badge de desconto: posição absolute top-left, `#fad0f6` / `#6b006b`
 
 ### Sidebar do dashboard
+
 - Background: `#141414`
 - Item ativo: background `#00a82d`, texto branco
 - Item hover: `rgba(255,255,255,0.06)`, texto `#cccccc`
@@ -151,6 +158,7 @@ Todos os badges usam `border-radius: 999px`, `font-size: 11px`, `font-weight: 60
 - Largura: 200px (expandida) / 64px (colapsada)
 
 ### Topbar do dashboard
+
 - Background: `#ffffff`
 - Borda inferior: `0.5px solid rgba(0,0,0,0.08)`
 - Altura: 56px
@@ -165,24 +173,24 @@ Adicionar ao `src/app/globals.css`:
 
 ```css
 :root {
-  --z-green:      #00a82d;
-  --z-lime:       #95e030;
-  --z-lilac:      #fad0f6;
-  --z-bg:         #f9f6f2;
-  --z-bg2:        #f4eee5;
-  --z-text:       #141414;
+  --z-green: #00a82d;
+  --z-lime: #95e030;
+  --z-lilac: #fad0f6;
+  --z-bg: #f9f6f2;
+  --z-bg2: #f4eee5;
+  --z-text: #141414;
   --z-text-muted: #5a5a5a;
-  --z-text-hint:  #888888;
-  --z-border:     rgba(0, 0, 0, 0.08);
-  --z-white:      #ffffff;
+  --z-text-hint: #888888;
+  --z-border: rgba(0, 0, 0, 0.08);
+  --z-white: #ffffff;
 
   /* Aliases para o Tailwind theme */
-  --color-primary:    var(--z-green);
+  --color-primary: var(--z-green);
   --color-primary-fg: #ffffff;
   --color-primary-hover: #008f25;
 
   /* Per-store override (catálogo público — injetado dinamicamente) */
-  --store-primary:    var(--z-green);
+  --store-primary: var(--z-green);
   --store-primary-fg: #ffffff;
   --store-primary-hover: #008f25;
 }

@@ -1,32 +1,37 @@
-import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
   HelpCircleIcon,
   WhatsappIcon,
   Mail01Icon,
   ArrowRightIcon,
-} from '@hugeicons/core-free-icons'
-import { Button } from '@/components/ui'
+} from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui";
 
-const CHANNELS: { icon: IconSvgElement; label: string; value: string; href: string }[] = [
+const CHANNELS: {
+  icon: IconSvgElement;
+  label: string;
+  value: string;
+  href: string;
+}[] = [
   {
     icon: WhatsappIcon,
-    label: 'WhatsApp',
-    value: 'Resposta em até 30 min',
-    href: 'https://wa.me/5500000000000',
+    label: "WhatsApp",
+    value: "Resposta em até 30 min",
+    href: "https://wa.me/5500000000000",
   },
   {
     icon: Mail01Icon,
-    label: 'E-mail',
-    value: 'manager@zapia.app',
-    href: 'mailto:manager@zapia.app',
+    label: "E-mail",
+    value: "manager@zapia.app",
+    href: "mailto:manager@zapia.app",
   },
   {
     icon: HelpCircleIcon,
-    label: 'Central de ajuda',
-    value: 'Tutoriais e FAQ',
-    href: 'https://zapia.app/ajuda',
+    label: "Central de ajuda",
+    value: "Tutoriais e FAQ",
+    href: "https://zapia.app/ajuda",
   },
-]
+];
 
 export default function SupportPage() {
   return (
@@ -78,5 +83,5 @@ export default function SupportPage() {
         </form>
       </section>
     </div>
-  )
+  );
 }

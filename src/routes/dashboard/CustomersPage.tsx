@@ -1,53 +1,66 @@
-import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Search01Icon, UserGroupIcon, Add01Icon, FilterHorizontalIcon } from '@hugeicons/core-free-icons'
-import { useActiveStore } from '@/lib/tenant'
-import { useCustomers } from '@/features/customers'
-import { CustomerRow } from '@/features/customers/components/CustomerRow'
-import { IntelligenceCards, type IntelligenceFilter } from '@/features/customers/components/IntelligenceCards'
-import { AIPanel } from '@/features/customers/components/AIPanel'
-import { ROUTES } from '@/config/routes'
-import { Skeleton, Sheet, Button } from '@/components/ui'
-import { EmptyState } from '@/components/feedback'
-import type { Customer } from '@/features/customers/types'
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Search01Icon,
+  UserGroupIcon,
+  Add01Icon,
+  FilterHorizontalIcon,
+} from "@hugeicons/core-free-icons";
+import { useActiveStore } from "@/lib/tenant";
+import { useCustomers } from "@/features/customers";
+import { CustomerRow } from "@/features/customers/components/CustomerRow";
+import {
+  IntelligenceCards,
+  type IntelligenceFilter,
+} from "@/features/customers/components/IntelligenceCards";
+import { AIPanel } from "@/features/customers/components/AIPanel";
+import { ROUTES } from "@/config/routes";
+import { Skeleton, Sheet, Button } from "@/components/ui";
+import { EmptyState } from "@/components/feedback";
+import type { Customer } from "@/features/customers/types";
 
 export default function CustomersPage() {
-  const navigate = useNavigate()
-  const { store } = useActiveStore()
-  const customers = useCustomers(store?.id)
+  const navigate = useNavigate();
+  const { store } = useActiveStore();
+  const customers = useCustomers(store?.id);
 
-  const [search, setSearch] = useState('')
-  const [tagFilter, setTagFilter] = useState('')
-  const [sellerFilter, setSellerFilter] = useState('')
-  const [intelligenceFilter, setIntelligenceFilter] = useState<IntelligenceFilter | null>(null)
-  const [filtersOpen, setFiltersOpen] = useState(false)
-  const activeFilterCount = (tagFilter ? 1 : 0) + (sellerFilter ? 1 : 0)
+  const [search, setSearch] = useState("");
+  const [tagFilter, setTagFilter] = useState("");
+  const [sellerFilter, setSellerFilter] = useState("");
+  const [intelligenceFilter, setIntelligenceFilter] =
+    useState<IntelligenceFilter | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const activeFilterCount = (tagFilter ? 1 : 0) + (sellerFilter ? 1 : 0);
 
   // Memoize so the `?? []` fallback keeps a stable reference and the
   // dependent useMemos below don't recompute on every render.
-  const list = useMemo(() => customers.data ?? [], [customers.data])
+  const list = useMemo(() => customers.data ?? [], [customers.data]);
 
   // Collect all unique tags across customers
   const allTags = useMemo(
     () => Array.from(new Set(list.flatMap((c) => c.tags))).sort(),
     [list],
-  )
+  );
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
+    const q = search.trim().toLowerCase();
     return list.filter((c) => {
-      if (q && !c.name.toLowerCase().includes(q) && !c.whatsapp_phone.includes(q.replace(/\D/g, ''))) {
-        return false
+      if (
+        q &&
+        !c.name.toLowerCase().includes(q) &&
+        !c.whatsapp_phone.includes(q.replace(/\D/g, ""))
+      ) {
+        return false;
       }
-      if (tagFilter && !c.tags.includes(tagFilter)) return false
-      if (sellerFilter && c.seller_id !== sellerFilter) return false
-      return true
-    })
-  }, [list, search, tagFilter, sellerFilter])
+      if (tagFilter && !c.tags.includes(tagFilter)) return false;
+      if (sellerFilter && c.seller_id !== sellerFilter) return false;
+      return true;
+    });
+  }, [list, search, tagFilter, sellerFilter]);
 
   function handleDetails(customer: Customer) {
-    navigate(`${ROUTES.dashboardCustomers}/${customer.id}`)
+    navigate(`${ROUTES.dashboardCustomers}/${customer.id}`);
   }
 
   return (
@@ -56,7 +69,9 @@ export default function CustomersPage() {
       <IntelligenceCards
         customers={list}
         activeFilter={intelligenceFilter}
-        onFilterChange={(f) => setIntelligenceFilter(intelligenceFilter === f ? null : f)}
+        onFilterChange={(f) =>
+          setIntelligenceFilter(intelligenceFilter === f ? null : f)
+        }
       />
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
@@ -105,10 +120,16 @@ export default function CustomersPage() {
             </button>
           </div>
 
-          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen} title="Filtros">
+          <Sheet
+            open={filtersOpen}
+            onOpenChange={setFiltersOpen}
+            title="Filtros"
+          >
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-z-text-muted">Tag</label>
+                <label className="text-xs font-semibold text-z-text-muted">
+                  Tag
+                </label>
                 <select
                   value={tagFilter}
                   onChange={(e) => setTagFilter(e.target.value)}
@@ -141,8 +162,8 @@ export default function CustomersPage() {
                 size="lg"
                 variant="outline"
                 onClick={() => {
-                  setTagFilter('')
-                  setSellerFilter('')
+                  setTagFilter("");
+                  setSellerFilter("");
                 }}
               >
                 Limpar filtros
@@ -156,7 +177,8 @@ export default function CustomersPage() {
           {/* Count */}
           {!customers.isLoading && (
             <p className="text-sm font-medium text-z-text-muted">
-              {filtered.length} {filtered.length === 1 ? 'encontrado' : 'encontrados'}
+              {filtered.length}{" "}
+              {filtered.length === 1 ? "encontrado" : "encontrados"}
             </p>
           )}
 
@@ -203,5 +225,5 @@ export default function CustomersPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

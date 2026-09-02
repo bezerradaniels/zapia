@@ -2,33 +2,36 @@
 // Opens the device camera to scan EAN/GTIN barcodes.
 // The library is loaded lazily so it doesn't affect initial bundle size.
 
-import { useEffect, useRef, useState } from 'react'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Cancel01Icon } from '@hugeicons/core-free-icons'
-import { cn } from '@/lib/utils'
+import { useEffect, useRef, useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
 
 interface Props {
-  onDetected: (barcode: string) => void
-  onClose: () => void
+  onDetected: (barcode: string) => void;
+  onClose: () => void;
 }
 
-const SCANNER_ELEMENT_ID = 'zapia-barcode-scanner'
+const SCANNER_ELEMENT_ID = "zapia-barcode-scanner";
 
 export function BarcodeScanner({ onDetected, onClose }: Props) {
-  const [error, setError] = useState<string | null>(null)
-  const [status, setStatus] = useState<'starting' | 'scanning' | 'error'>('starting')
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<"starting" | "scanning" | "error">(
+    "starting",
+  );
   // Holds the Html5QrcodeScanner instance so we can stop it on unmount
-  const scannerRef = useRef<{ clear: () => Promise<void> } | null>(null)
+  const scannerRef = useRef<{ clear: () => Promise<void> } | null>(null);
 
   useEffect(() => {
-    let mounted = true
+    let mounted = true;
 
     async function initScanner() {
       try {
         // Dynamic import keeps html5-qrcode out of the main bundle
-        const { Html5QrcodeScanner, Html5QrcodeScanType } = await import('html5-qrcode')
+        const { Html5QrcodeScanner, Html5QrcodeScanType } =
+          await import("html5-qrcode");
 
-        if (!mounted) return
+        if (!mounted) return;
 
         const scanner = new Html5QrcodeScanner(
           SCANNER_ELEMENT_ID,
@@ -40,39 +43,39 @@ export function BarcodeScanner({ onDetected, onClose }: Props) {
             aspectRatio: 1.5,
           },
           /* verbose = */ false,
-        )
+        );
 
         scanner.render(
           (decodedText: string) => {
             // Only accept barcode formats (EAN-8, EAN-13, UPC-A, Code128, etc.)
-            const digits = decodedText.replace(/\D/g, '')
+            const digits = decodedText.replace(/\D/g, "");
             if (digits.length >= 8) {
-              scanner.clear().catch(console.error)
-              onDetected(decodedText.trim())
+              scanner.clear().catch(console.error);
+              onDetected(decodedText.trim());
             }
           },
           () => {
             // Scan error / no match — ignore, scanner keeps trying
           },
-        )
+        );
 
-        scannerRef.current = scanner
-        if (mounted) setStatus('scanning')
+        scannerRef.current = scanner;
+        if (mounted) setStatus("scanning");
       } catch (err) {
-        if (!mounted) return
-        setError('Câmera não disponível ou permissão negada.')
-        setStatus('error')
-        console.error('[BarcodeScanner]', err)
+        if (!mounted) return;
+        setError("Câmera não disponível ou permissão negada.");
+        setStatus("error");
+        console.error("[BarcodeScanner]", err);
       }
     }
 
-    initScanner()
+    initScanner();
 
     return () => {
-      mounted = false
-      scannerRef.current?.clear().catch(console.error)
-    }
-  }, [onDetected])
+      mounted = false;
+      scannerRef.current?.clear().catch(console.error);
+    };
+  }, [onDetected]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4">
@@ -91,13 +94,13 @@ export function BarcodeScanner({ onDetected, onClose }: Props) {
 
         {/* Camera viewport */}
         <div className="p-4">
-          {status === 'starting' && (
+          {status === "starting" && (
             <div className="flex h-48 items-center justify-center">
               <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             </div>
           )}
 
-          {status === 'error' && (
+          {status === "error" && (
             <div className="flex h-48 flex-col items-center justify-center gap-2 text-center text-sm text-destructive">
               <p>{error}</p>
               <button
@@ -114,8 +117,8 @@ export function BarcodeScanner({ onDetected, onClose }: Props) {
           <div
             id={SCANNER_ELEMENT_ID}
             className={cn(
-              'overflow-hidden rounded-lg',
-              status !== 'scanning' && 'hidden',
+              "overflow-hidden rounded-lg",
+              status !== "scanning" && "hidden",
             )}
           />
         </div>
@@ -125,5 +128,5 @@ export function BarcodeScanner({ onDetected, onClose }: Props) {
         </p>
       </div>
     </div>
-  )
+  );
 }

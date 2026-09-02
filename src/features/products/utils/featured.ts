@@ -1,25 +1,25 @@
-import type { Product } from '@/types/domain'
+import type { Product } from "@/types/domain";
 
 /** Maximum number of products a store may feature at once. */
-export const MAX_FEATURED_PRODUCTS = 4
+export const MAX_FEATURED_PRODUCTS = 4;
 
 type FeaturedSlotsArgs = {
   /** All of the store's products (used to count occupied featured slots). */
-  allProducts: Pick<Product, 'is_featured' | 'deleted_at'>[]
+  allProducts: Pick<Product, "is_featured" | "deleted_at">[];
   /** Whether the product being edited is currently toggled as featured. */
-  isFeatured: boolean
+  isFeatured: boolean;
   /** Whether the product was already featured when the form opened. */
-  initiallyFeatured: boolean
-}
+  initiallyFeatured: boolean;
+};
 
 type FeaturedSlots = {
   /** Featured slots occupied by products other than the one being edited. */
-  otherCount: number
+  otherCount: number;
   /** Whether the "featured" toggle may still be enabled. */
-  canEnable: boolean
+  canEnable: boolean;
   /** Slots that would be used if the current toggle state were saved. */
-  displayedCount: number
-}
+  displayedCount: number;
+};
 
 /**
  * Computes featured-slot availability for the product form. Excludes the
@@ -31,11 +31,13 @@ export function featuredSlots({
   isFeatured,
   initiallyFeatured,
 }: FeaturedSlotsArgs): FeaturedSlots {
-  const total = allProducts.filter((p) => p.is_featured && !p.deleted_at).length
-  const otherCount = total - (initiallyFeatured ? 1 : 0)
+  const total = allProducts.filter(
+    (p) => p.is_featured && !p.deleted_at,
+  ).length;
+  const otherCount = total - (initiallyFeatured ? 1 : 0);
   return {
     otherCount,
     canEnable: isFeatured || otherCount < MAX_FEATURED_PRODUCTS,
     displayedCount: otherCount + (isFeatured ? 1 : 0),
-  }
+  };
 }

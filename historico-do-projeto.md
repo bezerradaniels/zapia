@@ -21,6 +21,7 @@ Plataforma multi-tenant onde cada lojista (dono de loja) publica um catálogo on
 ## 2. Linha do tempo das conversas
 
 ### Etapa 1 — 50 perguntas de alinhamento técnico
+
 Questionário múltipla escolha, uma pergunta por vez, para fixar decisões de arquitetura antes de qualquer linha de código.
 
 **Decisões chave:**
@@ -37,19 +38,22 @@ Questionário múltipla escolha, uma pergunta por vez, para fixar decisões de a
 - **Pacote:** `npm` (decisão tomada na Etapa 3; antes era pnpm).
 - **Testes:** Vitest + Testing Library + Playwright.
 - **IA:** Google Gemini via Supabase Edge Functions (nunca chamada direta do browser com secret key).
-- **i18n:** next-intl. *Inicialmente pt-BR + en + es — alterado na Etapa 5 para pt-BR apenas.*
+- **i18n:** next-intl. _Inicialmente pt-BR + en + es — alterado na Etapa 5 para pt-BR apenas._
 - **Princípios:** Clean Code, funções pequenas, feature modules, pastas rasas (<4 níveis).
 - **Organização:** feature-based. Estrutura padrão de cada feature: `api/` · `components/` · `hooks/` · `schemas/` · `utils/` · `types.ts` · `index.ts`.
 
 ### Etapa 2 — Geração do CLAUDE.md
+
 Documento mestre em inglês para o Claude Code, cobrindo: visão do projeto, tech stack, princípios, estrutura de pastas, anatomia de feature, convenções de nome e código, Supabase, multi-tenancy, i18n, state management, forms, theming, ambiente, scripts, git, testes, deploy, escopo do MVP e regras de Do/Don't.
 
 Arquivo: `CLAUDE.md` (raiz do projeto).
 
 ### Etapa 3 — Troca de pnpm para npm
+
 Todas as referências em CLAUDE.md migraram: tech stack, lockfile (`package-lock.json`), scripts, CLI do Supabase, Quick Reference. Regra adicionada: não misturar gerenciadores; comitar o lockfile.
 
 ### Etapa 4 — 20 perguntas sobre planos, preços e billing
+
 Questionário para fechar o modelo comercial.
 
 **Decisões chave:**
@@ -72,6 +76,7 @@ Questionário para fechar o modelo comercial.
 - **Regra de ouro:** todo acesso a capabilities pagas passa por `features/billing/hooks/usePlanLimits.ts`. Nunca hardcode de nome de plano em componente.
 
 ### Etapa 5 — Pivot para mercado brasileiro
+
 Mudança estratégica: **MVP Brazil-only**. Simplifica o produto, acelera o lançamento e evita dispersão.
 
 **Impactos aplicados ao CLAUDE.md:**
@@ -86,6 +91,7 @@ Mudança estratégica: **MVP Brazil-only**. Simplifica o produto, acelera o lan�
 - Billing reforçado: conta Stripe Brasil, preços apenas em BRL.
 
 ### Etapa 6 — Esquema gráfico (mapa do site + wireframes)
+
 Arquivo `sitemap-e-paginas.html` com:
 
 - Legenda colorida por tipo de área (marketing / auth / dashboard / catálogo público / billing).
@@ -94,6 +100,7 @@ Arquivo `sitemap-e-paginas.html` com:
 - Correspondência com os route groups do Next.js (`(marketing)`, `(auth)`, `(dashboard)`, `(public)`).
 
 ### Etapa 7 — Revisão de planos e remoção de referências externas
+
 Ajustes feitos em 22 de abril de 2026:
 
 - Removidas todas as referências a RediRedi / rdi / rdi.store dos documentos (eram apenas exemplos de referência visual, não parte do produto).
@@ -105,6 +112,7 @@ Ajustes feitos em 22 de abril de 2026:
 - Trial de 14 dias agora se aplica a todos os planos, incluindo o Básico (antes: Pro e Business).
 
 ### Etapa 8 — Naming: Zapable
+
 Decisão tomada em 22 de abril de 2026:
 
 - **Nome oficial do produto: Zapable**
@@ -115,6 +123,7 @@ Decisão tomada em 22 de abril de 2026:
 - Processo: avaliadas várias opções de nome até a escolha final de **Zapable**.
 
 ### Etapa 9 — Migração de Next.js para Vite + React
+
 Decisão tomada em 24 de abril de 2026.
 
 O projeto estava planejado com Next.js 14+ em modo Static Export. Após reflexão sobre a pilha, decidimos migrar para Vite 5 + React 18 como SPA puro. Os motivos:
@@ -140,19 +149,19 @@ O projeto estava planejado com Next.js 14+ em modo Static Export. Após reflexã
 
 ## 3. Correções de rumo importantes
 
-| Mudança | Antes | Depois | Motivo |
-|---|---|---|---|
-| Back-end | NestJS | Supabase direto | Redução de complexidade; Hostinger compartilhada não roda SSR/Node. |
-| Gerenciador de pacote | pnpm | npm | Decisão do Daniel por familiaridade. |
-| Idiomas | pt-BR + en + es | pt-BR apenas (MVP) | Foco estratégico no mercado brasileiro. |
-| Billing (inicialmente) | Fora do MVP | Dentro do MVP (Stripe Brasil) | Decisão comercial da Etapa 4. |
-| Planos | Free + Pro + Business | Básico + Pro + Premium (todos pagos) | Sem tier gratuito; preços mais acessíveis (R$4,99 / R$9,99 / R$29,99). |
-| Trial | Só Pro e Premium | Todos os planos (14 dias, sem cartão) | Decisão de produto para reduzir fricção no cadastro do Básico. |
-| Nome do produto | Online Catalog Platform (working title) | Zapable | Naming oficial definido na Etapa 8. |
-| Framework front-end | Next.js 14+ (App Router, Static Export) | Vite 5 + React 18 (SPA, `dist/`) | Simplifica a stack; Next.js trazia complexidade sem ganho real numa hospedagem estática. |
-| Roteamento | File-based (App Router `src/app/`) | React Router DOM v6 (`src/routes/`) | Estrutura explícita, sem magia de sistema de arquivos. |
-| i18n | next-intl | i18next + react-i18next | Alinhado à mudança de framework. |
-| Env vars (cliente) | `NEXT_PUBLIC_*` | `VITE_*` / `import.meta.env` | Convenção do Vite. |
+| Mudança                | Antes                                   | Depois                                | Motivo                                                                                   |
+| ---------------------- | --------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Back-end               | NestJS                                  | Supabase direto                       | Redução de complexidade; Hostinger compartilhada não roda SSR/Node.                      |
+| Gerenciador de pacote  | pnpm                                    | npm                                   | Decisão do Daniel por familiaridade.                                                     |
+| Idiomas                | pt-BR + en + es                         | pt-BR apenas (MVP)                    | Foco estratégico no mercado brasileiro.                                                  |
+| Billing (inicialmente) | Fora do MVP                             | Dentro do MVP (Stripe Brasil)         | Decisão comercial da Etapa 4.                                                            |
+| Planos                 | Free + Pro + Business                   | Básico + Pro + Premium (todos pagos)  | Sem tier gratuito; preços mais acessíveis (R$4,99 / R$9,99 / R$29,99).                   |
+| Trial                  | Só Pro e Premium                        | Todos os planos (14 dias, sem cartão) | Decisão de produto para reduzir fricção no cadastro do Básico.                           |
+| Nome do produto        | Online Catalog Platform (working title) | Zapable                               | Naming oficial definido na Etapa 8.                                                      |
+| Framework front-end    | Next.js 14+ (App Router, Static Export) | Vite 5 + React 18 (SPA, `dist/`)      | Simplifica a stack; Next.js trazia complexidade sem ganho real numa hospedagem estática. |
+| Roteamento             | File-based (App Router `src/app/`)      | React Router DOM v6 (`src/routes/`)   | Estrutura explícita, sem magia de sistema de arquivos.                                   |
+| i18n                   | next-intl                               | i18next + react-i18next               | Alinhado à mudança de framework.                                                         |
+| Env vars (cliente)     | `NEXT_PUBLIC_*`                         | `VITE_*` / `import.meta.env`          | Convenção do Vite.                                                                       |
 
 ---
 
@@ -182,7 +191,7 @@ O projeto estava planejado com Next.js 14+ em modo Static Export. Após reflexã
 2. Abra o Cowork no novo computador e selecione a pasta que contém esses arquivos como workspace.
 3. Comece uma nova conversa com um prompt como:
 
-   > *"Leia `historico-do-projeto.md` e `CLAUDE.md` nesta pasta. Estamos retomando o projeto de plataforma de catálogos online para o mercado brasileiro. Antes de responder, confirme o que entendeu do estado atual e me diga quais seriam os próximos 3 passos sugeridos."*
+   > _"Leia `historico-do-projeto.md` e `CLAUDE.md` nesta pasta. Estamos retomando o projeto de plataforma de catálogos online para o mercado brasileiro. Antes de responder, confirme o que entendeu do estado atual e me diga quais seriam os próximos 3 passos sugeridos."_
 
 4. A partir daí é só seguir. A conversa original não virá junto (o Cowork armazena histórico localmente por máquina), mas todo o contexto importante está nos arquivos.
 
@@ -201,4 +210,4 @@ Ordem sugerida quando retomar:
 
 ---
 
-_Última atualização: 24 de abril de 2026 — Etapa 9: migração de stack para Vite 5 + React 18 (SPA), React Router DOM v6, i18next, `VITE_` env prefix._
+_Última atualização: 24 de abril de 2026 — Etapa 9: migração de stack para Vite 5 + React 18 (SPA), React Router DOM v6, i18next, `VITE_` env prefix.\_

@@ -1,58 +1,60 @@
-import { createBrowserClient } from '@/lib/supabase'
+import { createBrowserClient } from "@/lib/supabase";
 import type {
   Invoice,
   PlanFeatures,
   StoreCatalogStatus,
   Subscription,
-} from '@/types/domain'
+} from "@/types/domain";
 
 export async function getSubscription(
   storeId: string,
 ): Promise<Subscription | null> {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient();
   const { data, error } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('store_id', storeId)
-    .maybeSingle()
+    .from("subscriptions")
+    .select("*")
+    .eq("store_id", storeId)
+    .maybeSingle();
 
-  if (error) throw error
-  return (data as Subscription | null) ?? null
+  if (error) throw error;
+  return (data as Subscription | null) ?? null;
 }
 
 export async function listInvoicesForStore(
   storeId: string,
 ): Promise<Invoice[]> {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient();
   const { data, error } = await supabase
-    .from('invoices')
-    .select('*')
-    .eq('store_id', storeId)
-    .order('created_at', { ascending: false })
+    .from("invoices")
+    .select("*")
+    .eq("store_id", storeId)
+    .order("created_at", { ascending: false });
 
-  if (error) throw error
-  return (data ?? []) as Invoice[]
+  if (error) throw error;
+  return (data ?? []) as Invoice[];
 }
 
 export async function listPlanFeatures(): Promise<PlanFeatures[]> {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient();
   const { data, error } = await supabase
-    .from('plan_features')
-    .select('id:plan_id, name, price_in_cents, max_products, max_sellers, has_ai_helpers, has_pdf_export, has_custom_theme, stripe_price_id, stripe_price_monthly, stripe_price_annual')
-    .order('price_in_cents', { ascending: true })
+    .from("plan_features")
+    .select(
+      "id:plan_id, name, price_in_cents, max_products, max_sellers, has_ai_helpers, has_pdf_export, has_custom_theme, stripe_price_id, stripe_price_monthly, stripe_price_annual",
+    )
+    .order("price_in_cents", { ascending: true });
 
-  if (error) throw error
-  return (data ?? []) as unknown as PlanFeatures[]
+  if (error) throw error;
+  return (data ?? []) as unknown as PlanFeatures[];
 }
 
 export async function getStoreCatalogStatus(
   storeId: string,
 ): Promise<StoreCatalogStatus | null> {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient();
   const { data, error } = await supabase
-    .rpc('store_catalog_status', { target_store: storeId })
-    .maybeSingle()
+    .rpc("store_catalog_status", { target_store: storeId })
+    .maybeSingle();
 
-  if (error) throw error
-  return (data as StoreCatalogStatus | null) ?? null
+  if (error) throw error;
+  return (data as StoreCatalogStatus | null) ?? null;
 }

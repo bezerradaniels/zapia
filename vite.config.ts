@@ -1,6 +1,6 @@
-import path from 'path'
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import path from "path";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
@@ -15,19 +15,24 @@ export default defineConfig({
         // chunks so the main app chunk (which changes on every deploy) stays
         // small and the browser can cache vendors across releases.
         manualChunks(id: string) {
-          if (!id.includes('node_modules')) return
-          if (/[\\/]node_modules[\\/](react-router|react-router-dom|react|react-dom|scheduler)[\\/]/.test(id))
-            return 'vendor-react'
-          if (id.includes('@tanstack')) return 'vendor-query'
-          if (/(react-hook-form|@hookform|[\\/]zod[\\/])/.test(id)) return 'vendor-forms'
-          if (id.includes('@hugeicons')) return 'vendor-icons'
+          if (!id.includes("node_modules")) return;
+          if (
+            /[\\/]node_modules[\\/](react-router|react-router-dom|react|react-dom|scheduler)[\\/]/.test(
+              id,
+            )
+          )
+            return "vendor-react";
+          if (id.includes("@tanstack")) return "vendor-query";
+          if (/(react-hook-form|@hookform|[\\/]zod[\\/])/.test(id))
+            return "vendor-forms";
+          if (id.includes("@hugeicons")) return "vendor-icons";
         },
       },
     },
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
-})
+});

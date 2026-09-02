@@ -1,23 +1,33 @@
-import { Link } from 'react-router-dom'
-import { Logo } from '@/components/ui'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { HeartCheckIcon } from '@hugeicons/core-free-icons'
-import { ROUTES } from '@/config/routes'
+import { Link } from "react-router-dom";
+import { Logo } from "@/components/ui";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { HeartCheckIcon } from "@hugeicons/core-free-icons";
+import { ROUTES } from "@/config/routes";
 
 type FooterLink =
-  | { kind: 'route'; label: string; id: string; to: string }
-  | { kind: 'external'; label: string; id: string; href: string }
+  | { kind: "route"; label: string; id: string; to: string }
+  | { kind: "external"; label: string; id: string; href: string };
 
 const links: FooterLink[] = [
-  { kind: 'route', label: 'Termos de uso', id: 'lp-footer-link-terms', to: ROUTES.terms },
-  { kind: 'route', label: 'Privacidade', id: 'lp-footer-link-privacy', to: ROUTES.privacy },
   {
-    kind: 'external',
-    label: 'Contato',
-    id: 'lp-footer-link-contact',
-    href: 'mailto:contato@zapia.app',
+    kind: "route",
+    label: "Termos de uso",
+    id: "lp-footer-link-terms",
+    to: ROUTES.terms,
   },
-]
+  {
+    kind: "route",
+    label: "Privacidade",
+    id: "lp-footer-link-privacy",
+    to: ROUTES.privacy,
+  },
+  {
+    kind: "external",
+    label: "Contato",
+    id: "lp-footer-link-contact",
+    href: "mailto:contato@zapia.app",
+  },
+];
 
 export function MarketingFooter() {
   return (
@@ -26,7 +36,7 @@ export function MarketingFooter() {
         <Logo variant="verde" height={47} />
         <div className="flex flex-wrap gap-6">
           {links.map((l) =>
-            l.kind === 'route' ? (
+            l.kind === "route" ? (
               <Link
                 key={l.label}
                 id={l.id}
@@ -50,17 +60,23 @@ export function MarketingFooter() {
             type="button"
             id="lp-footer-link-cookies"
             className="bg-transparent text-[13px] font-medium text-slate-600 transition-colors hover:text-slate-950"
-            onClick={() => window.dispatchEvent(new CustomEvent('zapia:cookie-consent-open'))}
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent("zapia:cookie-consent-open"))
+            }
           >
             Cookies
           </button>
         </div>
         <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
           <span>© 2026 Zapia · Feito com</span>
-          <HugeiconsIcon icon={HeartCheckIcon} size={14} className="text-z-primary" />
+          <HugeiconsIcon
+            icon={HeartCheckIcon}
+            size={14}
+            className="text-z-primary"
+          />
           <span>no Brasil</span>
         </div>
       </div>
     </footer>
-  )
+  );
 }

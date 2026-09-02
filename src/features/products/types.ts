@@ -7,35 +7,35 @@
 // ---------------------------------------------------------------------------
 
 export interface MlProductResult {
-  mlId: string
-  title: string
-  brand: string | null
-  thumbnail: string
-  images: string[]
-  attributes: { name: string; value: string }[]
-  description: string | null
-  permalink: string | null
-  source: 'catalog' | 'listing'
-  barcode: string | null
+  mlId: string;
+  title: string;
+  brand: string | null;
+  thumbnail: string;
+  images: string[];
+  attributes: { name: string; value: string }[];
+  description: string | null;
+  permalink: string | null;
+  source: "catalog" | "listing";
+  barcode: string | null;
 }
 
 export interface MlSearchResponse {
-  results: MlProductResult[]
-  source: 'cache' | 'api'
+  results: MlProductResult[];
+  source: "cache" | "api";
 }
 
 export interface MlImportImagesResponse {
-  urls: string[]
-  errors: string[]
+  urls: string[];
+  errors: string[];
 }
 
 /** Fields auto-populated in the product form after a ML import. */
 export interface MlImportPayload {
-  name: string
-  brand: string | null
-  description: string | null
-  images: string[]         // Supabase Storage URLs — already persisted
-  barcode: string | null
-  barcode_type: string | null
-  attributes: { name: string; value: string }[]
+  name: string;
+  brand: string | null;
+  description: string | null;
+  images: string[]; // Supabase Storage URLs — already persisted
+  barcode: string | null;
+  barcode_type: string | null;
+  attributes: { name: string; value: string }[];
 }

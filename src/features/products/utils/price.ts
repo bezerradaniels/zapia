@@ -1,14 +1,19 @@
-import type { Product } from '@/types/domain'
+import type { Product } from "@/types/domain";
 
 /**
  * Price the customer actually pays for this product right now.
  * Falls back to the regular price when there's no active promotion.
  */
-export function effectivePrice(p: Pick<Product, 'price_in_cents' | 'promo_price_in_cents'>): number {
-  if (p.promo_price_in_cents != null && p.promo_price_in_cents < p.price_in_cents) {
-    return p.promo_price_in_cents
+export function effectivePrice(
+  p: Pick<Product, "price_in_cents" | "promo_price_in_cents">,
+): number {
+  if (
+    p.promo_price_in_cents != null &&
+    p.promo_price_in_cents < p.price_in_cents
+  ) {
+    return p.promo_price_in_cents;
   }
-  return p.price_in_cents
+  return p.price_in_cents;
 }
 
 /**
@@ -20,16 +25,16 @@ export function marginPercent(
   costCents: number | null | undefined,
 ): number | null {
   if (costCents && costCents > 0 && priceCents > 0) {
-    return ((priceCents - costCents) / priceCents) * 100
+    return ((priceCents - costCents) / priceCents) * 100;
   }
-  return priceCents > 0 ? 100 : null
+  return priceCents > 0 ? 100 : null;
 }
 
 /** Discount percentage (0-100) when there's an active promo, otherwise null. */
 export function discountPercent(
-  p: Pick<Product, 'price_in_cents' | 'promo_price_in_cents'>,
+  p: Pick<Product, "price_in_cents" | "promo_price_in_cents">,
 ): number | null {
-  if (p.promo_price_in_cents == null || p.price_in_cents <= 0) return null
-  if (p.promo_price_in_cents >= p.price_in_cents) return null
-  return Math.round((1 - p.promo_price_in_cents / p.price_in_cents) * 100)
+  if (p.promo_price_in_cents == null || p.price_in_cents <= 0) return null;
+  if (p.promo_price_in_cents >= p.price_in_cents) return null;
+  return Math.round((1 - p.promo_price_in_cents / p.price_in_cents) * 100);
 }

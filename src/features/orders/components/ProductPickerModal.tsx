@@ -1,28 +1,28 @@
-import { useState, useMemo } from 'react'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { useState, useMemo } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Cancel01Icon,
   Search01Icon,
   MinusSignIcon,
   PlusSignIcon,
-} from '@hugeicons/core-free-icons'
-import { formatMoney } from '@/lib/format'
-import { effectivePrice } from '@/features/products/utils/price'
-import { cn } from '@/lib/utils'
-import type { Product } from '@/types/domain'
+} from "@hugeicons/core-free-icons";
+import { formatMoney } from "@/lib/format";
+import { effectivePrice } from "@/features/products/utils/price";
+import { cn } from "@/lib/utils";
+import type { Product } from "@/types/domain";
 
 export type PickedItem = {
-  product: Product
-  quantity: number
-}
+  product: Product;
+  quantity: number;
+};
 
 type Props = {
-  open: boolean
-  products: Product[]
-  alreadyPicked: PickedItem[]
-  onConfirm: (items: PickedItem[]) => void
-  onClose: () => void
-}
+  open: boolean;
+  products: Product[];
+  alreadyPicked: PickedItem[];
+  onConfirm: (items: PickedItem[]) => void;
+  onClose: () => void;
+};
 
 export function ProductPickerModal({
   open,
@@ -31,7 +31,7 @@ export function ProductPickerModal({
   onConfirm,
   onClose,
 }: Props) {
-  if (!open) return null
+  if (!open) return null;
   return (
     <PickerContent
       key="product-picker"
@@ -40,7 +40,7 @@ export function ProductPickerModal({
       onConfirm={onConfirm}
       onClose={onClose}
     />
-  )
+  );
 }
 
 function PickerContent({
@@ -48,58 +48,58 @@ function PickerContent({
   alreadyPicked,
   onConfirm,
   onClose,
-}: Omit<Props, 'open'>) {
-  const [search, setSearch] = useState('')
+}: Omit<Props, "open">) {
+  const [search, setSearch] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>(() => {
-    const initial: Record<string, number> = {}
+    const initial: Record<string, number> = {};
     for (const item of alreadyPicked) {
-      initial[item.product.id] = item.quantity
+      initial[item.product.id] = item.quantity;
     }
-    return initial
-  })
+    return initial;
+  });
   const [added, setAdded] = useState<Set<string>>(() => {
-    return new Set(alreadyPicked.map((i) => i.product.id))
-  })
+    return new Set(alreadyPicked.map((i) => i.product.id));
+  });
 
   const filtered = useMemo(() => {
-    const q = search.toLowerCase().trim()
-    if (!q) return products
+    const q = search.toLowerCase().trim();
+    if (!q) return products;
     return products.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
         (p.sku && p.sku.toLowerCase().includes(q)) ||
         (p.barcode && p.barcode.toLowerCase().includes(q)),
-    )
-  }, [products, search])
+    );
+  }, [products, search]);
 
-  const addedCount = added.size
+  const addedCount = added.size;
 
-  const getQty = (id: string) => quantities[id] ?? 1
+  const getQty = (id: string) => quantities[id] ?? 1;
 
   const setQty = (id: string, qty: number) =>
-    setQuantities((prev) => ({ ...prev, [id]: Math.max(1, qty) }))
+    setQuantities((prev) => ({ ...prev, [id]: Math.max(1, qty) }));
 
   const toggleAdd = (product: Product) => {
-    const id = product.id
+    const id = product.id;
     setAdded((prev) => {
-      const next = new Set(prev)
+      const next = new Set(prev);
       if (next.has(id)) {
-        next.delete(id)
+        next.delete(id);
       } else {
-        next.add(id)
-        if (!quantities[id]) setQty(id, 1)
+        next.add(id);
+        if (!quantities[id]) setQty(id, 1);
       }
-      return next
-    })
-  }
+      return next;
+    });
+  };
 
   const handleConfirm = () => {
     const items: PickedItem[] = products
       .filter((p) => added.has(p.id))
-      .map((p) => ({ product: p, quantity: getQty(p.id) }))
-    onConfirm(items)
-    onClose()
-  }
+      .map((p) => ({ product: p, quantity: getQty(p.id) }));
+    onConfirm(items);
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
@@ -138,7 +138,7 @@ function PickerContent({
         {/* Stats */}
         <div className="flex items-center justify-between border-b border-z-border bg-z-bg px-6 py-2 text-xs">
           <span className="text-z-text-muted">
-            Produtos encontrados{' '}
+            Produtos encontrados{" "}
             <strong className="text-z-text">({filtered.length} itens)</strong>
           </span>
           <span className="font-medium text-rose-500">
@@ -150,29 +150,37 @@ function PickerContent({
         <div className="flex-1 overflow-y-auto">
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center gap-2 p-12 text-center text-sm text-z-text-muted">
-              <HugeiconsIcon icon={Search01Icon} size={28} className="text-z-text-hint" />
+              <HugeiconsIcon
+                icon={Search01Icon}
+                size={28}
+                className="text-z-text-hint"
+              />
               <p>Nenhum produto encontrado para "{search}"</p>
             </div>
           ) : (
             <ul className="divide-y divide-z-border">
               {filtered.map((product) => {
-                const isAdded = added.has(product.id)
-                const qty = getQty(product.id)
-                const price = effectivePrice(product)
-                const cover = product.images[0]
+                const isAdded = added.has(product.id);
+                const qty = getQty(product.id);
+                const price = effectivePrice(product);
+                const cover = product.images[0];
 
                 return (
                   <li
                     key={product.id}
                     className={cn(
-                      'flex items-start gap-4 p-4 transition-colors',
-                      isAdded && 'bg-z-green/5',
+                      "flex items-start gap-4 p-4 transition-colors",
+                      isAdded && "bg-z-green/5",
                     )}
                   >
                     {/* Thumbnail */}
                     <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-z-border bg-z-bg">
                       {cover ? (
-                        <img src={cover} alt="" className="h-full w-full object-cover" />
+                        <img
+                          src={cover}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-[10px] text-z-text-hint">
                           ?
@@ -186,16 +194,20 @@ function PickerContent({
                         {product.name}
                       </p>
                       <p className="mt-0.5 text-xs text-z-text-muted">
-                        Código do produto:{' '}
-                        {product.barcode ?? product.sku ?? '-'}
+                        Código do produto:{" "}
+                        {product.barcode ?? product.sku ?? "-"}
                       </p>
                       <p className="text-xs text-z-text-muted">
-                        Estoque:{' '}
-                        {product.stock != null ? `${product.stock} un.` : 'Ilimitado'}
+                        Estoque:{" "}
+                        {product.stock != null
+                          ? `${product.stock} un.`
+                          : "Ilimitado"}
                       </p>
                       <p className="text-xs text-z-text-muted">
-                        Preço:{' '}
-                        <strong className="text-z-text">{formatMoney(price)}</strong>
+                        Preço:{" "}
+                        <strong className="text-z-text">
+                          {formatMoney(price)}
+                        </strong>
                       </p>
                     </div>
 
@@ -225,17 +237,17 @@ function PickerContent({
                         type="button"
                         onClick={() => toggleAdd(product)}
                         className={cn(
-                          'h-9 rounded-xl px-4 text-sm font-medium transition-colors',
+                          "h-9 rounded-xl px-4 text-sm font-medium transition-colors",
                           isAdded
-                            ? 'border border-z-green/30 bg-z-green/10 text-[#10b981]'
-                            : 'bg-z-green text-z-ink hover:opacity-90',
+                            ? "border border-z-green/30 bg-z-green/10 text-[#10b981]"
+                            : "bg-z-green text-z-ink hover:opacity-90",
                         )}
                       >
-                        {isAdded ? 'Adicionado ✓' : 'Adicionar'}
+                        {isAdded ? "Adicionado ✓" : "Adicionar"}
                       </button>
                     </div>
                   </li>
-                )
+                );
               })}
             </ul>
           )}
@@ -261,5 +273,5 @@ function PickerContent({
         </div>
       </div>
     </div>
-  )
+  );
 }

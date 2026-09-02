@@ -1,32 +1,32 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Mail01Icon, ArrowLeft02Icon } from '@hugeicons/core-free-icons'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Mail01Icon, ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import {
   forgotPasswordSchema,
   useResetPassword,
   type ForgotPasswordInput,
-} from '@/features/auth'
-import { ROUTES } from '@/config/routes'
-import { Button, Field } from '@/components/ui'
-import { AuthShell } from './_shared/AuthShell'
+} from "@/features/auth";
+import { ROUTES } from "@/config/routes";
+import { Button, Field } from "@/components/ui";
+import { AuthShell } from "./_shared/AuthShell";
 
 export default function ForgotPasswordPage() {
-  const navigate = useNavigate()
-  const reset = useResetPassword()
-  const [sentTo, setSentTo] = useState<string | null>(null)
+  const navigate = useNavigate();
+  const reset = useResetPassword();
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   const form = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: { email: '' },
-  })
+    defaultValues: { email: "" },
+  });
 
   const onSubmit = form.handleSubmit(async (values) => {
-    await reset.mutateAsync(values.email)
-    setSentTo(values.email)
-  })
+    await reset.mutateAsync(values.email);
+    setSentTo(values.email);
+  });
 
   if (sentTo) {
     return (
@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
         title="Verifique seu e-mail"
         subtitle={
           <>
-            Enviamos um link de recuperação para{' '}
+            Enviamos um link de recuperação para{" "}
             <strong className="text-z-text">{sentTo}</strong>. Verifique também
             a pasta de spam.
           </>
@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
           Voltar ao login
         </Button>
       </AuthShell>
-    )
+    );
   }
 
   return (
@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
           autoComplete="email"
           placeholder="seu@email.com"
           error={form.formState.errors.email?.message}
-          {...form.register('email')}
+          {...form.register("email")}
         />
         {reset.isError && (
           <p className="text-sm text-destructive">
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
           </p>
         )}
         <Button type="submit" disabled={reset.isPending} fullWidth>
-          {reset.isPending ? 'Enviando...' : 'Enviar link de recuperação'}
+          {reset.isPending ? "Enviando..." : "Enviar link de recuperação"}
         </Button>
       </form>
       <div className="mt-5 text-center">
@@ -91,5 +91,5 @@ export default function ForgotPasswordPage() {
         </Link>
       </div>
     </AuthShell>
-  )
+  );
 }

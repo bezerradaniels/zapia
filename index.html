@@ -9,70 +9,100 @@
       content="Zapia — O catálogo digital do comércio de Bom Jesus da Lapa. Crie seu catálogo online, receba pedidos no WhatsApp e impulsione suas vendas locais."
     />
     <link rel="canonical" href="https://zapia.app/" />
-    <meta name="facebook-domain-verification" content="vho2kwimgbq970idbbfk3efwvjd6sb" />
+    <!-- OpenGraph / Social Share -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://zapia.app/" />
+    <meta property="og:title" content="Zapia — Catálogo Digital de Bom Jesus da Lapa" />
+    <meta property="og:description" content="O catálogo digital do comércio de Bom Jesus da Lapa. Crie seu catálogo online e receba pedidos no WhatsApp." />
+    <meta property="og:image" content="https://zapia.app/logos/zapia-logo.svg" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zapia — Catálogo Digital de Bom Jesus da Lapa" />
+    <meta name="twitter:description" content="O catálogo digital do comércio de Bom Jesus da Lapa. Crie seu catálogo online e receba pedidos no WhatsApp." />
+    <meta name="twitter:image" content="https://zapia.app/logos/zapia-logo.svg" />
+    <meta
+      name="facebook-domain-verification"
+      content="vho2kwimgbq970idbbfk3efwvjd6sb"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://xopesjswojsesjmvazel.supabase.co" />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+    />
+    <noscript
+      ><link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    /></noscript>
     <title>Zapia — Catálogo Digital de Bom Jesus da Lapa</title>
     <script>
-      window.dataLayer = window.dataLayer || []
-      ;(() => {
-        const consentKey = 'zapia_cookie_consent'
+      window.dataLayer = window.dataLayer || [];
+      (() => {
+        const consentKey = "zapia_cookie_consent";
         const loadGtm = () => {
-          if (window.__gtmLoaded) return
+          if (window.__gtmLoaded) return;
           try {
-            if (window.localStorage.getItem(consentKey) !== 'accepted') return
+            if (window.localStorage.getItem(consentKey) !== "accepted") return;
           } catch {
-            return
+            return;
           }
-          window.__gtmLoaded = true
-          window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' })
-          const script = document.createElement('script')
-          script.async = true
-          script.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-TXTFF99H'
-          document.head.appendChild(script)
-        }
-        const loadRdStation = () => {
-          if (window.__rdStationLoaded) return
-          try {
-            if (window.localStorage.getItem(consentKey) !== 'accepted') return
-          } catch {
-            return
-          }
-          window.__rdStationLoaded = true
-          const script = document.createElement('script')
-          script.async = true
+          window.__gtmLoaded = true;
+          window.dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" });
+          const script = document.createElement("script");
+          script.async = true;
           script.src =
-            'https://d335luupugsy2.cloudfront.net/js/loader-scripts/7675dd27-b676-4787-b5aa-a9b61f9f7aa2-loader.js'
-          document.body.appendChild(script)
-        }
+            "https://www.googletagmanager.com/gtm.js?id=GTM-TXTFF99H";
+          document.head.appendChild(script);
+        };
+        const loadRdStation = () => {
+          if (window.__rdStationLoaded) return;
+          try {
+            if (window.localStorage.getItem(consentKey) !== "accepted") return;
+          } catch {
+            return;
+          }
+          window.__rdStationLoaded = true;
+          const script = document.createElement("script");
+          script.async = true;
+          script.src =
+            "https://d335luupugsy2.cloudfront.net/js/loader-scripts/7675dd27-b676-4787-b5aa-a9b61f9f7aa2-loader.js";
+          document.body.appendChild(script);
+        };
         const loadTrackers = () => {
-          loadGtm()
-          loadRdStation()
-        }
+          loadGtm();
+          loadRdStation();
+        };
         const schedule = () => {
           try {
-            if (window.localStorage.getItem(consentKey) !== 'accepted') return
+            if (window.localStorage.getItem(consentKey) !== "accepted") return;
           } catch {
-            return
+            return;
           }
-          if ('requestIdleCallback' in window) {
-            window.requestIdleCallback(loadTrackers, { timeout: 3500 })
-            return
+          if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(loadTrackers, { timeout: 3500 });
+            return;
           }
-          window.setTimeout(loadTrackers, 2500)
-        }
-        window.addEventListener('load', schedule, { once: true })
-        window.addEventListener('zapia:cookie-consent-accepted', schedule)
-        ;['pointerdown', 'keydown', 'touchstart'].forEach((eventName) => {
-          window.addEventListener(eventName, loadTrackers, { once: true, passive: true })
-        })
-      })()
+          window.setTimeout(loadTrackers, 2500);
+        };
+        window.addEventListener("load", schedule, { once: true });
+        window.addEventListener("zapia:cookie-consent-accepted", schedule);
+        ["pointerdown", "keydown", "touchstart"].forEach((eventName) => {
+          window.addEventListener(eventName, loadTrackers, {
+            once: true,
+            passive: true,
+          });
+        });
+      })();
     </script>
   </head>
-  <body style="font-family: 'DM Sans', sans-serif !important;">
+  <body style="font-family: &quot;DM Sans&quot;, sans-serif !important">
     <div id="root">
       <!--
         Static, JS-free shell so the very first paint isn't a blank white
@@ -80,8 +110,12 @@
         this the moment it mounts; the <Suspense> fallback in App.tsx
         mirrors the same markup so there's no flash in between.
       -->
-      <div class="flex min-h-screen flex-col items-center justify-center gap-3 bg-z-bg">
-        <div class="h-9 w-9 animate-spin rounded-full border-[3px] border-z-border border-t-z-green"></div>
+      <div
+        class="flex min-h-screen flex-col items-center justify-center gap-3 bg-z-bg"
+      >
+        <div
+          class="h-9 w-9 animate-spin rounded-full border-[3px] border-z-border border-t-z-green"
+        ></div>
         <span class="text-sm font-medium text-z-text-muted">Carregando...</span>
       </div>
     </div>

@@ -1,6 +1,6 @@
-import type { StoreCatalogStatus, SubscriptionStatus } from '@/types/domain'
+import type { StoreCatalogStatus, SubscriptionStatus } from "@/types/domain";
 
-const ACTIVE_STATUSES: SubscriptionStatus[] = ['active', 'past_due']
+const ACTIVE_STATUSES: SubscriptionStatus[] = ["active", "past_due"];
 
 /**
  * Whether the public catalog should be served right now.
@@ -16,7 +16,7 @@ const ACTIVE_STATUSES: SubscriptionStatus[] = ['active', 'past_due']
 export function canAccessCatalog(
   status: StoreCatalogStatus | null | undefined,
 ): boolean {
-  if (!status) return false
+  if (!status) return false;
 
-  return ACTIVE_STATUSES.includes(status.status)
+  return ACTIVE_STATUSES.includes(status.status);
 }

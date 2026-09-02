@@ -1,19 +1,25 @@
-import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
-import { cn } from '@/lib/utils'
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import { cn } from "@/lib/utils";
 
 type EmptyStateProps = {
-  icon: IconSvgElement
-  title: string
-  description?: string
-  action?: React.ReactNode
-  className?: string
-}
+  icon: IconSvgElement;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+  className?: string;
+};
 
-export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+  className,
+}: EmptyStateProps) {
   return (
     <div
       className={cn(
-        'flex flex-col items-center gap-3 rounded-2xl border border-dashed border-z-border py-12 text-center',
+        "flex flex-col items-center gap-3 rounded-2xl border border-dashed border-z-border py-12 text-center",
         className,
       )}
     >
@@ -22,9 +28,11 @@ export function EmptyState({ icon, title, description, action, className }: Empt
       </div>
       <div className="flex flex-col gap-1 px-6">
         <p className="text-sm font-semibold text-z-text">{title}</p>
-        {description && <p className="text-xs text-z-text-muted">{description}</p>}
+        {description && (
+          <p className="text-xs text-z-text-muted">{description}</p>
+        )}
       </div>
       {action}
     </div>
-  )
+  );
 }

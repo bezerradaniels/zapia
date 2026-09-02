@@ -8,35 +8,35 @@ Documentação do ambiente configurado a partir do template `npm create vite@lat
 
 ### Runtime
 
-| Pacote | Versão | Finalidade |
-|---|---|---|
-| `react-router-dom` | ^6 | Roteamento SPA |
-| `@tanstack/react-query` | ^5 | Server state / cache |
-| `zustand` | ^5 | UI state global |
-| `react-hook-form` | ^7 | Formulários |
-| `@hookform/resolvers` | ^5 | Integração RHF + Zod |
-| `zod` | ^4 | Validação de schemas |
-| `i18next` + `react-i18next` | ^26 / ^17 | Internacionalização (pt-BR) |
-| `@supabase/supabase-js` | ^2 | Banco de dados / Auth / Storage |
-| `@stripe/stripe-js` | ^9 | Billing (client-side) |
-| `clsx` | ^2 | Composição de classes CSS |
-| `tailwind-merge` | ^3 | Merge de classes Tailwind |
-| `class-variance-authority` | ^0.7 | Variantes de componentes (shadcn/ui) |
-| `lucide-react` | ^1 | Ícones |
-| `@radix-ui/react-slot` | ^1 | Primitivo base do shadcn/ui |
+| Pacote                      | Versão    | Finalidade                           |
+| --------------------------- | --------- | ------------------------------------ |
+| `react-router-dom`          | ^6        | Roteamento SPA                       |
+| `@tanstack/react-query`     | ^5        | Server state / cache                 |
+| `zustand`                   | ^5        | UI state global                      |
+| `react-hook-form`           | ^7        | Formulários                          |
+| `@hookform/resolvers`       | ^5        | Integração RHF + Zod                 |
+| `zod`                       | ^4        | Validação de schemas                 |
+| `i18next` + `react-i18next` | ^26 / ^17 | Internacionalização (pt-BR)          |
+| `@supabase/supabase-js`     | ^2        | Banco de dados / Auth / Storage      |
+| `@stripe/stripe-js`         | ^9        | Billing (client-side)                |
+| `clsx`                      | ^2        | Composição de classes CSS            |
+| `tailwind-merge`            | ^3        | Merge de classes Tailwind            |
+| `class-variance-authority`  | ^0.7      | Variantes de componentes (shadcn/ui) |
+| `lucide-react`              | ^1        | Ícones                               |
+| `@radix-ui/react-slot`      | ^1        | Primitivo base do shadcn/ui          |
 
 ### Dev
 
-| Pacote | Finalidade |
-|---|---|
-| `tailwindcss@3` | Framework CSS |
-| `postcss` + `autoprefixer` | Processamento CSS |
-| `tailwindcss-animate` | Animações Tailwind (shadcn/ui) |
-| `prettier` + `prettier-plugin-tailwindcss` | Formatação de código |
-| `vitest` + `@vitest/ui` | Testes unitários |
-| `jsdom` | Ambiente DOM para testes |
-| `@testing-library/react` + `jest-dom` + `user-event` | Testes de componentes |
-| `@playwright/test` | Testes E2E |
+| Pacote                                               | Finalidade                     |
+| ---------------------------------------------------- | ------------------------------ |
+| `tailwindcss@3`                                      | Framework CSS                  |
+| `postcss` + `autoprefixer`                           | Processamento CSS              |
+| `tailwindcss-animate`                                | Animações Tailwind (shadcn/ui) |
+| `prettier` + `prettier-plugin-tailwindcss`           | Formatação de código           |
+| `vitest` + `@vitest/ui`                              | Testes unitários               |
+| `jsdom`                                              | Ambiente DOM para testes       |
+| `@testing-library/react` + `jest-dom` + `user-event` | Testes de componentes          |
+| `@playwright/test`                                   | Testes E2E                     |
 
 ---
 
@@ -47,18 +47,18 @@ Documentação do ambiente configurado a partir do template `npm create vite@lat
 Path alias `@/*` apontando para `src/*`:
 
 ```ts
-import path from 'path'
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import path from "path";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
-})
+});
 ```
 
 ### `tsconfig.app.json`
@@ -80,32 +80,36 @@ Adicionados `strict: true`, `DOM.Iterable` e o path alias. O `baseUrl` foi omiti
 ### `tailwind.config.ts`
 
 Tailwind v3 configurado com:
+
 - CSS variables do shadcn/ui (`--background`, `--primary`, etc.)
 - Cor dinâmica por loja (`--color-primary`, `--color-primary-fg`, `--color-primary-hover`) para o tema do catálogo público
 - Plugin `tailwindcss-animate`
 
 ```ts
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ['class'],
-  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  darkMode: ["class"],
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
         // shadcn/ui CSS vars
-        primary: { DEFAULT: 'hsl(var(--primary))', foreground: 'hsl(var(--primary-foreground))' },
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
         // ...demais tokens
 
         // Tema dinâmico da loja (injetado via JS em src/lib/theme/derivePalette.ts)
-        'store-primary': 'var(--color-primary)',
-        'store-primary-fg': 'var(--color-primary-fg)',
-        'store-primary-hover': 'var(--color-primary-hover)',
+        "store-primary": "var(--color-primary)",
+        "store-primary-fg": "var(--color-primary-fg)",
+        "store-primary-hover": "var(--color-primary-hover)",
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
-}
+  plugins: [require("tailwindcss-animate")],
+};
 ```
 
 ### `postcss.config.js`
@@ -116,7 +120,7 @@ export default {
     tailwindcss: {},
     autoprefixer: {},
   },
-}
+};
 ```
 
 ### `components.json` — shadcn/ui
@@ -169,14 +173,14 @@ npx shadcn@latest add dialog input label ...
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ["./src/test/setup.ts"],
   },
   resolve: {
-    alias: { '@': path.resolve(__dirname, './src') },
+    alias: { "@": path.resolve(__dirname, "./src") },
   },
-})
+});
 ```
 
 O arquivo `src/test/setup.ts` importa `@testing-library/jest-dom` para disponibilizar os matchers (`.toBeInTheDocument()`, etc.).
@@ -296,22 +300,22 @@ Contém as três diretivas do Tailwind e as variáveis CSS do shadcn/ui nos toke
 
 ## Variáveis de ambiente (`.env.example`)
 
-| Variável | Onde fica | Descrição |
-|---|---|---|
-| `VITE_SUPABASE_URL` | `.env.local` | URL do projeto Supabase |
-| `VITE_SUPABASE_ANON_KEY` | `.env.local` | Chave anon pública |
-| `VITE_APP_URL` | `.env.local` | URL raiz da aplicação |
-| `VITE_ROOT_DOMAIN` | `.env.local` | Domínio raiz (`zapable.com.br`) |
-| `VITE_DEFAULT_LOCALE` | `.env.local` | `pt-BR` |
-| `VITE_DEFAULT_CURRENCY` | `.env.local` | `BRL` |
-| `VITE_DEFAULT_TIMEZONE` | `.env.local` | `America/Sao_Paulo` |
-| `VITE_DEFAULT_COUNTRY` | `.env.local` | `BR` |
-| `VITE_STRIPE_PUBLISHABLE_KEY` | `.env.local` | Chave pública do Stripe |
-| `STRIPE_SECRET_KEY` | Supabase secret | **Nunca no browser** |
-| `STRIPE_WEBHOOK_SECRET` | Supabase secret | **Nunca no browser** |
-| `STRIPE_PRICE_BASICO/PRO/PREMIUM` | Supabase secret | Price IDs do Stripe |
-| `GEMINI_API_KEY` | Supabase secret | **Nunca no browser** |
-| `NFSE_PROVIDER_API_KEY` | Supabase secret | **Nunca no browser** |
-| `NFSE_COMPANY_ID` | Supabase secret | **Nunca no browser** |
+| Variável                          | Onde fica       | Descrição                       |
+| --------------------------------- | --------------- | ------------------------------- |
+| `VITE_SUPABASE_URL`               | `.env.local`    | URL do projeto Supabase         |
+| `VITE_SUPABASE_ANON_KEY`          | `.env.local`    | Chave anon pública              |
+| `VITE_APP_URL`                    | `.env.local`    | URL raiz da aplicação           |
+| `VITE_ROOT_DOMAIN`                | `.env.local`    | Domínio raiz (`zapable.com.br`) |
+| `VITE_DEFAULT_LOCALE`             | `.env.local`    | `pt-BR`                         |
+| `VITE_DEFAULT_CURRENCY`           | `.env.local`    | `BRL`                           |
+| `VITE_DEFAULT_TIMEZONE`           | `.env.local`    | `America/Sao_Paulo`             |
+| `VITE_DEFAULT_COUNTRY`            | `.env.local`    | `BR`                            |
+| `VITE_STRIPE_PUBLISHABLE_KEY`     | `.env.local`    | Chave pública do Stripe         |
+| `STRIPE_SECRET_KEY`               | Supabase secret | **Nunca no browser**            |
+| `STRIPE_WEBHOOK_SECRET`           | Supabase secret | **Nunca no browser**            |
+| `STRIPE_PRICE_BASICO/PRO/PREMIUM` | Supabase secret | Price IDs do Stripe             |
+| `GEMINI_API_KEY`                  | Supabase secret | **Nunca no browser**            |
+| `NFSE_PROVIDER_API_KEY`           | Supabase secret | **Nunca no browser**            |
+| `NFSE_COMPANY_ID`                 | Supabase secret | **Nunca no browser**            |
 
 Variáveis prefixadas com `VITE_` são injetadas no bundle pelo Vite via `import.meta.env`. As demais ficam exclusivamente em secrets do Supabase / GitHub Actions.

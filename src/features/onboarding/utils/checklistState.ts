@@ -1,14 +1,14 @@
-const DEFAULT_PRIMARY_COLOR = '#00a82d'
+const DEFAULT_PRIMARY_COLOR = "#00a82d";
 
 export type ChecklistState = {
-  hasProduct: boolean
-  hasLogo: boolean
-  hasBanner: boolean
-  hasColor: boolean
-  hasAddress: boolean
-  hasCategory: boolean
-  hasCoupon: boolean
-}
+  hasProduct: boolean;
+  hasLogo: boolean;
+  hasBanner: boolean;
+  hasColor: boolean;
+  hasAddress: boolean;
+  hasCategory: boolean;
+  hasCoupon: boolean;
+};
 
 export function buildChecklistState({
   hasProducts,
@@ -19,13 +19,13 @@ export function buildChecklistState({
   hasCategories,
   hasCoupons,
 }: {
-  hasProducts: boolean
-  logoUrl: string | null | undefined
-  bannerUrl: string | null | undefined
-  primaryColor: string | undefined
-  addressCity: string | null | undefined
-  hasCategories: boolean
-  hasCoupons: boolean
+  hasProducts: boolean;
+  logoUrl: string | null | undefined;
+  bannerUrl: string | null | undefined;
+  primaryColor: string | undefined;
+  addressCity: string | null | undefined;
+  hasCategories: boolean;
+  hasCoupons: boolean;
 }): ChecklistState {
   return {
     hasProduct: hasProducts,
@@ -35,5 +35,5 @@ export function buildChecklistState({
     hasAddress: !!addressCity,
     hasCategory: hasCategories,
     hasCoupon: hasCoupons,
-  }
+  };
 }

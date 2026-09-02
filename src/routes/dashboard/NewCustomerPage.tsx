@@ -1,31 +1,33 @@
-import { useNavigate } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowLeft02Icon } from '@hugeicons/core-free-icons'
-import { useActiveStore } from '@/lib/tenant'
-import { useCreateCustomer } from '@/features/customers'
-import { CustomerForm } from '@/features/customers/components/CustomerForm'
-import { ROUTES } from '@/config/routes'
-import { toE164BR } from '@/lib/br'
-import type { CustomerFormValues } from '@/features/customers/schemas/customerSchema'
+import { useNavigate } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { useActiveStore } from "@/lib/tenant";
+import { useCreateCustomer } from "@/features/customers";
+import { CustomerForm } from "@/features/customers/components/CustomerForm";
+import { ROUTES } from "@/config/routes";
+import { toE164BR } from "@/lib/br";
+import type { CustomerFormValues } from "@/features/customers/schemas/customerSchema";
 
 export default function NewCustomerPage() {
-  const navigate = useNavigate()
-  const { store } = useActiveStore()
-  const createCustomer = useCreateCustomer(store?.id ?? '')
+  const navigate = useNavigate();
+  const { store } = useActiveStore();
+  const createCustomer = useCreateCustomer(store?.id ?? "");
 
   async function handleSubmit(values: CustomerFormValues) {
-    if (!store) return
+    if (!store) return;
     await createCustomer.mutateAsync({
       ...values,
       whatsapp_phone: toE164BR(values.whatsapp_phone),
-      secondary_phone: values.secondary_phone ? toE164BR(values.secondary_phone) : null,
+      secondary_phone: values.secondary_phone
+        ? toE164BR(values.secondary_phone)
+        : null,
       email: values.email || null,
       website: values.website || null,
       cpf_cnpj: values.cpf_cnpj || null,
       birthday: values.birthday || null,
       profile_notes: values.profile_notes || null,
-    })
-    navigate(ROUTES.dashboardCustomers)
+    });
+    navigate(ROUTES.dashboardCustomers);
   }
 
   return (
@@ -51,5 +53,5 @@ export default function NewCustomerPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

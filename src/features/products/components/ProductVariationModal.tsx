@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Cancel01Icon,
   PlusSignIcon,
@@ -8,48 +8,85 @@ import {
   ColorPickerIcon,
   RulerIcon,
   Settings01Icon,
-} from '@hugeicons/core-free-icons'
-import { cn } from '@/lib/utils'
-import type { VariationType, VariationOption } from '@/types/domain'
+} from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
+import type { VariationType, VariationOption } from "@/types/domain";
 
 type SharedProps = {
-  productName?: string
-  productStock?: number | null
-  initialType?: VariationType | null
-  initialLabel?: string | null
-  initialOptions?: VariationOption[] | null
-  onSave: (type: VariationType, label: string, options: VariationOption[]) => void
-  onClose: () => void
-}
+  productName?: string;
+  productStock?: number | null;
+  initialType?: VariationType | null;
+  initialLabel?: string | null;
+  initialOptions?: VariationOption[] | null;
+  onSave: (
+    type: VariationType,
+    label: string,
+    options: VariationOption[],
+  ) => void;
+  onClose: () => void;
+};
 
-type Props = SharedProps & { open: boolean }
+type Props = SharedProps & { open: boolean };
 
-const COLOR_PRESETS = ['Preto', 'Branco', 'Cinza', 'Amarelo', 'Vermelho', 'Verde', 'Azul', 'Roxo', 'Rosa']
-const SIZE_PRESETS = ['PP', 'P', 'M', 'G', 'GG', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
+const COLOR_PRESETS = [
+  "Preto",
+  "Branco",
+  "Cinza",
+  "Amarelo",
+  "Vermelho",
+  "Verde",
+  "Azul",
+  "Roxo",
+  "Rosa",
+];
+const SIZE_PRESETS = [
+  "PP",
+  "P",
+  "M",
+  "G",
+  "GG",
+  "35",
+  "36",
+  "37",
+  "38",
+  "39",
+  "40",
+  "41",
+  "42",
+  "43",
+  "44",
+];
 
 const TYPE_OPTIONS = [
-  { value: 'color' as VariationType, label: 'Cor', icon: ColorPickerIcon },
-  { value: 'size' as VariationType, label: 'Tamanho', icon: RulerIcon },
-  { value: 'other' as VariationType, label: 'Outro tipo', icon: Settings01Icon },
-]
+  { value: "color" as VariationType, label: "Cor", icon: ColorPickerIcon },
+  { value: "size" as VariationType, label: "Tamanho", icon: RulerIcon },
+  {
+    value: "other" as VariationType,
+    label: "Outro tipo",
+    icon: Settings01Icon,
+  },
+];
 
 function optionAttributeValue(option: VariationOption, label: string) {
-  return option.attributes?.[label] ?? option.name
+  return option.attributes?.[label] ?? option.name;
 }
 
-function inferExtraLabels(options: VariationOption[] | null | undefined, mainLabel?: string | null) {
-  const labels: string[] = []
-  ;(options ?? []).forEach((option) => {
+function inferExtraLabels(
+  options: VariationOption[] | null | undefined,
+  mainLabel?: string | null,
+) {
+  const labels: string[] = [];
+  (options ?? []).forEach((option) => {
     Object.keys(option.attributes ?? {}).forEach((label) => {
-      if (label !== mainLabel && !labels.includes(label)) labels.push(label)
-    })
-  })
-  return labels
+      if (label !== mainLabel && !labels.includes(label)) labels.push(label);
+    });
+  });
+  return labels;
 }
 
 export function ProductVariationModal({ open, ...rest }: Props) {
-  if (!open) return null
-  return <ModalContent key="variation-modal" {...rest} />
+  if (!open) return null;
+  return <ModalContent key="variation-modal" {...rest} />;
 }
 
 function ModalContent({
@@ -61,160 +98,185 @@ function ModalContent({
   onSave,
   onClose,
 }: SharedProps) {
-  const [type, setType] = useState<VariationType>(initialType ?? 'color')
+  const [type, setType] = useState<VariationType>(initialType ?? "color");
   const [customLabel, setCustomLabel] = useState(
-    initialType === 'other' ? (initialLabel ?? '') : '',
-  )
+    initialType === "other" ? (initialLabel ?? "") : "",
+  );
   const [extraLabels, setExtraLabels] = useState<string[]>(
     inferExtraLabels(initialOptions, initialLabel),
-  )
+  );
   const [options, setOptions] = useState<VariationOption[]>(
-    initialOptions?.length ? initialOptions : [{ name: '' }],
-  )
+    initialOptions?.length ? initialOptions : [{ name: "" }],
+  );
 
   const label =
-    type === 'color' ? 'Cor' : type === 'size' ? 'Tamanho' : customLabel || 'Opções do produto'
-  const currentProductName = productName?.trim() ?? ''
+    type === "color"
+      ? "Cor"
+      : type === "size"
+        ? "Tamanho"
+        : customLabel || "Opções do produto";
+  const currentProductName = productName?.trim() ?? "";
 
-  const presets = type === 'color' ? COLOR_PRESETS : type === 'size' ? SIZE_PRESETS : []
+  const presets =
+    type === "color" ? COLOR_PRESETS : type === "size" ? SIZE_PRESETS : [];
 
   const addPreset = (name: string) => {
     if (
       options.some(
-        (o) => optionAttributeValue(o, label).toLowerCase() === name.toLowerCase(),
+        (o) =>
+          optionAttributeValue(o, label).toLowerCase() === name.toLowerCase(),
       )
     ) {
-      return
+      return;
     }
-    const lastEmpty = options.findIndex((o) => !o.name.trim())
+    const lastEmpty = options.findIndex((o) => !o.name.trim());
     if (lastEmpty >= 0) {
       setOptions(
         options.map((o, i) =>
-          i === lastEmpty ? { ...o, name, attributes: { ...(o.attributes ?? {}), [label]: name } } : o,
+          i === lastEmpty
+            ? {
+                ...o,
+                name,
+                attributes: { ...(o.attributes ?? {}), [label]: name },
+              }
+            : o,
         ),
-      )
+      );
     } else {
-      setOptions([...options, { name, attributes: { [label]: name } }])
+      setOptions([...options, { name, attributes: { [label]: name } }]);
     }
-  }
+  };
 
-  const addOption = () => setOptions([...options, { name: '' }])
+  const addOption = () => setOptions([...options, { name: "" }]);
 
-  const addExtraLabel = () => setExtraLabels([...extraLabels, ''])
+  const addExtraLabel = () => setExtraLabels([...extraLabels, ""]);
 
   const updateExtraLabel = (index: number, nextLabel: string) => {
-    const previousLabel = extraLabels[index]
-    setExtraLabels(extraLabels.map((item, i) => (i === index ? nextLabel : item)))
-    if (!previousLabel || previousLabel === nextLabel) return
+    const previousLabel = extraLabels[index];
+    setExtraLabels(
+      extraLabels.map((item, i) => (i === index ? nextLabel : item)),
+    );
+    if (!previousLabel || previousLabel === nextLabel) return;
     setOptions(
       options.map((option) => {
-        const attributes = { ...(option.attributes ?? {}) }
+        const attributes = { ...(option.attributes ?? {}) };
         if (attributes[previousLabel] !== undefined) {
-          attributes[nextLabel] = attributes[previousLabel]
-          delete attributes[previousLabel]
+          attributes[nextLabel] = attributes[previousLabel];
+          delete attributes[previousLabel];
         }
-        return { ...option, attributes }
+        return { ...option, attributes };
       }),
-    )
-  }
+    );
+  };
 
   const removeExtraLabel = (index: number) => {
-    const removedLabel = extraLabels[index]
-    setExtraLabels(extraLabels.filter((_, i) => i !== index))
-    if (!removedLabel) return
+    const removedLabel = extraLabels[index];
+    setExtraLabels(extraLabels.filter((_, i) => i !== index));
+    if (!removedLabel) return;
     setOptions(
       options.map((option) => {
-        const attributes = { ...(option.attributes ?? {}) }
-        delete attributes[removedLabel]
-        return { ...option, attributes }
+        const attributes = { ...(option.attributes ?? {}) };
+        delete attributes[removedLabel];
+        return { ...option, attributes };
       }),
-    )
-  }
+    );
+  };
 
   const addCurrentProductOption = () => {
-    const name = currentProductName
-    if (!name) return
-    if (options.some((o) => o.name.trim().toLowerCase() === name.toLowerCase())) return
+    const name = currentProductName;
+    if (!name) return;
+    if (options.some((o) => o.name.trim().toLowerCase() === name.toLowerCase()))
+      return;
 
     const currentProductOption: VariationOption = {
       name,
       stock: productStock ?? null,
       attributes: { [label]: name },
-    }
-    const filledOptions = options.filter((o) => o.name.trim())
-    setOptions([currentProductOption, ...filledOptions])
-  }
+    };
+    const filledOptions = options.filter((o) => o.name.trim());
+    setOptions([currentProductOption, ...filledOptions]);
+  };
 
   const removeOption = (i: number) => {
     if (options.length === 1) {
-      setOptions([{ name: '' }])
+      setOptions([{ name: "" }]);
     } else {
-      setOptions(options.filter((_, idx) => idx !== i))
+      setOptions(options.filter((_, idx) => idx !== i));
     }
-  }
+  };
 
   const updateOption = (i: number, name: string) =>
     setOptions(
       options.map((o, idx) =>
         idx === i
-          ? { ...o, name, attributes: { ...(o.attributes ?? {}), [label]: name } }
+          ? {
+              ...o,
+              name,
+              attributes: { ...(o.attributes ?? {}), [label]: name },
+            }
           : o,
       ),
-    )
+    );
 
-  const updateOptionAttribute = (i: number, attributeLabel: string, value: string) =>
+  const updateOptionAttribute = (
+    i: number,
+    attributeLabel: string,
+    value: string,
+  ) =>
     setOptions(
       options.map((o, idx) => {
-        if (idx !== i) return o
-        const attributes = { ...(o.attributes ?? {}) }
+        if (idx !== i) return o;
+        const attributes = { ...(o.attributes ?? {}) };
         if (value.trim()) {
-          attributes[attributeLabel] = value
+          attributes[attributeLabel] = value;
         } else {
-          delete attributes[attributeLabel]
+          delete attributes[attributeLabel];
         }
-        return { ...o, attributes }
+        return { ...o, attributes };
       }),
-    )
+    );
 
   const updateOptionStock = (i: number, stock: number | null) =>
-    setOptions(options.map((o, idx) => (idx === i ? { ...o, stock } : o)))
+    setOptions(options.map((o, idx) => (idx === i ? { ...o, stock } : o)));
 
   const handleSave = () => {
     const filled = options
       .filter((o) => o.name.trim())
       .map((o) => {
-        const attributes = { ...(o.attributes ?? {}), [label]: o.name.trim() }
+        const attributes = { ...(o.attributes ?? {}), [label]: o.name.trim() };
         extraLabels
           .map((extraLabel) => extraLabel.trim())
           .filter(Boolean)
           .forEach((extraLabel) => {
-            const value = attributes[extraLabel]?.trim()
+            const value = attributes[extraLabel]?.trim();
             if (value) {
-              attributes[extraLabel] = value
+              attributes[extraLabel] = value;
             } else {
-              delete attributes[extraLabel]
+              delete attributes[extraLabel];
             }
-          })
+          });
         const cleanAttributes = Object.fromEntries(
-          Object.entries(attributes).filter(([key, value]) => key.trim() && value.trim()),
-        )
+          Object.entries(attributes).filter(
+            ([key, value]) => key.trim() && value.trim(),
+          ),
+        );
 
         return {
           name:
             Object.keys(cleanAttributes).length > 1
-              ? Object.values(cleanAttributes).join(' / ')
+              ? Object.values(cleanAttributes).join(" / ")
               : o.name.trim(),
           image_url: null,
           stock: o.stock ?? null,
           sku: o.sku ?? null,
           attributes: cleanAttributes,
-        }
-      })
-    onSave(type, label, filled)
-    onClose()
-  }
+        };
+      });
+    onSave(type, label, filled);
+    onClose();
+  };
 
-  const canSave = options.some((o) => o.name.trim())
+  const canSave = options.some((o) => o.name.trim());
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
@@ -252,10 +314,10 @@ function ModalContent({
                   type="button"
                   onClick={() => setType(opt.value)}
                   className={cn(
-                    'flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-medium transition-colors',
+                    "flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-medium transition-colors",
                     type === opt.value
-                      ? 'border-z-green bg-z-green/10 text-[#10b981]'
-                      : 'border-z-border text-z-text-muted hover:border-z-text hover:text-z-text',
+                      ? "border-z-green bg-z-green/10 text-[#10b981]"
+                      : "border-z-border text-z-text-muted hover:border-z-text hover:text-z-text",
                   )}
                 >
                   <HugeiconsIcon icon={opt.icon} size={16} />
@@ -264,7 +326,7 @@ function ModalContent({
               ))}
             </div>
 
-            {type === 'other' && (
+            {type === "other" && (
               <div className="mt-3">
                 <input
                   type="text"
@@ -276,11 +338,14 @@ function ModalContent({
               </div>
             )}
 
-            {type !== 'other' && (
+            {type !== "other" && (
               <div className="mt-2 rounded-lg border border-z-border bg-z-bg px-3 py-2 text-sm text-z-text-muted">
                 <span className="inline-flex items-center gap-1.5 font-medium text-z-text">
-                  <HugeiconsIcon icon={type === 'color' ? ColorPickerIcon : RulerIcon} size={16} />
-                  {type === 'color' ? 'Cor' : 'Tamanho'}
+                  <HugeiconsIcon
+                    icon={type === "color" ? ColorPickerIcon : RulerIcon}
+                    size={16}
+                  />
+                  {type === "color" ? "Cor" : "Tamanho"}
                 </span>
               </div>
             )}
@@ -292,7 +357,8 @@ function ModalContent({
                     Variações combinadas
                   </p>
                   <p className="mt-1 text-xs text-z-text-muted">
-                    Use quando a opção depender de mais de uma escolha, como jogador e tipo.
+                    Use quando a opção depender de mais de uma escolha, como
+                    jogador e tipo.
                   </p>
                 </div>
                 <button
@@ -312,7 +378,9 @@ function ModalContent({
                         type="text"
                         placeholder="Ex: Tamanho, Acabamento, Time..."
                         value={extraLabel}
-                        onChange={(e) => updateExtraLabel(index, e.target.value)}
+                        onChange={(e) =>
+                          updateExtraLabel(index, e.target.value)
+                        }
                         className="h-9 min-w-0 flex-1 rounded-lg border border-z-border bg-white px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                       />
                       <button
@@ -340,7 +408,8 @@ function ModalContent({
                   Que opções de "{label}" este produto possui?
                 </span>
                 <span className="block text-xs text-z-text-muted">
-                  Inclua todas as versões vendáveis, inclusive a versão atual do produto.
+                  Inclua todas as versões vendáveis, inclusive a versão atual do
+                  produto.
                 </span>
               </div>
             </div>
@@ -369,7 +438,8 @@ function ModalContent({
                 onClick={addCurrentProductOption}
                 disabled={options.some(
                   (o) =>
-                    o.name.trim().toLowerCase() === currentProductName.toLowerCase(),
+                    o.name.trim().toLowerCase() ===
+                    currentProductName.toLowerCase(),
                 )}
                 className="mb-4 inline-flex items-center gap-2 rounded-xl border border-z-border bg-white px-3 py-2 text-sm font-medium text-z-text transition-colors hover:border-z-green hover:text-[#10b981] disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -395,11 +465,11 @@ function ModalContent({
                       <input
                         type="text"
                         placeholder={
-                          type === 'color'
-                            ? 'Ex: Azul ou Rosa'
-                            : type === 'size'
-                              ? 'Ex: P, M ou G'
-                              : 'Ex: Opção 1'
+                          type === "color"
+                            ? "Ex: Azul ou Rosa"
+                            : type === "size"
+                              ? "Ex: P, M ou G"
+                              : "Ex: Opção 1"
                         }
                         value={optionAttributeValue(opt, label)}
                         onChange={(e) => updateOption(i, e.target.value)}
@@ -414,11 +484,13 @@ function ModalContent({
                         type="number"
                         min={0}
                         placeholder="Ilimitado"
-                        value={opt.stock ?? ''}
+                        value={opt.stock ?? ""}
                         onChange={(e) =>
                           updateOptionStock(
                             i,
-                            e.target.value === '' ? null : Number(e.target.value),
+                            e.target.value === ""
+                              ? null
+                              : Number(e.target.value),
                           )
                         }
                         className="h-10 w-full rounded-lg border border-z-border px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
@@ -442,33 +514,41 @@ function ModalContent({
                       type="number"
                       min={0}
                       placeholder="Ilimitado"
-                      value={opt.stock ?? ''}
+                      value={opt.stock ?? ""}
                       onChange={(e) =>
                         updateOptionStock(
                           i,
-                          e.target.value === '' ? null : Number(e.target.value),
+                          e.target.value === "" ? null : Number(e.target.value),
                         )
                       }
                       className="mt-1.5 h-10 w-full rounded-lg border border-z-border px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                     />
                   </div>
 
-                  {extraLabels.filter((extraLabel) => extraLabel.trim()).length > 0 && (
+                  {extraLabels.filter((extraLabel) => extraLabel.trim())
+                    .length > 0 && (
                     <div className="ml-10 mt-3 grid gap-2 sm:grid-cols-2">
                       {extraLabels
                         .map((extraLabel) => extraLabel.trim())
                         .filter(Boolean)
                         .map((extraLabel) => (
-                          <div key={extraLabel} className="flex flex-col gap-1.5">
+                          <div
+                            key={extraLabel}
+                            className="flex flex-col gap-1.5"
+                          >
                             <span className="text-[11px] font-semibold text-z-text-hint">
                               {extraLabel}
                             </span>
                             <input
                               type="text"
                               placeholder={`Ex: ${extraLabel}`}
-                              value={opt.attributes?.[extraLabel] ?? ''}
+                              value={opt.attributes?.[extraLabel] ?? ""}
                               onChange={(e) =>
-                                updateOptionAttribute(i, extraLabel, e.target.value)
+                                updateOptionAttribute(
+                                  i,
+                                  extraLabel,
+                                  e.target.value,
+                                )
                               }
                               className="h-10 w-full rounded-lg border border-z-border px-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
                             />
@@ -511,5 +591,5 @@ function ModalContent({
         </div>
       </div>
     </div>
-  )
+  );
 }

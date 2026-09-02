@@ -1,55 +1,70 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, Navigate, useNavigate, useOutletContext } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowLeft02Icon, WhatsappIcon, Alert02Icon } from '@hugeicons/core-free-icons'
-import type { Store } from '@/types/domain'
-import { useCartStore } from '@/features/cart'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Link,
+  Navigate,
+  useNavigate,
+  useOutletContext,
+} from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  ArrowLeft02Icon,
+  WhatsappIcon,
+  Alert02Icon,
+} from "@hugeicons/core-free-icons";
+import type { Store } from "@/types/domain";
+import { useCartStore } from "@/features/cart";
 // Direct file import (not the '@/features/products' barrel) so this
 // storefront page doesn't pull in ProductForm's dashboard-only weight.
-import { effectivePrice } from '@/features/products/utils/price'
-import { checkoutSchema, type CheckoutInput, useCreateOrder } from '@/features/orders'
-import { formatMoney, toTitleCase } from '@/lib/format'
-import { maskPhoneBR, validatePhoneBR } from '@/lib/br'
-import { buildOrderMessage, buildWhatsAppLink } from '@/lib/whatsapp'
-import { PhoneInput } from '@/components/forms/PhoneInput'
-import { Input } from '@/components/ui'
-import { buildStorePath } from '@/lib/tenant'
-import { useDocumentMeta } from '@/hooks/useDocumentMeta'
-import { EmptyState } from '@/components/feedback'
+import { effectivePrice } from "@/features/products/utils/price";
+import {
+  checkoutSchema,
+  type CheckoutInput,
+  useCreateOrder,
+} from "@/features/orders";
+import { formatMoney, toTitleCase } from "@/lib/format";
+import { maskPhoneBR, validatePhoneBR } from "@/lib/br";
+import { buildOrderMessage, buildWhatsAppLink } from "@/lib/whatsapp";
+import { PhoneInput } from "@/components/forms/PhoneInput";
+import { Input } from "@/components/ui";
+import { buildStorePath } from "@/lib/tenant";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import { EmptyState } from "@/components/feedback";
 
 export default function CheckoutPage() {
-  const store = useOutletContext<Store>()
+  const store = useOutletContext<Store>();
 
   useDocumentMeta({
     title: `Finalizar pedido - ${store.name}`,
     description: `Finalize seu pedido na ${store.name} e receba a confirmação pelo WhatsApp.`,
-  })
+  });
 
-  const navigate = useNavigate()
-  const items = useCartStore((s) => s.items)
-  const subtotal = useCartStore((s) => s.subtotalInCents())
-  const discount = useCartStore((s) => s.discountInCents())
-  const total = useCartStore((s) => s.totalInCents())
-  const coupon = useCartStore((s) => s.coupon)
-  const clearCart = useCartStore((s) => s.clearCart)
-  const createOrder = useCreateOrder()
-  const homePath = buildStorePath(store.slug)
-  const cartPath = buildStorePath(store.slug, 'carrinho')
-  const [deliveryConfirmed, setDeliveryConfirmed] = useState(false)
+  const navigate = useNavigate();
+  const items = useCartStore((s) => s.items);
+  const subtotal = useCartStore((s) => s.subtotalInCents());
+  const discount = useCartStore((s) => s.discountInCents());
+  const total = useCartStore((s) => s.totalInCents());
+  const coupon = useCartStore((s) => s.coupon);
+  const clearCart = useCartStore((s) => s.clearCart);
+  const createOrder = useCreateOrder();
+  const homePath = buildStorePath(store.slug);
+  const cartPath = buildStorePath(store.slug, "carrinho");
+  const [deliveryConfirmed, setDeliveryConfirmed] = useState(false);
 
   const form = useForm<CheckoutInput>({
     resolver: zodResolver(checkoutSchema),
-    defaultValues: { name: '', phone: '' },
-  })
+    defaultValues: { name: "", phone: "" },
+  });
 
-  const name = form.watch('name')
-  const phone = form.watch('phone')
+  const name = form.watch("name");
+  const phone = form.watch("phone");
   const isFormComplete =
-    name.trim().length >= 2 && validatePhoneBR(phone ?? '') && deliveryConfirmed
+    name.trim().length >= 2 &&
+    validatePhoneBR(phone ?? "") &&
+    deliveryConfirmed;
 
-  if (items.length === 0) return <Navigate to={cartPath} replace />
+  if (items.length === 0) return <Navigate to={cartPath} replace />;
 
   if (!store.whatsapp_phone) {
     return (
@@ -62,23 +77,23 @@ export default function CheckoutPage() {
             <Link
               to={homePath}
               className="text-sm font-semibold hover:underline"
-              style={{ color: 'var(--store-primary)' }}
+              style={{ color: "var(--store-primary)" }}
             >
               Voltar ao catálogo
             </Link>
           }
         />
       </div>
-    )
+    );
   }
 
   const onSubmit = form.handleSubmit(async (values) => {
     if (!deliveryConfirmed) {
-      form.setError('root', {
+      form.setError("root", {
         message:
-          'Confirme a forma de entrega para continuar. O pedido será finalizado pelo WhatsApp.',
-      })
-      return
+          "Confirme a forma de entrega para continuar. O pedido será finalizado pelo WhatsApp.",
+      });
+      return;
     }
 
     try {
@@ -95,7 +110,7 @@ export default function CheckoutPage() {
               discountInCents: coupon.discountInCents,
             }
           : null,
-      })
+      });
 
       const message = buildOrderMessage({
         store: { name: store.name, slug: store.slug },
@@ -108,24 +123,24 @@ export default function CheckoutPage() {
         coupon: coupon
           ? { code: coupon.code, discountInCents: coupon.discountInCents }
           : null,
-      })
-      const url = buildWhatsAppLink(store.whatsapp_phone!, message)
+      });
+      const url = buildWhatsAppLink(store.whatsapp_phone!, message);
 
-      clearCart()
+      clearCart();
       navigate(buildStorePath(store.slug, `pedido/${order.id}`), {
         replace: true,
         state: { whatsappUrl: url },
-      })
-      window.open(url, '_blank', 'noopener')
+      });
+      window.open(url, "_blank", "noopener");
     } catch (err) {
-      form.setError('root', {
+      form.setError("root", {
         message:
           err instanceof Error
             ? `Não conseguimos registrar o pedido: ${err.message}`
-            : 'Não conseguimos registrar o pedido. Tente novamente.',
-      })
+            : "Não conseguimos registrar o pedido. Tente novamente.",
+      });
     }
-  })
+  });
 
   return (
     <div className="mx-auto w-full max-w-[800px] px-4 py-5 pb-28 sm:px-6 sm:pb-8">
@@ -142,11 +157,17 @@ export default function CheckoutPage() {
 
       <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          <div className="rounded-2xl border bg-white p-5" style={{ borderColor: '#cbd5e1' }}>
+          <div
+            className="rounded-2xl border bg-white p-5"
+            style={{ borderColor: "#cbd5e1" }}
+          >
             <div className="mb-4 text-[15px] font-bold">Dados pessoais</div>
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="flex items-center gap-1.5 text-sm font-medium text-z-text" htmlFor="checkout-name">
+                <label
+                  className="flex items-center gap-1.5 text-sm font-medium text-z-text"
+                  htmlFor="checkout-name"
+                >
                   Nome completo
                   <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
                     Obrigatório
@@ -158,7 +179,7 @@ export default function CheckoutPage() {
                   placeholder="Seu nome"
                   aria-invalid={!!form.formState.errors.name || undefined}
                   className="bg-z-bg border-[#cbd5e1]"
-                  {...form.register('name')}
+                  {...form.register("name")}
                 />
                 {form.formState.errors.name && (
                   <span className="text-xs text-destructive">
@@ -167,7 +188,10 @@ export default function CheckoutPage() {
                 )}
               </div>
               <div className="flex flex-col gap-1">
-                <label className="flex items-center gap-1.5 text-sm font-medium text-z-text" htmlFor="checkout-phone">
+                <label
+                  className="flex items-center gap-1.5 text-sm font-medium text-z-text"
+                  htmlFor="checkout-phone"
+                >
                   WhatsApp
                   <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
                     Obrigatório
@@ -176,9 +200,9 @@ export default function CheckoutPage() {
                 <PhoneInput
                   id="checkout-phone"
                   className="h-11 w-full rounded-lg border border-[#cbd5e1] bg-z-bg px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                  value={form.watch('phone') ?? ''}
+                  value={form.watch("phone") ?? ""}
                   onChange={(masked) =>
-                    form.setValue('phone', masked, {
+                    form.setValue("phone", masked, {
                       shouldValidate: true,
                       shouldDirty: true,
                     })
@@ -193,7 +217,10 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5" style={{ borderColor: '#cbd5e1' }}>
+          <div
+            className="rounded-2xl border bg-white p-5"
+            style={{ borderColor: "#cbd5e1" }}
+          >
             <div className="mb-3 flex items-center gap-1.5 text-[15px] font-bold">
               Confirmar forma de entrega
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-[#02a650]">
@@ -204,45 +231,48 @@ export default function CheckoutPage() {
               type="button"
               aria-pressed={deliveryConfirmed}
               onClick={() => {
-                setDeliveryConfirmed((current) => !current)
-                form.clearErrors('root')
+                setDeliveryConfirmed((current) => !current);
+                form.clearErrors("root");
               }}
               className="flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors"
               style={{
-                background: deliveryConfirmed ? 'rgba(0,168,45,0.04)' : '#f8fafc',
+                background: deliveryConfirmed
+                  ? "rgba(0,168,45,0.04)"
+                  : "#f8fafc",
                 border: deliveryConfirmed
-                  ? '2px solid var(--store-primary)'
-                  : '1px solid #cbd5e1',
+                  ? "2px solid var(--store-primary)"
+                  : "1px solid #cbd5e1",
               }}
             >
               <div
                 className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border bg-white"
                 style={{
                   borderColor: deliveryConfirmed
-                    ? 'var(--store-primary)'
-                    : 'var(--z-border, #e5e7eb)',
+                    ? "var(--store-primary)"
+                    : "var(--z-border, #e5e7eb)",
                 }}
                 aria-hidden="true"
               >
                 {deliveryConfirmed && (
                   <span
                     className="h-2.5 w-2.5 rounded-full"
-                    style={{ background: 'var(--store-primary)' }}
+                    style={{ background: "var(--store-primary)" }}
                   />
                 )}
               </div>
               <div>
-                <div className="text-sm font-semibold">Combinar entrega pelo WhatsApp</div>
+                <div className="text-sm font-semibold">
+                  Combinar entrega pelo WhatsApp
+                </div>
                 <div className="mt-1 text-xs leading-relaxed text-z-text-muted">
-                  Ao confirmar o pedido, você será direcionado para abrir o app do
-                  WhatsApp com as informações do pedido preenchidas. Envie a mensagem
-                  por lá para finalizar o pedido e combinar entrega, frete e prazo com
-                  a loja.
+                  Ao confirmar o pedido, você será direcionado para abrir o app
+                  do WhatsApp com as informações do pedido preenchidas. Envie a
+                  mensagem por lá para finalizar o pedido e combinar entrega,
+                  frete e prazo com a loja.
                 </div>
               </div>
             </button>
           </div>
-
 
           {form.formState.errors.root && (
             <p className="text-sm text-destructive">
@@ -252,7 +282,10 @@ export default function CheckoutPage() {
         </form>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-2xl border bg-white p-5" style={{ borderColor: '#cbd5e1' }}>
+          <div
+            className="rounded-2xl border bg-white p-5"
+            style={{ borderColor: "#cbd5e1" }}
+          >
             <div className="mb-4 text-[15px] font-bold">Resumo do pedido</div>
             <ul className="flex flex-col gap-2.5 text-[13px]">
               {items.map((item) => (
@@ -299,10 +332,10 @@ export default function CheckoutPage() {
               onClick={onSubmit}
               disabled={createOrder.isPending || !isFormComplete}
               className="mt-4 hidden w-full items-center justify-center gap-2 rounded-lg py-3.5 text-[15px] font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-60 sm:flex"
-              style={{ background: '#34d399' }}
+              style={{ background: "#34d399" }}
             >
               <HugeiconsIcon icon={WhatsappIcon} size={18} />
-              {createOrder.isPending ? 'Registrando...' : 'Confirmar pedido'}
+              {createOrder.isPending ? "Registrando..." : "Confirmar pedido"}
             </button>
           </div>
         </aside>
@@ -311,7 +344,7 @@ export default function CheckoutPage() {
       {/* Sticky bottom confirm — mobile only */}
       <div
         className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-z-border bg-white px-4 py-3 shadow-z-lg sm:hidden"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
       >
         <div className="min-w-0 flex-1">
           <div className="text-[11px] text-z-text-hint">Total</div>
@@ -324,12 +357,12 @@ export default function CheckoutPage() {
           onClick={onSubmit}
           disabled={createOrder.isPending || !isFormComplete}
           className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full px-5 text-[13px] font-bold uppercase tracking-wider text-white transition-opacity active:opacity-80 disabled:opacity-60"
-          style={{ background: '#34d399' }}
+          style={{ background: "#34d399" }}
         >
           <HugeiconsIcon icon={WhatsappIcon} size={14} />
-          {createOrder.isPending ? 'Enviando...' : 'Confirmar'}
+          {createOrder.isPending ? "Enviando..." : "Confirmar"}
         </button>
       </div>
     </div>
-  )
+  );
 }

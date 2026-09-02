@@ -24,10 +24,11 @@ export function AIPanel() {
           Eu encontro oportunidades de vendas onde você não vê
         </p>
         <p className="text-xs text-z-text-muted leading-relaxed">
-          Eu analiso os nossos clientes, pedidos e produtos e identifico as melhores oportunidades
-          de negócio entre eles. Só preciso dos cadastros atualizados.
+          Eu analiso os nossos clientes, pedidos e produtos e identifico as
+          melhores oportunidades de negócio entre eles. Só preciso dos cadastros
+          atualizados.
         </p>
       </div>
     </div>
-  )
+  );
 }

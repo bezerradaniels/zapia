@@ -21,20 +21,20 @@ R$ 20/dia ainda está abaixo do que o Google recomenda para PMax (R$ 50–100/di
 
 ## 1. Configurações da campanha
 
-| Campo | Valor |
-|---|---|
-| Tipo | Performance Max |
-| Objetivo | Leads / "Incentivar ações on-line" (sem meta de objetivo de loja física) |
-| Conversão principal | **Cadastro de trial** (marque como "Primária"; deixe as demais como "Secundária") |
-| Estratégia de lance | **Maximizar conversões** (SEM tCPA no início) |
-| Orçamento diário | R$ 20,00 |
-| Localização | Brasil (selecione "Presença: pessoas no Brasil" — não "interesse") |
-| Idioma | Português |
-| **URL final** | Página de trial: `https://zapia.app/cadastro` *(confirme a rota exata — é a `TrialSignupPage`)* |
-| **Expansão de URL final** | **DESATIVADA** (trava o tráfego na página de trial) |
-| Exclusões de URL | Adicione domínio inteiro exceto a página de trial, se quiser reforçar |
-| Rotação de anúncios | Otimizar (padrão) |
-| Conteúdo (brand safety) | Inventário padrão; exclua tipos sensíveis e conteúdo "para crianças" |
+| Campo                     | Valor                                                                                           |
+| ------------------------- | ----------------------------------------------------------------------------------------------- |
+| Tipo                      | Performance Max                                                                                 |
+| Objetivo                  | Leads / "Incentivar ações on-line" (sem meta de objetivo de loja física)                        |
+| Conversão principal       | **Cadastro de trial** (marque como "Primária"; deixe as demais como "Secundária")               |
+| Estratégia de lance       | **Maximizar conversões** (SEM tCPA no início)                                                   |
+| Orçamento diário          | R$ 20,00                                                                                        |
+| Localização               | Brasil (selecione "Presença: pessoas no Brasil" — não "interesse")                              |
+| Idioma                    | Português                                                                                       |
+| **URL final**             | Página de trial: `https://zapia.app/cadastro` _(confirme a rota exata — é a `TrialSignupPage`)_ |
+| **Expansão de URL final** | **DESATIVADA** (trava o tráfego na página de trial)                                             |
+| Exclusões de URL          | Adicione domínio inteiro exceto a página de trial, se quiser reforçar                           |
+| Rotação de anúncios       | Otimizar (padrão)                                                                               |
+| Conteúdo (brand safety)   | Inventário padrão; exclua tipos sensíveis e conteúdo "para crianças"                            |
 
 **Estrutura:** 1 campanha → **1 asset group** só. Não dilua o budget em vários grupos.
 
@@ -45,9 +45,11 @@ R$ 20/dia ainda está abaixo do que o Google recomenda para PMax (R$ 50–100/di
 > Respeite os limites de caracteres do Google. Quanto mais ativos preenchidos, melhor a "Força do anúncio" (mire em **Excelente**).
 
 ### Nome da empresa
+
 `Zapia`
 
 ### Títulos — até 15 (máx. 30 caracteres cada)
+
 1. Catálogo no WhatsApp
 2. Sua loja no WhatsApp
 3. Venda mais pelo WhatsApp
@@ -65,6 +67,7 @@ R$ 20/dia ainda está abaixo do que o Google recomenda para PMax (R$ 50–100/di
 15. Pedidos direto no WhatsApp
 
 ### Títulos longos — até 5 (máx. 90 caracteres cada)
+
 1. Transforme sua loja em um catálogo pronto para o WhatsApp
 2. Crie seu catálogo online e receba pedidos direto no seu WhatsApp
 3. Monte sua loja virtual em menos de 5 minutos, sem precisar de site
@@ -72,26 +75,31 @@ R$ 20/dia ainda está abaixo do que o Google recomenda para PMax (R$ 50–100/di
 5. Catálogo profissional no WhatsApp para vender mais todos os dias
 
 ### Descrição curta — 1 (máx. 60 caracteres)
+
 - Catálogo no WhatsApp. Teste grátis, sem cartão.
 
 ### Descrições longas — até 4 (máx. 90 caracteres cada)
+
 1. Crie um catálogo online lindo e receba pedidos direto no WhatsApp. Comece grátis hoje.
 2. Monte sua loja em minutos, adicione produtos e compartilhe o link. Sem precisar de site.
 3. 7 dias grátis, sem cartão de crédito. Configure em menos de 5 minutos e venda mais.
 4. Ideal para quem vende pelo WhatsApp. Organize pedidos, clientes e produtos num só lugar.
 
 ### Frase de chamariz (CTA)
+
 `Inscrever-se` ou `Começar agora` (selecione no dropdown — não é texto livre)
 
 ### Sitelinks — 4+ (texto ≤ 25 caracteres + 2 descrições ≤ 35)
-| Texto do link | Descrição 1 | Descrição 2 | Destino |
-|---|---|---|---|
-| Planos e preços | A partir de R$ 9,90/mês | 7 dias grátis sem cartão | `/precos` |
-| Como funciona | Monte sua loja em 5 min | Simples e sem complicação | `/#como-funciona` |
-| Ver exemplo de loja | Veja um catálogo real | Pronto para o WhatsApp | (loja demo) |
-| Começar grátis | Teste 7 dias sem cartão | Cancele quando quiser | `/cadastro` |
+
+| Texto do link       | Descrição 1             | Descrição 2               | Destino           |
+| ------------------- | ----------------------- | ------------------------- | ----------------- |
+| Planos e preços     | A partir de R$ 9,90/mês | 7 dias grátis sem cartão  | `/precos`         |
+| Como funciona       | Monte sua loja em 5 min | Simples e sem complicação | `/#como-funciona` |
+| Ver exemplo de loja | Veja um catálogo real   | Pronto para o WhatsApp    | (loja demo)       |
+| Começar grátis      | Teste 7 dias sem cartão | Cancele quando quiser     | `/cadastro`       |
 
 ### Frases de destaque (callouts ≤ 25 caracteres)
+
 - Sem cartão de crédito
 - Pronto em 5 minutos
 - Pedidos pelo WhatsApp
@@ -100,6 +108,7 @@ R$ 20/dia ainda está abaixo do que o Google recomenda para PMax (R$ 50–100/di
 - Feito para o Brasil
 
 ### Snippets estruturados
+
 - **Cabeçalho "Tipos":** Catálogo online, Loja virtual, Pedidos por WhatsApp, Gestão de produtos, Cupons
 
 ---
@@ -108,14 +117,14 @@ R$ 20/dia ainda está abaixo do que o Google recomenda para PMax (R$ 50–100/di
 
 Use as cores da marca (verde `#00a82d`, lima `#95e030`, fundo off-white `#f9f6f2`) e mostre **o catálogo no celular + a conversa no WhatsApp**.
 
-| Tipo | Proporção | Tamanho recomendado | Qtd. mínima |
-|---|---|---|---|
-| Paisagem | 1.91:1 | 1200×628 | 1 (envie 3–5) |
-| Quadrada | 1:1 | 1200×1200 | 1 (envie 3–5) |
-| Retrato | 4:5 | 960×1200 | 1 (recomendado) |
-| Logo quadrado | 1:1 | 1200×1200 | 1 |
-| Logo paisagem | 4:1 | 1200×300 | 1 |
-| Vídeo | horizontal/vertical/quadrado | ≥ 10s (ideal 15–30s) | 1 |
+| Tipo          | Proporção                    | Tamanho recomendado  | Qtd. mínima     |
+| ------------- | ---------------------------- | -------------------- | --------------- |
+| Paisagem      | 1.91:1                       | 1200×628             | 1 (envie 3–5)   |
+| Quadrada      | 1:1                          | 1200×1200            | 1 (envie 3–5)   |
+| Retrato       | 4:5                          | 960×1200             | 1 (recomendado) |
+| Logo quadrado | 1:1                          | 1200×1200            | 1               |
+| Logo paisagem | 4:1                          | 1200×300             | 1               |
+| Vídeo         | horizontal/vertical/quadrado | ≥ 10s (ideal 15–30s) | 1               |
 
 > Se você não enviar vídeo, o Google **gera um automaticamente** a partir das imagens — costuma ficar fraco. Vale fazer 1 vídeo simples (até no Canva) mostrando: produto → catálogo → "novo pedido no WhatsApp". Posso te ajudar a roteirizar.
 
@@ -173,11 +182,13 @@ Cole estes temas no asset group (eles dizem ao PMax quais buscas priorizar):
 ## 6. Negativas e exclusões (proteção de orçamento)
 
 ### Palavras-chave negativas no nível da conta
+
 Adicione em **Ferramentas → Listas de exclusão de palavras-chave** e aplique à conta:
 
 baixar whatsapp, whatsapp web, atualizar whatsapp, gb whatsapp, whatsapp gb, figurinhas, status whatsapp, espião whatsapp, espionar whatsapp, clonar whatsapp, recuperar conversas, disparo em massa, disparador whatsapp, envio em massa, api whatsapp, chatbot whatsapp, curso, apostila, emprego, vaga, trabalhe em casa, planilha grátis, template grátis, pdf grátis, gratis para sempre, de graça sem pagar, crackeado, pirata
 
 ### Exclusão de marca (brand exclusions)
+
 - Só ative se você criar **uma campanha de Pesquisa separada para a marca "Zapia"**. Aí exclua "zapia" da PMax para não competir/duplicar.
 - No início, com 1 só campanha, **deixe sem exclusão de marca** — buscas pela marca são baratas e convertem bem.
 
@@ -201,14 +212,17 @@ Subir campanha com tudo acima. Força do anúncio = Excelente. Conferir que a co
 Não pausar, não editar lance, não trocar ativos. CPA vai vir alto — é esperado.
 
 **Semanas 3–4 — Primeiros ajustes**
+
 - Veja o **relatório de termos de pesquisa** (Insights) e adicione novas negativas para buscas ruins.
 - Pause/troque os ativos individuais marcados como "Baixo" desempenho; reforce os "Melhores".
 - Se o gasto estiver indo todo para Display/YouTube, reforce search themes e negativas.
 
 **A partir de ~30 conversões acumuladas**
+
 - Considere trocar para **CPA desejado** (tCPA), começando ~20% acima do CPA médio que você já está pagando. Abaixo de 30 conversões/mês, **fique em Maximizar conversões**.
 
 **A partir de ~50 conversões/30 dias**
+
 - Aí sim dá para pensar em escalar o orçamento (suba no máx. ~20–30% por vez, a cada 1–2 semanas) ou abrir um segundo asset group/tema.
 
 ---
@@ -229,4 +243,4 @@ Não pausar, não editar lance, não trocar ativos. CPA vai vir alto — é espe
 
 ---
 
-*Documento gerado para a campanha de captação de trials da Zapia. Ativos prontos para colar no Google Ads. Próximos passos sugeridos: confirmar a URL exata da página de trial e o nome do evento de conversão; produzir 1 vídeo curto e 3–5 imagens nas cores da marca.*
+_Documento gerado para a campanha de captação de trials da Zapia. Ativos prontos para colar no Google Ads. Próximos passos sugeridos: confirmar a URL exata da página de trial e o nome do evento de conversão; produzir 1 vídeo curto e 3–5 imagens nas cores da marca._

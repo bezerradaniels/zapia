@@ -252,7 +252,7 @@ Health check atual: `tsc → 0 erros · lint → 0 erros · build → ok`.
       plano via Portal, o downgrade deve respeitar CLAUDE.md §13.5
       (downgrade no fim do ciclo, não imediato — Stripe faz isso quando
       configurado, mas o Portal precisa estar com `proration_behavior:
-      'none'`). **Validar configuração do Portal Stripe.**
+    'none'`). **Validar configuração do Portal Stripe.**
 - [ ] **Quando `subscription.status='unpaid'`** → marcar `subscriptions`
       como `unpaid` (CLAUDE.md §13.6 manda suspender no primeiro
       pagamento falho — hoje só viramos `past_due`). Ajustar

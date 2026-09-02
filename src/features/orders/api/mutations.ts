@@ -29,13 +29,16 @@ function catalogOrderErrorMessage(message: string): string {
     invalid_order_item: "Um item do pedido está inválido.",
     product_unavailable: "Um dos produtos não está mais disponível.",
     variation_required: "Selecione uma variação para continuar.",
-    variation_unavailable: "Uma das variações selecionadas não está mais disponível.",
+    variation_unavailable:
+      "Uma das variações selecionadas não está mais disponível.",
     insufficient_stock: "Não há estoque suficiente para finalizar este pedido.",
     coupon_not_found: "O cupom não está mais disponível.",
     coupon_expired: "O cupom expirou.",
     coupon_max_uses_reached: "O cupom atingiu o limite de uso.",
-    coupon_min_subtotal_not_reached: "O pedido não atinge o valor mínimo do cupom.",
-    coupon_category_not_eligible: "O cupom não é válido para os produtos selecionados.",
+    coupon_min_subtotal_not_reached:
+      "O pedido não atinge o valor mínimo do cupom.",
+    coupon_category_not_eligible:
+      "O cupom não é válido para os produtos selecionados.",
   };
 
   return messages[message] ?? message;
@@ -132,7 +135,10 @@ export async function createManualOrder(
 
   if (itemsError) throw itemsError;
 
-  return { ...(order as unknown as Order), items: (items ?? []) as OrderItem[] };
+  return {
+    ...(order as unknown as Order),
+    items: (items ?? []) as OrderItem[],
+  };
 }
 
 export async function updateOrderStatus(

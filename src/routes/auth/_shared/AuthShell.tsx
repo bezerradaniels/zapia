@@ -1,15 +1,15 @@
-import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import { Logo } from '@/components/ui'
-import { ROUTES } from '@/config/routes'
-import { cn } from '@/lib/utils'
+import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
+import { Logo } from "@/components/ui";
+import { ROUTES } from "@/config/routes";
+import { cn } from "@/lib/utils";
 
 interface AuthShellProps {
-  children: ReactNode
-  title: string
-  subtitle?: ReactNode
-  width?: number
-  contentClassName?: string
+  children: ReactNode;
+  title: string;
+  subtitle?: ReactNode;
+  width?: number;
+  contentClassName?: string;
 }
 
 export function AuthShell({
@@ -22,7 +22,10 @@ export function AuthShell({
   return (
     <main className="flex min-h-screen items-center justify-center bg-z-bg p-6">
       <div
-        className={cn('w-full rounded-2xl border border-z-border bg-white p-9 shadow-z', contentClassName)}
+        className={cn(
+          "w-full rounded-2xl border border-z-border bg-white p-9 shadow-z",
+          contentClassName,
+        )}
         style={{ maxWidth: width }}
       >
         <div className="mb-7 flex flex-col items-center text-center">
@@ -37,5 +40,5 @@ export function AuthShell({
         {children}
       </div>
     </main>
-  )
+  );
 }

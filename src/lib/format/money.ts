@@ -1,10 +1,10 @@
-const formatter = new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-})
+const formatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
 
 export function formatMoney(valueInCents: number): string {
-  return formatter.format(valueInCents / 100)
+  return formatter.format(valueInCents / 100);
 }
 
 /**
@@ -13,10 +13,10 @@ export function formatMoney(valueInCents: number): string {
  */
 export function parseMoneyToCents(raw: string): number {
   const cleaned = raw
-    .replace(/[^\d.,-]/g, '')
-    .replace(/\.(?=\d{3}(\D|$))/g, '') // drop thousands separator
-    .replace(',', '.')
-  const num = Number(cleaned)
-  if (!Number.isFinite(num)) return Number.NaN
-  return Math.round(num * 100)
+    .replace(/[^\d.,-]/g, "")
+    .replace(/\.(?=\d{3}(\D|$))/g, "") // drop thousands separator
+    .replace(",", ".");
+  const num = Number(cleaned);
+  if (!Number.isFinite(num)) return Number.NaN;
+  return Math.round(num * 100);
 }

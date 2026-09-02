@@ -1,19 +1,34 @@
-import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/Button'
-import { Logo } from '@/components/ui/Logo'
-import { ROUTES } from '@/config/routes'
-import { useSession } from '@/features/auth'
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/Button";
+import { Logo } from "@/components/ui/Logo";
+import { ROUTES } from "@/config/routes";
+import { useSession } from "@/features/auth";
 
 const links = [
-  { id: 'how', label: 'Como funciona', href: '#como-funciona', htmlId: 'lp-nav-link-como-funciona' },
-  { id: 'features', label: 'Funcionalidades', href: '#funcionalidades', htmlId: 'lp-nav-link-funcionalidades' },
-  { id: 'pricing', label: 'Preços', href: '#precos', htmlId: 'lp-nav-link-precos' },
-  { id: 'faq', label: 'Dúvidas', href: '#faq', htmlId: 'lp-nav-link-faq' },
-]
+  {
+    id: "how",
+    label: "Como funciona",
+    href: "#como-funciona",
+    htmlId: "lp-nav-link-como-funciona",
+  },
+  {
+    id: "features",
+    label: "Funcionalidades",
+    href: "#funcionalidades",
+    htmlId: "lp-nav-link-funcionalidades",
+  },
+  {
+    id: "pricing",
+    label: "Preços",
+    href: "#precos",
+    htmlId: "lp-nav-link-precos",
+  },
+  { id: "faq", label: "Dúvidas", href: "#faq", htmlId: "lp-nav-link-faq" },
+];
 
 export function MarketingNavbar() {
-  const { session, isLoading } = useSession()
-  const isAuthenticated = !isLoading && session !== null
+  const { session, isLoading } = useSession();
+  const isAuthenticated = !isLoading && session !== null;
 
   return (
     <nav className="sticky top-0 z-40 border-b border-z-border bg-white/95 backdrop-blur-md">
@@ -24,27 +39,27 @@ export function MarketingNavbar() {
             <Logo size="lg" className="hidden md:flex" />
           </Link>
           <div className="hidden items-center gap-7 md:flex">
-          {links.map((l) =>
-            l.href.startsWith('#') ? (
-              <a
-                key={l.id}
-                id={l.htmlId}
-                href={l.href}
-                className="text-sm font-medium text-z-text-muted transition-colors hover:text-z-text"
-              >
-                {l.label}
-              </a>
-            ) : (
-              <Link
-                key={l.id}
-                id={l.htmlId}
-                to={l.href}
-                className="text-sm font-medium text-z-text-muted transition-colors hover:text-z-text"
-              >
-                {l.label}
-              </Link>
-            ),
-          )}
+            {links.map((l) =>
+              l.href.startsWith("#") ? (
+                <a
+                  key={l.id}
+                  id={l.htmlId}
+                  href={l.href}
+                  className="text-sm font-medium text-z-text-muted transition-colors hover:text-z-text"
+                >
+                  {l.label}
+                </a>
+              ) : (
+                <Link
+                  key={l.id}
+                  id={l.htmlId}
+                  to={l.href}
+                  className="text-sm font-medium text-z-text-muted transition-colors hover:text-z-text"
+                >
+                  {l.label}
+                </Link>
+              ),
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -85,5 +100,5 @@ export function MarketingNavbar() {
         </div>
       </div>
     </nav>
-  )
+  );
 }

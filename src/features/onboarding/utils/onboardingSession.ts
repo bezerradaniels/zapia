@@ -1,16 +1,16 @@
-const KEY = 'zap_onboarding_session'
+const KEY = "zap_onboarding_session";
 
 export type OnboardingSession = {
-  storeId: string
-  storeSlug: string
-  storeName: string
-  startedAt: number
-}
+  storeId: string;
+  storeSlug: string;
+  storeName: string;
+  startedAt: number;
+};
 
 export function saveOnboardingSession(data: OnboardingSession): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(data))
-    sessionStorage.setItem(KEY, JSON.stringify(data))
+    localStorage.setItem(KEY, JSON.stringify(data));
+    sessionStorage.setItem(KEY, JSON.stringify(data));
   } catch {
     // Storage unavailable in some private-browsing modes — silently ignore
   }
@@ -18,17 +18,17 @@ export function saveOnboardingSession(data: OnboardingSession): void {
 
 export function loadOnboardingSession(): OnboardingSession | null {
   try {
-    const raw = localStorage.getItem(KEY) ?? sessionStorage.getItem(KEY)
-    return raw ? (JSON.parse(raw) as OnboardingSession) : null
+    const raw = localStorage.getItem(KEY) ?? sessionStorage.getItem(KEY);
+    return raw ? (JSON.parse(raw) as OnboardingSession) : null;
   } catch {
-    return null
+    return null;
   }
 }
 
 export function clearOnboardingSession(): void {
   try {
-    localStorage.removeItem(KEY)
-    sessionStorage.removeItem(KEY)
+    localStorage.removeItem(KEY);
+    sessionStorage.removeItem(KEY);
   } catch {
     // ignore
   }

@@ -1,41 +1,39 @@
-import { HugeiconsIcon } from '@hugeicons/react'
-import {
-  WhatsappIcon,
-} from '@hugeicons/core-free-icons'
-import type { Customer } from '../types'
+import { HugeiconsIcon } from "@hugeicons/react";
+import { WhatsappIcon } from "@hugeicons/core-free-icons";
+import type { Customer } from "../types";
 
 type Props = {
-  customer: Customer
-  onDetails: (customer: Customer) => void
-}
+  customer: Customer;
+  onDetails: (customer: Customer) => void;
+};
 
 function initials(name: string) {
   return name
-    .split(' ')
+    .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0].toUpperCase())
-    .join('')
+    .join("");
 }
 
 const AVATAR_COLORS = [
-  'bg-indigo-100 text-indigo-700',
-  'bg-teal-100 text-teal-700',
-  'bg-rose-100 text-rose-700',
-  'bg-amber-100 text-amber-700',
-  'bg-violet-100 text-violet-700',
-  'bg-sky-100 text-sky-700',
-]
+  "bg-indigo-100 text-indigo-700",
+  "bg-teal-100 text-teal-700",
+  "bg-rose-100 text-rose-700",
+  "bg-amber-100 text-amber-700",
+  "bg-violet-100 text-violet-700",
+  "bg-sky-100 text-sky-700",
+];
 
 function avatarColor(name: string) {
-  let hash = 0
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffffff
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
+  let hash = 0;
+  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffffff;
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 export function CustomerRow({ customer, onDetails }: Props) {
-  const waHref = `https://wa.me/${customer.whatsapp_phone.replace('+', '')}`
-  const colorClass = avatarColor(customer.name)
+  const waHref = `https://wa.me/${customer.whatsapp_phone.replace("+", "")}`;
+  const colorClass = avatarColor(customer.name);
 
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-z-border bg-white px-4 py-3 transition-shadow hover:shadow-sm">
@@ -56,10 +54,12 @@ export function CustomerRow({ customer, onDetails }: Props) {
 
       {/* Info */}
       <div className="min-w-0 flex-1">
-        <p className="truncate font-semibold leading-tight text-z-text">{customer.name}</p>
+        <p className="truncate font-semibold leading-tight text-z-text">
+          {customer.name}
+        </p>
         {customer.tags.length > 0 && (
           <p className="mt-0.5 truncate text-xs text-z-text-muted">
-            {customer.tags.slice(0, 2).join(' · ')}
+            {customer.tags.slice(0, 2).join(" · ")}
           </p>
         )}
       </div>
@@ -84,5 +84,5 @@ export function CustomerRow({ customer, onDetails }: Props) {
         </button>
       </div>
     </div>
-  )
+  );
 }

@@ -6,58 +6,58 @@ import {
   Image,
   StyleSheet,
   Font,
-} from '@react-pdf/renderer'
-import type { Product, Store } from '@/types/domain'
-import { effectivePrice } from '@/features/products/utils/price'
+} from "@react-pdf/renderer";
+import type { Product, Store } from "@/types/domain";
+import { effectivePrice } from "@/features/products/utils/price";
 
 Font.register({
-  family: 'Inter',
+  family: "Inter",
   fonts: [
     {
-      src: 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff',
+      src: "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff",
       fontWeight: 400,
     },
     {
-      src: 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fAZ9hiJ-Ek-_EeA.woff',
+      src: "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fAZ9hiJ-Ek-_EeA.woff",
       fontWeight: 600,
     },
     {
-      src: 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiJ-Ek-_EeA.woff',
+      src: "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiJ-Ek-_EeA.woff",
       fontWeight: 700,
     },
   ],
-})
+});
 
 function formatBRL(cents: number): string {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(cents / 100)
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(cents / 100);
 }
 
 function formatDate(): string {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    timeZone: 'America/Sao_Paulo',
-  }).format(new Date())
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date());
 }
 
 type CatalogPdfProps = {
-  store: Store
-  products: Product[]
-  storeUrl: string
-}
+  store: Store;
+  products: Product[];
+  storeUrl: string;
+};
 
 export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
-  const primary = store.primary_color ?? '#00a82d'
-  const activeProducts = products.filter((p) => p.is_active && !p.deleted_at)
+  const primary = store.primary_color ?? "#00a82d";
+  const activeProducts = products.filter((p) => p.is_active && !p.deleted_at);
 
   const styles = StyleSheet.create({
     page: {
-      fontFamily: 'Inter',
-      backgroundColor: '#f9fafb',
+      fontFamily: "Inter",
+      backgroundColor: "#f9fafb",
       paddingBottom: 60,
     },
     // ── Header ──────────────────────────────────────────────
@@ -65,27 +65,27 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
       backgroundColor: primary,
       paddingHorizontal: 36,
       paddingVertical: 28,
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: 16,
     },
     logo: {
       width: 60,
       height: 60,
       borderRadius: 12,
-      objectFit: 'cover',
-      backgroundColor: '#ffffff33',
+      objectFit: "cover",
+      backgroundColor: "#ffffff33",
     },
     logoFallback: {
       width: 60,
       height: 60,
       borderRadius: 12,
-      backgroundColor: '#ffffff33',
-      alignItems: 'center',
-      justifyContent: 'center',
+      backgroundColor: "#ffffff33",
+      alignItems: "center",
+      justifyContent: "center",
     },
     logoFallbackText: {
-      color: '#ffffff',
+      color: "#ffffff",
       fontSize: 24,
       fontWeight: 700,
     },
@@ -96,24 +96,24 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
     storeName: {
       fontSize: 22,
       fontWeight: 700,
-      color: '#ffffff',
+      color: "#ffffff",
     },
     storeSlogan: {
       fontSize: 11,
       fontWeight: 400,
-      color: '#ffffffcc',
+      color: "#ffffffcc",
     },
     headerContact: {
-      alignItems: 'flex-end',
+      alignItems: "flex-end",
       gap: 4,
     },
     headerContactText: {
       fontSize: 9,
-      color: '#ffffffcc',
+      color: "#ffffffcc",
     },
     headerContactBold: {
       fontSize: 10,
-      color: '#ffffff',
+      color: "#ffffff",
       fontWeight: 600,
     },
     // ── Body ────────────────────────────────────────────────
@@ -124,40 +124,40 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
     sectionTitle: {
       fontSize: 11,
       fontWeight: 700,
-      color: '#374151',
+      color: "#374151",
       marginBottom: 14,
-      textTransform: 'uppercase',
+      textTransform: "uppercase",
       letterSpacing: 0.8,
     },
     // ── Product Grid ────────────────────────────────────────
     grid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
+      flexDirection: "row",
+      flexWrap: "wrap",
       gap: 10,
     },
     card: {
-      width: '31.5%',
-      backgroundColor: '#ffffff',
+      width: "31.5%",
+      backgroundColor: "#ffffff",
       borderRadius: 10,
-      overflow: 'hidden',
-      border: '1px solid #e5e7eb',
+      overflow: "hidden",
+      border: "1px solid #e5e7eb",
     },
     cardImage: {
-      width: '100%',
+      width: "100%",
       height: 120,
-      objectFit: 'cover',
-      backgroundColor: '#f3f4f6',
+      objectFit: "cover",
+      backgroundColor: "#f3f4f6",
     },
     cardImagePlaceholder: {
-      width: '100%',
+      width: "100%",
       height: 120,
-      backgroundColor: '#f3f4f6',
-      alignItems: 'center',
-      justifyContent: 'center',
+      backgroundColor: "#f3f4f6",
+      alignItems: "center",
+      justifyContent: "center",
     },
     cardImagePlaceholderText: {
       fontSize: 9,
-      color: '#9ca3af',
+      color: "#9ca3af",
     },
     cardBody: {
       padding: 10,
@@ -165,19 +165,19 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
     },
     cardCategory: {
       fontSize: 8,
-      color: '#6b7280',
-      textTransform: 'uppercase',
+      color: "#6b7280",
+      textTransform: "uppercase",
       letterSpacing: 0.5,
     },
     cardName: {
       fontSize: 10,
       fontWeight: 600,
-      color: '#111827',
+      color: "#111827",
       lineHeight: 1.3,
     },
     priceRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: 6,
       marginTop: 2,
     },
@@ -188,8 +188,8 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
     },
     cardOldPrice: {
       fontSize: 9,
-      color: '#9ca3af',
-      textDecoration: 'line-through',
+      color: "#9ca3af",
+      textDecoration: "line-through",
     },
     cardBadge: {
       backgroundColor: `${primary}22`,
@@ -204,26 +204,26 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
     },
     // ── Empty state ─────────────────────────────────────────
     empty: {
-      alignItems: 'center',
+      alignItems: "center",
       paddingVertical: 40,
     },
     emptyText: {
       fontSize: 11,
-      color: '#9ca3af',
+      color: "#9ca3af",
     },
     // ── Footer ──────────────────────────────────────────────
     footer: {
-      position: 'absolute',
+      position: "absolute",
       bottom: 0,
       left: 0,
       right: 0,
-      backgroundColor: '#f3f4f6',
-      borderTop: '1px solid #e5e7eb',
+      backgroundColor: "#f3f4f6",
+      borderTop: "1px solid #e5e7eb",
       paddingHorizontal: 36,
       paddingVertical: 12,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
     },
     footerLeft: {
       gap: 2,
@@ -235,26 +235,28 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
     },
     footerDate: {
       fontSize: 8,
-      color: '#9ca3af',
+      color: "#9ca3af",
     },
     footerRight: {
-      alignItems: 'flex-end',
+      alignItems: "flex-end",
       gap: 2,
     },
     footerBrand: {
       fontSize: 8,
-      color: '#9ca3af',
+      color: "#9ca3af",
     },
     footerTotal: {
       fontSize: 9,
-      color: '#6b7280',
+      color: "#6b7280",
     },
-  })
+  });
 
-  const hasWhatsapp = !!store.whatsapp_phone
+  const hasWhatsapp = !!store.whatsapp_phone;
   const whatsappDisplay = store.whatsapp_phone
-    ? store.whatsapp_phone.replace(/^55/, '').replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-    : null
+    ? store.whatsapp_phone
+        .replace(/^55/, "")
+        .replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3")
+    : null;
 
   return (
     <Document
@@ -271,7 +273,7 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
           ) : (
             <View style={styles.logoFallback}>
               <Text style={styles.logoFallbackText}>
-                {store.name[0]?.toUpperCase() ?? '?'}
+                {store.name[0]?.toUpperCase() ?? "?"}
               </Text>
             </View>
           )}
@@ -291,7 +293,9 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
               </>
             )}
             {store.contact_email && (
-              <Text style={styles.headerContactText}>{store.contact_email}</Text>
+              <Text style={styles.headerContactText}>
+                {store.contact_email}
+              </Text>
             )}
           </View>
         </View>
@@ -300,27 +304,32 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
         <View style={styles.body}>
           <Text style={styles.sectionTitle}>
             {activeProducts.length > 0
-              ? `${activeProducts.length} produto${activeProducts.length !== 1 ? 's' : ''}`
-              : 'Produtos'}
+              ? `${activeProducts.length} produto${activeProducts.length !== 1 ? "s" : ""}`
+              : "Produtos"}
           </Text>
 
           {activeProducts.length === 0 ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyText}>Nenhum produto ativo no catálogo.</Text>
+              <Text style={styles.emptyText}>
+                Nenhum produto ativo no catálogo.
+              </Text>
             </View>
           ) : (
             <View style={styles.grid}>
               {activeProducts.map((product) => {
-                const price = effectivePrice(product)
+                const price = effectivePrice(product);
                 const hasPromo =
                   product.promo_price_in_cents != null &&
-                  product.promo_price_in_cents < product.price_in_cents
+                  product.promo_price_in_cents < product.price_in_cents;
                 const discountPct = hasPromo
                   ? Math.round(
-                      (1 - product.promo_price_in_cents! / product.price_in_cents) * 100,
+                      (1 -
+                        product.promo_price_in_cents! /
+                          product.price_in_cents) *
+                        100,
                     )
-                  : null
-                const firstImage = product.images?.[0] ?? null
+                  : null;
+                const firstImage = product.images?.[0] ?? null;
 
                 return (
                   <View key={product.id} style={styles.card}>
@@ -328,17 +337,19 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
                       <Image src={firstImage} style={styles.cardImage} />
                     ) : (
                       <View style={styles.cardImagePlaceholder}>
-                        <Text style={styles.cardImagePlaceholderText}>sem foto</Text>
+                        <Text style={styles.cardImagePlaceholderText}>
+                          sem foto
+                        </Text>
                       </View>
                     )}
 
                     <View style={styles.cardBody}>
                       {product.category && (
-                        <Text style={styles.cardCategory}>{product.category}</Text>
+                        <Text style={styles.cardCategory}>
+                          {product.category}
+                        </Text>
                       )}
-                      <Text style={styles.cardName}>
-                        {product.name}
-                      </Text>
+                      <Text style={styles.cardName}>{product.name}</Text>
 
                       <View style={styles.priceRow}>
                         <Text style={styles.cardPrice}>{formatBRL(price)}</Text>
@@ -359,7 +370,7 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
                       </View>
                     </View>
                   </View>
-                )
+                );
               })}
             </View>
           )}
@@ -374,11 +385,12 @@ export function CatalogPdf({ store, products, storeUrl }: CatalogPdfProps) {
           <View style={styles.footerRight}>
             <Text style={styles.footerBrand}>Criado com Zapia</Text>
             <Text style={styles.footerTotal}>
-              {activeProducts.length} produto{activeProducts.length !== 1 ? 's' : ''}
+              {activeProducts.length} produto
+              {activeProducts.length !== 1 ? "s" : ""}
             </Text>
           </View>
         </View>
       </Page>
     </Document>
-  )
+  );
 }

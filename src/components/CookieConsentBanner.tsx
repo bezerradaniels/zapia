@@ -1,47 +1,47 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { CookieIcon } from '@hugeicons/core-free-icons'
-import { Button } from '@/components/ui'
-import { ROUTES } from '@/config/routes'
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { CookieIcon } from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui";
+import { ROUTES } from "@/config/routes";
 
-const COOKIE_CONSENT_KEY = 'zapia_cookie_consent'
+const COOKIE_CONSENT_KEY = "zapia_cookie_consent";
 
-type CookieConsent = 'accepted' | 'rejected'
+type CookieConsent = "accepted" | "rejected";
 
 function shouldShowCookieBanner() {
   try {
-    const consent = window.localStorage.getItem(COOKIE_CONSENT_KEY)
-    return consent !== 'accepted' && consent !== 'rejected'
+    const consent = window.localStorage.getItem(COOKIE_CONSENT_KEY);
+    return consent !== "accepted" && consent !== "rejected";
   } catch {
-    return true
+    return true;
   }
 }
 
 export function CookieConsentBanner() {
-  const [visible, setVisible] = useState(() => shouldShowCookieBanner())
+  const [visible, setVisible] = useState(() => shouldShowCookieBanner());
 
   useEffect(() => {
-    const openPreferences = () => setVisible(true)
-    window.addEventListener('zapia:cookie-consent-open', openPreferences)
+    const openPreferences = () => setVisible(true);
+    window.addEventListener("zapia:cookie-consent-open", openPreferences);
     return () => {
-      window.removeEventListener('zapia:cookie-consent-open', openPreferences)
-    }
-  }, [])
+      window.removeEventListener("zapia:cookie-consent-open", openPreferences);
+    };
+  }, []);
 
   const saveConsent = (consent: CookieConsent) => {
     try {
-      window.localStorage.setItem(COOKIE_CONSENT_KEY, consent)
+      window.localStorage.setItem(COOKIE_CONSENT_KEY, consent);
     } catch {
       // Browsers can block storage; the choice still applies for this session.
     }
-    if (consent === 'accepted') {
-      window.dispatchEvent(new CustomEvent('zapia:cookie-consent-accepted'))
+    if (consent === "accepted") {
+      window.dispatchEvent(new CustomEvent("zapia:cookie-consent-accepted"));
     }
-    setVisible(false)
-  }
+    setVisible(false);
+  };
 
-  if (!visible) return null
+  if (!visible) return null;
 
   return (
     <section
@@ -54,11 +54,13 @@ export function CookieConsentBanner() {
       <div className="min-w-0 flex-1">
         <h2 className="text-sm font-bold text-z-text">Cookies no Zapia</h2>
         <p className="mt-1 text-sm leading-relaxed text-slate-600">
-          Usamos cookies essenciais para manter o site funcionando e, com sua permissao,
-          cookies de analise para melhorar a experiencia. Voce pode aceitar ou recusar
-          os cookies nao essenciais.
-          {' '}
-          <Link to={ROUTES.privacy} className="font-semibold text-z-primary hover:underline">
+          Usamos cookies essenciais para manter o site funcionando e, com sua
+          permissao, cookies de analise para melhorar a experiencia. Voce pode
+          aceitar ou recusar os cookies nao essenciais.{" "}
+          <Link
+            to={ROUTES.privacy}
+            className="font-semibold text-z-primary hover:underline"
+          >
             Saiba mais
           </Link>
           .
@@ -70,14 +72,14 @@ export function CookieConsentBanner() {
           variant="ghost"
           size="sm"
           className="border border-slate-300 bg-white text-slate-700 hover:text-slate-950"
-          onClick={() => saveConsent('rejected')}
+          onClick={() => saveConsent("rejected")}
         >
           Recusar
         </Button>
-        <Button type="button" size="sm" onClick={() => saveConsent('accepted')}>
+        <Button type="button" size="sm" onClick={() => saveConsent("accepted")}>
           Aceitar
         </Button>
       </div>
     </section>
-  )
+  );
 }

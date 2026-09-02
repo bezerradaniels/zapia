@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { useState } from "react";
+import { Link, useOutletContext } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft02Icon,
   ArrowRight02Icon,
@@ -8,31 +8,39 @@ import {
   StoreLocationIcon,
   InstagramIcon,
   LinkSquare02Icon,
-} from '@hugeicons/core-free-icons'
-import type { Store } from '@/types/domain'
-import { buildWhatsAppLink } from '@/lib/whatsapp'
-import { buildStorePath } from '@/lib/tenant'
-import { ImageCarousel, ImageCarouselThumbnails } from '@/components/ui/ImageCarousel'
-import { useDocumentMeta } from '@/hooks/useDocumentMeta'
+} from "@hugeicons/core-free-icons";
+import type { Store } from "@/types/domain";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { buildStorePath } from "@/lib/tenant";
+import {
+  ImageCarousel,
+  ImageCarouselThumbnails,
+} from "@/components/ui/ImageCarousel";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 export default function StoreAboutPage() {
-  const store = useOutletContext<Store>()
-  const homePath = buildStorePath(store.slug)
-  const catalogPath = buildStorePath(store.slug, 'catalogo')
-  const [galleryActive, setGalleryActive] = useState(0)
+  const store = useOutletContext<Store>();
+  const homePath = buildStorePath(store.slug);
+  const catalogPath = buildStorePath(store.slug, "catalogo");
+  const [galleryActive, setGalleryActive] = useState(0);
 
-  useDocumentMeta({ title: `Sobre - ${store.name} - Catálogo por Zapia` })
+  useDocumentMeta({ title: `Sobre - ${store.name} - Catálogo por Zapia` });
 
   const whatsappUrl = store.whatsapp_phone
-    ? buildWhatsAppLink(store.whatsapp_phone, `Olá! Vi o catálogo da ${store.name}.`)
-    : null
+    ? buildWhatsAppLink(
+        store.whatsapp_phone,
+        `Olá! Vi o catálogo da ${store.name}.`,
+      )
+    : null;
 
-  const instagramHandle = store.social_links?.instagram?.replace(/^@/, '').trim()
+  const instagramHandle = store.social_links?.instagram
+    ?.replace(/^@/, "")
+    .trim();
   const instagramUrl = instagramHandle
     ? `https://instagram.com/${instagramHandle}`
-    : null
+    : null;
 
-  const customLinks = store.custom_links?.filter((l) => l.label && l.url) ?? []
+  const customLinks = store.custom_links?.filter((l) => l.label && l.url) ?? [];
 
   return (
     <div className="mx-auto max-w-[800px] px-4 py-5 sm:px-6">
@@ -52,9 +60,16 @@ export default function StoreAboutPage() {
           {/* Banner */}
           <div className="relative h-32 sm:h-40 bg-z-bg2">
             {store.banner_url ? (
-              <img src={store.banner_url} alt="" className="h-full w-full object-cover" />
+              <img
+                src={store.banner_url}
+                alt=""
+                className="h-full w-full object-cover"
+              />
             ) : (
-              <div className="h-full w-full" style={{ background: 'var(--store-primary)', opacity: 0.15 }} />
+              <div
+                className="h-full w-full"
+                style={{ background: "var(--store-primary)", opacity: 0.15 }}
+              />
             )}
           </div>
 
@@ -70,7 +85,7 @@ export default function StoreAboutPage() {
               ) : (
                 <div
                   className="flex h-20 w-20 items-center justify-center rounded-xl text-white ring-4 ring-white"
-                  style={{ background: 'var(--store-primary)' }}
+                  style={{ background: "var(--store-primary)" }}
                 >
                   <HugeiconsIcon icon={StoreLocationIcon} size={32} />
                 </div>
@@ -78,11 +93,13 @@ export default function StoreAboutPage() {
             </div>
 
             <div className="pt-12">
-              <h1 className="text-[20px] font-bold leading-tight tracking-tight">{store.name}</h1>
+              <h1 className="text-[20px] font-bold leading-tight tracking-tight">
+                {store.name}
+              </h1>
               {store.slogan && (
                 <p className="mt-1 text-sm text-z-text-muted">{store.slogan}</p>
               )}
-              {(store.address_city && store.address_state) && (
+              {store.address_city && store.address_state && (
                 <p className="mt-1 text-xs text-z-text-hint">
                   {[
                     store.address_street && store.address_number
@@ -90,14 +107,16 @@ export default function StoreAboutPage() {
                       : store.address_street,
                     store.address_neighborhood,
                     `${store.address_city}, ${store.address_state}`,
-                  ].filter(Boolean).join(' · ')}
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
               )}
 
               <Link
                 to={catalogPath}
                 className="mt-4 flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ background: 'var(--store-primary)' }}
+                style={{ background: "var(--store-primary)" }}
               >
                 Ir para o catálogo
                 <HugeiconsIcon icon={ArrowRight02Icon} size={14} />
@@ -107,7 +126,11 @@ export default function StoreAboutPage() {
         </section>
 
         {/* Menu âncora */}
-        {((whatsappUrl || instagramUrl) || store.gallery_images?.length > 0 || store.about_us || customLinks.length > 0) && (
+        {(whatsappUrl ||
+          instagramUrl ||
+          store.gallery_images?.length > 0 ||
+          store.about_us ||
+          customLinks.length > 0) && (
           <nav className="flex flex-wrap gap-2">
             {(whatsappUrl || instagramUrl) && (
               <a
@@ -146,7 +169,10 @@ export default function StoreAboutPage() {
 
         {/* Contato */}
         {(whatsappUrl || instagramUrl) && (
-          <section id="contato" className="flex flex-col gap-2 rounded-2xl border border-z-border bg-white p-5 scroll-mt-24">
+          <section
+            id="contato"
+            className="flex flex-col gap-2 rounded-2xl border border-z-border bg-white p-5 scroll-mt-24"
+          >
             <h2 className="mb-1 text-[15px] font-bold">Contato</h2>
             <div className="flex gap-2">
               {whatsappUrl && (
@@ -180,15 +206,28 @@ export default function StoreAboutPage() {
           <div id="fotos" className="flex flex-col gap-2 scroll-mt-24">
             <h2 className="text-[15px] font-bold">Galeria da loja</h2>
             <section className="overflow-hidden rounded-2xl border border-z-border bg-white">
-              <ImageCarousel images={store.gallery_images} alt={store.name} hideThumbnails active={galleryActive} onActiveChange={setGalleryActive} />
+              <ImageCarousel
+                images={store.gallery_images}
+                alt={store.name}
+                hideThumbnails
+                active={galleryActive}
+                onActiveChange={setGalleryActive}
+              />
             </section>
-            <ImageCarouselThumbnails images={store.gallery_images} active={galleryActive} onSelect={setGalleryActive} />
+            <ImageCarouselThumbnails
+              images={store.gallery_images}
+              active={galleryActive}
+              onSelect={setGalleryActive}
+            />
           </div>
         )}
 
         {/* Descrição */}
         {store.about_us && (
-          <section id="sobre" className="rounded-2xl border border-z-border bg-white p-5 scroll-mt-24">
+          <section
+            id="sobre"
+            className="rounded-2xl border border-z-border bg-white p-5 scroll-mt-24"
+          >
             <h2 className="mb-2 text-[15px] font-bold">Sobre a loja</h2>
             <p className="text-sm leading-relaxed text-z-text-muted whitespace-pre-line">
               {store.about_us}
@@ -198,7 +237,10 @@ export default function StoreAboutPage() {
 
         {/* Links customizados */}
         {customLinks.length > 0 && (
-          <section id="links" className="flex flex-col gap-2 rounded-2xl border border-z-border bg-white p-5 scroll-mt-24">
+          <section
+            id="links"
+            className="flex flex-col gap-2 rounded-2xl border border-z-border bg-white p-5 scroll-mt-24"
+          >
             <h2 className="mb-1 text-[15px] font-bold">Links</h2>
             {customLinks.map((link, i) => (
               <a
@@ -208,7 +250,11 @@ export default function StoreAboutPage() {
                 rel="noopener noreferrer"
                 className="flex w-full items-center justify-center gap-2 rounded-xl border border-z-border py-3 text-[15px] font-semibold text-z-text transition-colors hover:bg-z-bg2"
               >
-                <HugeiconsIcon icon={LinkSquare02Icon} size={18} className="text-z-text-hint" />
+                <HugeiconsIcon
+                  icon={LinkSquare02Icon}
+                  size={18}
+                  className="text-z-text-hint"
+                />
                 {link.label}
               </a>
             ))}
@@ -216,5 +262,5 @@ export default function StoreAboutPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

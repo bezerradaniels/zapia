@@ -1,79 +1,84 @@
-import { useEffect } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Tick02Icon, Store01Icon, ShoppingCartIcon, Payment01Icon } from '@hugeicons/core-free-icons'
-import { signUpSchema, useSignUp, type SignUpInput } from '@/features/auth'
-import { ROUTES } from '@/config/routes'
-import { Button, Field, Logo } from '@/components/ui'
-import { cn } from '@/lib/utils'
+import { useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Tick02Icon,
+  Store01Icon,
+  ShoppingCartIcon,
+  Payment01Icon,
+} from "@hugeicons/core-free-icons";
+import { signUpSchema, useSignUp, type SignUpInput } from "@/features/auth";
+import { ROUTES } from "@/config/routes";
+import { Button, Field, Logo } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
-const SIGNUP_DRAFT_KEY = 'zapia_signup_draft'
+const SIGNUP_DRAFT_KEY = "zapia_signup_draft";
 
-type SignupDraft = Pick<SignUpInput, 'name' | 'email' | 'accepted'>
+type SignupDraft = Pick<SignUpInput, "name" | "email" | "accepted">;
 
 function loadSignupDraft(): Partial<SignupDraft> | null {
   try {
-    const raw = localStorage.getItem(SIGNUP_DRAFT_KEY)
-    return raw ? (JSON.parse(raw) as Partial<SignupDraft>) : null
+    const raw = localStorage.getItem(SIGNUP_DRAFT_KEY);
+    return raw ? (JSON.parse(raw) as Partial<SignupDraft>) : null;
   } catch {
-    return null
+    return null;
   }
 }
 
 function saveSignupDraft(data: SignupDraft): void {
   try {
-    localStorage.setItem(SIGNUP_DRAFT_KEY, JSON.stringify(data))
+    localStorage.setItem(SIGNUP_DRAFT_KEY, JSON.stringify(data));
   } catch {}
 }
 
 function clearSignupDraft(): void {
   try {
-    localStorage.removeItem(SIGNUP_DRAFT_KEY)
+    localStorage.removeItem(SIGNUP_DRAFT_KEY);
   } catch {}
 }
 
 export default function SignupPage() {
-  const navigate = useNavigate()
-  const signUp = useSignUp()
-  const draft = loadSignupDraft()
+  const navigate = useNavigate();
+  const signUp = useSignUp();
+  const draft = loadSignupDraft();
 
   const form = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      name: draft?.name ?? '',
-      email: draft?.email ?? '',
-      password: '',
-      passwordConfirm: '',
+      name: draft?.name ?? "",
+      email: draft?.email ?? "",
+      password: "",
+      passwordConfirm: "",
       accepted: draft?.accepted ?? true,
     },
-  })
+  });
 
   useEffect(() => {
     const { unsubscribe } = form.watch((values) => {
       saveSignupDraft({
-        name: values.name ?? '',
-        email: values.email ?? '',
+        name: values.name ?? "",
+        email: values.email ?? "",
         accepted: values.accepted ?? false,
-      })
-    })
+      });
+    });
 
-    return unsubscribe
-  }, [form])
+    return unsubscribe;
+  }, [form]);
 
   const onSubmit = form.handleSubmit(async (values) => {
-    const result = await signUp.mutateAsync(values)
-    clearSignupDraft()
+    const result = await signUp.mutateAsync(values);
+    clearSignupDraft();
 
     if (result.session) {
-      navigate(ROUTES.onboarding)
+      navigate(ROUTES.onboarding);
     } else {
-      navigate(ROUTES.confirmEmail, { state: { email: values.email } })
+      navigate(ROUTES.confirmEmail, { state: { email: values.email } });
     }
-  })
+  });
 
-  const accepted = form.watch('accepted')
+  const accepted = form.watch("accepted");
 
   return (
     <div className="flex h-screen w-full flex-col lg:flex-row">
@@ -94,7 +99,11 @@ export default function SignupPage() {
         <div className="space-y-6">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15">
-              <HugeiconsIcon icon={Store01Icon} size={24} className="text-white" />
+              <HugeiconsIcon
+                icon={Store01Icon}
+                size={24}
+                className="text-white"
+              />
             </div>
             <div>
               <h3 className="font-semibold text-white mb-1">Crie sua loja</h3>
@@ -106,10 +115,16 @@ export default function SignupPage() {
 
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15">
-              <HugeiconsIcon icon={ShoppingCartIcon} size={24} className="text-white" />
+              <HugeiconsIcon
+                icon={ShoppingCartIcon}
+                size={24}
+                className="text-white"
+              />
             </div>
             <div>
-              <h3 className="font-semibold text-white mb-1">Adicione produtos</h3>
+              <h3 className="font-semibold text-white mb-1">
+                Adicione produtos
+              </h3>
               <p className="text-sm text-white">
                 Cadastre seus produtos com fotos, preços e descrições
               </p>
@@ -118,7 +133,11 @@ export default function SignupPage() {
 
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15">
-              <HugeiconsIcon icon={Payment01Icon} size={24} className="text-white" />
+              <HugeiconsIcon
+                icon={Payment01Icon}
+                size={24}
+                className="text-white"
+              />
             </div>
             <div>
               <h3 className="font-semibold text-white mb-1">Receba pedidos</h3>
@@ -134,7 +153,9 @@ export default function SignupPage() {
       <div className="flex w-full flex-1 lg:w-1/2 flex-col justify-start lg:justify-center overflow-y-auto bg-z-bg px-6 py-6 lg:py-12 lg:px-16">
         <div className="mx-auto w-full max-w-md">
           <Logo height={58} className="mb-8 hidden lg:block" />
-          <h2 className="text-3xl font-bold tracking-tight text-z-text mb-2">Criar sua conta</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-z-text mb-2">
+            Criar sua conta
+          </h2>
           <p className="text-sm text-z-text-muted mb-8">
             Comece gratuitamente hoje mesmo
           </p>
@@ -147,7 +168,7 @@ export default function SignupPage() {
               autoComplete="name"
               placeholder="Seu nome"
               error={form.formState.errors.name?.message}
-              {...form.register('name')}
+              {...form.register("name")}
             />
             <Field
               label="E-mail"
@@ -157,7 +178,7 @@ export default function SignupPage() {
               autoComplete="email"
               placeholder="seu@email.com"
               error={form.formState.errors.email?.message}
-              {...form.register('email')}
+              {...form.register("email")}
             />
             <Field
               label="Senha"
@@ -167,7 +188,7 @@ export default function SignupPage() {
               autoComplete="new-password"
               placeholder="Mínimo 8 caracteres"
               error={form.formState.errors.password?.message}
-              {...form.register('password')}
+              {...form.register("password")}
             />
             <Field
               label="Confirmar senha"
@@ -177,7 +198,7 @@ export default function SignupPage() {
               autoComplete="new-password"
               placeholder="Repita sua senha"
               error={form.formState.errors.passwordConfirm?.message}
-              {...form.register('passwordConfirm')}
+              {...form.register("passwordConfirm")}
             />
 
             <Controller
@@ -190,10 +211,10 @@ export default function SignupPage() {
                     onClick={() => field.onChange(!field.value)}
                     aria-pressed={field.value}
                     className={cn(
-                      'flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-2 transition-colors',
+                      "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-2 transition-colors",
                       field.value
-                        ? 'border-[#10b981] bg-[#10b981]'
-                        : 'border-slate-300 bg-white',
+                        ? "border-[#10b981] bg-[#10b981]"
+                        : "border-slate-300 bg-white",
                     )}
                   >
                     {field.value && (
@@ -206,7 +227,7 @@ export default function SignupPage() {
                     )}
                   </button>
                   <span className="text-[13px] leading-snug text-z-text-muted">
-                    Li e aceito os{' '}
+                    Li e aceito os{" "}
                     <Link
                       to={ROUTES.terms}
                       target="_blank"
@@ -215,8 +236,8 @@ export default function SignupPage() {
                       className="font-medium text-z-text underline hover:no-underline"
                     >
                       Termos de uso
-                    </Link>{' '}
-                    e a{' '}
+                    </Link>{" "}
+                    e a{" "}
                     <Link
                       to={ROUTES.privacy}
                       target="_blank"
@@ -239,9 +260,9 @@ export default function SignupPage() {
             {signUp.isError && (
               <p className="text-sm text-destructive">
                 {signUp.error instanceof Error &&
-                signUp.error.message.toLowerCase().includes('rate limit')
-                  ? 'Muitas tentativas. Aguarde alguns minutos e tente novamente.'
-                  : 'Não foi possível criar a conta. Verifique os dados e tente novamente.'}
+                signUp.error.message.toLowerCase().includes("rate limit")
+                  ? "Muitas tentativas. Aguarde alguns minutos e tente novamente."
+                  : "Não foi possível criar a conta. Verifique os dados e tente novamente."}
               </p>
             )}
 
@@ -251,11 +272,11 @@ export default function SignupPage() {
               fullWidth
               size="lg"
             >
-              {signUp.isPending ? 'Criando...' : 'Criar conta'}
+              {signUp.isPending ? "Criando..." : "Criar conta"}
             </Button>
           </form>
         </div>
       </div>
     </div>
-  )
+  );
 }

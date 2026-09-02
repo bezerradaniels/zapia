@@ -19,6 +19,7 @@ Acessa o **Painel Admin** (rota interna, não indexada, não listada publicament
 Pode haver múltiplos admins (equipe interna). Gerenciados por convite.
 
 **Responsabilidades:**
+
 - Visualizar e gerenciar todas as lojas cadastradas
 - Suspender, reativar ou excluir lojas
 - Visualizar métricas gerais da plataforma (lojas ativas, MRR, churn)
@@ -29,6 +30,7 @@ Pode haver múltiplos admins (equipe interna). Gerenciados por convite.
 - Acessar log de eventos de billing (`billing_events`)
 
 **O que NÃO faz:**
+
 - Não acessa dados de pedidos ou clientes individuais de cada loja (privacidade)
 - Não gerencia produtos de nenhuma loja
 
@@ -40,6 +42,7 @@ Acessa o **Dashboard da Loja**. Cada conta é vinculada a uma única loja
 (1 conta = 1 loja). É o único que tem controle total sobre a loja.
 
 **Responsabilidades:**
+
 - Configurar a loja (nome, slug, logo, banner, cores, WhatsApp)
 - Gerenciar produtos (criar, editar, arquivar, categorizar)
 - Visualizar e gerenciar todos os pedidos da loja
@@ -52,6 +55,7 @@ Acessa o **Dashboard da Loja**. Cada conta é vinculada a uma única loja
 - Acessar suporte
 
 **O que NÃO faz:**
+
 - Não acessa outras lojas
 - Não acessa o Painel Admin
 
@@ -63,11 +67,13 @@ Acessa o **Dashboard da Loja** com visão restrita. É criado e vinculado
 pelo lojista. Cada vendedor pertence a uma única loja.
 
 **Responsabilidades:**
+
 - Ver e gerenciar **apenas os pedidos atribuídos a ele**
 - Atualizar status dos pedidos atribuídos
 - Ver o perfil dos clientes vinculados aos seus pedidos
 
 **O que NÃO faz:**
+
 - Não vê pedidos de outros vendedores
 - Não vê pedidos não atribuídos
 - Não gerencia produtos
@@ -84,6 +90,7 @@ Acessa o **Catálogo Público** (`{slug}.zapable.com.br`). Não cria conta.
 A sessão é mantida apenas no lado do cliente (carrinho em memória / localStorage).
 
 **Pode fazer:**
+
 - Navegar pelos produtos do catálogo
 - Filtrar por categoria
 - Ver detalhe de produto
@@ -93,6 +100,7 @@ A sessão é mantida apenas no lado do cliente (carrinho em memória / localStor
 - Abrir o WhatsApp com o resumo do pedido pré-formatado
 
 **Não pode:**
+
 - Criar conta
 - Acompanhar histórico de pedidos (acessa pelo código de confirmação)
 - Acessar o dashboard de qualquer loja
@@ -127,6 +135,7 @@ Landing page → CTA "Criar minha loja"
 ```
 
 Regras:
+
 - 1 e-mail = 1 conta = 1 loja.
 - O trial de 14 dias começa **após a conclusão do onboarding**, não no cadastro.
 - Enquanto o onboarding não está completo, o usuário fica preso na tela de onboarding.
@@ -197,6 +206,7 @@ Lojista acessa Dashboard → Configurações → Vendedores → "Convidar vended
 ```
 
 Regras:
+
 - O vendedor só existe no contexto da loja que o convidou.
 - Um e-mail não pode ser vendedor de mais de uma loja no MVP.
 - O lojista pode remover um vendedor a qualquer momento.
@@ -210,14 +220,14 @@ Regras:
 
 Rota protegida, acessível apenas por `platform_admin`. Não aparece no sitemap público.
 
-| Seção | Funcionalidades |
-|---|---|
-| **Visão geral** | Total de lojas, lojas ativas, MRR estimado, novos cadastros (gráfico) |
-| **Lojas** | Listar todas as lojas, buscar por nome/slug/e-mail, ver detalhes, suspender, reativar, excluir |
-| **Planos** | Ver distribuição de lojas por plano; editar limites de `plan_features` |
-| **Billing** | Log de eventos Stripe (`billing_events`), status de pagamentos por loja |
-| **Admins** | Listar admins da plataforma, convidar novo admin, revogar acesso |
-| **Suporte** | Ver mensagens abertas no suporte de todas as lojas |
+| Seção           | Funcionalidades                                                                                |
+| --------------- | ---------------------------------------------------------------------------------------------- |
+| **Visão geral** | Total de lojas, lojas ativas, MRR estimado, novos cadastros (gráfico)                          |
+| **Lojas**       | Listar todas as lojas, buscar por nome/slug/e-mail, ver detalhes, suspender, reativar, excluir |
+| **Planos**      | Ver distribuição de lojas por plano; editar limites de `plan_features`                         |
+| **Billing**     | Log de eventos Stripe (`billing_events`), status de pagamentos por loja                        |
+| **Admins**      | Listar admins da plataforma, convidar novo admin, revogar acesso                               |
+| **Suporte**     | Ver mensagens abertas no suporte de todas as lojas                                             |
 
 ---
 
@@ -226,12 +236,14 @@ Rota protegida, acessível apenas por `platform_admin`. Não aparece no sitemap 
 Acessível por `owner` (completo) e `seller` (restrito — ver seção 3.3).
 
 #### Início (Home)
+
 - Resumo do dia: pedidos novos, receita do período, clientes novos
 - Atalhos rápidos: novo produto, ver pedidos, compartilhar catálogo
 - Banner de trial (se ativo) com contador de dias restantes
 - Alerta de assinatura suspensa / pagamento pendente (se aplicável)
 
 #### Pedidos
+
 - Cards de resumo no topo: pedidos aguardando envio, aguardando pagamento, gráfico de performance de vendas por período
 - Lista de todos os pedidos da loja (owner) ou pedidos atribuídos (seller)
 - Filtros: status, data, vendedor atribuído, busca por nome/código/produto
@@ -240,6 +252,7 @@ Acessível por `owner` (completo) e `seller` (restrito — ver seção 3.3).
 - **Criação manual de pedido** ("Novo pedido"): selecionar cliente cadastrado ou criar novo cliente, selecionar vendedor responsável, adicionar produtos — útil para pedidos recebidos por telefone ou WhatsApp direto
 
 #### Produtos
+
 - Cards de alerta no topo: estoque mínimo, fora de estoque, sem foto, sem preço, com vendas, sem vendas, sem categoria
 - Lista de produtos com foto, nome, código de barras/SKU, data de atualização, preço, estoque
 - Filtros: busca por título/código de barras/SKU, categoria, subcategoria
@@ -259,6 +272,7 @@ Acessível por `owner` (completo) e `seller` (restrito — ver seção 3.3).
 - Botão "Ver no meu catálogo" fixo no rodapé da edição
 
 #### Clientes
+
 - Cards de filtros inteligentes no topo: clientes com recompra em atraso, com aniversário esta semana, com possível recompra, com compras complementares
 - Lista de clientes com busca, filtro por tag e por vendedor responsável
 - Ações rápidas na linha: abrir WhatsApp, enviar e-mail, ver pedidos, editar, excluir
@@ -274,15 +288,18 @@ Acessível por `owner` (completo) e `seller` (restrito — ver seção 3.3).
 - **Criação manual de cliente** também disponível na tela de Novo Pedido
 
 #### Vendedores
+
 - Listar vendedores ativos com seus pedidos vinculados
 - Convidar novo vendedor por e-mail (limitado por plano)
 - Remover vendedor (acesso revogado imediatamente)
 - Ver pedidos atribuídos a cada vendedor
 
 #### Catálogo (personalização)
+
 A área de personalização do catálogo é dividida em subseções acessadas por menu lateral interno:
 
 **Informações Gerais**
+
 - Nome da loja, CNPJ (para exibição), slogan (+ IA), texto "Sobre nós" (+ IA)
 - Indicação de restrição de idade (+18): sim/não
 - Idioma do catálogo (pt-BR — único no MVP)
@@ -292,56 +309,68 @@ A área de personalização do catálogo é dividida em subseções acessadas po
 - Pré-visualização ao vivo (desktop e mobile) no lado direito da tela
 
 **Logo, banner e cores**
+
 - Upload do logo (512×512px recomendado)
 - Upload do banner do catálogo
 - Paleta de cor primária (seletor de cor pré-definidas + custom)
 
 **WhatsApp e contatos**
+
 - Número de WhatsApp para receber pedidos (+55, obrigatório)
 - Telefone de contato visível no catálogo
 - E-mail de contato visível no catálogo
 - Endereço da loja (CEP, logradouro, número, bairro, cidade, estado) — exibe mapa no catálogo
 
 **Pedidos e carrinho**
+
 - Ativar/desativar carrinho de compras (quando desativado, só botão direto para WhatsApp)
 - Dados obrigatórios no checkout: solicitar forma de entrega, solicitar CPF/CNPJ, solicitar forma de pagamento
 - Instruções de pagamento: título e mensagem exibidos na confirmação do pedido
 - Ativar/desativar botão "Pedir via WhatsApp" direto no produto
 
-**Métodos de pagamento** *(informativo — o lojista gerencia o pagamento diretamente com o cliente)*
+**Métodos de pagamento** _(informativo — o lojista gerencia o pagamento diretamente com o cliente)_
+
 - Checkboxes para exibir no catálogo quais métodos são aceitos: Dinheiro, Transferência, Cartão de crédito, Cartão de débito, PIX, Boleto, Link de pagamento
 
 **Métodos de entrega**
+
 - Formas de entrega oferecidas: Entrega em domicílio, Retirada na loja, Serviço de quarto, Entrega digital
 - Campo de texto livre: informações especiais sobre entrega (ex.: "Frete grátis acima de R$200")
 - Configuração de frete: "Combinar via WhatsApp" (único modo no MVP)
 
 **Categorias**
+
 - Criar, editar, reordenar e excluir categorias
 - Criar, editar e excluir subcategorias vinculadas a cada categoria
 - Visualização de como as categorias aparecem no catálogo público
 
 **Links sociais**
+
 - Instagram, X (Twitter), Facebook, YouTube, Kwai, TikTok
 - Exibidos na página "Sobre nós" do catálogo
 
 **Site do catálogo**
+
 - Visualizar e editar slug da URL (`{slug}.zapable.com.br`)
 - Aviso de que alterar o slug quebra links já compartilhados
 
 **Código QR**
+
 - Gerar e baixar QR code do catálogo
 
 **Avançado**
+
 - Configurações extras (a definir conforme necessidade)
 
 #### Analytics
+
 - Visitas ao catálogo (pageviews por dia)
 - Pedidos por período
 - Produtos mais visualizados / mais pedidos
 - Origem dos pedidos (MVP: dados básicos do Supabase; sem GA)
 
 #### Billing
+
 - Plano atual, data de renovação, status da assinatura
 - Botão "Gerenciar assinatura" → Stripe Customer Portal
 - Histórico de faturas com download do PDF/NFSe
@@ -349,10 +378,12 @@ A área de personalização do catálogo é dividida em subseções acessadas po
 - Alerta de downgrade quando limites seriam excedidos
 
 #### Suporte
+
 - Chat/inbox simples com a equipe da plataforma
 - Histórico de mensagens
 
 #### Configurações da loja
+
 - Dados da loja (nome, slug, WhatsApp, segmento)
 - Conta do lojista (nome, e-mail, senha)
 - Zona de perigo: excluir loja / encerrar conta
@@ -363,19 +394,19 @@ A área de personalização do catálogo é dividida em subseções acessadas po
 
 O vendedor acessa o mesmo front-end do lojista, mas as rotas e dados são filtrados.
 
-| Rota | Acesso do Vendedor |
-|---|---|
-| `/` (Home) | ✓ Resumo limitado (só seus pedidos) |
-| `/orders` | ✓ Apenas pedidos atribuídos a ele |
-| `/orders/[id]` | ✓ Apenas se o pedido for dele |
-| `/products` | ✗ Redirecionado |
-| `/customers` | ✓ Apenas clientes dos seus pedidos |
-| `/sellers` | ✗ Redirecionado |
-| `/catalog` | ✗ Redirecionado |
-| `/analytics` | ✗ Redirecionado |
-| `/billing` | ✗ Redirecionado |
-| `/support` | ✓ Pode abrir chamados |
-| `/settings` | ✓ Apenas dados pessoais (nome, senha) |
+| Rota           | Acesso do Vendedor                    |
+| -------------- | ------------------------------------- |
+| `/` (Home)     | ✓ Resumo limitado (só seus pedidos)   |
+| `/orders`      | ✓ Apenas pedidos atribuídos a ele     |
+| `/orders/[id]` | ✓ Apenas se o pedido for dele         |
+| `/products`    | ✗ Redirecionado                       |
+| `/customers`   | ✓ Apenas clientes dos seus pedidos    |
+| `/sellers`     | ✗ Redirecionado                       |
+| `/catalog`     | ✗ Redirecionado                       |
+| `/analytics`   | ✗ Redirecionado                       |
+| `/billing`     | ✗ Redirecionado                       |
+| `/support`     | ✓ Pode abrir chamados                 |
+| `/settings`    | ✓ Apenas dados pessoais (nome, senha) |
 
 ---
 
@@ -383,14 +414,14 @@ O vendedor acessa o mesmo front-end do lojista, mas as rotas e dados são filtra
 
 Sem autenticação. Resolvido client-side pelo subdomínio.
 
-| Rota | Página |
-|---|---|
-| `/` | Home: header, banner, seção de ofertas especiais, busca, filtros de categoria, grid de produtos |
+| Rota              | Página                                                                                          |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| `/`               | Home: header, banner, seção de ofertas especiais, busca, filtros de categoria, grid de produtos |
 | `/product/[slug]` | Detalhe do produto: galeria, info, preço, quantidade, estoque, botão WhatsApp direto + carrinho |
-| `/checkout` | Checkout unificado: dados do cliente, resumo do pedido, cupom, observação |
-| `/order/[code]` | Confirmação: código do pedido, resumo, instruções de pagamento, botão WhatsApp |
-| `/about` | Sobre a loja: texto, contato, endereço + mapa, redes sociais |
-| `/unavailable` | Loja suspensa ou sem assinatura ativa |
+| `/checkout`       | Checkout unificado: dados do cliente, resumo do pedido, cupom, observação                       |
+| `/order/[code]`   | Confirmação: código do pedido, resumo, instruções de pagamento, botão WhatsApp                  |
+| `/about`          | Sobre a loja: texto, contato, endereço + mapa, redes sociais                                    |
+| `/unavailable`    | Loja suspensa ou sem assinatura ativa                                                           |
 
 #### Anatomia da Home do catálogo
 
@@ -441,12 +472,14 @@ Footer
 #### Anatomia do checkout
 
 **Lado esquerdo — Seus dados:**
+
 - Nome (obrigatório)
 - Celular com DDD +55 (obrigatório)
 - E-mail (obrigatório — definido junto com Daniel)
 - Toggle "Salvar estas informações para a próxima compra" (localStorage)
 
 **Lado direito — Seu pedido:**
+
 - Lista de itens com foto, nome, preço e quantidade
 - Total de itens e valor total
 - Campo "Aplicar cupom" com botão Aplicar

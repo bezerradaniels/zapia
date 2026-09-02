@@ -1,21 +1,21 @@
-import { Link } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { Link } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   PackageIcon,
   ShoppingBagAddIcon,
   CheckmarkCircle01Icon,
   Edit01Icon,
   StarIcon,
-} from '@hugeicons/core-free-icons'
-import type { Product } from '@/types/domain'
-import { discountPercent } from '@/features/products/utils/price'
-import { useCartStore, buildCartKey } from '@/features/cart'
-import { formatMoney, toTitleCase } from '@/lib/format'
-import { cn } from '@/lib/utils'
-import { buildStorePath } from '@/lib/tenant'
-import { OptimizedImage } from '@/components/ui/OptimizedImage'
-import { ROUTES } from '@/config/routes'
-import { useStoreOwnerMode } from '@/routes/store/storeOwnerMode'
+} from "@hugeicons/core-free-icons";
+import type { Product } from "@/types/domain";
+import { discountPercent } from "@/features/products/utils/price";
+import { useCartStore, buildCartKey } from "@/features/cart";
+import { formatMoney, toTitleCase } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { buildStorePath } from "@/lib/tenant";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { ROUTES } from "@/config/routes";
+import { useStoreOwnerMode } from "@/routes/store/storeOwnerMode";
 
 export function ProductCard({
   product: p,
@@ -23,24 +23,24 @@ export function ProductCard({
   onAdd,
   featured = false,
 }: {
-  product: Product
-  storeSlug: string
-  onAdd: () => void
-  featured?: boolean
+  product: Product;
+  storeSlug: string;
+  onAdd: () => void;
+  featured?: boolean;
 }) {
-  const discount = discountPercent(p)
-  const finalPrice = p.promo_price_in_cents ?? p.price_in_cents
-  const hasPromo = discount !== null
-  const cartItems = useCartStore((s) => s.items)
-  const removeItem = useCartStore((s) => s.removeItem)
-  const isInCart = cartItems.some((item) => item.product.id === p.id)
-  const { isOwner, ownerMode } = useStoreOwnerMode()
-  const showEditOverlay = isOwner && ownerMode === 'lojista'
+  const discount = discountPercent(p);
+  const finalPrice = p.promo_price_in_cents ?? p.price_in_cents;
+  const hasPromo = discount !== null;
+  const cartItems = useCartStore((s) => s.items);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const isInCart = cartItems.some((item) => item.product.id === p.id);
+  const { isOwner, ownerMode } = useStoreOwnerMode();
+  const showEditOverlay = isOwner && ownerMode === "lojista";
 
   return (
     <article
       className="group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-shadow hover:shadow-md"
-      style={{ borderColor: '#cbd5e1' }}
+      style={{ borderColor: "#cbd5e1" }}
     >
       {showEditOverlay && (
         <Link
@@ -58,7 +58,10 @@ export function ProductCard({
           Destaque
         </div>
       )}
-      <Link to={buildStorePath(storeSlug, `produto/${p.slug}`)} className="block flex-1">
+      <Link
+        to={buildStorePath(storeSlug, `produto/${p.slug}`)}
+        className="block flex-1"
+      >
         <div className="relative aspect-square w-full overflow-hidden">
           {p.images[0] ? (
             <OptimizedImage
@@ -72,7 +75,7 @@ export function ProductCard({
           ) : (
             <div
               className="flex h-full w-full flex-col items-center justify-center text-z-text-hint"
-              style={{ backgroundColor: '#f9f6f2' }}
+              style={{ backgroundColor: "#f9f6f2" }}
             >
               <HugeiconsIcon icon={PackageIcon} size={36} />
               <span className="mt-2 text-xs">produto sem imagem</span>
@@ -99,7 +102,7 @@ export function ProductCard({
               ) : (
                 <span className="text-[16px] font-extrabold leading-none text-z-ink">
                   <span className="text-[12px]">R$&nbsp;</span>
-                  {formatMoney(finalPrice).replace(/^R\$[\s\u00A0]+/, '')}
+                  {formatMoney(finalPrice).replace(/^R\$[\s\u00A0]+/, "")}
                 </span>
               )}
               {hasPromo && (
@@ -108,17 +111,24 @@ export function ProductCard({
                 </span>
               )}
             </div>
-            {p.installment_count != null && p.installment_total_in_cents != null && (
-              <span className="text-[11px] text-z-text-muted">
-                <span className="font-semibold text-z-ink">{p.installment_count}x </span>
-                <span className="font-semibold text-z-ink">
-                  {formatMoney(Math.ceil(p.installment_total_in_cents / p.installment_count))}
+            {p.installment_count != null &&
+              p.installment_total_in_cents != null && (
+                <span className="text-[11px] text-z-text-muted">
+                  <span className="font-semibold text-z-ink">
+                    {p.installment_count}x{" "}
+                  </span>
+                  <span className="font-semibold text-z-ink">
+                    {formatMoney(
+                      Math.ceil(
+                        p.installment_total_in_cents / p.installment_count,
+                      ),
+                    )}
+                  </span>
+                  {p.installment_total_in_cents <= finalPrice && (
+                    <span className="text-[#02a650]"> sem juros</span>
+                  )}
                 </span>
-                {p.installment_total_in_cents <= finalPrice && (
-                  <span className="text-[#02a650]"> sem juros</span>
-                )}
-              </span>
-            )}
+              )}
           </div>
         </div>
       </Link>
@@ -128,7 +138,7 @@ export function ProductCard({
           <Link
             to={buildStorePath(storeSlug, `produto/${p.slug}`)}
             className="mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-lg text-[12px] font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-            style={{ background: 'var(--store-primary)' }}
+            style={{ background: "var(--store-primary)" }}
           >
             Ver mais
           </Link>
@@ -137,20 +147,26 @@ export function ProductCard({
             <button
               type="button"
               onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                onAdd()
+                e.preventDefault();
+                e.stopPropagation();
+                onAdd();
               }}
               className={cn(
-                'mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-lg text-[12px] font-bold text-white transition-all active:scale-[0.98]',
-                isInCart ? 'bg-gray-200 text-gray-600' : 'hover:opacity-90',
+                "mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-lg text-[12px] font-bold text-white transition-all active:scale-[0.98]",
+                isInCart ? "bg-gray-200 text-gray-600" : "hover:opacity-90",
               )}
-              style={!isInCart ? { background: 'var(--store-primary)' } : undefined}
+              style={
+                !isInCart ? { background: "var(--store-primary)" } : undefined
+              }
             >
               {isInCart ? (
                 <>
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-400">
-                    <HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} className="text-white" />
+                    <HugeiconsIcon
+                      icon={CheckmarkCircle01Icon}
+                      size={14}
+                      className="text-white"
+                    />
                   </div>
                   Adicionado
                 </>
@@ -165,9 +181,9 @@ export function ProductCard({
               <button
                 type="button"
                 onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  removeItem(buildCartKey(p.id, null))
+                  e.preventDefault();
+                  e.stopPropagation();
+                  removeItem(buildCartKey(p.id, null));
                 }}
                 className="mt-2 block w-full text-center text-xs text-red-500 hover:text-red-600"
               >
@@ -178,5 +194,5 @@ export function ProductCard({
         )}
       </div>
     </article>
-  )
+  );
 }

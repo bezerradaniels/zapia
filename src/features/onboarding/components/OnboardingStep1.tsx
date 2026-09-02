@@ -1,30 +1,33 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod' 
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowRight02Icon } from '@hugeicons/core-free-icons'
-import { Button, Combobox, Input, Label } from '@/components/ui'
-import { PhoneInput } from '@/components/forms/PhoneInput'
-import { STATES, toE164BR, NEIGHBORHOOD_OPTIONS } from '@/lib/br'
-import { createStore, SlugTakenError, patchStore } from '@/features/catalog'
-import { slugify } from '@/lib/utils/slugify'
-import { ROUTES } from '@/config/routes'
-import { track } from '@/features/analytics'
-import { loadOnboardingSession, saveOnboardingSession } from '../utils/onboardingSession'
-import { saveDraft, loadDraft } from '../utils/onboardingDraft'
-import { useCities } from '../hooks/useCities'
-import { step1Schema, type Step1Values } from '../schemas'
-import { cn } from '@/lib/utils'
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { Button, Combobox, Input, Label } from "@/components/ui";
+import { PhoneInput } from "@/components/forms/PhoneInput";
+import { STATES, toE164BR, NEIGHBORHOOD_OPTIONS } from "@/lib/br";
+import { createStore, SlugTakenError, patchStore } from "@/features/catalog";
+import { slugify } from "@/lib/utils/slugify";
+import { ROUTES } from "@/config/routes";
+import { track } from "@/features/analytics";
+import {
+  loadOnboardingSession,
+  saveOnboardingSession,
+} from "../utils/onboardingSession";
+import { saveDraft, loadDraft } from "../utils/onboardingDraft";
+import { useCities } from "../hooks/useCities";
+import { step1Schema, type Step1Values } from "../schemas";
+import { cn } from "@/lib/utils";
 
-const STATE_OPTIONS = STATES.map((s) => ({ value: s.uf, label: s.name }))
+const STATE_OPTIONS = STATES.map((s) => ({ value: s.uf, label: s.name }));
 
 export function OnboardingStep1() {
-  const navigate = useNavigate()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const draft = loadDraft<Step1Values>(1)
-  const onboardingSession = loadOnboardingSession()
+  const draft = loadDraft<Step1Values>(1);
+  const onboardingSession = loadOnboardingSession();
 
   const {
     register,
@@ -36,30 +39,32 @@ export function OnboardingStep1() {
   } = useForm<Step1Values>({
     resolver: zodResolver(step1Schema),
     defaultValues: {
-      name: draft?.name ?? '',
-      whatsapp_phone: draft?.whatsapp_phone ?? '',
-      address_state: draft?.address_state || 'BA',
-      address_city: draft?.address_city || 'Bom Jesus da Lapa',
-      address_street: draft?.address_street ?? '',
-      address_neighborhood: draft?.address_neighborhood ?? '',
+      name: draft?.name ?? "",
+      whatsapp_phone: draft?.whatsapp_phone ?? "",
+      address_state: draft?.address_state || "BA",
+      address_city: draft?.address_city || "Bom Jesus da Lapa",
+      address_street: draft?.address_street ?? "",
+      address_neighborhood: draft?.address_neighborhood ?? "",
     },
-  })
+  });
 
   useEffect(() => {
-    const { unsubscribe } = watch((values) => saveDraft(1, values))
-    return unsubscribe
-  }, [watch])
+    const { unsubscribe } = watch((values) => saveDraft(1, values));
+    return unsubscribe;
+  }, [watch]);
 
   useEffect(() => {
-    if (!onboardingSession) track('onboarding_started', { step: 1 })
+    if (!onboardingSession) track("onboarding_started", { step: 1 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
-  const selectedState = watch('address_state')
-  const { data: cityOptions = [], isLoading: loadingCities } = useCities(selectedState || null)
+  const selectedState = watch("address_state");
+  const { data: cityOptions = [], isLoading: loadingCities } = useCities(
+    selectedState || null,
+  );
 
   const onSubmit = async (values: Step1Values) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       let store = onboardingSession
         ? {
@@ -67,32 +72,32 @@ export function OnboardingStep1() {
             slug: onboardingSession.storeSlug,
             name: values.name,
           }
-        : null
+        : null;
 
-      let isNewStore = false
+      let isNewStore = false;
 
       if (!store) {
-        isNewStore = true
-        const baseSlug = slugify(values.name)
+        isNewStore = true;
+        const baseSlug = slugify(values.name);
 
         try {
           store = await createStore({
             name: values.name,
             slug: baseSlug,
-            primary_color: '#34d399',
+            primary_color: "#34d399",
             whatsapp_phone: values.whatsapp_phone,
-          })
+          });
         } catch (err) {
           if (err instanceof SlugTakenError) {
-            const suffix = Math.floor(100 + Math.random() * 900)
+            const suffix = Math.floor(100 + Math.random() * 900);
             store = await createStore({
               name: values.name,
               slug: `${baseSlug.slice(0, 36)}-${suffix}`,
-              primary_color: '#34d399',
+              primary_color: "#34d399",
               whatsapp_phone: values.whatsapp_phone,
-            })
+            });
           } else {
-            throw err
+            throw err;
           }
         }
       }
@@ -104,11 +109,11 @@ export function OnboardingStep1() {
         address_city: values.address_city,
         address_street: values.address_street || null,
         address_neighborhood: values.address_neighborhood || null,
-      })
+      });
 
       if (isNewStore) {
-        track('store_created', { store_id: store.id, store_slug: store.slug })
-        track('free_plan_started', { store_id: store.id, plan_tier: 'basico' })
+        track("store_created", { store_id: store.id, store_slug: store.slug });
+        track("free_plan_started", { store_id: store.id, plan_tier: "basico" });
       }
 
       saveOnboardingSession({
@@ -116,46 +121,62 @@ export function OnboardingStep1() {
         storeSlug: store.slug,
         storeName: store.name,
         startedAt: onboardingSession?.startedAt ?? Date.now(),
-      })
+      });
 
-      track('onboarding_step_completed', { store_id: store.id, step: 1, step_name: 'dados_da_loja' })
+      track("onboarding_step_completed", {
+        store_id: store.id,
+        step: 1,
+        step_name: "dados_da_loja",
+      });
 
-      navigate(ROUTES.onboardingStep2)
+      navigate(ROUTES.onboardingStep2);
     } catch (err) {
       const msg =
         err instanceof Error
           ? err.message
-          : typeof err === 'object' && err !== null && 'message' in err
+          : typeof err === "object" && err !== null && "message" in err
             ? String((err as { message: unknown }).message)
-            : 'Algo deu errado. Tente novamente.'
-      setError('root', { message: msg })
+            : "Algo deu errado. Tente novamente.";
+      setError("root", { message: msg });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-5"
+      noValidate
+    >
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-z-text">Dados da sua loja</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-z-text">
+          Dados da sua loja
+        </h1>
         <p className="mt-1 text-sm text-z-text-muted">
           Essas informações identificam sua loja para os clientes.
         </p>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="name" className="text-sm">Nome da loja *</Label>
+        <Label htmlFor="name" className="text-sm">
+          Nome da loja *
+        </Label>
         <Input
           id="name"
           placeholder="Ex: Moda da Ana"
-          className={cn('border-slate-300', errors.name && 'border-red-400')}
-          {...register('name')}
+          className={cn("border-slate-300", errors.name && "border-red-400")}
+          {...register("name")}
         />
-        {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+        {errors.name && (
+          <p className="text-xs text-red-500">{errors.name.message}</p>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="whatsapp_phone" className="text-sm">WhatsApp para receber pedidos *</Label>
+        <Label htmlFor="whatsapp_phone" className="text-sm">
+          WhatsApp para receber pedidos *
+        </Label>
         <Controller
           name="whatsapp_phone"
           control={control}
@@ -164,18 +185,25 @@ export function OnboardingStep1() {
               id="whatsapp_phone"
               value={field.value}
               onChange={field.onChange}
-              className={cn('border-slate-300', errors.whatsapp_phone && 'border-red-400')}
+              className={cn(
+                "border-slate-300",
+                errors.whatsapp_phone && "border-red-400",
+              )}
             />
           )}
         />
         {errors.whatsapp_phone && (
-          <p className="text-xs text-red-500">{errors.whatsapp_phone.message}</p>
+          <p className="text-xs text-red-500">
+            {errors.whatsapp_phone.message}
+          </p>
         )}
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address_state" className="text-sm">Estado *</Label>
+          <Label htmlFor="address_state" className="text-sm">
+            Estado *
+          </Label>
           <Controller
             name="address_state"
             control={control}
@@ -190,12 +218,16 @@ export function OnboardingStep1() {
             )}
           />
           {errors.address_state && (
-            <p className="text-xs text-red-500">{errors.address_state.message}</p>
+            <p className="text-xs text-red-500">
+              {errors.address_state.message}
+            </p>
           )}
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address_city" className="text-sm">Cidade *</Label>
+          <Label htmlFor="address_city" className="text-sm">
+            Cidade *
+          </Label>
           <Controller
             name="address_city"
             control={control}
@@ -205,7 +237,9 @@ export function OnboardingStep1() {
                 value={field.value}
                 onChange={field.onChange}
                 placeholder={
-                  !selectedState ? 'Selecione o estado primeiro' : 'Digite para buscar...'
+                  !selectedState
+                    ? "Selecione o estado primeiro"
+                    : "Digite para buscar..."
                 }
                 disabled={!selectedState}
                 loading={loadingCities}
@@ -214,7 +248,9 @@ export function OnboardingStep1() {
             )}
           />
           {errors.address_city && (
-            <p className="text-xs text-red-500">{errors.address_city.message}</p>
+            <p className="text-xs text-red-500">
+              {errors.address_city.message}
+            </p>
           )}
         </div>
       </div>
@@ -222,22 +258,28 @@ export function OnboardingStep1() {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="address_street" className="text-sm">
-            Endereço{' '}
-            <span className="text-z-text-hint text-xs font-normal normal-case">(aparece no rodapé)</span>
+            Endereço{" "}
+            <span className="text-z-text-hint text-xs font-normal normal-case">
+              (aparece no rodapé)
+            </span>
           </Label>
           <Input
             id="address_street"
             placeholder="Ex: Rua das Flores, 123"
             className="border-slate-300"
-            {...register('address_street')}
+            {...register("address_street")}
           />
           {errors.address_street && (
-            <p className="text-xs text-red-500">{errors.address_street.message}</p>
+            <p className="text-xs text-red-500">
+              {errors.address_street.message}
+            </p>
           )}
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address_neighborhood" className="text-sm">Bairro *</Label>
+          <Label htmlFor="address_neighborhood" className="text-sm">
+            Bairro *
+          </Label>
           <Controller
             name="address_neighborhood"
             control={control}
@@ -252,7 +294,9 @@ export function OnboardingStep1() {
             )}
           />
           {errors.address_neighborhood && (
-            <p className="text-xs text-red-500">{errors.address_neighborhood.message}</p>
+            <p className="text-xs text-red-500">
+              {errors.address_neighborhood.message}
+            </p>
           )}
         </div>
       </div>
@@ -264,9 +308,9 @@ export function OnboardingStep1() {
       )}
 
       <Button type="submit" size="lg" fullWidth disabled={isSubmitting}>
-        {isSubmitting ? 'Criando sua loja...' : 'Continuar'}
+        {isSubmitting ? "Criando sua loja..." : "Continuar"}
         {!isSubmitting && <HugeiconsIcon icon={ArrowRight02Icon} size={20} />}
       </Button>
     </form>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-import DOMPurify from 'dompurify'
+import DOMPurify from "dompurify";
 
 // The product rich-text editor only emits a small set of formatting tags.
 // We allow exactly those and strip ALL attributes (no `style`, no event
 // handlers like `onclick`/`onmouseover`, no `href`/`src`). This is the
 // security boundary for any store-owner-supplied HTML rendered on a catalog.
-const ALLOWED_TAGS = ['ul', 'ol', 'li', 'p', 'br', 'strong', 'em', 'b', 'i']
+const ALLOWED_TAGS = ["ul", "ol", "li", "p", "br", "strong", "em", "b", "i"];
 
 /**
  * Sanitizes untrusted HTML (e.g. a product description authored by a lojista)
@@ -16,10 +16,10 @@ const ALLOWED_TAGS = ['ul', 'ol', 'li', 'p', 'br', 'strong', 'em', 'b', 'i']
  * tag and attribute, including all event handlers.
  */
 export function sanitizeRichText(html: string | null | undefined): string {
-  if (!html) return ''
+  if (!html) return "";
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR: [],
     ALLOW_DATA_ATTR: false,
-  })
+  });
 }

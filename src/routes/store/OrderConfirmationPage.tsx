@@ -1,18 +1,23 @@
-import { Link, useLocation, useOutletContext, useParams } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { Tick02Icon, WhatsappIcon } from '@hugeicons/core-free-icons'
-import { buildStorePath } from '@/lib/tenant'
-import { Button } from '@/components/ui'
-import type { Store } from '@/types/domain'
+import {
+  Link,
+  useLocation,
+  useOutletContext,
+  useParams,
+} from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Tick02Icon, WhatsappIcon } from "@hugeicons/core-free-icons";
+import { buildStorePath } from "@/lib/tenant";
+import { Button } from "@/components/ui";
+import type { Store } from "@/types/domain";
 
-type LocationState = { whatsappUrl?: string } | null
+type LocationState = { whatsappUrl?: string } | null;
 
 export default function OrderConfirmationPage() {
-  const { id } = useParams<{ id: string }>()
-  const store = useOutletContext<Store>()
-  const location = useLocation()
-  const state = location.state as LocationState
-  const whatsappUrl = state?.whatsappUrl
+  const { id } = useParams<{ id: string }>();
+  const store = useOutletContext<Store>();
+  const location = useLocation();
+  const state = location.state as LocationState;
+  const whatsappUrl = state?.whatsappUrl;
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-5 py-10">
@@ -20,11 +25,13 @@ export default function OrderConfirmationPage() {
         <div className="mx-auto mb-5 flex h-[72px] w-[72px] items-center justify-center rounded-full bg-slate-100 text-[#10b981]">
           <HugeiconsIcon icon={Tick02Icon} size={34} strokeWidth={3} />
         </div>
-        <h1 className="text-[22px] font-bold tracking-tighter">Pedido registrado!</h1>
+        <h1 className="text-[22px] font-bold tracking-tighter">
+          Pedido registrado!
+        </h1>
         {id && (
           <div
             className="mt-2 text-2xl font-bold"
-            style={{ color: 'var(--store-primary)' }}
+            style={{ color: "var(--store-primary)" }}
           >
             #{id.slice(0, 8)}
           </div>
@@ -53,5 +60,5 @@ export default function OrderConfirmationPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

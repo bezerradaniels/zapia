@@ -1,22 +1,25 @@
-import * as React from 'react'
-import { cn } from '@/lib/utils'
-import { Label } from './Label'
-import { Input, type InputProps } from './Input'
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { Label } from "./Label";
+import { Input, type InputProps } from "./Input";
 
 export interface FieldProps extends InputProps {
-  label?: string
-  error?: string
-  hint?: string
-  containerClassName?: string
-  labelClassName?: string
+  label?: string;
+  error?: string;
+  hint?: string;
+  containerClassName?: string;
+  labelClassName?: string;
 }
 
 export const Field = React.forwardRef<HTMLInputElement, FieldProps>(
-  ({ label, error, hint, containerClassName, labelClassName, id, ...props }, ref) => {
-    const generatedId = React.useId()
-    const inputId = id ?? generatedId
+  (
+    { label, error, hint, containerClassName, labelClassName, id, ...props },
+    ref,
+  ) => {
+    const generatedId = React.useId();
+    const inputId = id ?? generatedId;
     return (
-      <div className={cn('flex flex-col gap-1.5', containerClassName)}>
+      <div className={cn("flex flex-col gap-1.5", containerClassName)}>
         {label && (
           <Label htmlFor={inputId} className={labelClassName}>
             {label}
@@ -34,7 +37,7 @@ export const Field = React.forwardRef<HTMLInputElement, FieldProps>(
           <span className="text-xs text-z-text-hint">{hint}</span>
         ) : null}
       </div>
-    )
+    );
   },
-)
-Field.displayName = 'Field'
+);
+Field.displayName = "Field";

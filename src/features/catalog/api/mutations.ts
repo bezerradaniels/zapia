@@ -1,27 +1,27 @@
-import { createBrowserClient } from '@/lib/supabase'
-import { toE164BR } from '@/lib/br'
-import { buildStoreUrl } from '@/lib/tenant'
-import type { Store } from '@/types/domain'
-import type { CreateStoreInput, UpdateStoreInput } from '../schemas'
+import { createBrowserClient } from "@/lib/supabase";
+import { toE164BR } from "@/lib/br";
+import { buildStoreUrl } from "@/lib/tenant";
+import type { Store } from "@/types/domain";
+import type { CreateStoreInput, UpdateStoreInput } from "../schemas";
 
 export class SlugTakenError extends Error {
   constructor() {
-    super('Este endereço de loja já está em uso.')
-    this.name = 'SlugTakenError'
+    super("Este endereço de loja já está em uso.");
+    this.name = "SlugTakenError";
   }
 }
 
 export async function createStore(input: CreateStoreInput): Promise<Store> {
-  const supabase = createBrowserClient()
-  const { data: userData, error: userErr } = await supabase.auth.getUser()
+  const supabase = createBrowserClient();
+  const { data: userData, error: userErr } = await supabase.auth.getUser();
   if (userErr || !userData.user) {
-    throw new Error('Sessão expirada. Entre novamente.')
+    throw new Error("Sessão expirada. Entre novamente.");
   }
 
-  const defaultGtmId = import.meta.env.VITE_DEFAULT_GTM_ID ?? null
+  const defaultGtmId = import.meta.env.VITE_DEFAULT_GTM_ID ?? null;
 
   const { data, error } = await supabase
-    .from('stores')
+    .from("stores")
     .insert({
       name: input.name,
       slug: input.slug,
@@ -31,47 +31,52 @@ export async function createStore(input: CreateStoreInput): Promise<Store> {
       owner_id: userData.user.id,
       gtm_id: defaultGtmId,
     })
-    .select('*')
-    .single()
+    .select("*")
+    .single();
 
   if (error) {
     // 23505 = unique_violation → slug tomado
-    if (error.code === '23505') throw new SlugTakenError()
-    throw error
+    if (error.code === "23505") throw new SlugTakenError();
+    throw error;
   }
 
-  const store = data as unknown as Store
+  const store = data as unknown as Store;
 
   try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    const { data: sessionData } = await supabase.auth.getSession();
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
     if (sessionData.session?.access_token) {
-      headers.Authorization = `Bearer ${sessionData.session.access_token}`
+      headers.Authorization = `Bearer ${sessionData.session.access_token}`;
     }
 
-    await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/store-created-notification`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        name: userData.user.user_metadata?.name ?? '',
-        email: userData.user.email ?? '',
-        whatsapp_phone: store.whatsapp_phone ?? '',
-        store_name: store.name,
-        store_url: buildStoreUrl(store.slug),
-      }),
-    })
+    await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/store-created-notification`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          name: userData.user.user_metadata?.name ?? "",
+          email: userData.user.email ?? "",
+          whatsapp_phone: store.whatsapp_phone ?? "",
+          store_name: store.name,
+          store_url: buildStoreUrl(store.slug),
+        }),
+      },
+    );
   } catch {
     // Don't block store creation if notification fails
   }
 
-  return store
+  return store;
 }
 
 export async function updateStore(
   storeId: string,
   input: UpdateStoreInput,
 ): Promise<Store> {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient();
 
   // Build social_links object from individual fields
   const social_links = {
@@ -81,10 +86,10 @@ export async function updateStore(
     youtube: input.social_youtube?.trim() || undefined,
     kwai: input.social_kwai?.trim() || undefined,
     tiktok: input.social_tiktok?.trim() || undefined,
-  }
+  };
 
   const { data, error } = await supabase
-    .from('stores')
+    .from("stores")
     .update({
       name: input.name,
       primary_color: input.primary_color,
@@ -107,36 +112,42 @@ export async function updateStore(
       require_shipping_choice: input.require_shipping_choice ?? false,
       require_cpf: input.require_cpf ?? false,
       require_payment_choice: input.require_payment_choice ?? false,
-      payment_instructions_title: input.payment_instructions_title?.trim() || null,
-      payment_instructions_message: input.payment_instructions_message?.trim() || null,
+      payment_instructions_title:
+        input.payment_instructions_title?.trim() || null,
+      payment_instructions_message:
+        input.payment_instructions_message?.trim() || null,
       whatsapp_button_enabled: input.whatsapp_button_enabled ?? true,
       accepted_payment_methods: input.accepted_payment_methods ?? [],
       accepted_shipping_methods: input.accepted_shipping_methods ?? [],
       delivery_hours: input.delivery_hours ?? [],
-      delivery_area_scope: input.delivery_area_scope ?? 'city_only',
-      delivery_area_custom_locations: input.delivery_area_custom_locations ?? [],
+      delivery_area_scope: input.delivery_area_scope ?? "city_only",
+      delivery_area_custom_locations:
+        input.delivery_area_custom_locations ?? [],
       custom_links: input.custom_links ?? [],
       gallery_images: input.gallery_images ?? [],
       social_links,
       about_us: input.about_us?.trim() || null,
       age_restricted: input.age_restricted ?? false,
       show_out_of_stock: input.show_out_of_stock ?? false,
-      product_sort: input.product_sort ?? 'recent',
-      home_view: input.home_view ?? 'catalog',
+      product_sort: input.product_sort ?? "recent",
+      home_view: input.home_view ?? "catalog",
       gtm_id: input.gtm_id?.trim() || null,
       // If slug is provided, we update it and set the timestamp.
       // The UI will handle the business rule (once every 3 months).
-      ...(input.slug ? { 
-        slug: input.slug,
-        slug_last_updated_at: new Date().toISOString()
-      } : {}),
+      ...(input.slug
+        ? {
+            slug: input.slug,
+            slug_last_updated_at: new Date().toISOString(),
+          }
+        : {}),
     })
-    .eq('id', storeId)
-    .select('*')
-    .single()
+    .eq("id", storeId)
+    .select("*")
+    .single();
 
-  if (error || !data) throw error ?? new Error('Não foi possível atualizar a loja')
-  return data as unknown as Store
+  if (error || !data)
+    throw error ?? new Error("Não foi possível atualizar a loja");
+  return data as unknown as Store;
 }
 
 /**
@@ -147,13 +158,16 @@ export async function patchStore(
   storeId: string,
   patch: Record<string, unknown>,
 ): Promise<void> {
-  const supabase = createBrowserClient()
-  const { error } = await supabase.from('stores').update(patch as never).eq('id', storeId)
-  if (error) throw error
+  const supabase = createBrowserClient();
+  const { error } = await supabase
+    .from("stores")
+    .update(patch as never)
+    .eq("id", storeId);
+  if (error) throw error;
 }
 
 export async function deleteStore(storeId: string): Promise<void> {
-  const supabase = createBrowserClient()
-  const { error } = await supabase.from('stores').delete().eq('id', storeId)
-  if (error) throw error
+  const supabase = createBrowserClient();
+  const { error } = await supabase.from("stores").delete().eq("id", storeId);
+  if (error) throw error;
 }

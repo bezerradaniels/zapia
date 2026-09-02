@@ -1,66 +1,75 @@
-import { useCallback, useRef, useState } from 'react'
-import Cropper, { type Area } from 'react-easy-crop'
-import 'react-easy-crop/react-easy-crop.css'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ImageIcon, UploadIcon, DeleteIcon, ReloadIcon } from '@hugeicons/core-free-icons'
-import { uploadImage, deleteImageByUrl, UploadError } from '@/lib/supabase'
-import type { StorageBucket } from '@/lib/supabase'
-import { Button } from '@/components/ui'
-import { cn } from '@/lib/utils'
+import { useCallback, useRef, useState } from "react";
+import Cropper, { type Area } from "react-easy-crop";
+import "react-easy-crop/react-easy-crop.css";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  ImageIcon,
+  UploadIcon,
+  DeleteIcon,
+  ReloadIcon,
+} from "@hugeicons/core-free-icons";
+import { uploadImage, deleteImageByUrl, UploadError } from "@/lib/supabase";
+import type { StorageBucket } from "@/lib/supabase";
+import { Button } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
 type Props = {
-  bucket: StorageBucket
-  storeId: string
-  value: string | null
-  onChange: (url: string | null) => void
+  bucket: StorageBucket;
+  storeId: string;
+  value: string | null;
+  onChange: (url: string | null) => void;
   /** Width / height ratio. 1 = square logo, 1.6 = 16:10 banner. */
-  aspect?: number
-  label?: string
-  hint?: string
-  compact?: boolean
-}
+  aspect?: number;
+  label?: string;
+  hint?: string;
+  compact?: boolean;
+};
 
-const MAX_OUTPUT_DIM = 1600
+const MAX_OUTPUT_DIM = 1600;
 
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = reject
-    img.src = url
-  })
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
 }
 
-async function cropToBlob(imageSrc: string, pixelCrop: Area, rotation: number): Promise<Blob> {
-  const image = await loadImage(imageSrc)
-  const maxSize = Math.max(image.width, image.height)
-  const safeArea = Math.ceil(2 * ((maxSize / 2) * Math.sqrt(2)))
+async function cropToBlob(
+  imageSrc: string,
+  pixelCrop: Area,
+  rotation: number,
+): Promise<Blob> {
+  const image = await loadImage(imageSrc);
+  const maxSize = Math.max(image.width, image.height);
+  const safeArea = Math.ceil(2 * ((maxSize / 2) * Math.sqrt(2)));
 
-  const rotCanvas = document.createElement('canvas')
-  rotCanvas.width = safeArea
-  rotCanvas.height = safeArea
-  const rotCtx = rotCanvas.getContext('2d')!
-  rotCtx.translate(safeArea / 2, safeArea / 2)
-  rotCtx.rotate((rotation * Math.PI) / 180)
-  rotCtx.translate(-safeArea / 2, -safeArea / 2)
+  const rotCanvas = document.createElement("canvas");
+  rotCanvas.width = safeArea;
+  rotCanvas.height = safeArea;
+  const rotCtx = rotCanvas.getContext("2d")!;
+  rotCtx.translate(safeArea / 2, safeArea / 2);
+  rotCtx.rotate((rotation * Math.PI) / 180);
+  rotCtx.translate(-safeArea / 2, -safeArea / 2);
   rotCtx.drawImage(
     image,
     safeArea / 2 - image.width * 0.5,
     safeArea / 2 - image.height * 0.5,
-  )
+  );
 
   const scale =
     pixelCrop.width < 800
       ? 800 / pixelCrop.width
       : pixelCrop.width > MAX_OUTPUT_DIM
         ? MAX_OUTPUT_DIM / pixelCrop.width
-        : 1
-  const outCanvas = document.createElement('canvas')
-  outCanvas.width = Math.round(pixelCrop.width * scale)
-  outCanvas.height = Math.round(pixelCrop.height * scale)
-  const outCtx = outCanvas.getContext('2d')!
-  outCtx.imageSmoothingEnabled = true
-  outCtx.imageSmoothingQuality = 'high'
+        : 1;
+  const outCanvas = document.createElement("canvas");
+  outCanvas.width = Math.round(pixelCrop.width * scale);
+  outCanvas.height = Math.round(pixelCrop.height * scale);
+  const outCtx = outCanvas.getContext("2d")!;
+  outCtx.imageSmoothingEnabled = true;
+  outCtx.imageSmoothingQuality = "high";
   outCtx.drawImage(
     rotCanvas,
     Math.round(safeArea / 2 - image.width * 0.5 + pixelCrop.x),
@@ -71,15 +80,15 @@ async function cropToBlob(imageSrc: string, pixelCrop: Area, rotation: number): 
     0,
     outCanvas.width,
     outCanvas.height,
-  )
+  );
 
   return new Promise((resolve, reject) => {
     outCanvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error('Canvas vazio'))),
-      'image/webp',
+      (blob) => (blob ? resolve(blob) : reject(new Error("Canvas vazio"))),
+      "image/webp",
       0.92,
-    )
-  })
+    );
+  });
 }
 
 export function ImageCropUploader({
@@ -88,101 +97,124 @@ export function ImageCropUploader({
   value,
   onChange,
   aspect = 1,
-  label = 'Imagem',
+  label = "Imagem",
   hint,
   compact = false,
 }: Props) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [srcUrl, setSrcUrl] = useState<string | null>(null)
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
-  const [rotation, setRotation] = useState(0)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [srcUrl, setSrcUrl] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const pick = () => fileInputRef.current?.click()
+  const pick = () => fileInputRef.current?.click();
 
   const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    if (fileInputRef.current) fileInputRef.current.value = ''
-    const url = URL.createObjectURL(file)
-    setSrcUrl(url)
-    setCrop({ x: 0, y: 0 })
-    setZoom(1)
-    setRotation(0)
-    setCroppedAreaPixels(null)
-  }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    const url = URL.createObjectURL(file);
+    setSrcUrl(url);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setRotation(0);
+    setCroppedAreaPixels(null);
+  };
 
   const onCropComplete = useCallback((_: Area, pixels: Area) => {
-    setCroppedAreaPixels(pixels)
-  }, [])
+    setCroppedAreaPixels(pixels);
+  }, []);
 
   const handleConfirm = async () => {
-    if (!srcUrl || !croppedAreaPixels) return
-    setError(null)
-    setIsUploading(true)
+    if (!srcUrl || !croppedAreaPixels) return;
+    setError(null);
+    setIsUploading(true);
     try {
-      const blob = await cropToBlob(srcUrl, croppedAreaPixels, rotation)
-      const file = new File([blob], 'image.webp', { type: 'image/webp' })
-      if (value) deleteImageByUrl(bucket, value).catch(() => {})
-      const url = await uploadImage(bucket, storeId, file)
-      onChange(url)
-      handleCancel()
+      const blob = await cropToBlob(srcUrl, croppedAreaPixels, rotation);
+      const file = new File([blob], "image.webp", { type: "image/webp" });
+      if (value) deleteImageByUrl(bucket, value).catch(() => {});
+      const url = await uploadImage(bucket, storeId, file);
+      onChange(url);
+      handleCancel();
     } catch (err) {
       setError(
-        err instanceof UploadError ? err.message : 'Não foi possível enviar a imagem.',
-      )
+        err instanceof UploadError
+          ? err.message
+          : "Não foi possível enviar a imagem.",
+      );
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   const handleCancel = () => {
-    if (srcUrl) URL.revokeObjectURL(srcUrl)
-    setSrcUrl(null)
-    setCrop({ x: 0, y: 0 })
-    setZoom(1)
-    setRotation(0)
-    setCroppedAreaPixels(null)
-  }
+    if (srcUrl) URL.revokeObjectURL(srcUrl);
+    setSrcUrl(null);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setRotation(0);
+    setCroppedAreaPixels(null);
+  };
 
   const remove = () => {
-    if (!value) return
-    deleteImageByUrl(bucket, value).catch(() => {})
-    onChange(null)
-  }
+    if (!value) return;
+    deleteImageByUrl(bucket, value).catch(() => {});
+    onChange(null);
+  };
 
-  const thumbH = compact ? (aspect >= 2 ? 'h-12' : 'h-14') : aspect >= 2 ? 'h-16' : 'h-20'
-  const thumbW = compact ? (aspect >= 2 ? 'w-24' : aspect === 1 ? 'w-14' : 'w-20') : aspect >= 2 ? 'w-32' : aspect === 1 ? 'w-20' : 'w-28'
+  const thumbH = compact
+    ? aspect >= 2
+      ? "h-12"
+      : "h-14"
+    : aspect >= 2
+      ? "h-16"
+      : "h-20";
+  const thumbW = compact
+    ? aspect >= 2
+      ? "w-24"
+      : aspect === 1
+        ? "w-14"
+        : "w-20"
+    : aspect >= 2
+      ? "w-32"
+      : aspect === 1
+        ? "w-20"
+        : "w-28";
 
   return (
     <>
-      <div className={cn('flex flex-col', compact ? 'gap-1.5' : 'gap-2')}>
-        <span className={cn('font-semibold text-z-text-hint', compact ? 'text-xs' : 'text-[13px]')}>
+      <div className={cn("flex flex-col", compact ? "gap-1.5" : "gap-2")}>
+        <span
+          className={cn(
+            "font-semibold text-z-text-hint",
+            compact ? "text-xs" : "text-[13px]",
+          )}
+        >
           {label}
         </span>
 
         {value ? (
-          <div className={cn('flex items-center', compact ? 'gap-2' : 'gap-3')}>
+          <div className={cn("flex items-center", compact ? "gap-2" : "gap-3")}>
             <div
               className={cn(
-                'shrink-0 overflow-hidden rounded-lg border border-z-border bg-z-bg2',
+                "shrink-0 overflow-hidden rounded-lg border border-z-border bg-z-bg2",
                 thumbH,
                 thumbW,
               )}
             >
               <img src={value} alt="" className="h-full w-full object-cover" />
             </div>
-            <div className={cn('flex flex-col', compact ? 'gap-1' : 'gap-1.5')}>
+            <div className={cn("flex flex-col", compact ? "gap-1" : "gap-1.5")}>
               <button
                 type="button"
                 onClick={pick}
                 className={cn(
-                  'flex items-center gap-1.5 rounded-lg border border-z-border bg-white text-xs font-medium hover:bg-z-bg2',
-                  compact ? 'px-2.5 py-1' : 'px-3 py-1.5',
+                  "flex items-center gap-1.5 rounded-lg border border-z-border bg-white text-xs font-medium hover:bg-z-bg2",
+                  compact ? "px-2.5 py-1" : "px-3 py-1.5",
                 )}
               >
                 <HugeiconsIcon icon={UploadIcon} size={13} />
@@ -192,8 +224,8 @@ export function ImageCropUploader({
                 type="button"
                 onClick={remove}
                 className={cn(
-                  'flex items-center gap-1.5 rounded-lg border border-red-300 bg-red-50 text-xs font-medium text-red-700 hover:bg-red-100',
-                  compact ? 'px-2.5 py-1' : 'px-3 py-1.5',
+                  "flex items-center gap-1.5 rounded-lg border border-red-300 bg-red-50 text-xs font-medium text-red-700 hover:bg-red-100",
+                  compact ? "px-2.5 py-1" : "px-3 py-1.5",
                 )}
               >
                 <HugeiconsIcon icon={DeleteIcon} size={13} />
@@ -205,10 +237,10 @@ export function ImageCropUploader({
           <button
             type="button"
             onClick={pick}
-            style={{ backgroundColor: '#10b981' }}
+            style={{ backgroundColor: "#10b981" }}
             className={cn(
-              'flex w-fit items-center gap-2 rounded-lg text-xs font-medium text-white transition-opacity hover:opacity-85',
-              compact ? 'px-3 py-1.5' : 'px-4 py-2',
+              "flex w-fit items-center gap-2 rounded-lg text-xs font-medium text-white transition-opacity hover:opacity-85",
+              compact ? "px-3 py-1.5" : "px-4 py-2",
             )}
           >
             <HugeiconsIcon icon={ImageIcon} size={15} />
@@ -216,7 +248,16 @@ export function ImageCropUploader({
           </button>
         )}
 
-        {hint && <span className={cn('text-z-text-hint', compact ? 'text-xs' : 'text-[13px]')}>{hint}</span>}
+        {hint && (
+          <span
+            className={cn(
+              "text-z-text-hint",
+              compact ? "text-xs" : "text-[13px]",
+            )}
+          >
+            {hint}
+          </span>
+        )}
         {error && <p className="text-xs text-destructive">{error}</p>}
 
         <input
@@ -250,7 +291,9 @@ export function ImageCropUploader({
 
             {/* Zoom slider */}
             <div className="flex items-center gap-3">
-              <span className="shrink-0 text-[11px] text-z-text-muted">Zoom</span>
+              <span className="shrink-0 text-[11px] text-z-text-muted">
+                Zoom
+              </span>
               <input
                 type="range"
                 min={1}
@@ -270,7 +313,11 @@ export function ImageCropUploader({
                 disabled={isUploading}
                 className="flex items-center gap-1.5 rounded-lg border border-z-border bg-white px-3 py-1.5 text-xs font-medium hover:bg-z-bg2 disabled:opacity-60"
               >
-                <HugeiconsIcon icon={ReloadIcon} size={14} className="-scale-x-100" />
+                <HugeiconsIcon
+                  icon={ReloadIcon}
+                  size={14}
+                  className="-scale-x-100"
+                />
                 Girar esquerda
               </button>
               <button
@@ -287,16 +334,23 @@ export function ImageCropUploader({
             {error && <p className="text-sm text-destructive">{error}</p>}
 
             <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={handleCancel} disabled={isUploading}>
+              <Button
+                variant="ghost"
+                onClick={handleCancel}
+                disabled={isUploading}
+              >
                 Cancelar
               </Button>
-              <Button onClick={handleConfirm} disabled={isUploading || !croppedAreaPixels}>
-                {isUploading ? 'Enviando...' : 'Confirmar recorte'}
+              <Button
+                onClick={handleConfirm}
+                disabled={isUploading || !croppedAreaPixels}
+              >
+                {isUploading ? "Enviando..." : "Confirmar recorte"}
               </Button>
             </div>
           </div>
         </div>
       )}
     </>
-  )
+  );
 }

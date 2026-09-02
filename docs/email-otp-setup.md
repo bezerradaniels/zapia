@@ -24,17 +24,24 @@ No dashboard do Supabase:
 3. Configure o template com o seguinte conteúdo:
 
 **Assunto:**
+
 ```
 Seu código de confirmação - Zapable
 ```
 
 **Corpo do Email (HTML):**
+
 ```html
 <h2>Confirme sua conta</h2>
 <p>Olá {{ .Data.name }},</p>
 <p>Use o código abaixo para confirmar sua conta no Zapable:</p>
-<div style="background: #f0f0f0; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
-  <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #333;">{{ .Token }}</span>
+<div
+  style="background: #f0f0f0; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;"
+>
+  <span
+    style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #333;"
+    >{{ .Token }}</span
+  >
 </div>
 <p>Este código expira em 1 hora.</p>
 <p>Se você não solicitou esta conta, ignore este email.</p>
@@ -113,6 +120,7 @@ O Supabase disponibiliza estas variáveis no template:
 ### Alterar duração do código
 
 No dashboard do Supabase:
+
 - Authentication → Settings
 - Altere "Email confirmation token expiry" (padrão: 1 hora)
 

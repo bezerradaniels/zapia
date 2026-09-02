@@ -1,19 +1,19 @@
-import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowRight02Icon } from '@hugeicons/core-free-icons'
-import { Button } from '@/components/ui'
-import { ROUTES } from '@/config/routes'
-import { track } from '@/features/analytics'
-import { MarketingNavbar } from './_shared/MarketingNavbar'
-import { MarketingFooter } from './_shared/MarketingFooter'
-import { PricingTable } from './_shared/PricingTable'
-import { FaqAccordion } from './_shared/FaqAccordion'
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui";
+import { ROUTES } from "@/config/routes";
+import { track } from "@/features/analytics";
+import { MarketingNavbar } from "./_shared/MarketingNavbar";
+import { MarketingFooter } from "./_shared/MarketingFooter";
+import { PricingTable } from "./_shared/PricingTable";
+import { FaqAccordion } from "./_shared/FaqAccordion";
 
 export default function PricingPage() {
   useEffect(() => {
-    track('pricing_page_viewed')
-  }, [])
+    track("pricing_page_viewed");
+  }, []);
 
   return (
     <div className="min-h-screen bg-z-bg">
@@ -67,5 +67,5 @@ export default function PricingPage() {
 
       <MarketingFooter />
     </div>
-  )
+  );
 }

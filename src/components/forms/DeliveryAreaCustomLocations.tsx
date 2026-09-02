@@ -1,35 +1,37 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui'
+import { useState } from "react";
+import { Button } from "@/components/ui";
 
 type Props = {
-  value: string[]
-  onChange: (value: string[]) => void
-}
+  value: string[];
+  onChange: (value: string[]) => void;
+};
 
 /** Free-text tag list for the "Personalizado" delivery area scope —
  * lets the lojista add cities/regions not covered by the preset options. */
 export function DeliveryAreaCustomLocations({ value, onChange }: Props) {
-  const [draft, setDraft] = useState('')
+  const [draft, setDraft] = useState("");
 
   const add = () => {
-    const v = draft.trim()
-    if (!v) return
-    onChange([...value, v])
-    setDraft('')
-  }
+    const v = draft.trim();
+    if (!v) return;
+    onChange([...value, v]);
+    setDraft("");
+  };
 
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-z-border bg-z-bg p-3">
-      <p className="text-xs text-z-text-muted">Adicione as cidades e regiões para onde você entrega.</p>
+      <p className="text-xs text-z-text-muted">
+        Adicione as cidades e regiões para onde você entrega.
+      </p>
       <div className="flex items-center gap-2">
         <input
           type="text"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key !== 'Enter') return
-            e.preventDefault()
-            add()
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            add();
           }}
           placeholder="Ex.: Zona Sul, Niterói..."
           className="h-10 flex-1 rounded-lg border border-z-border bg-white px-3 text-sm outline-none focus:border-z-green"
@@ -59,5 +61,5 @@ export function DeliveryAreaCustomLocations({ value, onChange }: Props) {
         </div>
       )}
     </div>
-  )
+  );
 }

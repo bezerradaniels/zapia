@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
-import { adminKeys } from '../api/keys'
-import { getStoreDetail } from '../api/queries'
+import { useQuery } from "@tanstack/react-query";
+import { adminKeys } from "../api/keys";
+import { getStoreDetail } from "../api/queries";
 
 export function useAdminStore(storeId: string) {
   return useQuery({
@@ -8,5 +8,5 @@ export function useAdminStore(storeId: string) {
     queryFn: () => getStoreDetail(storeId),
     enabled: !!storeId,
     staleTime: 30_000,
-  })
+  });
 }

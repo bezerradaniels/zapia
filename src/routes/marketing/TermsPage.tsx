@@ -1,36 +1,36 @@
-import { MarketingFooter } from './_shared/MarketingFooter'
-import { MarketingNavbar } from './_shared/MarketingNavbar'
+import { MarketingFooter } from "./_shared/MarketingFooter";
+import { MarketingNavbar } from "./_shared/MarketingNavbar";
 
 const sections = [
   {
-    title: '1. Aceite dos termos',
-    body: 'Ao acessar ou usar o Zapia, voce concorda com estes Termos de uso. Se nao concordar com alguma condicao, nao utilize a plataforma.',
+    title: "1. Aceite dos termos",
+    body: "Ao acessar ou usar o Zapia, voce concorda com estes Termos de uso. Se nao concordar com alguma condicao, nao utilize a plataforma.",
   },
   {
-    title: '2. Uso da plataforma',
-    body: 'O Zapia oferece ferramentas para criacao de catalogos digitais, gestao de produtos, pedidos e atendimento comercial. O lojista e responsavel pelas informacoes publicadas, pelos produtos ofertados e pelo relacionamento com seus clientes.',
+    title: "2. Uso da plataforma",
+    body: "O Zapia oferece ferramentas para criacao de catalogos digitais, gestao de produtos, pedidos e atendimento comercial. O lojista e responsavel pelas informacoes publicadas, pelos produtos ofertados e pelo relacionamento com seus clientes.",
   },
   {
-    title: '3. Cadastro e seguranca',
-    body: 'Voce deve fornecer dados verdadeiros e manter suas credenciais protegidas. Atividades realizadas com sua conta poderao ser consideradas de sua responsabilidade.',
+    title: "3. Cadastro e seguranca",
+    body: "Voce deve fornecer dados verdadeiros e manter suas credenciais protegidas. Atividades realizadas com sua conta poderao ser consideradas de sua responsabilidade.",
   },
   {
-    title: '4. Planos, pagamentos e cancelamento',
-    body: 'Recursos pagos, periodo de avaliacao, valores e condicoes comerciais sao apresentados nas paginas de contratacao. O cancelamento pode limitar ou suspender funcionalidades da loja conforme o plano vigente.',
+    title: "4. Planos, pagamentos e cancelamento",
+    body: "Recursos pagos, periodo de avaliacao, valores e condicoes comerciais sao apresentados nas paginas de contratacao. O cancelamento pode limitar ou suspender funcionalidades da loja conforme o plano vigente.",
   },
   {
-    title: '5. Conteudo e condutas proibidas',
-    body: 'Nao e permitido publicar conteudo ilegal, enganoso, ofensivo, que viole direitos de terceiros ou que seja usado para fraude, spam, abuso da plataforma ou atividades contrarias a lei brasileira.',
+    title: "5. Conteudo e condutas proibidas",
+    body: "Nao e permitido publicar conteudo ilegal, enganoso, ofensivo, que viole direitos de terceiros ou que seja usado para fraude, spam, abuso da plataforma ou atividades contrarias a lei brasileira.",
   },
   {
-    title: '6. Disponibilidade e alteracoes',
-    body: 'Trabalhamos para manter a plataforma estavel, mas podem ocorrer interrupcoes, manutencoes ou alteracoes de funcionalidades. Podemos atualizar estes termos quando necessario.',
+    title: "6. Disponibilidade e alteracoes",
+    body: "Trabalhamos para manter a plataforma estavel, mas podem ocorrer interrupcoes, manutencoes ou alteracoes de funcionalidades. Podemos atualizar estes termos quando necessario.",
   },
   {
-    title: '7. Contato',
-    body: 'Para duvidas sobre estes termos, entre em contato pelo e-mail contato@zapia.app.',
+    title: "7. Contato",
+    body: "Para duvidas sobre estes termos, entre em contato pelo e-mail contato@zapia.app.",
   },
-]
+];
 
 export default function TermsPage() {
   return (
@@ -50,8 +50,12 @@ export default function TermsPage() {
           <div className="mt-10 space-y-8 rounded-lg bg-white p-6 text-z-text md:p-10">
             {sections.map((section) => (
               <section key={section.title}>
-                <h2 className="text-lg font-bold text-z-text">{section.title}</h2>
-                <p className="mt-3 leading-relaxed text-z-text-muted">{section.body}</p>
+                <h2 className="text-lg font-bold text-z-text">
+                  {section.title}
+                </h2>
+                <p className="mt-3 leading-relaxed text-z-text-muted">
+                  {section.body}
+                </p>
               </section>
             ))}
           </div>
@@ -59,5 +63,5 @@ export default function TermsPage() {
       </main>
       <MarketingFooter />
     </div>
-  )
+  );
 }

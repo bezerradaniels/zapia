@@ -2,20 +2,20 @@ import type {
   AnalyticsEventMap,
   AnalyticsEventName,
   AnalyticsEventParams,
-} from './events'
+} from "./events";
 
 /**
  * Mesma chave usada pelo banner de consentimento (`CookieConsentBanner.tsx`) e
  * pelo carregador do GTM no `index.html`. Eventos só vão para a `dataLayer`
  * depois que o visitante aceita os cookies de análise (LGPD).
  */
-const COOKIE_CONSENT_KEY = 'zapia_cookie_consent'
+const COOKIE_CONSENT_KEY = "zapia_cookie_consent";
 
 function hasAnalyticsConsent(): boolean {
   try {
-    return window.localStorage.getItem(COOKIE_CONSENT_KEY) === 'accepted'
+    return window.localStorage.getItem(COOKIE_CONSENT_KEY) === "accepted";
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -26,8 +26,8 @@ function hasAnalyticsConsent(): boolean {
  * fila ao subir.
  */
 function pushToDataLayer(payload: Record<string, unknown>): void {
-  window.dataLayer = window.dataLayer ?? []
-  window.dataLayer.push(payload)
+  window.dataLayer = window.dataLayer ?? [];
+  window.dataLayer.push(payload);
 }
 
 /**
@@ -46,16 +46,16 @@ export function track<E extends AnalyticsEventName>(
     ? [event: E]
     : [event: E, params: AnalyticsEventParams<E>]
 ): void {
-  const [event, params] = args as [E, AnalyticsEventParams<E>?]
+  const [event, params] = args as [E, AnalyticsEventParams<E>?];
 
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return;
 
   if (import.meta.env.DEV) {
-    console.log('[analytics]', event, params ?? {})
-    return
+    console.log("[analytics]", event, params ?? {});
+    return;
   }
 
-  if (!hasAnalyticsConsent()) return
+  if (!hasAnalyticsConsent()) return;
 
-  pushToDataLayer({ event, ...(params ?? {}) })
+  pushToDataLayer({ event, ...(params ?? {}) });
 }
