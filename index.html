@@ -4,22 +4,32 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zapia — Catálogo Digital e Pedidos no WhatsApp</title>
     <meta
       name="description"
-      content="Zapia — O catálogo digital do comércio de Bom Jesus da Lapa. Crie seu catálogo online, receba pedidos no WhatsApp e impulsione suas vendas locais."
+      content="Crie seu catálogo digital online em 5 minutos. Receba pedidos direto no WhatsApp com checkout integrado, múltiplos vendedores e controle de estoque."
     />
     <link rel="canonical" href="https://zapia.app/" />
+
     <!-- OpenGraph / Social Share -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://zapia.app/" />
-    <meta property="og:title" content="Zapia — Catálogo Digital de Bom Jesus da Lapa" />
-    <meta property="og:description" content="O catálogo digital do comércio de Bom Jesus da Lapa. Crie seu catálogo online e receba pedidos no WhatsApp." />
+    <meta property="og:title" content="Zapia — Catálogo Digital e Pedidos no WhatsApp" />
+    <meta
+      property="og:description"
+      content="Crie seu catálogo digital online em 5 minutos. Receba pedidos direto no WhatsApp com checkout integrado, múltiplos vendedores e controle de estoque."
+    />
     <meta property="og:image" content="https://zapia.app/logos/zapia-logo.svg" />
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Zapia — Catálogo Digital de Bom Jesus da Lapa" />
-    <meta name="twitter:description" content="O catálogo digital do comércio de Bom Jesus da Lapa. Crie seu catálogo online e receba pedidos no WhatsApp." />
+    <meta name="twitter:title" content="Zapia — Catálogo Digital e Pedidos no WhatsApp" />
+    <meta
+      name="twitter:description"
+      content="Crie seu catálogo digital online em 5 minutos. Receba pedidos direto no WhatsApp com checkout integrado, múltiplos vendedores e controle de estoque."
+    />
     <meta name="twitter:image" content="https://zapia.app/logos/zapia-logo.svg" />
+
     <meta
       name="facebook-domain-verification"
       content="vho2kwimgbq970idbbfk3efwvjd6sb"
@@ -41,7 +51,82 @@
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
     /></noscript>
-    <title>Zapia — Catálogo Digital de Bom Jesus da Lapa</title>
+
+    <!-- Schema.org JSON-LD Structured Data (AEO/SEO/GEO) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://zapia.app/#organization",
+          "name": "Zapia",
+          "url": "https://zapia.app",
+          "logo": "https://zapia.app/logos/zapia-logo.svg",
+          "sameAs": [
+            "https://instagram.com/zapia.app"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://zapia.app/#website",
+          "url": "https://zapia.app",
+          "name": "Zapia",
+          "publisher": {
+            "@id": "https://zapia.app/#organization"
+          },
+          "inLanguage": "pt-BR"
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://zapia.app/#software",
+          "name": "Zapia - Catálogo Digital para WhatsApp",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web, iOS, Android",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "BRL"
+          },
+          "description": "Crie seu catálogo online em 5 minutos e receba pedidos no WhatsApp com controle de estoque e múltiplos vendedores.",
+          "publisher": {
+            "@id": "https://zapia.app/#organization"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://zapia.app/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Como criar um catálogo digital para o WhatsApp?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Com a Zapia, você se cadastra gratuitamente, adiciona seus produtos com fotos e preços e gera um link exclusivo para compartilhar com seus clientes pelo WhatsApp."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "A Zapia cobra comissão por venda?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Não. A Zapia não cobra comissão sobre as suas vendas. Você recebe 100% do valor dos seus pedidos diretamente pelo WhatsApp ou Pix."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "É possível adicionar múltiplos vendedores ao mesmo catálogo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim. Com o recurso de múltiplos vendedores, cada vendedor possui seu link e WhatsApp próprio, compartilhando o mesmo estoque e catálogo da loja."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
     <script>
       window.dataLayer = window.dataLayer || [];
       (() => {
@@ -102,14 +187,9 @@
       })();
     </script>
   </head>
-  <body style="font-family: &quot;DM Sans&quot;, sans-serif !important">
+  <body class="font-sans antialiased">
     <div id="root">
-      <!--
-        Static, JS-free shell so the very first paint isn't a blank white
-        page while the JS bundle downloads/parses/executes. React replaces
-        this the moment it mounts; the <Suspense> fallback in App.tsx
-        mirrors the same markup so there's no flash in between.
-      -->
+      <!-- Static shell for initial paint -->
       <div
         class="flex min-h-screen flex-col items-center justify-center gap-3 bg-z-bg"
       >

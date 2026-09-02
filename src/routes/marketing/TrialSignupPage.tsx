@@ -13,6 +13,7 @@ import { signUpSchema, useSignUp, type SignUpInput } from "@/features/auth";
 import { ROUTES } from "@/config/routes";
 import { Button, Field, Logo } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 const STEPS = [
   {
@@ -36,6 +37,13 @@ const STEPS = [
 ];
 
 export default function TrialSignupPage() {
+  useDocumentMeta({
+    title: "Criar Catálogo Digital Grátis: Teste 7 Dias | Zapia",
+    description:
+      "Crie sua conta na Zapia e monte seu catálogo digital para WhatsApp em menos de 5 minutos. Teste grátis, sem necessidade de cartão de crédito.",
+    canonical: "https://zapia.app/cadastrar-trial",
+  });
+
   const navigate = useNavigate();
   const signUp = useSignUp();
 

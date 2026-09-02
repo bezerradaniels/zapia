@@ -12,11 +12,11 @@ const PLAN_LABELS: Record<string, string> = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  active: "bg-emerald-50 text-emerald-700",
-  trialing: "bg-amber-50 text-amber-700",
-  past_due: "bg-red-50 text-red-700",
-  canceled: "bg-gray-100 text-gray-600",
-  inactive: "bg-gray-100 text-gray-500",
+  active: "bg-[#e6f4ea] text-[#137333] border border-[#ceead6]",
+  trialing: "bg-[#fef7e0] text-[#b06000] border border-[#feefc3]",
+  past_due: "bg-[#fce8e6] text-[#c5221f] border border-[#fad2cf]",
+  canceled: "bg-[#f1f3f4] text-[#5f6368] border border-[#dadce0]",
+  inactive: "bg-[#f1f3f4] text-[#5f6368] border border-[#dadce0]",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -52,80 +52,91 @@ export default function AdminStoresPage() {
   });
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Top Header & Search */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-950">Lojas</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-xl font-semibold tracking-tight text-[#202124] sm:text-2xl">
+            Lojas cadastradas
+          </h1>
+          <p className="mt-0.5 text-xs text-[#5f6368]">
             {stores
-              ? `${stores.length} loja${stores.length !== 1 ? "s" : ""} cadastrada${stores.length !== 1 ? "s" : ""}`
-              : ""}
+              ? `${stores.length} loja${stores.length !== 1 ? "s" : ""} registrada${stores.length !== 1 ? "s" : ""} no sistema`
+              : "Carregando contagem..."}
           </p>
         </div>
-        <input
-          type="search"
-          placeholder="Buscar por nome, slug ou e-mail…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-72 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        />
+
+        <div className="relative w-full sm:w-80">
+          <input
+            type="search"
+            placeholder="Buscar por nome, slug ou e-mail…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-lg border border-[#dadce0] bg-white px-3.5 py-2 text-xs text-[#202124] placeholder-[#80868b] shadow-[0_1px_2px_0_rgba(60,64,67,0.06)] transition-all focus:border-[#1a73e8] focus:outline-none focus:ring-1 focus:ring-[#1a73e8]"
+          />
+        </div>
       </div>
 
       {isLoading && (
-        <div className="flex h-48 items-center justify-center text-sm text-gray-500">
-          Carregando lojas…
+        <div className="flex h-48 items-center justify-center text-xs text-[#5f6368]">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#1a73e8] border-t-transparent" />
+            <span>Carregando lista de lojas…</span>
+          </div>
         </div>
       )}
 
       {error && (
-        <div className="flex h-48 items-center justify-center text-sm text-red-400">
-          Erro ao carregar lojas.
+        <div className="flex h-48 items-center justify-center rounded-xl border border-[#fce8e6] bg-[#fdf2f2] text-xs text-[#c5221f]">
+          Erro ao carregar lojas. Verifique as permissões.
         </div>
       )}
 
       {!isLoading && !error && (
-        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <table className="w-full min-w-[860px] text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                {[
-                  "Loja",
-                  "Proprietário",
-                  "Criada em",
-                  "Plano",
-                  "Status",
-                  "Trial",
-                  "Último pgto.",
-                  "Produtos",
-                  "Vendedores",
-                  "",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-gray-500"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 bg-white">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={10}
-                    className="px-4 py-10 text-center text-sm text-gray-600"
-                  >
-                    Nenhuma loja encontrada.
-                  </td>
+        <div className="overflow-hidden rounded-xl border border-[#dadce0] bg-white shadow-[0_1px_2px_0_rgba(60,64,67,0.06)]">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[860px] text-left text-xs">
+              <thead>
+                <tr className="border-b border-[#dadce0] bg-[#f8f9fa]">
+                  {[
+                    "Loja",
+                    "Proprietário",
+                    "Criada em",
+                    "Plano",
+                    "Status",
+                    "Trial",
+                    "Último pgto.",
+                    "Produtos",
+                    "Vendedores",
+                    "",
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-[#5f6368]"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ) : (
-                filtered.map((store) => (
-                  <StoreRow key={store.id} store={store} onDeleted={refetch} />
-                ))
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[#f1f3f4] bg-white">
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={10}
+                      className="px-4 py-12 text-center text-xs text-[#80868b]"
+                    >
+                      Nenhuma loja encontrada para os termos pesquisados.
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((store) => (
+                    <StoreRow key={store.id} store={store} onDeleted={refetch} />
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
@@ -148,7 +159,7 @@ function StoreRow({
   async function handleDelete() {
     if (
       !confirm(
-        `Excluir a loja "${store.name}"? Esta ação não pode ser desfeita.`,
+        `Excluir permanentemente a loja "${store.name}"? Esta ação não pode ser desfeita.`,
       )
     )
       return;
@@ -164,45 +175,51 @@ function StoreRow({
   }
 
   return (
-    <tr className="transition-colors hover:bg-gray-50">
+    <tr className="transition-colors hover:bg-[#f8f9fa]">
       <td className="px-4 py-3">
-        <div className="font-medium text-gray-950">{store.name}</div>
+        <div className="font-semibold text-[#202124]">{store.name}</div>
         <a
           href={`https://zapia.app/${store.slug}`}
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-emerald-600 hover:underline"
+          className="text-[11px] font-medium text-[#1a73e8] hover:underline"
         >
-          zapia.app/{store.slug}
+          zapia.app/{store.slug} ↗
         </a>
       </td>
 
       <td className="px-4 py-3">
-        <div className="text-gray-800">{store.owner_name ?? "—"}</div>
-        <div className="text-xs text-gray-500">{store.owner_email}</div>
+        <div className="font-medium text-[#202124]">
+          {store.owner_name ?? "—"}
+        </div>
+        <div className="text-[11px] text-[#5f6368]">{store.owner_email}</div>
       </td>
 
-      <td className="px-4 py-3 text-gray-500">
+      <td className="px-4 py-3 text-[#5f6368]">
         {formatDate(store.created_at)}
       </td>
 
-      <td className="px-4 py-3 text-gray-700">
+      <td className="px-4 py-3 font-medium text-[#3c4043]">
         {store.plan_id ? (PLAN_LABELS[store.plan_id] ?? store.plan_id) : "—"}
       </td>
 
       <td className="px-4 py-3">
         <span
-          className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusStyle}`}
+          className={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-medium ${statusStyle}`}
         >
           {statusLabel}
         </span>
       </td>
 
-      <td className="px-4 py-3 text-gray-500">
+      <td className="px-4 py-3 text-[#5f6368]">
         {days !== null ? (
           <span
             className={
-              days === 0 ? "text-red-600" : days <= 3 ? "text-amber-600" : ""
+              days === 0
+                ? "font-semibold text-[#c5221f]"
+                : days <= 3
+                  ? "font-semibold text-[#b06000]"
+                  : "text-[#3c4043]"
             }
           >
             {days}d
@@ -212,23 +229,23 @@ function StoreRow({
         )}
       </td>
 
-      <td className="px-4 py-3 text-gray-500">
+      <td className="px-4 py-3 text-[#5f6368]">
         {formatDate(store.last_payment_at)}
       </td>
 
-      <td className="px-4 py-3 text-center text-gray-700">
+      <td className="px-4 py-3 font-medium text-[#202124]">
         {store.product_count}
       </td>
 
-      <td className="px-4 py-3 text-center text-gray-700">
+      <td className="px-4 py-3 font-medium text-[#202124]">
         {store.seller_count}
       </td>
 
       <td className="px-4 py-3">
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-1.5">
           <Link
             to={ROUTES.adminStore.replace(":id", store.id)}
-            className="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200"
+            className="rounded-lg border border-[#dadce0] bg-white px-2.5 py-1 text-xs font-medium text-[#1a73e8] transition-colors hover:bg-[#e8f0fe] hover:border-[#1a73e8]"
           >
             Ver
           </Link>
@@ -236,9 +253,9 @@ function StoreRow({
             type="button"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50"
+            className="rounded-lg border border-transparent px-2.5 py-1 text-xs font-medium text-[#c5221f] transition-colors hover:bg-[#fce8e6] disabled:opacity-50"
           >
-            {isDeleting ? "Excluindo..." : "Excluir"}
+            {isDeleting ? "..." : "Excluir"}
           </button>
         </div>
       </td>

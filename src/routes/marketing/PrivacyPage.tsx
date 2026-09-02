@@ -1,3 +1,4 @@
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { MarketingFooter } from "./_shared/MarketingFooter";
 import { MarketingNavbar } from "./_shared/MarketingNavbar";
 
@@ -33,6 +34,12 @@ const sections = [
 ];
 
 export default function PrivacyPage() {
+  useDocumentMeta({
+    title: "Política de Privacidade | Zapia",
+    description:
+      "Política de privacidade e proteção de dados da plataforma Zapia.",
+    canonical: "https://zapia.app/privacidade",
+  });
   return (
     <div className="min-h-screen bg-z-bg">
       <MarketingNavbar />

@@ -3,36 +3,79 @@ import { useEffect } from "react";
 type DocumentMeta = {
   title: string;
   description?: string;
+  canonical?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  noindex?: boolean;
 };
 
-function setMetaDescription(content: string) {
-  let tag = document.querySelector('meta[name="description"]');
+function setMetaTag(attrName: "name" | "property", attrValue: string, content: string) {
+  let tag = document.querySelector(`meta[${attrName}="${attrValue}"]`);
   if (!tag) {
     tag = document.createElement("meta");
-    tag.setAttribute("name", "description");
+    tag.setAttribute(attrName, attrValue);
     document.head.appendChild(tag);
   }
   tag.setAttribute("content", content);
 }
 
-// Vite is a static SPA with a single index.html, so route-level <title> and
-// meta description changes happen client-side via this hook instead of a
-// head-management library.
-export function useDocumentMeta({ title, description }: DocumentMeta) {
+function setCanonical(href: string) {
+  let link = document.querySelector('link[rel="canonical"]');
+  if (!link) {
+    link = document.createElement("link");
+    link.setAttribute("rel", "canonical");
+    document.head.appendChild(link);
+  }
+  link.setAttribute("href", href);
+}
+
+export function useDocumentMeta({
+  title,
+  description,
+  canonical,
+  ogTitle,
+  ogDescription,
+  noindex,
+}: DocumentMeta) {
   useEffect(() => {
     const previousTitle = document.title;
-    const previousDescription = document
-      .querySelector('meta[name="description"]')
-      ?.getAttribute("content");
+    const previousDesc = document.querySelector('meta[name="description"]')?.getAttribute("content");
+    const previousCanonical = document.querySelector('link[rel="canonical"]')?.getAttribute("href");
 
     document.title = title;
-    if (description) setMetaDescription(description);
+
+    if (description) {
+      setMetaTag("name", "description", description);
+      setMetaTag("property", "og:description", ogDescription || description);
+      setMetaTag("name", "twitter:description", ogDescription || description);
+    }
+
+    setMetaTag("property", "og:title", ogTitle || title);
+    setMetaTag("name", "twitter:title", ogTitle || title);
+
+    const canonicalUrl =
+      canonical ||
+      (typeof window !== "undefined"
+        ? `${window.location.origin}${window.location.pathname}`
+        : "https://zapia.app/");
+
+    setCanonical(canonicalUrl);
+    setMetaTag("property", "og:url", canonicalUrl);
+
+    if (noindex) {
+      setMetaTag("name", "robots", "noindex, nofollow");
+    } else {
+      setMetaTag("name", "robots", "index, follow");
+    }
 
     return () => {
       document.title = previousTitle;
-      if (description && previousDescription) {
-        setMetaDescription(previousDescription);
+      if (previousDesc) {
+        setMetaTag("name", "description", previousDesc);
+      }
+      if (previousCanonical) {
+        setCanonical(previousCanonical);
       }
     };
-  }, [title, description]);
+  }, [title, description, canonical, ogTitle, ogDescription, noindex]);
 }

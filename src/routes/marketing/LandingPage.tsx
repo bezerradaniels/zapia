@@ -587,12 +587,12 @@ function Hero() {
       <div className="relative mx-auto max-w-3xl text-center">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-50 px-3.5 py-1 text-xs font-semibold text-emerald-700 shadow-sm">
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          O catálogo digital do comércio de Bom Jesus da Lapa - BA
+          Catálogo digital interativo para WhatsApp e vendas online
         </div>
 
         <h1 className="text-[36px] font-black leading-[1.08] tracking-tighter text-z-ink md:text-[54px] lg:text-[60px]">
-          Seus produtos no WhatsApp dos clientes de{" "}
-          <span className="text-emerald-600">Bom Jesus da Lapa</span>
+          Seus produtos no WhatsApp dos clientes com{" "}
+          <span className="text-emerald-600">mais facilidade</span>
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-z-text-muted md:text-[20px]">
           Crie seu catálogo online em menos de 5 minutos, envie seu link
@@ -1319,7 +1319,12 @@ function FinalCTA() {
 
 /* ─── Page ───────────────────────────────────────────────────────────────── */
 export default function LandingPage() {
-  useDocumentMeta({ title: "Zapia Catálogos Digitais" });
+  useDocumentMeta({
+    title: "Catálogo Digital para WhatsApp: Crie Grátis | Zapia",
+    description:
+      "Crie seu catálogo digital online em 5 minutos. Receba pedidos direto no WhatsApp com checkout integrado, múltiplos vendedores e controle de estoque.",
+    canonical: "https://zapia.app/",
+  });
 
   return (
     <div className="min-h-screen bg-white">

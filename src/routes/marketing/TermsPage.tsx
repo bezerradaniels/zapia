@@ -1,3 +1,4 @@
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { MarketingFooter } from "./_shared/MarketingFooter";
 import { MarketingNavbar } from "./_shared/MarketingNavbar";
 
@@ -33,6 +34,11 @@ const sections = [
 ];
 
 export default function TermsPage() {
+  useDocumentMeta({
+    title: "Termos de Uso | Zapia",
+    description: "Termos e condições gerais de uso da plataforma Zapia.",
+    canonical: "https://zapia.app/termos-de-uso",
+  });
   return (
     <div className="min-h-screen bg-z-bg">
       <MarketingNavbar />

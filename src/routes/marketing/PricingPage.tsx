@@ -5,12 +5,20 @@ import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui";
 import { ROUTES } from "@/config/routes";
 import { track } from "@/features/analytics";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { MarketingNavbar } from "./_shared/MarketingNavbar";
 import { MarketingFooter } from "./_shared/MarketingFooter";
 import { PricingTable } from "./_shared/PricingTable";
 import { FaqAccordion } from "./_shared/FaqAccordion";
 
 export default function PricingPage() {
+  useDocumentMeta({
+    title: "Planos e Preços: Catálogo Digital WhatsApp | Zapia",
+    description:
+      "Conheça os planos da Zapia. Comece gratuitamente sem cartão de crédito. Catálogos ilimitados, múltiplos vendedores e checkout no WhatsApp.",
+    canonical: "https://zapia.app/precos",
+  });
+
   useEffect(() => {
     track("pricing_page_viewed");
   }, []);
