@@ -192,7 +192,7 @@ export function ProductForm({
   const variationType = form.watch("variation_type");
   const variationLabel = form.watch("variation_label");
   const variationOptions = form.watch("variation_options");
-  const autoSku = form.watch("auto_sku");
+
   const hasBarcodeType = !!form.watch("barcode_type");
   const hasNoBrand = form.watch("has_no_brand");
   const isEditing = !!initialValues;
@@ -441,47 +441,7 @@ export function ProductForm({
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-semibold text-z-text-hint">
-                      Código interno (SKU)
-                      <HugeiconsIcon
-                        icon={InformationCircleIcon}
-                        size={12}
-                        className="ml-1 inline text-z-text-hint"
-                      />
-                    </label>
-                    <input
-                      placeholder="Seu código interno (SKU)"
-                      disabled={autoSku}
-                      value={autoSku ? "(gerado automaticamente)" : undefined}
-                      className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 disabled:bg-z-bg disabled:italic disabled:text-z-text-hint"
-                      {...(autoSku ? {} : form.register("sku"))}
-                    />
-                    <Controller
-                      control={form.control}
-                      name="auto_sku"
-                      render={({ field }) => (
-                        <label className="flex cursor-pointer items-center gap-2 text-xs text-z-text-muted">
-                          <button
-                            type="button"
-                            onClick={() => field.onChange(!field.value)}
-                            className="text-[#10b981]"
-                          >
-                            <HugeiconsIcon
-                              icon={field.value ? ToggleOnIcon : ToggleOffIcon}
-                              size={22}
-                              className={
-                                field.value
-                                  ? "text-[#10b981]"
-                                  : "text-z-text-hint"
-                              }
-                            />
-                          </button>
-                          Gerar automaticamente
-                        </label>
-                      )}
-                    />
-                  </div>
+
                 </div>
               </section>
 
