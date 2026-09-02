@@ -49,3 +49,11 @@ verify_jwt = true
 # header compared against the CRON_SECRET env (same pattern as stripe-webhook).
 [functions.check-trial-completions]
 verify_jwt = false
+
+# Mercado Pago PIX generation - invoked by authenticated browser client
+[functions.mercadopago-create-pix]
+verify_jwt = true
+
+# Mercado Pago Webhook - MUST be false: Mercado Pago does not send a Supabase JWT.
+[functions.mercadopago-webhook]
+verify_jwt = false
