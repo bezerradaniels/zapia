@@ -205,7 +205,7 @@ export default function EditSellerPage() {
     control,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -561,8 +561,29 @@ export default function EditSellerPage() {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-z-border pt-4">
+        {/* Mobile Floating Action Bar */}
+        {isDirty && (
+          <div className="fixed bottom-20 inset-x-4 mx-auto max-w-sm z-40 flex items-center justify-between gap-3 rounded-2xl border border-z-border bg-white/95 px-4 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.12)] backdrop-blur-md sm:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+            <button
+              type="button"
+              onClick={() => navigate(`${ROUTES.dashboardSellers}/${id}`)}
+              disabled={isSubmitting}
+              className="px-3 py-2 text-sm font-semibold text-rose-500 hover:text-rose-600 transition-colors disabled:opacity-50"
+            >
+              cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="h-10 rounded-xl bg-[#10b981] px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
+            >
+              {isSubmitting ? "Salvando..." : "Salvar"}
+            </button>
+          </div>
+        )}
+
+        {/* Desktop Footer */}
+        <div className="hidden sm:flex items-center justify-end gap-3 border-t border-z-border pt-4">
           <button
             type="button"
             onClick={() => navigate(`${ROUTES.dashboardSellers}/${id}`)}

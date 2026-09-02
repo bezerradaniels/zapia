@@ -2938,15 +2938,26 @@ export default function CatalogPage() {
       </BottomSheet>
 
       {form.formState.isDirty && (
-        <div className="sticky bottom-16 z-40 flex items-center justify-between gap-3 rounded-2xl border border-z-border bg-white/95 px-4 py-3 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
-          <span className="text-sm font-medium text-z-text-muted">
-            Alterações não salvas.
-          </span>
+        <div className="fixed bottom-20 inset-x-4 mx-auto max-w-sm z-40 flex items-center justify-between gap-3 rounded-2xl border border-z-border bg-white/95 px-4 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.12)] backdrop-blur-md lg:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <button
+            type="button"
+            onClick={() =>
+              handleResetFields(
+                Object.keys(
+                  form.formState.dirtyFields,
+                ) as (keyof UpdateStoreInput)[],
+              )
+            }
+            disabled={updateStore.isPending}
+            className="px-3 py-2 text-sm font-semibold text-rose-500 hover:text-rose-600 transition-colors disabled:opacity-50"
+          >
+            cancelar
+          </button>
           <Button
             type="submit"
             form="catalog-mobile-form"
             disabled={updateStore.isPending}
-            className="rounded-full px-6"
+            className="h-10 rounded-xl bg-[#10b981] px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
           >
             {updateStore.isPending ? "Salvando..." : "Salvar"}
           </Button>
