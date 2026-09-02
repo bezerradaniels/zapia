@@ -1,3 +1,4 @@
+import AppProviders from "@/providers/AppProviders"
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppLoadingShell } from '@/components/AppLoadingShell'
@@ -10,8 +11,8 @@ import { isStoreDomain } from '@/lib/tenant/resolveStore'
 // All routes are lazy-loaded so the dashboard pages (which pull in
 // react-hook-form + zod) never land in the initial bundle served to public
 // catalog / landing visitors. The top-level <Suspense> below covers them.
-const LandingPage = lazy(() => import('@/routes/marketing/LandingPage'))
-const DashboardLayout = lazy(() => import('@/routes/dashboard/DashboardLayout'))
+import LandingPage from '@/routes/marketing/LandingPage'
+import DashboardLayout from '@/routes/dashboard/DashboardLayout'
 const DashboardHome = lazy(() => import('@/routes/dashboard/HomePage'))
 const BillingPage = lazy(() => import('@/routes/dashboard/BillingPage'))
 const OrdersPage = lazy(() => import('@/routes/dashboard/OrdersPage'))
@@ -23,7 +24,7 @@ const LoginPage = lazy(() => import('@/routes/auth/LoginPage'))
 const SignupPage = lazy(() => import('@/routes/auth/SignupPage'))
 const ConfirmEmailPage = lazy(() => import('@/routes/auth/ConfirmEmailPage'))
 const ForgotPasswordPage = lazy(() => import('@/routes/auth/ForgotPasswordPage'))
-const OnboardingLayout = lazy(() => import('@/routes/dashboard/OnboardingLayout'))
+import OnboardingLayout from '@/routes/dashboard/OnboardingLayout'
 const OnboardingStep1Page = lazy(() => import('@/routes/dashboard/OnboardingStep1Page'))
 const OnboardingStep2Page = lazy(() => import('@/routes/dashboard/OnboardingStep2Page'))
 const OnboardingStep3Page = lazy(() => import('@/routes/dashboard/OnboardingStep3Page'))
@@ -33,14 +34,14 @@ const ProfilePage = lazy(() => import('@/routes/dashboard/ProfilePage'))
 const ProductsPage = lazy(() => import('@/routes/dashboard/ProductsPage'))
 const NewProductPage = lazy(() => import('@/routes/dashboard/NewProductPage'))
 const EditProductPage = lazy(() => import('@/routes/dashboard/EditProductPage'))
-const StoreLayout = lazy(() => import('@/routes/store/StoreLayout'))
-const StoreHomePage = lazy(() => import('@/routes/store/StoreHomePage'))
-const StorePage = lazy(() => import('@/routes/store/StorePage'))
+import StoreLayout from '@/routes/store/StoreLayout'
+import StoreHomePage from '@/routes/store/StoreHomePage'
+import StorePage from '@/routes/store/StorePage'
 const ProductPage = lazy(() => import('@/routes/store/ProductPage'))
 const CartPage = lazy(() => import('@/routes/store/CartPage'))
 const CheckoutPage = lazy(() => import('@/routes/store/CheckoutPage'))
 const OrderConfirmationPage = lazy(() => import('@/routes/store/OrderConfirmationPage'))
-const StoreAboutPage = lazy(() => import('@/routes/store/StoreAboutPage'))
+import StoreAboutPage from '@/routes/store/StoreAboutPage'
 const CouponRedirectPage = lazy(() => import('@/routes/store/CouponRedirectPage'))
 const CatalogPage = lazy(() => import('@/routes/dashboard/CatalogPage'))
 const CustomersPage = lazy(() => import('@/routes/dashboard/CustomersPage'))
@@ -55,11 +56,10 @@ const SupportPage = lazy(() => import('@/routes/dashboard/SupportPage'))
 const MorePage = lazy(() => import('@/routes/dashboard/MorePage'))
 const NewOrderPage = lazy(() => import('@/routes/dashboard/NewOrderPage'))
 const NotFoundPage = lazy(() => import('@/routes/NotFoundPage'))
-const AdminLayout = lazy(() => import('@/routes/admin/AdminLayout'))
+import AdminLayout from '@/routes/admin/AdminLayout'
 const AdminHomePage = lazy(() => import('@/routes/admin/AdminHomePage'))
 const AdminStoresPage = lazy(() => import('@/routes/admin/AdminStoresPage'))
 const AdminStorePage = lazy(() => import('@/routes/admin/AdminStorePage'))
-const AppProviders = lazy(() => import('@/providers/AppProviders'))
 const CookieConsentBanner = lazy(() =>
   import('@/components/CookieConsentBanner').then((module) => ({
     default: module.CookieConsentBanner,

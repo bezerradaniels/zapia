@@ -5,7 +5,6 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   build: {
-    modulePreload: false,
     // react-pdf (~1.4MB) is intentionally lazy-loaded only when exporting a
     // catalog PDF, so it never hits the initial load. Raise the warning ceiling
     // so that on-demand chunk doesn't trip a false alarm on every build.
