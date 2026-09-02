@@ -50,7 +50,7 @@ import {
 import { useActiveStore, buildStoreUrl, ROOT_DOMAIN } from "@/lib/tenant";
 import { usePlanLimits } from "@/features/billing";
 import { useCatalogPdf } from "@/lib/pdf";
-import { fromE164BR } from "@/lib/br";
+import { fromE164BR, NEIGHBORHOOD_OPTIONS } from "@/lib/br";
 import { PhoneInput } from "@/components/forms/PhoneInput";
 import { ImageCropUploader } from "@/components/forms/ImageCropUploader";
 import { RoundMultiCheck } from "@/components/forms/RoundMultiCheck";
@@ -590,6 +590,48 @@ function BottomSheet({
   );
 }
 
+function SectionSaveBar({
+  fields,
+  dirtyFields,
+  isPending,
+  onCancel,
+}: {
+  fields: (keyof UpdateStoreInput)[];
+  dirtyFields: Record<string, any>;
+  isPending?: boolean;
+  onCancel: () => void;
+}) {
+  const isDirty = fields.some((f) => Boolean(dirtyFields[f]));
+  if (!isDirty && !isPending) return null;
+
+  return (
+    <div className="mt-3 flex items-center justify-between gap-3 border-t border-z-border pt-4">
+      <span className="text-xs text-z-text-muted">
+        Você tem alterações não salvas.
+      </span>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isPending}
+          className="text-xs font-medium text-z-text-muted hover:text-z-text transition-colors disabled:opacity-50"
+        >
+          Cancelar
+        </button>
+        <Button
+          type="submit"
+          form="catalog-form"
+          size="sm"
+          disabled={isPending}
+          className="rounded-full px-5 text-xs h-8"
+        >
+          {isPending ? "Salvando..." : "Salvar alterações"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 /* -------------------------------------------------------------------------- */
 
 export default function CatalogPage() {
@@ -764,6 +806,72 @@ export default function CatalogPage() {
       });
     }
   });
+
+  const handleResetFields = (fieldsToReset: (keyof UpdateStoreInput)[]) => {
+    if (!store) return;
+    const initialValuesMap: Partial<Record<keyof UpdateStoreInput, any>> = {
+      slug: store.slug,
+      name: store.name,
+      primary_color: store.primary_color,
+      slogan: store.slogan ?? "",
+      whatsapp_phone: store.whatsapp_phone
+        ? fromE164BR(store.whatsapp_phone)
+        : "",
+      logo_url: store.logo_url ?? "",
+      banner_url: store.banner_url ?? "",
+      contact_email: store.contact_email ?? "",
+      contact_phone: store.contact_phone ? fromE164BR(store.contact_phone) : "",
+      address_cep: store.address_cep ?? "",
+      address_street: store.address_street ?? "",
+      address_neighborhood: store.address_neighborhood ?? "",
+      address_number: store.address_number ?? "",
+      address_state: store.address_state ?? "",
+      address_city: store.address_city ?? "",
+      cart_enabled: store.cart_enabled ?? true,
+      require_shipping_choice: store.require_shipping_choice ?? false,
+      require_cpf: store.require_cpf ?? false,
+      require_payment_choice: store.require_payment_choice ?? false,
+      payment_instructions_title: store.payment_instructions_title ?? "",
+      payment_instructions_message: store.payment_instructions_message ?? "",
+      whatsapp_button_enabled: store.whatsapp_button_enabled ?? true,
+      accepted_payment_methods: store.accepted_payment_methods ?? [
+        "cash",
+        "pix",
+        "credit_card",
+        "debit_card",
+      ],
+      accepted_shipping_methods: store.accepted_shipping_methods ?? [
+        "delivery",
+        "pickup_in_store",
+      ],
+      delivery_hours: store.delivery_hours ?? [],
+      delivery_area_scope: store.delivery_area_scope ?? "city_only",
+      delivery_area_custom_locations:
+        store.delivery_area_custom_locations ?? [],
+      custom_links: (store.custom_links ?? []) as {
+        label: string;
+        url: string;
+      }[],
+      gallery_images: (store.gallery_images ?? []) as string[],
+      social_instagram: store.social_links?.instagram ?? "",
+      social_facebook: store.social_links?.facebook ?? "",
+      social_x: store.social_links?.x ?? "",
+      social_youtube: store.social_links?.youtube ?? "",
+      social_kwai: store.social_links?.kwai ?? "",
+      social_tiktok: store.social_links?.tiktok ?? "",
+      about_us: store.about_us ?? "",
+      age_restricted: store.age_restricted ?? false,
+      show_out_of_stock: store.show_out_of_stock ?? false,
+      product_sort: store.product_sort ?? "recent",
+      home_view: store.home_view ?? "catalog",
+      cnpj: store.cnpj ?? "",
+      gtm_id: store.gtm_id ?? "",
+    };
+
+    for (const field of fieldsToReset) {
+      form.resetField(field, { defaultValue: initialValuesMap[field] });
+    }
+  };
 
   const handleGenerateCopy = async (kind: StoreCopyKind) => {
     setGeneratingKind(kind);
@@ -1245,6 +1353,15 @@ export default function CatalogPage() {
                       catálogo.
                     </p>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["name", "cnpj", "slogan", "about_us"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() =>
+                      handleResetFields(["name", "cnpj", "slogan", "about_us"])
+                    }
+                  />
                 </section>
 
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
@@ -1294,6 +1411,13 @@ export default function CatalogPage() {
                       </label>
                     </div>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["age_restricted"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() => handleResetFields(["age_restricted"])}
+                  />
                 </section>
 
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
@@ -1330,6 +1454,13 @@ export default function CatalogPage() {
                       </div>
                     </label>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["show_out_of_stock"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() => handleResetFields(["show_out_of_stock"])}
+                  />
                 </section>
 
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
@@ -1363,6 +1494,13 @@ export default function CatalogPage() {
                       </select>
                     </div>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["product_sort"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() => handleResetFields(["product_sort"])}
+                  />
                 </section>
 
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
@@ -1403,6 +1541,13 @@ export default function CatalogPage() {
                       />
                     </div>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["home_view"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() => handleResetFields(["home_view"])}
+                  />
                 </section>
               </div>
             )}
@@ -1536,6 +1681,19 @@ export default function CatalogPage() {
                       </div>
                     </div>
                   </fieldset>
+
+                  <SectionSaveBar
+                    fields={["logo_url", "banner_url", "primary_color"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() =>
+                      handleResetFields([
+                        "logo_url",
+                        "banner_url",
+                        "primary_color",
+                      ])
+                    }
+                  />
                 </div>
 
                 {/* Galeria de fotos */}
@@ -1576,6 +1734,13 @@ export default function CatalogPage() {
                       </Link>
                     </div>
                   )}
+
+                  <SectionSaveBar
+                    fields={["gallery_images"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() => handleResetFields(["gallery_images"])}
+                  />
                 </div>
               </section>
             )}
@@ -1584,22 +1749,20 @@ export default function CatalogPage() {
             {activeTab === "contato" && (
               <div className="flex flex-col gap-6">
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#25D366]">
-                      <svg
-                        className="h-5 w-5 text-white"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.487-1.761-1.66-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
-                      </svg>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="h-5 w-5 text-z-text-muted"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.487-1.761-1.66-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+                    </svg>
                     <h2 className="text-base font-semibold">
                       WhatsApp para receber pedidos
                     </h2>
                   </div>
 
-                  <div className="flex flex-col gap-1.5 ml-11">
+                  <div className="flex flex-col gap-1.5 ml-7">
                     <span className="text-sm text-z-text-muted">
                       Os pedidos e perguntas chegarão neste número
                     </span>
@@ -1627,17 +1790,17 @@ export default function CatalogPage() {
                       </span>
                     )}
 
-                    <div className="mt-4 flex items-start gap-3 rounded-xl border border-[#FDE047] bg-[#FEF9C3] p-4 text-sm text-[#854D0E]">
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white">
-                        <span className="text-lg">💡</span>
-                      </div>
-                      <p>
-                        <strong>Importante:</strong> Esse é o número que seus
-                        clientes vão usar para falar com você e fazer pedidos no
-                        WhatsApp 📲
-                      </p>
-                    </div>
+                    <p className="mt-1 text-xs text-z-text-muted">
+                      Esse é o número que seus clientes vão usar para falar com você e fazer pedidos no WhatsApp.
+                    </p>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["whatsapp_phone"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() => handleResetFields(["whatsapp_phone"])}
+                  />
                 </section>
 
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
@@ -1667,16 +1830,41 @@ export default function CatalogPage() {
                         error={form.formState.errors.address_street?.message}
                         {...form.register("address_street")}
                       />
-                      <Field
-                        label="Bairro"
-                        placeholder="Ex: Centro"
-                        error={
-                          form.formState.errors.address_neighborhood?.message
-                        }
-                        {...form.register("address_neighborhood")}
-                      />
+                      <div className="flex flex-col gap-1.5">
+                        <Label className="text-sm">Bairro</Label>
+                        <Controller
+                          name="address_neighborhood"
+                          control={form.control}
+                          render={({ field }) => (
+                            <Combobox
+                              options={NEIGHBORHOOD_OPTIONS}
+                              value={field.value ?? ""}
+                              onChange={field.onChange}
+                              placeholder="Digite para buscar o bairro..."
+                              emptyMessage="Bairro não encontrado"
+                            />
+                          )}
+                        />
+                        {form.formState.errors.address_neighborhood && (
+                          <span className="text-xs text-destructive">
+                            {form.formState.errors.address_neighborhood.message}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["address_street", "address_neighborhood"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() =>
+                      handleResetFields([
+                        "address_street",
+                        "address_neighborhood",
+                      ])
+                    }
+                  />
                 </section>
               </div>
             )}
@@ -1826,19 +2014,40 @@ export default function CatalogPage() {
                       </div>
                     </div>
                   </div>
+
+                  <SectionSaveBar
+                    fields={[
+                      "cart_enabled",
+                      "require_shipping_choice",
+                      "require_cpf",
+                      "require_payment_choice",
+                      "payment_instructions_title",
+                      "payment_instructions_message",
+                    ]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() =>
+                      handleResetFields([
+                        "cart_enabled",
+                        "require_shipping_choice",
+                        "require_cpf",
+                        "require_payment_choice",
+                        "payment_instructions_title",
+                        "payment_instructions_message",
+                      ])
+                    }
+                  />
                 </section>
 
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#25D366]">
-                      <svg
-                        className="h-3 w-3 text-white"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
-                      </svg>
-                    </div>
+                    <svg
+                      className="h-5 w-5 text-z-text-muted"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
+                    </svg>
                     <h2 className="text-base font-semibold">
                       Botão do WhatsApp
                     </h2>
@@ -1865,17 +2074,19 @@ export default function CatalogPage() {
                       </div>
                     </label>
 
-                    <div className="flex items-start gap-3 rounded-xl border border-[#FDE047] bg-[#FEF9C3] p-4 text-sm text-[#854D0E]">
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white">
-                        <span className="text-lg">💡</span>
-                      </div>
-                      <p>
-                        <strong>Importante:</strong> Com o botão desativado, o
-                        contato via WhatsApp só estará disponível após o cliente
-                        concluir o pedido.
-                      </p>
-                    </div>
+                    <p className="text-xs text-z-text-muted">
+                      Com o botão desativado, o contato via WhatsApp só estará disponível após o cliente concluir o pedido.
+                    </p>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["whatsapp_button_enabled"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() =>
+                      handleResetFields(["whatsapp_button_enabled"])
+                    }
+                  />
                 </section>
               </div>
             )}
@@ -1918,17 +2129,19 @@ export default function CatalogPage() {
                     }
                   />
 
-                  <div className="flex items-start gap-3 rounded-xl border border-[#FDE047] bg-[#FEF9C3] p-4 text-sm text-[#854D0E]">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white">
-                      <span className="text-lg">💡</span>
-                    </div>
-                    <p>
-                      <strong>Importante:</strong> Você deverá gerenciar o
-                      pagamento diretamente com o seu cliente. A Zapia não
-                      cobrará o seu cliente.
-                    </p>
-                  </div>
+                  <p className="text-xs text-z-text-muted">
+                    Você deverá gerenciar o pagamento diretamente com o seu cliente. A Zapia não cobrará o seu cliente.
+                  </p>
                 </div>
+
+                <SectionSaveBar
+                  fields={["accepted_payment_methods"]}
+                  dirtyFields={form.formState.dirtyFields}
+                  isPending={updateStore.isPending}
+                  onCancel={() =>
+                    handleResetFields(["accepted_payment_methods"])
+                  }
+                />
               </section>
             )}
 
@@ -2039,6 +2252,25 @@ export default function CatalogPage() {
                     )}
                   </div>
                 </div>
+
+                <SectionSaveBar
+                  fields={[
+                    "accepted_shipping_methods",
+                    "delivery_area_scope",
+                    "delivery_area_custom_locations",
+                    "delivery_hours",
+                  ]}
+                  dirtyFields={form.formState.dirtyFields}
+                  isPending={updateStore.isPending}
+                  onCancel={() =>
+                    handleResetFields([
+                      "accepted_shipping_methods",
+                      "delivery_area_scope",
+                      "delivery_area_custom_locations",
+                      "delivery_hours",
+                    ])
+                  }
+                />
               </section>
             )}
 
@@ -2241,6 +2473,31 @@ export default function CatalogPage() {
                     + Adicionar link
                   </button>
                 </div>
+
+                <SectionSaveBar
+                  fields={[
+                    "social_instagram",
+                    "social_facebook",
+                    "social_x",
+                    "social_youtube",
+                    "social_kwai",
+                    "social_tiktok",
+                    "custom_links",
+                  ]}
+                  dirtyFields={form.formState.dirtyFields}
+                  isPending={updateStore.isPending}
+                  onCancel={() =>
+                    handleResetFields([
+                      "social_instagram",
+                      "social_facebook",
+                      "social_x",
+                      "social_youtube",
+                      "social_kwai",
+                      "social_tiktok",
+                      "custom_links",
+                    ])
+                  }
+                />
               </section>
             )}
 
@@ -2356,6 +2613,13 @@ export default function CatalogPage() {
                       )}
                     </div>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["slug"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() => handleResetFields(["slug"])}
+                  />
                 </section>
 
                 {/* Google Tag Manager */}
@@ -2413,6 +2677,13 @@ export default function CatalogPage() {
                       </p>
                     </div>
                   </div>
+
+                  <SectionSaveBar
+                    fields={["gtm_id"]}
+                    dirtyFields={form.formState.dirtyFields}
+                    isPending={updateStore.isPending}
+                    onCancel={() => handleResetFields(["gtm_id"])}
+                  />
                 </section>
               </div>
             )}
@@ -2681,23 +2952,6 @@ export default function CatalogPage() {
           </Button>
         </div>
       )}
-
-      {activeTab !== "categorias" &&
-        (form.formState.isDirty || updateStore.isPending) && (
-          <div className="sticky bottom-16 z-40 mt-2 hidden items-center justify-between gap-4 rounded-2xl border border-z-border bg-white/90 px-5 py-3 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:bottom-0 lg:flex">
-            <span className="text-sm text-z-text-muted">
-              Você tem alterações não salvas.
-            </span>
-            <Button
-              type="submit"
-              form="catalog-form"
-              disabled={updateStore.isPending}
-              className="rounded-full px-8"
-            >
-              {updateStore.isPending ? "Salvando..." : "Salvar alterações"}
-            </Button>
-          </div>
-        )}
     </div>
   );
 }
