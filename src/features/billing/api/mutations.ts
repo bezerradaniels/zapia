@@ -57,6 +57,28 @@ export async function startCheckoutSession(
   return data.url;
 }
 
+export type PixPaymentResponse = {
+  invoiceId: string | null;
+  mpPaymentId: string;
+  qrCode: string;
+  qrCodeBase64: string;
+  expiresAt: string | null;
+  amountInCents: number;
+  planName: string;
+};
+
+export async function createMercadoPagoPix(
+  storeId: string,
+  planId: PlanId,
+  billingPeriod: "monthly" | "annual" = "monthly",
+): Promise<PixPaymentResponse> {
+  const data = await invokeBillingFunction<PixPaymentResponse>(
+    "mercadopago-create-pix",
+    { storeId, planId, billingPeriod },
+  );
+  return data;
+}
+
 export async function openCustomerPortal(storeId: string): Promise<string> {
   const data = await invokeBillingFunction<{ url?: string }>(
     "stripe-portal-session",

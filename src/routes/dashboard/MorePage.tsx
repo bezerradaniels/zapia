@@ -92,7 +92,7 @@ export default function MorePage() {
               index < items.length - 1 ? "border-b border-z-border" : ""
             }`}
           >
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-[#0bfeda]">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-white">
               <HugeiconsIcon icon={item.icon} size={25} />
             </span>
             <span className="min-w-0 flex-1">

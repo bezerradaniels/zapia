@@ -281,7 +281,7 @@ function OrderDetailContent({
               href={`https://wa.me/${o.customer_phone.replace("+", "")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-medium text-[#0bfeda] hover:underline"
+              className="inline-flex items-center gap-1 font-medium text-black hover:underline"
             >
               <HugeiconsIcon icon={WhatsappIcon} size={14} />
               {fromE164BR(o.customer_phone)}
@@ -315,7 +315,7 @@ function OrderDetailContent({
           </ul>
           <div className="mt-3 flex justify-between border-t border-z-border pt-3 font-bold">
             <span>Total</span>
-            <span className="tabular-nums text-[#0bfeda]">
+            <span className="tabular-nums text-black">
               {formatMoney(o.total_in_cents)}
             </span>
           </div>

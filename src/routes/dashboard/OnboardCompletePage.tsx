@@ -31,7 +31,7 @@ export default function OnboardCompletePage() {
         </div>
 
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-[#0bfeda]">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white">
             <HugeiconsIcon icon={CheckmarkBadge01Icon} size={30} />
           </div>
           <h1 className="mb-2 text-xl font-semibold text-z-text">

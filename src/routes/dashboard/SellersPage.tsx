@@ -172,7 +172,7 @@ export default function SellersPage() {
             </span>
             <Link
               to={ROUTES.dashboardBilling}
-              className="font-semibold text-[#0bfeda] hover:underline"
+              className="font-semibold text-black hover:underline"
             >
               Ver planos →
             </Link>

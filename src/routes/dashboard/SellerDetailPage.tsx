@@ -64,7 +64,7 @@ export default function SellerDetailPage() {
         <p className="text-sm text-z-text-muted">Vendedor não encontrado.</p>
         <Link
           to={ROUTES.dashboardSellers}
-          className="text-sm font-medium text-[#0bfeda] hover:underline"
+          className="text-sm font-medium text-black hover:underline"
         >
           Voltar
         </Link>

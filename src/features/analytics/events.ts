@@ -119,6 +119,7 @@ export type AnalyticsEventMap = {
   pricing_page_viewed: Record<string, never>;
   free_plan_started: { plan_tier: string };
   subscription_started: { plan_tier: string };
+  pix_generated: { plan_tier: string; billing_period: string };
 };
 
 /** Nomes válidos de evento. */

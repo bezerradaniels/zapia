@@ -164,7 +164,7 @@ function ProductPicker({ storeId, selected, onChange }: ProductPickerProps) {
                   <HugeiconsIcon
                     icon={Add01Icon}
                     size={12}
-                    className="shrink-0 text-[#0bfeda]"
+                    className="shrink-0 text-black"
                   />
                 )}
               </button>

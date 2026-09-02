@@ -11,7 +11,7 @@ import { formatMoney } from "@/lib/format/money";
 import { ROUTES } from "@/config/routes";
 
 type PlanCard = {
-  id: "basico" | "pro" | "premium";
+  id: "basico" | "avancado" | "full";
   tone: "neutral" | "lime" | "lilac";
   features: string[];
   subtitle: string;
@@ -22,39 +22,42 @@ const cards: PlanCard[] = [
   {
     id: "basico",
     tone: "neutral",
-    subtitle: "Mais flexibilidade",
+    subtitle: "Ideal para começar",
     features: [
       "Até 10 produtos",
-      "0 vendedores",
-      "1 cupom de desconto",
-      "Catálogo online",
-      "Suporte por e-mail",
+      "0 vendedores extras",
+      "0 produtos em destaque",
+      "1 cupom por vez",
+      "Catálogo público online",
+      "Pedidos direto no WhatsApp",
     ],
   },
   {
-    id: "pro",
+    id: "avancado",
     tone: "lime",
-    subtitle: "Crescimento avançado",
+    subtitle: "Crescimento acelerado",
     features: [
       "Até 100 produtos",
-      "3 vendedores",
-      "5 cupons de desconto",
-      "PDF do catálogo",
-      "Suporte presencial",
+      "Até 3 vendedores extras",
+      "Até 4 produtos em destaque",
+      "5 cupons por vez",
+      "Exportação do catálogo em PDF",
+      "Cores personalizadas",
     ],
     highlight: true,
   },
   {
-    id: "premium",
+    id: "full",
     tone: "lilac",
-    subtitle: "Crescimento sem limites",
+    subtitle: "Sem limites para escalar",
     features: [
       "Produtos ilimitados",
-      "Vendedores ilimitados",
+      "Até 50 vendedores extras",
+      "Até 8 produtos em destaque",
       "Cupons ilimitados",
-      "4 produtos em destaque",
-      "PDF do catálogo",
-      "Suporte presencial",
+      "Exportação em PDF",
+      "Cores personalizadas",
+      "Assistente de IA",
     ],
   },
 ];

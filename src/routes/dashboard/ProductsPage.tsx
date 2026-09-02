@@ -105,7 +105,7 @@ export default function ProductsPage() {
           </span>
           <Link
             to={ROUTES.dashboardBilling}
-            className="shrink-0 text-sm font-semibold text-[#0bfeda] hover:underline"
+            className="shrink-0 text-sm font-semibold text-black hover:underline"
           >
             Ver planos →
           </Link>
@@ -184,7 +184,7 @@ export default function ProductsPage() {
                       </p>
                     )}
                     <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                      <span className="text-[15px] font-extrabold tracking-tight text-[#0bfeda]">
+                      <span className="text-[15px] font-extrabold tracking-tight text-black">
                         {formatMoney(
                           product.promo_price_in_cents ??
                             product.price_in_cents,

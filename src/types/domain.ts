@@ -225,7 +225,7 @@ export type Customer = {
   created_at: string;
 };
 
-export type PlanId = "basico" | "pro" | "premium";
+export type PlanId = "basico" | "avancado" | "full" | "pro" | "premium";
 
 export type SubscriptionStatus =
   | "none"
@@ -242,6 +242,8 @@ export type Subscription = {
   store_id: string;
   plan_id: PlanId;
   status: SubscriptionStatus;
+  gateway?: "mercadopago" | "stripe" | null;
+  mp_payment_id?: string | null;
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   current_period_end: string | null;
@@ -268,7 +270,13 @@ export type PlanFeatures = {
 export type Invoice = {
   id: string;
   store_id: string;
-  stripe_invoice_id: string;
+  plan_id?: PlanId;
+  gateway?: "mercadopago" | "stripe";
+  stripe_invoice_id?: string | null;
+  mp_payment_id?: string | null;
+  pix_qr_code?: string | null;
+  pix_qr_code_base64?: string | null;
+  pix_expires_at?: string | null;
   amount_in_cents: number;
   status: string;
   hosted_invoice_url: string | null;

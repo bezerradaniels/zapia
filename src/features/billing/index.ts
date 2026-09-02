@@ -11,3 +11,8 @@ export {
 export { usePlanLimits, type PlanLimits } from "./utils/usePlanLimits";
 export { canAccessCatalog } from "./utils/canAccessCatalog";
 export { DowngradeProductSelector } from "./components/DowngradeProductSelector";
+export { PixPaymentModal } from "./components/PixPaymentModal";
+export {
+  createMercadoPagoPix,
+  type PixPaymentResponse,
+} from "./api/mutations";

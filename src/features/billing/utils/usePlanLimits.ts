@@ -36,7 +36,19 @@ export function usePlanLimits(storeId: string | undefined): PlanLimits {
     // ("never hardcode plan limits in components — import from
     // src/config/plans.ts or query plan_features").
     const plan = (planId && plans.data?.find((p) => p.id === planId)) ?? null;
-    const config = planId ? PLANS[planId] : null;
+    const isTrialActive =
+      subscription?.status === "trialing" &&
+      (!subscription.trial_ends_at ||
+        new Date(subscription.trial_ends_at).getTime() > Date.now());
+
+    const isSubscriptionActive =
+      subscription?.status === "active" || isTrialActive;
+
+    const config = isTrialActive
+      ? PLANS.full
+      : isSubscriptionActive && planId && PLANS[planId]
+        ? PLANS[planId]
+        : null;
 
     return {
       plan,

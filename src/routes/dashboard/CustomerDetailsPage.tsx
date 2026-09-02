@@ -99,7 +99,7 @@ export default function CustomerDetailsPage() {
         <p className="text-sm text-z-text-muted">Cliente não encontrado.</p>
         <Link
           to={ROUTES.dashboardCustomers}
-          className="text-sm font-medium text-[#0bfeda] hover:underline"
+          className="text-sm font-medium text-black hover:underline"
         >
           Voltar
         </Link>
@@ -178,7 +178,7 @@ export default function CustomerDetailsPage() {
               href={waHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-[#0bfeda]"
+              className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-black"
             >
               <HugeiconsIcon icon={WhatsappIcon} size={15} />
               {fromE164BR(customer.data.whatsapp_phone)}
@@ -279,7 +279,7 @@ export default function CustomerDetailsPage() {
                     {product.quantity} unidade(s)
                   </p>
                 </div>
-                <span className="shrink-0 whitespace-nowrap text-sm font-bold text-[#0bfeda]">
+                <span className="shrink-0 whitespace-nowrap text-sm font-bold text-black">
                   {formatMoney(product.total)}
                 </span>
               </div>

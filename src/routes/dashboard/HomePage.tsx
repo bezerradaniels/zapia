@@ -40,7 +40,7 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50/80 p-4">
       <div className="w-full max-w-md rounded-2xl border border-z-border bg-white p-8 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-[#0bfeda]">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white">
           <HugeiconsIcon icon={ShoppingBag03Icon} size={30} />
         </div>
         <h2 className="text-xl font-bold">Sua loja está pronta!</h2>
@@ -178,7 +178,7 @@ export default function HomePage() {
         ].map((action) => {
           const inner = (
             <>
-              <div className="flex h-[62px] w-full items-center justify-center rounded-2xl border border-z-border bg-slate-900 text-[#0bfeda] transition-colors group-hover:border-[#10b981]/40">
+              <div className="flex h-[62px] w-full items-center justify-center rounded-2xl border border-z-border bg-slate-900 text-white transition-colors group-hover:border-[#10b981]/40">
                 <HugeiconsIcon icon={action.icon} size={24} />
               </div>
               <span className="text-center text-[10.5px] font-semibold leading-tight text-z-text-muted">
@@ -272,7 +272,7 @@ export default function HomePage() {
               <p className="text-sm text-z-text-muted">Nenhum pedido ainda.</p>
               <Link
                 to={ROUTES.dashboardCatalog}
-                className="text-xs font-medium text-[#0bfeda] hover:underline"
+                className="text-xs font-medium text-black hover:underline"
               >
                 Compartilhar catálogo →
               </Link>
@@ -344,7 +344,7 @@ function StatCard({
         <div
           className={cn(
             "mt-1.5 text-[11px] font-semibold",
-            subPositive ? "text-[#0bfeda]" : "text-z-text-muted",
+            subPositive ? "text-black" : "text-z-text-muted",
           )}
         >
           {sub}
@@ -394,7 +394,7 @@ function WeeklyBars({ orders }: { orders: Order[] }) {
             className={cn(
               "text-[10px]",
               i === counts.length - 1
-                ? "font-semibold text-[#0bfeda]"
+                ? "font-semibold text-black"
                 : "text-z-text-hint",
             )}
           >

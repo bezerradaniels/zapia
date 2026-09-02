@@ -172,7 +172,7 @@ function ProductPicker({ storeId, selected, onChange }: ProductPickerProps) {
                   <HugeiconsIcon
                     icon={Add01Icon}
                     size={12}
-                    className="shrink-0 text-[#0bfeda]"
+                    className="shrink-0 text-black"
                   />
                 )}
               </button>
@@ -259,7 +259,7 @@ export default function EditSellerPage() {
         <p className="text-sm text-z-text-muted">Vendedor não encontrado.</p>
         <Link
           to={ROUTES.dashboardSellers}
-          className="text-sm font-medium text-[#0bfeda] hover:underline"
+          className="text-sm font-medium text-black hover:underline"
         >
           Voltar
         </Link>

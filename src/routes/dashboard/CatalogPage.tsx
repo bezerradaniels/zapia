@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
 import {
@@ -636,6 +636,7 @@ function SectionSaveBar({
 
 export default function CatalogPage() {
   const { section } = useParams<{ section?: string }>();
+  const navigate = useNavigate();
   const { store } = useActiveStore();
   const updateStore = useUpdateStore();
   const limits = usePlanLimits(store?.id);
@@ -661,6 +662,7 @@ export default function CatalogPage() {
   const [mobileCategoryModalOpen, setMobileCategoryModalOpen] = useState(false);
   const [mobileCategoryName, setMobileCategoryName] = useState("");
   const [mobileSubcategoryName, setMobileSubcategoryName] = useState("");
+  const [pdfUpgradeModalOpen, setPdfUpgradeModalOpen] = useState(false);
   const activeTab = isTabId(section) ? section : "gerais";
 
   const form = useForm<UpdateStoreInput>({
@@ -1092,34 +1094,118 @@ export default function CatalogPage() {
             setMobileOpenCard(mobileOpenCard === "visual" ? "gerais" : "visual")
           }
         >
-          <InfoValue
-            label="Cor primária"
-            value={`Cor selecionada (${primaryColor})`}
-            swatch={primaryColor}
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setVisualModalOpen(true)}
-              className="h-11 rounded-xl border border-z-border bg-z-bg2 text-sm font-semibold text-z-text"
-            >
-              Adicionar logo
-            </button>
-            <button
-              type="button"
-              onClick={() => setVisualModalOpen(true)}
-              className="h-11 rounded-xl border border-z-border bg-z-bg2 text-sm font-semibold text-z-text"
-            >
-              Adicionar banner
-            </button>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-bold text-z-text">Cor primária</Label>
+              {!canTheme && (
+                <Link
+                  to={ROUTES.dashboardBilling}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:underline"
+                >
+                  <HugeiconsIcon icon={LockedIcon} size={11} />
+                  Disponível no Pro
+                </Link>
+              )}
+            </div>
+
+            <fieldset disabled={!canTheme} className={cn("flex flex-col gap-3", !canTheme && "opacity-60")}>
+              <div className="flex items-center gap-3 rounded-xl border border-z-border bg-z-bg2 p-3">
+                <div
+                  className="h-8 w-8 shrink-0 rounded-full border border-z-border shadow-sm"
+                  style={{ backgroundColor: primaryColor ?? "#000000" }}
+                />
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs text-z-text-hint">Cor selecionada</span>
+                  <span className="text-sm font-mono font-bold text-z-text">
+                    {(primaryColor ?? "").toUpperCase()}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                {COLOR_PRESETS.map((preset) => {
+                  const isSelected =
+                    primaryColor?.toLowerCase() === preset.toLowerCase();
+                  return (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() =>
+                        form.setValue("primary_color", preset, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                      className={cn(
+                        "relative h-8 w-8 rounded-full transition-transform active:scale-95 disabled:cursor-not-allowed",
+                        isSelected
+                          ? "ring-2 ring-z-ink ring-offset-2 scale-105"
+                          : "hover:scale-105",
+                      )}
+                      style={{ backgroundColor: preset }}
+                      aria-label={`Selecionar cor ${preset}`}
+                    >
+                      {isSelected && (
+                        <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
+                          ✓
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
           </div>
-          <button
-            type="button"
-            onClick={() => setVisualModalOpen(true)}
-            className="h-11 rounded-xl bg-z-ink px-4 text-sm font-extrabold text-white"
-          >
-            Editar identidade visual
-          </button>
+
+          {/* Logo do catálogo */}
+          <div className="flex flex-col gap-1.5 pt-3 border-t border-z-border">
+            <Label className="text-sm font-bold text-z-text">Logo do catálogo</Label>
+            <ImageCropUploader
+              bucket="store-logos"
+              storeId={store.id}
+              label="Clique aqui para enviar um logo"
+              aspect={1}
+              value={form.watch("logo_url") || null}
+              onChange={(url) =>
+                form.setValue("logo_url", url ?? "", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+              hint="JPG, PNG ou WEBP. Máximo 5 MB."
+              compact
+            />
+            {form.formState.errors.logo_url && (
+              <span className="text-xs text-destructive">
+                {form.formState.errors.logo_url.message}
+              </span>
+            )}
+          </div>
+
+          {/* Banner do catálogo */}
+          <div className="flex flex-col gap-1.5 pt-3 border-t border-z-border">
+            <Label className="text-sm font-bold text-z-text">Banner do catálogo</Label>
+            <ImageCropUploader
+              bucket="store-logos"
+              storeId={store.id}
+              label="Clique aqui para enviar um banner"
+              aspect={16 / 10}
+              value={form.watch("banner_url") || null}
+              onChange={(url) =>
+                form.setValue("banner_url", url ?? "", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+              hint="JPG, PNG ou WEBP. Máximo 5 MB. Proporção 16:10."
+              compact
+            />
+            {form.formState.errors.banner_url && (
+              <span className="text-xs text-destructive">
+                {form.formState.errors.banner_url.message}
+              </span>
+            )}
+          </div>
         </MobileCatalogCard>
 
         <MobileCatalogCard
@@ -1274,31 +1360,25 @@ export default function CatalogPage() {
                         Dados da empresa
                       </h2>
                     </div>
-                    {canPdf ? (
-                      <button
-                        type="button"
-                        disabled={isGeneratingPdf || products.isLoading}
-                        onClick={() =>
-                          downloadPdf(
-                            store,
-                            products.data ?? [],
-                            buildStoreUrl(store.slug),
-                          )
+                    <button
+                      type="button"
+                      disabled={isGeneratingPdf || products.isLoading}
+                      onClick={() => {
+                        if (!canPdf) {
+                          setPdfUpgradeModalOpen(true);
+                          return;
                         }
-                        className="flex items-center gap-2 rounded-lg border border-z-border bg-white px-4 py-2 text-sm font-medium text-z-text transition-colors hover:border-z-green hover:text-[#0bfeda] disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <HugeiconsIcon icon={FileDownloadIcon} size={16} />
-                        {isGeneratingPdf ? "Gerando..." : "Baixar PDF"}
-                      </button>
-                    ) : (
-                      <div
-                        title="Disponível nos planos Pro e Premium"
-                        className="flex items-center gap-2 rounded-lg border border-dashed border-z-border px-4 py-2 text-sm font-medium text-z-text-muted opacity-50"
-                      >
-                        <HugeiconsIcon icon={FileDownloadIcon} size={16} />
-                        PDF (Pro+)
-                      </div>
-                    )}
+                        downloadPdf(
+                          store,
+                          products.data ?? [],
+                          buildStoreUrl(store.slug),
+                        );
+                      }}
+                      className="flex items-center gap-2 rounded-lg border border-z-border bg-[#fafafa] px-4 py-2 text-sm font-medium text-z-text transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <HugeiconsIcon icon={FileDownloadIcon} size={16} />
+                      {isGeneratingPdf ? "Gerando..." : "Baixar PDF"}
+                    </button>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -1308,7 +1388,7 @@ export default function CatalogPage() {
                       {...form.register("name")}
                     />
                     <Field
-                      label="CNPJ"
+                      label="CNPJ (Opcional)"
                       placeholder="00.000.000/0001-00"
                       error={form.formState.errors.cnpj?.message}
                       {...form.register("cnpj")}
@@ -1317,9 +1397,7 @@ export default function CatalogPage() {
 
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-z-text">
-                        Slogan da loja
-                      </span>
+                      <Label htmlFor="slogan">Slogan da loja</Label>
                       <AiGenerateButton
                         canUse={canAi}
                         isLoading={generatingKind === "slogan"}
@@ -1327,6 +1405,7 @@ export default function CatalogPage() {
                       />
                     </div>
                     <Field
+                      id="slogan"
                       placeholder="Produtos que encantam, feitos para você!"
                       error={form.formState.errors.slogan?.message}
                       {...form.register("slogan")}
@@ -1391,7 +1470,7 @@ export default function CatalogPage() {
                               shouldDirty: true,
                             })
                           }
-                          className="text-[#0bfeda] focus:ring-z-green h-4 w-4"
+                          className="text-emerald-600 focus:ring-emerald-500 h-4 w-4"
                         />
                         <span className="text-sm">Sim</span>
                       </label>
@@ -1405,7 +1484,7 @@ export default function CatalogPage() {
                               shouldDirty: true,
                             })
                           }
-                          className="text-[#0bfeda] focus:ring-z-green h-4 w-4"
+                          className="text-emerald-600 focus:ring-emerald-500 h-4 w-4"
                         />
                         <span className="text-sm">Não</span>
                       </label>
@@ -1503,52 +1582,7 @@ export default function CatalogPage() {
                   />
                 </section>
 
-                <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
-                  <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <HugeiconsIcon
-                        icon={StoreLocationIcon}
-                        size={20}
-                        className="text-z-text-muted"
-                      />
-                      <h2 className="text-base font-semibold">
-                        Página inicial do catálogo
-                      </h2>
-                    </div>
-                  </div>
 
-                  <div className="flex flex-col gap-3 ml-7">
-                    <p className="text-sm text-z-text-muted">
-                      Escolha o que seus clientes verão ao abrir o link da sua
-                      loja. A outra opção continua disponível em sua própria
-                      página.
-                    </p>
-
-                    <div className="max-w-md">
-                      <RoundSingleCheck
-                        options={[
-                          { value: "catalog", label: "Catálogo" },
-                          { value: "about", label: "Sobre" },
-                        ]}
-                        value={form.watch("home_view") ?? "catalog"}
-                        onChange={(next) =>
-                          form.setValue(
-                            "home_view",
-                            next as UpdateStoreInput["home_view"],
-                            { shouldDirty: true },
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <SectionSaveBar
-                    fields={["home_view"]}
-                    dirtyFields={form.formState.dirtyFields}
-                    isPending={updateStore.isPending}
-                    onCancel={() => handleResetFields(["home_view"])}
-                  />
-                </section>
               </div>
             )}
 
@@ -1613,7 +1647,7 @@ export default function CatalogPage() {
                     {!canTheme && (
                       <Link
                         to={ROUTES.dashboardBilling}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0bfeda] hover:underline"
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-slate-900 hover:underline"
                       >
                         <HugeiconsIcon icon={LockedIcon} size={11} />
                         Disponível no Pro
@@ -2468,7 +2502,7 @@ export default function CatalogPage() {
                         { shouldDirty: true },
                       );
                     }}
-                    className="flex w-fit items-center gap-1.5 text-sm font-medium text-[#0bfeda] hover:underline"
+                    className="flex w-fit items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
                   >
                     + Adicionar link
                   </button>
@@ -2512,70 +2546,35 @@ export default function CatalogPage() {
                       className="text-z-text-muted"
                     />
                     <h2 className="text-base font-semibold">
-                      Endereço do seu catálogo
+                      Endereço da sua loja
                     </h2>
                   </div>
 
                   <div className="flex flex-col gap-4 ml-7">
                     <p className="text-sm text-z-text-muted -mt-2">
-                      Este é o link que você deve compartilhar com seus clientes
-                      para que eles acessem seu catálogo online.
+                      Este é o link que você compartilha com seus clientes.
                     </p>
 
-                    <div className="flex h-11 items-center gap-2 rounded-lg border border-z-border bg-z-bg px-3.5">
-                      <div className="flex-1 truncate text-sm font-medium text-z-text">
-                        {buildStoreUrl(store.slug).replace(/^https?:\/\//, "")}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 shrink-0 rounded-lg px-3 text-xs"
-                        onClick={() => {
-                          navigator.clipboard.writeText(
-                            buildStoreUrl(store.slug),
-                          );
-                          track("share_link_copied", {
-                            store_id: store.id,
-                            link_type: "store",
-                            item_id: store.id,
-                          });
-                        }}
-                      >
-                        Copiar link
-                      </Button>
-                    </div>
-
-                    <div className="my-2 h-px w-full bg-z-border" />
-
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-z-text">
-                        Alterar URL da loja
-                      </label>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center rounded-lg border border-z-border bg-white focus-within:border-z-green focus-within:ring-2 focus-within:ring-z-green/20 max-w-lg">
+                        <span className="bg-z-bg px-3 py-2.5 text-xs text-z-text-muted border-r border-z-border rounded-l-lg select-none font-mono">
+                          {ROOT_DOMAIN}/
+                        </span>
                         <input
-                          className={cn(
-                            "h-12 w-40 min-w-0 rounded-lg border bg-white px-3.5 text-sm transition-colors placeholder:text-z-text-hint focus:outline-none focus:ring-2",
-                            form.formState.errors.slug ||
-                              slugAvailability === "taken"
-                              ? "border-red-400 focus:border-red-400 focus:ring-red-400/20"
-                              : slugAvailability === "available"
-                                ? "border-[#10b981] focus:border-[#10b981] focus:ring-[#10b981]/20"
-                                : "border-z-border focus:border-z-green focus:ring-z-green/20",
-                            slugLocked &&
-                              "opacity-50 cursor-not-allowed bg-z-bg",
-                          )}
-                          placeholder="seu-endereco"
+                          placeholder="minhaloja"
                           disabled={slugLocked}
+                          className="h-10 flex-1 bg-transparent px-3 text-sm font-mono focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
                           {...form.register("slug")}
                         />
-                        <span className="shrink-0 text-sm text-z-text-hint">
-                          .{ROOT_DOMAIN}
-                        </span>
                       </div>
+                      
                       {form.formState.errors.slug ? (
                         <span className="text-xs text-destructive">
                           {form.formState.errors.slug.message}
+                        </span>
+                      ) : slugAvailability === "checking" ? (
+                        <span className="text-xs text-z-text-hint">
+                          Verificando disponibilidade...
                         </span>
                       ) : slugAvailability === "taken" ? (
                         <span className="flex items-center gap-1 text-xs font-medium text-red-500">
@@ -2583,7 +2582,7 @@ export default function CatalogPage() {
                           Nome indisponível
                         </span>
                       ) : slugAvailability === "available" ? (
-                        <span className="flex items-center gap-1 text-xs font-medium text-[#0bfeda]">
+                        <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
                           <HugeiconsIcon
                             icon={CheckmarkCircle02Icon}
                             size={13}
@@ -2668,7 +2667,7 @@ export default function CatalogPage() {
                           href="https://tagmanager.google.com"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#0bfeda] hover:underline"
+                          className="text-emerald-600 hover:underline"
                         >
                           Google Tag Manager
                         </a>
@@ -2732,28 +2731,50 @@ export default function CatalogPage() {
       >
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label>Cor primária</Label>
-            <div className="grid grid-cols-10 gap-1.5">
-              {COLOR_PRESETS.map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() =>
-                    form.setValue("primary_color", preset, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }
-                  className={cn(
-                    "h-7 w-7 rounded-full transition-transform active:scale-95",
-                    primaryColor?.toLowerCase() === preset.toLowerCase() &&
-                      "ring-2 ring-z-ink ring-offset-1",
-                  )}
-                  style={{ backgroundColor: preset }}
-                  aria-label={`Selecionar cor ${preset}`}
-                />
-              ))}
+            <div className="flex items-center justify-between">
+              <Label>Cor primária</Label>
+              {!canTheme && (
+                <Link
+                  to={ROUTES.dashboardBilling}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:underline"
+                >
+                  <HugeiconsIcon icon={LockedIcon} size={11} />
+                  Disponível no Pro
+                </Link>
+              )}
             </div>
+            <fieldset disabled={!canTheme} className={cn("flex flex-wrap items-center gap-2", !canTheme && "opacity-60")}>
+              {COLOR_PRESETS.map((preset) => {
+                const isSelected =
+                  primaryColor?.toLowerCase() === preset.toLowerCase();
+                return (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() =>
+                      form.setValue("primary_color", preset, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    className={cn(
+                      "relative h-8 w-8 rounded-full transition-transform active:scale-95 disabled:cursor-not-allowed",
+                      isSelected
+                        ? "ring-2 ring-z-ink ring-offset-2 scale-105"
+                        : "hover:scale-105",
+                    )}
+                    style={{ backgroundColor: preset }}
+                    aria-label={`Selecionar cor ${preset}`}
+                  >
+                    {isSelected && (
+                      <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </fieldset>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -2936,6 +2957,59 @@ export default function CatalogPage() {
           </Button>
         </div>
       </BottomSheet>
+
+      {pdfUpgradeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative flex w-full max-w-md flex-col gap-5 rounded-2xl bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+            <button
+              type="button"
+              onClick={() => setPdfUpgradeModalOpen(false)}
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg text-z-text-muted hover:bg-zinc-100 hover:text-z-text transition-colors"
+              aria-label="Fechar"
+            >
+              <HugeiconsIcon icon={Cancel01Icon} size={18} />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 text-z-text">
+                <HugeiconsIcon icon={FileDownloadIcon} size={22} />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-z-text">
+                  Exportação de Catálogo em PDF
+                </h3>
+                <span className="text-xs text-z-text-muted">
+                  Recurso dos planos Pro e Premium
+                </span>
+              </div>
+            </div>
+
+            <p className="text-sm text-z-text-muted leading-relaxed">
+              Gere um catálogo digital completo em PDF pronto para baixar, imprimir ou enviar diretamente para seus clientes no WhatsApp.
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-z-border">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setPdfUpgradeModalOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  setPdfUpgradeModalOpen(false);
+                  navigate(ROUTES.dashboardBilling);
+                }}
+                className="rounded-xl px-5"
+              >
+                Conhecer planos
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {form.formState.isDirty && (
         <div className="fixed bottom-20 inset-x-4 mx-auto max-w-sm z-40 flex items-center justify-between gap-3 rounded-2xl border border-z-border bg-white/95 px-4 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.12)] backdrop-blur-md lg:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
