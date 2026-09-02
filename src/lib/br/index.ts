@@ -18,3 +18,4 @@ export {
   toE164BR,
   fromE164BR,
 } from './phone'
+export { NEIGHBORHOOD_OPTIONS, filterNeighborhoods } from './neighborhoods'

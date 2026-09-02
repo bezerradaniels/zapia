@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@hookform/resolvers/zod' 
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowRight02Icon } from '@hugeicons/core-free-icons'
 import { Button, Combobox, Input, Label } from '@/components/ui'
 import { PhoneInput } from '@/components/forms/PhoneInput'
-import { STATES, toE164BR } from '@/lib/br'
+import { STATES, toE164BR, NEIGHBORHOOD_OPTIONS } from '@/lib/br'
 import { createStore, SlugTakenError, patchStore } from '@/features/catalog'
 import { slugify } from '@/lib/utils/slugify'
 import { ROUTES } from '@/config/routes'
@@ -237,15 +237,19 @@ export function OnboardingStep1() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="address_neighborhood" className="text-sm">
-            Bairro{' '}
-            <span className="text-z-text-hint text-xs font-normal normal-case">(aparece no rodapé)</span>
-          </Label>
-          <Input
-            id="address_neighborhood"
-            placeholder="Ex: Centro"
-            className="border-slate-300"
-            {...register('address_neighborhood')}
+          <Label htmlFor="address_neighborhood" className="text-sm">Bairro *</Label>
+          <Controller
+            name="address_neighborhood"
+            control={control}
+            render={({ field }) => (
+              <Combobox
+                options={NEIGHBORHOOD_OPTIONS}
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Digite para buscar o bairro..."
+                emptyMessage="Bairro não encontrado"
+              />
+            )}
           />
           {errors.address_neighborhood && (
             <p className="text-xs text-red-500">{errors.address_neighborhood.message}</p>

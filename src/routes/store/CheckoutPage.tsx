@@ -41,7 +41,7 @@ export default function CheckoutPage() {
 
   const form = useForm<CheckoutInput>({
     resolver: zodResolver(checkoutSchema),
-    defaultValues: { name: '', phone: '', notes: '' },
+    defaultValues: { name: '', phone: '' },
   })
 
   const name = form.watch('name')
@@ -86,7 +86,6 @@ export default function CheckoutPage() {
         storeId: store.id,
         customerName: values.name.trim(),
         customerPhone: values.phone,
-        customerNotes: values.notes,
         items,
         totalInCents: total,
         coupon: coupon
@@ -104,7 +103,6 @@ export default function CheckoutPage() {
         customer: {
           name: values.name,
           phone: maskPhoneBR(values.phone),
-          notes: values.notes,
         },
         totalInCents: total,
         coupon: coupon
@@ -245,17 +243,6 @@ export default function CheckoutPage() {
             </button>
           </div>
 
-          <div className="rounded-2xl border bg-white p-5" style={{ borderColor: '#cbd5e1' }}>
-            <label className="mb-2 block text-sm font-medium text-z-text">
-              Observação (opcional)
-            </label>
-            <textarea
-              rows={3}
-              placeholder="Algum detalhe especial para o pedido?"
-              className="w-full resize-y rounded-lg border border-[#cbd5e1] bg-z-bg px-3.5 py-2.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-              {...form.register('notes')}
-            />
-          </div>
 
           {form.formState.errors.root && (
             <p className="text-sm text-destructive">

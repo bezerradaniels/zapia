@@ -1294,65 +1294,6 @@ export default function CatalogPage() {
                   </div>
                 </section>
 
-                <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
-                  <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <HugeiconsIcon icon={StoreLocationIcon} size={20} className="text-z-text-muted" />
-                      <h2 className="text-base font-semibold">Telefone e e-mail visíveis no seu catálogo</h2>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col gap-4 ml-7">
-                    <p className="text-sm text-z-text-muted">
-                      Estes informações estarão visíveis em vários locais do seu catálogo, como rodapé, área de sobre nós e página de pedidos.
-                    </p>
-                    
-                    <div className="grid gap-4 sm:grid-cols-2 items-start">
-                      <div className="flex flex-col gap-1.5">
-                        <Label>Telefone de contato (Fixo ou Celular)</Label>
-                        <div className="flex items-center gap-2">
-                          <select className="h-11 rounded-lg border border-z-border bg-white px-3 text-sm w-24">
-                            <option>+55</option>
-                          </select>
-                          <PhoneInput
-                            className={`h-11 w-full rounded-lg border bg-white px-3.5 text-sm transition-colors focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 ${
-                              form.formState.errors.contact_phone
-                                ? 'border-destructive focus:border-destructive focus:ring-destructive/20'
-                                : 'border-z-border'
-                            }`}
-                            value={form.watch('contact_phone')}
-                            onChange={(val) => {
-                              const raw = val.replace(/\D/g, '')
-                              let masked = raw
-                              if (raw.length > 2) {
-                                masked = `(${raw.slice(0, 2)}) ${raw.slice(2)}`
-                              }
-                              if (raw.length > 6) {
-                                masked = `(${raw.slice(0, 2)}) ${raw.slice(2, 7)}-${raw.slice(7, 11)}`
-                              }
-                              form.setValue('contact_phone', masked, {
-                                shouldValidate: true,
-                                shouldDirty: true,
-                              })
-                            }}
-                          />
-                        </div>
-                        {form.formState.errors.contact_phone && (
-                          <span className="text-xs text-destructive">
-                            {form.formState.errors.contact_phone.message}
-                          </span>
-                        )}
-                      </div>
-                      <Field
-                        label="E-mail para contato"
-                        type="email"
-                        placeholder="contato@sualoja.com.br"
-                        error={form.formState.errors.contact_email?.message}
-                        {...form.register('contact_email')}
-                      />
-                    </div>
-                  </div>
-                </section>
 
                 <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
                   <div className="mb-2 flex items-center justify-between">
@@ -1364,57 +1305,21 @@ export default function CatalogPage() {
                   
                   <div className="flex flex-col gap-4 ml-7">
                     <p className="text-sm text-z-text-muted">
-                      Este é o endereço que seus clientes verão em seu catálogo.
+                      Rua e bairro que seus clientes verão no catálogo (Bom Jesus da Lapa - BA).
                     </p>
                     
-                    <div className="flex gap-4">
-                      <div className="flex-1 max-w-[200px]">
-                        <Field 
-                          label="Cep" 
-                          placeholder="70.381-515" 
-                          error={form.formState.errors.address_cep?.message}
-                          {...form.register('address_cep')}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <Field 
-                          label="Endereço" 
-                          placeholder="Quadra CRS 516 Bloco A" 
-                          error={form.formState.errors.address_street?.message}
-                          {...form.register('address_street')}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <Field 
-                          label="Bairro" 
-                          placeholder="Asa Sul" 
-                          error={form.formState.errors.address_neighborhood?.message}
-                          {...form.register('address_neighborhood')}
-                        />
-                      </div>
-                      <div className="flex-1 max-w-[200px]">
-                        <Field 
-                          label="Número" 
-                          placeholder="120" 
-                          error={form.formState.errors.address_number?.message}
-                          {...form.register('address_number')}
-                        />
-                      </div>
-                    </div>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <Field 
-                        label="Estado" 
-                        placeholder="Distrito Federal" 
-                        error={form.formState.errors.address_state?.message}
-                        {...form.register('address_state')}
+                        label="Endereço (Rua)" 
+                        placeholder="Ex: Rua das Flores, 123" 
+                        error={form.formState.errors.address_street?.message}
+                        {...form.register('address_street')}
                       />
                       <Field 
-                        label="Cidade" 
-                        placeholder="Brasília" 
-                        error={form.formState.errors.address_city?.message}
-                        {...form.register('address_city')}
+                        label="Bairro" 
+                        placeholder="Ex: Centro" 
+                        error={form.formState.errors.address_neighborhood?.message}
+                        {...form.register('address_neighborhood')}
                       />
                     </div>
                   </div>

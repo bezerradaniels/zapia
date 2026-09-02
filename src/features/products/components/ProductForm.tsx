@@ -26,15 +26,12 @@ import { MAX_FEATURED_PRODUCTS, featuredSlots } from '../utils/featured'
 import { formatMoney } from '@/lib/format'
 import { MoneyInput } from '@/components/forms/MoneyInput'
 import { ProductImagesUploader } from '@/components/forms/ProductImagesUploader'
-import { ProductRichTextEditor } from './ProductRichTextEditor'
 import { ProductVariationModal } from './ProductVariationModal'
 import type { VariationType } from '@/types/domain'
 import { cn } from '@/lib/utils'
-import { useCategories, useCreateCategory } from '@/features/categories'
+import { useCreateCategory } from '@/features/categories'
 import { usePlanLimits } from '@/features/billing'
-import { AiGenerateButton } from '@/components/ui'
 import { useProducts } from '../hooks/useProducts'
-import { useGenerateProductDescription } from '../hooks/useGenerateProductDescription'
 
 type Tab = 'info' | 'stock' | 'photos' | 'price'
 
@@ -108,22 +105,14 @@ export function ProductForm({
   const [variationModalOpen, setVariationModalOpen] = useState(false)
   const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false)
   const [newCategoryName, setNewCategoryName] = useState('')
-  const [newSubcategoryModalOpen, setNewSubcategoryModalOpen] = useState(false)
-  const [newSubcategoryName, setNewSubcategoryName] = useState('')
   const [homeModalOpen, setHomeModalOpen] = useState(false)
   const [missingFieldsModalOpen, setMissingFieldsModalOpen] = useState(false)
   const newCategoryInputRef = useRef<HTMLInputElement>(null)
-  const newSubcategoryInputRef = useRef<HTMLInputElement>(null)
   const submitModeRef = useRef<'publish' | 'draft'>('publish')
 
-  const categoriesQuery = useCategories(storeId)
-  const categories = categoriesQuery.data ?? []
-  const topLevelCategories = categories.filter((c) => !c.parent_id)
   const planLimits = usePlanLimits(storeId)
   const allProductsQuery = useProducts(planLimits.canUse('featured') ? storeId : undefined)
   const createCategoryMutation = useCreateCategory()
-  const { generate: generateDescription, isGenerating: isGeneratingDescription } =
-    useGenerateProductDescription()
 
   const defaults = useMemo(
     () => ({
@@ -162,16 +151,6 @@ export function ProductForm({
     resolver: zodResolver(productSchema),
     defaultValues: defaults as ProductInput,
   })
-
-  const selectedCategory = form.watch('category')
-  const selectedSubcategory = form.watch('subcategory')
-  const selectedCategoryObj = categories.find((c) => c.name === selectedCategory)
-  const availableSubcategories = categories.filter((c) => c.parent_id === selectedCategoryObj?.id)
-
-  const handleCategoryChange = (value: string) => {
-    form.setValue('category', value || undefined, { shouldDirty: true })
-    form.setValue('subcategory', undefined, { shouldDirty: true })
-  }
 
   const name = form.watch('name') ?? ''
   const images = form.watch('images') ?? []
@@ -223,27 +202,6 @@ export function ProductForm({
     }
   })
 
-  const handleGenerateDescription = async () => {
-    const productName = form.getValues('name')
-    if (!productName) {
-      toast.error('Informe o nome do produto antes de gerar a descrição.')
-      return
-    }
-    try {
-      const html = await generateDescription({
-        storeId,
-        name: productName,
-        category: form.getValues('category') || undefined,
-        subcategory: form.getValues('subcategory') || undefined,
-        brand: form.getValues('brand') || undefined,
-        condition: form.getValues('condition'),
-        unit: form.getValues('unit') || undefined,
-      })
-      form.setValue('description', html, { shouldDirty: true, shouldValidate: true })
-    } catch {
-      toast.error('Não foi possível gerar a descrição. Tente novamente.')
-    }
-  }
 
   const handlePublish = async () => {
     submitModeRef.current = 'publish'
@@ -284,34 +242,14 @@ export function ProductForm({
     }
   }, [newCategoryModalOpen])
 
-  useEffect(() => {
-    if (newSubcategoryModalOpen) {
-      setTimeout(() => newSubcategoryInputRef.current?.focus(), 50)
-    }
-  }, [newSubcategoryModalOpen])
-
   const handleCreateCategory = async () => {
     if (!newCategoryName.trim()) return
-    const cat = await createCategoryMutation.mutateAsync({
+    await createCategoryMutation.mutateAsync({
       store_id: storeId,
       name: newCategoryName.trim(),
     })
-    form.setValue('category', cat.name, { shouldDirty: true })
-    form.setValue('subcategory', undefined, { shouldDirty: true })
     setNewCategoryModalOpen(false)
     setNewCategoryName('')
-  }
-
-  const handleCreateSubcategory = async () => {
-    if (!newSubcategoryName.trim() || !selectedCategoryObj) return
-    const sub = await createCategoryMutation.mutateAsync({
-      store_id: storeId,
-      name: newSubcategoryName.trim(),
-      parent_id: selectedCategoryObj.id,
-    })
-    form.setValue('subcategory', sub.name, { shouldDirty: true })
-    setNewSubcategoryModalOpen(false)
-    setNewSubcategoryName('')
   }
 
   return (
@@ -371,9 +309,9 @@ export function ProductForm({
           {/* ─── INFORMAÇÕES GERAIS ─── */}
           {activeTab === 'info' && (
             <div className="flex flex-col gap-8">
-              {/* Título e descrição */}
+              {/* Título */}
               <section>
-                <h3 className="mb-4 font-semibold text-z-text">Título e descrição</h3>
+                <h3 className="mb-4 font-semibold text-z-text">Título do produto</h3>
 
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-1.5">
@@ -412,141 +350,9 @@ export function ProductForm({
                       </span>
                     )}
                   </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-[11px] font-semibold text-z-text-hint">
-                        Descrição
-                        <HugeiconsIcon
-                          icon={InformationCircleIcon}
-                          size={12}
-                          className="ml-1 inline text-z-text-hint"
-                        />
-                      </label>
-                      <AiGenerateButton
-                        canUse={planLimits.canUse('ai')}
-                        isLoading={isGeneratingDescription}
-                        onClick={handleGenerateDescription}
-                      />
-                    </div>
-                    <Controller
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <ProductRichTextEditor
-                          value={field.value ?? ''}
-                          onChange={field.onChange}
-                          placeholder="Conte algo sobre o produto..."
-                        />
-                      )}
-                    />
-                    <span className="text-right text-xs text-z-text-hint">
-                      {10000 - (form.watch('description')?.length ?? 0)} caracteres restantes
-                    </span>
-                    {form.formState.errors.description && (
-                      <span className="text-xs text-destructive">
-                        {form.formState.errors.description.message}
-                      </span>
-                    )}
-                  </div>
                 </div>
               </section>
 
-              {/* Categoria e subcategoria */}
-              <section className="border-t border-z-border pt-6">
-                <h3 className="mb-4 font-semibold text-z-text">
-                  Categoria e subcategoria
-                </h3>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-semibold text-z-text-hint">
-                      Categoria
-                      <HugeiconsIcon
-                        icon={InformationCircleIcon}
-                        size={12}
-                        className="ml-1 inline text-z-text-hint"
-                      />
-                    </label>
-                    <select
-                      className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                      value={selectedCategory ?? ''}
-                      onChange={(e) => {
-                        if (e.target.value === '__ADD_CATEGORY__') {
-                          setNewCategoryModalOpen(true)
-                          return
-                        }
-                        handleCategoryChange(e.target.value)
-                      }}
-                    >
-                      <option value="">Selecione...</option>
-                      {selectedCategory &&
-                        !topLevelCategories.some(
-                          (cat) => cat.name === selectedCategory,
-                        ) && (
-                          <option value={selectedCategory}>{selectedCategory}</option>
-                        )}
-                      {topLevelCategories.map((cat) => (
-                        <option key={cat.id} value={cat.name}>
-                          {cat.name}
-                        </option>
-                      ))}
-                      <option value="__ADD_CATEGORY__">+ Criar nova categoria</option>
-                    </select>
-                    {form.formState.errors.category && (
-                      <span className="text-xs text-destructive">
-                        {form.formState.errors.category.message}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] font-semibold text-z-text-hint">
-                      Subcategoria
-                      <HugeiconsIcon
-                        icon={InformationCircleIcon}
-                        size={12}
-                        className="ml-1 inline text-z-text-hint"
-                      />
-                    </label>
-                    <select
-                      className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm text-z-text focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20 disabled:bg-z-bg disabled:text-z-text-hint"
-                      value={selectedSubcategory ?? ''}
-                      onChange={(e) => {
-                        if (e.target.value === '__ADD_SUBCATEGORY__') {
-                          setNewSubcategoryModalOpen(true)
-                          return
-                        }
-                        form.setValue('subcategory', e.target.value || undefined, { shouldDirty: true })
-                      }}
-                      disabled={!selectedCategory}
-                    >
-                      <option value="">Selecione...</option>
-                      {selectedSubcategory &&
-                        !availableSubcategories.some(
-                          (sub) => sub.name === selectedSubcategory,
-                        ) && (
-                          <option value={selectedSubcategory}>
-                            {selectedSubcategory}
-                          </option>
-                        )}
-                      {availableSubcategories.map((sub) => (
-                        <option key={sub.id} value={sub.name}>
-                          {sub.name}
-                        </option>
-                      ))}
-                      {selectedCategory && (
-                        <option value="__ADD_SUBCATEGORY__">+ Criar nova subcategoria</option>
-                      )}
-                    </select>
-                    {form.formState.errors.subcategory && (
-                      <span className="text-xs text-destructive">
-                        {form.formState.errors.subcategory.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </section>
 
               {/* Códigos de identificação */}
               <section className="border-t border-z-border pt-6">
@@ -1409,63 +1215,6 @@ export function ProductForm({
         </div>
       )}
 
-      {/* New subcategory modal */}
-      {newSubcategoryModalOpen && (
-        <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 p-4 sm:items-center"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setNewSubcategoryModalOpen(false)
-              setNewSubcategoryName('')
-            }
-          }}
-        >
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="mb-1 font-semibold text-z-text">Nova subcategoria</h3>
-            <p className="mb-4 text-sm text-z-text-muted">
-              Será criada dentro de <strong>{selectedCategory}</strong>.
-            </p>
-            <div className="flex flex-col gap-3">
-              <input
-                ref={newSubcategoryInputRef}
-                type="text"
-                value={newSubcategoryName}
-                onChange={(e) => setNewSubcategoryName(e.target.value)}
-                placeholder="Nome da subcategoria"
-                maxLength={60}
-                className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleCreateSubcategory()
-                  if (e.key === 'Escape') {
-                    setNewSubcategoryModalOpen(false)
-                    setNewSubcategoryName('')
-                  }
-                }}
-              />
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setNewSubcategoryModalOpen(false)
-                    setNewSubcategoryName('')
-                  }}
-                  className="flex-1 rounded-xl border border-z-border px-4 py-2.5 text-sm font-medium text-z-text-muted hover:bg-z-bg"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCreateSubcategory}
-                  disabled={!newSubcategoryName.trim() || createCategoryMutation.isPending}
-                  className="flex-1 rounded-xl bg-z-green px-4 py-2.5 text-sm font-semibold text-z-ink hover:bg-green-600 disabled:opacity-60"
-                >
-                  {createCategoryMutation.isPending ? 'Criando...' : 'Criar'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Missing fields modal */}
       {missingFieldsModalOpen && (

@@ -11,7 +11,7 @@ export const step1Schema = z.object({
   address_state: z.string().min(2, 'Selecione um estado'),
   address_city: z.string().min(1, 'Informe a cidade'),
   address_street: z.string().max(120, 'Máximo 120 caracteres').optional().or(z.literal('')),
-  address_neighborhood: z.string().max(80, 'Máximo 80 caracteres').optional().or(z.literal('')),
+  address_neighborhood: z.string().min(1, 'Selecione o bairro'),
 })
 
 export const step2Schema = z.object({
