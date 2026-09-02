@@ -144,6 +144,7 @@ serve(async (req) => {
         expiresAt,
         amountInCents,
         planName: planInfo.name,
+        billingPeriod,
       },
       { status: 200, req },
     );

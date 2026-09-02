@@ -271,6 +271,7 @@ export type Invoice = {
   id: string;
   store_id: string;
   plan_id?: PlanId;
+  billing_period?: "monthly" | "annual" | null;
   gateway?: "mercadopago" | "stripe";
   stripe_invoice_id?: string | null;
   mp_payment_id?: string | null;

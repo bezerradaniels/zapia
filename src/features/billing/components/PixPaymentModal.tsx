@@ -20,6 +20,7 @@ interface PixPaymentModalProps {
   storeId: string;
   pixData: PixPaymentResponse | null;
   isLoading: boolean;
+  billingPeriod?: "monthly" | "annual";
   onSuccess?: () => void;
 }
 
@@ -29,6 +30,7 @@ export function PixPaymentModal({
   storeId,
   pixData,
   isLoading,
+  billingPeriod,
   onSuccess,
 }: PixPaymentModalProps) {
   const [copied, setCopied] = useState(false);
@@ -161,9 +163,18 @@ export function PixPaymentModal({
               <h3 className="text-lg font-bold text-z-text">
                 Pague com PIX para ativar
               </h3>
-              <p className="text-xs text-z-text-muted">
-                Plano {pixData?.planName} ·{" "}
-                <strong>{formatMoney(pixData?.amountInCents ?? 0)}</strong>
+              <p className="mt-1 text-sm text-slate-700">
+                Você irá pagar{" "}
+                <strong className="font-bold text-black">
+                  {formatMoney(pixData?.amountInCents ?? 0)}
+                </strong>{" "}
+                por uma assinatura de{" "}
+                <strong className="font-bold text-black">
+                  {(pixData?.billingPeriod || billingPeriod) === "annual"
+                    ? "12 meses"
+                    : "1 mês"}
+                </strong>
+                {pixData?.planName ? ` (Plano ${pixData.planName})` : ""}.
               </p>
             </div>
 

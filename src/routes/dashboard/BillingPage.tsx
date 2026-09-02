@@ -209,6 +209,7 @@ export default function BillingPage() {
         storeId={store?.id ?? ""}
         pixData={pixData}
         isLoading={pixLoading}
+        billingPeriod={billingPeriod}
         onSuccess={() => {
           subscription.refetch();
         }}
@@ -430,6 +431,7 @@ export default function BillingPage() {
                             expiresAt: inv.pix_expires_at || null,
                             amountInCents: inv.amount_in_cents,
                             planName: inv.plan_id ? PLANS[inv.plan_id]?.name : "Plano",
+                            billingPeriod: (inv.billing_period as "monthly" | "annual") || "monthly",
                           });
                           setPixModalOpen(true);
                         }}

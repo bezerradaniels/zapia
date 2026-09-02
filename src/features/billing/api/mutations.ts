@@ -65,6 +65,7 @@ export type PixPaymentResponse = {
   expiresAt: string | null;
   amountInCents: number;
   planName: string;
+  billingPeriod?: "monthly" | "annual";
 };
 
 export async function createMercadoPagoPix(
