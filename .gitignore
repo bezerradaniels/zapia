@@ -34,3 +34,8 @@ supabase/.temp
 
 # Large binary docs — keep on disk, out of git history
 docs/*.pdf
+
+# Test coverage & tooling caches
+coverage
+.eslintcache
+*.tsbuildinfo
