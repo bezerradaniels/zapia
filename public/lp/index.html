@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="pt-BR" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zapia — Crie seu Catálogo Digital e Venda pelo WhatsApp em 3 Minutos</title>
+    <meta
+      name="description"
+      content="Pare de mandar fotos uma a uma no WhatsApp. Tenha seu catálogo online lindo para colocar na bio do Instagram e receba pedidos prontos. Comece grátis sem cartão!"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- OpenGraph / Social Share -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Crie seu Catálogo Online no WhatsApp em 3 Minutos | Zapia" />
+    <meta
+      property="og:description"
+      content="Pare de mandar foto uma a uma. Crie sua vitrine virtual para a bio do Instagram e receba pedidos montados no WhatsApp."
+    />
+    <meta property="og:image" content="https://zapia.app/logos/zapia-logo.svg" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS v4 Browser Compiler -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --font-sans: "Plus Jakarta Sans", "Inter", sans-serif;
+        --color-brand: #10b981;
+        --color-brand-hover: #059669;
+        --color-brand-dark: #064e3b;
+        --color-brand-light: #ecfdf5;
+        --color-accent-pink: #f43f5e;
+        --color-accent-purple: #8b5cf6;
+        --color-bg-light: #fafafa;
+        --color-ink: #0f172a;
+      }
+    </style>
+
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      .shimmer {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.4) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 2.5s infinite;
+      }
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+      .floating-pulse {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        animation: pulse-green 2s infinite;
+      }
+      @keyframes pulse-green {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+        70% {
+          transform: scale(1.02);
+          box-shadow: 0 0 0 14px rgba(16, 185, 129, 0);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+      }
+    </style>
+
+    <!-- Google Tag Manager (Campaign tracking) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtagTrack(event, category, label) {
+        window.dataLayer.push({
+          event: event,
+          eventCategory: category,
+          eventLabel: label,
+        });
+      }
+    </script>
+  </head>
+
+  <body class="bg-[#fafafa] text-[#0f172a] antialiased">
+    <!-- Top Announcement Bar -->
+    <div class="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 px-4 py-2 text-center text-xs font-semibold text-white shadow-sm">
+      <span class="inline-flex items-center gap-1.5">
+        <span class="inline-block h-2 w-2 rounded-full bg-white animate-ping"></span>
+        ✨ Vagas Abertas: Teste 7 dias grátis sem precisar cadastrar cartão!
+      </span>
+    </div>
+
+    <!-- Header / Brand minimal (Zero escape links) -->
+    <header class="border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0 z-40">
+      <div class="mx-auto flex max-w-5xl items-center justify-between px-5 py-3.5">
+        <div class="flex items-center gap-2">
+          <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500 text-white font-extrabold shadow-sm">
+            Z
+          </div>
+          <span class="text-lg font-bold tracking-tight text-slate-900">Zapia</span>
+          <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200/60">
+            Moda & Varejo
+          </span>
+        </div>
+
+        <a
+          href="/cadastrar"
+          class="cta-link inline-flex items-center gap-1.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 text-xs font-bold shadow-sm transition-all hover:scale-[1.03] active:scale-[0.98]"
+        >
+          <span>Começar Grátis</span>
+          <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </div>
+    </header>
+
+    <!-- HERO SECTION (Above the fold CRO Masterpiece) -->
+    <section class="relative overflow-hidden pt-8 pb-14 md:pt-16 md:pb-20">
+      <!-- Glow background -->
+      <div class="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+        <div class="h-96 w-96 rounded-full bg-emerald-400/15 blur-3xl"></div>
+        <div class="h-96 w-96 rounded-full bg-rose-400/10 blur-3xl -ml-20 mt-20"></div>
+      </div>
+
+      <div class="mx-auto max-w-5xl px-5">
+        <div class="mx-auto max-w-3xl text-center">
+          <!-- Hook Badge -->
+          <div class="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3.5 py-1.5 text-xs font-semibold text-rose-700 shadow-sm mb-5">
+            <span>👗 Roupas · 💎 Semijoias · 💄 Cosméticos · 🧁 Doces</span>
+          </div>
+
+          <!-- Main H1 Headline -->
+          <h1 class="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-5xl sm:leading-[1.15]">
+            Pare de mandar fotos uma a uma no WhatsApp.
+            <span class="block text-emerald-600 mt-1">Crie seu catálogo online em 3 minutos.</span>
+          </h1>
+
+          <!-- Subheadline -->
+          <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+            Coloque seu link exclusivo na bio do Instagram. Suas clientes escolhem os produtos sozinhas e você recebe o <strong>pedido montado com total, tamanho e endereço no WhatsApp</strong>.
+          </p>
+
+          <!-- Primary CTA Button with High Contrast & Micro-copy -->
+          <div class="mt-8 flex flex-col items-center gap-3">
+            <a
+              href="/cadastrar"
+              id="hero-cta-button"
+              class="cta-link floating-pulse group relative inline-flex w-full sm:w-auto items-center justify-center gap-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span class="shimmer absolute inset-0 rounded-2xl"></span>
+              <span>CRIAR MEU CATÁLOGO GRÁTIS AGORA</span>
+              <svg class="h-5 w-5 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </a>
+
+            <!-- Micro-commitments & Friction Reducers -->
+            <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-slate-500">
+              <span class="flex items-center gap-1">
+                <svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Sem cartão de crédito
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Leva menos de 3 minutos
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                100% pelo celular
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Proof Mockup (Smartphone Catálogo + WhatsApp Notification) -->
+        <div class="relative mx-auto mt-12 max-w-2xl">
+          <!-- Smartphone Showcase Card -->
+          <div class="rounded-3xl border-4 border-slate-900/90 bg-white p-3 shadow-2xl">
+            <!-- Simulated Mobile App Topbar -->
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 px-2">
+              <div class="flex items-center gap-2">
+                <div class="h-8 w-8 rounded-full bg-rose-100 text-rose-600 font-bold text-xs flex items-center justify-center">
+                  LJ
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-slate-900">Loja da Juliana • Moda & Acessórios</p>
+                  <p class="text-[10px] text-emerald-600 font-medium">zapia.app/lojadajuliana</p>
+                </div>
+              </div>
+              <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Online</span>
+            </div>
+
+            <!-- Simulated Product Grid in Catalog -->
+            <div class="grid grid-cols-2 gap-2.5 p-2 bg-slate-50 rounded-2xl mt-2">
+              <!-- Item 1 -->
+              <div class="rounded-xl bg-white p-2 border border-slate-200/70 shadow-sm">
+                <div class="h-28 w-full rounded-lg bg-gradient-to-br from-rose-100 to-pink-200 flex items-center justify-center text-3xl">
+                  👗
+                </div>
+                <div class="mt-2">
+                  <p class="text-[11px] font-bold text-slate-900 truncate">Vestido Midi Floral</p>
+                  <div class="flex items-center justify-between mt-1">
+                    <span class="text-xs font-bold text-emerald-600">R$ 139,90</span>
+                    <span class="text-[9px] bg-slate-100 rounded px-1 text-slate-600">P · M · G</span>
+                  </div>
+                  <div class="mt-2 flex items-center justify-center rounded-lg bg-emerald-500 py-1 text-[10px] font-bold text-white shadow-sm">
+                    + Adicionar
+                  </div>
+                </div>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="rounded-xl bg-white p-2 border border-slate-200/70 shadow-sm">
+                <div class="h-28 w-full rounded-lg bg-gradient-to-br from-amber-100 to-yellow-200 flex items-center justify-center text-3xl">
+                  ✨
+                </div>
+                <div class="mt-2">
+                  <p class="text-[11px] font-bold text-slate-900 truncate">Conjunto Brinco Dourado</p>
+                  <div class="flex items-center justify-between mt-1">
+                    <span class="text-xs font-bold text-emerald-600">R$ 59,90</span>
+                    <span class="text-[9px] bg-slate-100 rounded px-1 text-slate-600">Semijoia</span>
+                  </div>
+                  <div class="mt-2 flex items-center justify-center rounded-lg bg-emerald-500 py-1 text-[10px] font-bold text-white shadow-sm">
+                    + Adicionar
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating WhatsApp Notification Badge (Direct Visual Proof) -->
+          <div class="absolute -bottom-6 -right-2 sm:-right-8 sm:-bottom-4 rounded-2xl border-2 border-emerald-500 bg-[#075e54] p-3.5 text-white shadow-2xl max-w-[280px] sm:max-w-xs animate-bounce">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400 text-xs font-bold text-slate-950">✓</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-200">WhatsApp Recebido!</span>
+            </div>
+            <p class="text-xs leading-snug">
+              <strong>🛍️ Novo Pedido:</strong><br/>
+              1x Vestido Midi (M) + 1x Brinco Dourado<br/>
+              <span class="text-emerald-300 font-bold">Total: R$ 199,80 (Pix)</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOCIAL PROOF METRICS BAR -->
+    <section class="border-y border-slate-200 bg-white py-6">
+      <div class="mx-auto max-w-5xl px-5">
+        <div class="grid grid-cols-2 gap-4 text-center md:grid-cols-4">
+          <div>
+            <p class="text-2xl font-extrabold text-slate-900">3 Minutos</p>
+            <p class="text-xs text-slate-500">para colocar sua loja no ar</p>
+          </div>
+          <div>
+            <p class="text-2xl font-extrabold text-emerald-600">R$ 0,00</p>
+            <p class="text-xs text-slate-500">para começar sem cartão</p>
+          </div>
+          <div>
+            <p class="text-2xl font-extrabold text-slate-900">+3 Horas</p>
+            <p class="text-xs text-slate-500">economizadas por dia</p>
+          </div>
+          <div>
+            <p class="text-2xl font-extrabold text-emerald-600">0% Taxa</p>
+            <p class="text-xs text-slate-500">sobre suas vendas</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: O ANTES vs DEPOIS (Dor x Alívio Imediato) -->
+    <section class="py-16 bg-slate-50/70">
+      <div class="mx-auto max-w-5xl px-5">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <span class="text-xs font-bold uppercase tracking-widest text-emerald-600">Transforme Sua Rotina</span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-950 mt-1">
+            Por que as empreendedoras estão trocando a bagunça pelo catálogo Zapia?
+          </h2>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <!-- O ANTES (A DOR) -->
+          <div class="rounded-3xl border border-rose-200 bg-rose-50/50 p-6 shadow-sm">
+            <div class="flex items-center gap-2 text-rose-600 font-bold text-sm mb-4">
+              <span class="flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-rose-600">✕</span>
+              <span>A rotina cansativa sem catálogo:</span>
+            </div>
+            <ul class="space-y-3.5 text-xs sm:text-sm text-slate-700">
+              <li class="flex items-start gap-2.5">
+                <span class="text-rose-500 font-bold">❌</span>
+                <span>Passar horas mandando 20 fotos uma a uma no WhatsApp e travando a memória do celular.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-rose-500 font-bold">❌</span>
+                <span>Responder a mesma coisa 50x por dia: <em>"Tem tamanho M?", "Qual o valor?", "Quais cores têm?"</em>.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-rose-500 font-bold">❌</span>
+                <span>Clientes desistem da compra porque você demorou 15 minutos para atender.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-rose-500 font-bold">❌</span>
+                <span>Anotar pedidos no papel e correr o risco de esquecer peças ou errar o valor.</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- O DEPOIS (O ALÍVIO) -->
+          <div class="rounded-3xl border-2 border-emerald-500 bg-white p-6 shadow-md relative">
+            <span class="absolute -top-3 right-6 rounded-full bg-emerald-500 px-3 py-0.5 text-[10px] font-extrabold uppercase text-white shadow-sm">
+              Mais Praticidade
+            </span>
+            <div class="flex items-center gap-2 text-emerald-700 font-bold text-sm mb-4">
+              <span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span>
+              <span>Com o Catálogo Zapia:</span>
+            </div>
+            <ul class="space-y-3.5 text-xs sm:text-sm text-slate-700">
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span><strong>Um único link na bio</strong> com todas as peças organizadas, fotos lindas e preços claros.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>A cliente navega sozinha, escolhe os tamanhos e monta a sacola sem você precisar digitar nada.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>O pedido chega no seu WhatsApp pronto para você receber o pagamento via Pix.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>Você passa uma imagem profissional e vende até quando estiver ocupada.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Mid-page CTA -->
+        <div class="text-center mt-10">
+          <a
+            href="/cadastrar"
+            class="cta-link inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 px-7 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-500/20 transition-all hover:scale-[1.02]"
+          >
+            Quero Economizar Tempo e Criar Meu Catálogo Grátis →
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: COMO FUNCIONA EM 3 PASSOS SIMPLES -->
+    <section class="py-16 bg-white">
+      <div class="mx-auto max-w-5xl px-5">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <span class="text-xs font-bold uppercase tracking-widest text-emerald-600">Simples de Verdade</span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-950 mt-1">
+            Veja como é fácil colocar sua loja no ar em 3 passos
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-2">Você não precisa de computador e nem entender de tecnologia.</p>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-3">
+          <!-- Passo 1 -->
+          <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 text-center hover:border-emerald-300 transition-all">
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 font-black text-lg mb-4">
+              1
+            </div>
+            <h3 class="text-base font-bold text-slate-900">Cadastre suas peças</h3>
+            <p class="mt-2 text-xs leading-relaxed text-slate-600">
+              Tire fotos pelo celular, coloque o valor e os tamanhos disponíveis (P, M, G). É super intuitivo.
+            </p>
+          </div>
+
+          <!-- Passo 2 -->
+          <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 text-center hover:border-emerald-300 transition-all">
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 font-black text-lg mb-4">
+              2
+            </div>
+            <h3 class="text-base font-bold text-slate-900">Divulgue seu link</h3>
+            <p class="mt-2 text-xs leading-relaxed text-slate-600">
+              Coloque o link exclusivo na bio do seu Instagram, nos Stories e no status do seu WhatsApp.
+            </p>
+          </div>
+
+          <!-- Passo 3 -->
+          <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 text-center hover:border-emerald-300 transition-all">
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 font-black text-lg mb-4">
+              3
+            </div>
+            <h3 class="text-base font-bold text-slate-900">Receba pedidos prontos</h3>
+            <p class="mt-2 text-xs leading-relaxed text-slate-600">
+              A cliente escolhe tudo, monta a sacola e o pedido chega mastigado no seu WhatsApp para você faturar.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: PROVA SOCIAL REAL (DEPOIMENTOS FEMININOS) -->
+    <section class="py-16 bg-[#0f172a] text-white">
+      <div class="mx-auto max-w-5xl px-5">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Quem Usa Recomenda</span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold mt-1">
+            Mulheres que transformaram suas vendas com a Zapia
+          </h2>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-3">
+          <!-- Depoimento 1 -->
+          <div class="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-lg">
+            <div class="flex items-center gap-1 text-amber-400 text-xs mb-3">
+              ★★★★★
+            </div>
+            <p class="text-xs leading-relaxed text-slate-300 italic">
+              "Eu perdia a tarde toda mandando fotos no WhatsApp. Hoje minhas clientes entram no link da bio, escolhem o que querem e já me mandam o pedido fechado. Vendi 40% a mais no primeiro mês!"
+            </p>
+            <div class="mt-4 flex items-center gap-3 border-t border-slate-800 pt-3">
+              <div class="h-9 w-9 rounded-full bg-rose-400 text-white font-bold text-xs flex items-center justify-center">
+                JC
+              </div>
+              <div>
+                <p class="text-xs font-bold text-white">Juliana Castro</p>
+                <p class="text-[10px] text-emerald-400">Loja de Roupas Femininas</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Depoimento 2 -->
+          <div class="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-lg">
+            <div class="flex items-center gap-1 text-amber-400 text-xs mb-3">
+              ★★★★★
+            </div>
+            <p class="text-xs leading-relaxed text-slate-300 italic">
+              "Minhas clientes elogiaram muito o visual do catálogo. É muito rápido no celular e passa uma imagem de loja grande e segura. Não fico mais sem!"
+            </p>
+            <div class="mt-4 flex items-center gap-3 border-t border-slate-800 pt-3">
+              <div class="h-9 w-9 rounded-full bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center">
+                CR
+              </div>
+              <div>
+                <p class="text-xs font-bold text-white">Camila Ribeiro</p>
+                <p class="text-[10px] text-emerald-400">Semijoias e Acessórios</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Depoimento 3 -->
+          <div class="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-lg">
+            <div class="flex items-center gap-1 text-amber-400 text-xs mb-3">
+              ★★★★★
+            </div>
+            <p class="text-xs leading-relaxed text-slate-300 italic">
+              "Gero o catálogo em PDF com 1 clique para mandar no grupo de clientes fiéis e é um sucesso. A facilidade para cadastrar produtos no celular é maravilhosa."
+            </p>
+            <div class="mt-4 flex items-center gap-3 border-t border-slate-800 pt-3">
+              <div class="h-9 w-9 rounded-full bg-purple-400 text-white font-bold text-xs flex items-center justify-center">
+                BM
+              </div>
+              <div>
+                <p class="text-xs font-bold text-white">Beatriz Mendes</p>
+                <p class="text-[10px] text-emerald-400">Doceria Gourmet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: QUEBRA DE OBJEÇÕES (FAQ CRO) -->
+    <section class="py-16 bg-white">
+      <div class="mx-auto max-w-3xl px-5">
+        <div class="text-center mb-12">
+          <span class="text-xs font-bold uppercase tracking-widest text-emerald-600">Tire Suas Dúvidas</span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-950 mt-1">
+            Perguntas Frequentes
+          </h2>
+        </div>
+
+        <div class="space-y-4">
+          <!-- FAQ 1 -->
+          <details class="group rounded-2xl border border-slate-200 bg-slate-50/60 p-4 transition-all [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between font-bold text-sm text-slate-900">
+              <span>Preciso de computador para criar ou mexer no catálogo?</span>
+              <span class="transition duration-300 group-open:-rotate-180 text-emerald-600">▼</span>
+            </summary>
+            <p class="mt-3 text-xs leading-relaxed text-slate-600">
+              Não! O Zapia foi feito para você fazer 100% pelo celular. Você tira a foto na hora, cadastra a peça e já compartilha o link em menos de 3 minutos.
+            </p>
+          </details>
+
+          <!-- FAQ 2 -->
+          <details class="group rounded-2xl border border-slate-200 bg-slate-50/60 p-4 transition-all [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between font-bold text-sm text-slate-900">
+              <span>Preciso cadastrar cartão de crédito para testar?</span>
+              <span class="transition duration-300 group-open:-rotate-180 text-emerald-600">▼</span>
+            </summary>
+            <p class="mt-3 text-xs leading-relaxed text-slate-600">
+              Não! O cadastro é totalmente gratuito e não pedimos nenhum dado de cartão de crédito. Você testa com tranquilidade.
+            </p>
+          </details>
+
+          <!-- FAQ 3 -->
+          <details class="group rounded-2xl border border-slate-200 bg-slate-50/60 p-4 transition-all [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between font-bold text-sm text-slate-900">
+              <span>A Zapia cobra porcentagem ou comissão sobre minhas vendas?</span>
+              <span class="transition duration-300 group-open:-rotate-180 text-emerald-600">▼</span>
+            </summary>
+            <p class="mt-3 text-xs leading-relaxed text-slate-600">
+              Zero comissão! Todo o dinheiro das suas vendas vai 100% direto para a sua conta bancária via Pix ou como você combinar com sua cliente.
+            </p>
+          </details>
+
+          <!-- FAQ 4 -->
+          <details class="group rounded-2xl border border-slate-200 bg-slate-50/60 p-4 transition-all [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between font-bold text-sm text-slate-900">
+              <span>Consigo colocar meu link na bio do Instagram?</span>
+              <span class="transition duration-300 group-open:-rotate-180 text-emerald-600">▼</span>
+            </summary>
+            <p class="mt-3 text-xs leading-relaxed text-slate-600">
+              Sim! Você recebe um endereço exclusivo (ex: <code>zapia.app/sualoja</code>) pronto para colar na bio do seu Instagram, nos destaques e nos Stories.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: FINAL CONVERSION PUSH -->
+    <section class="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 py-16 text-center text-white px-5">
+      <div class="mx-auto max-w-2xl">
+        <h2 class="text-3xl font-extrabold sm:text-4xl leading-tight">
+          Sua loja merece um catálogo lindo e profissional hoje mesmo.
+        </h2>
+        <p class="mt-3 text-sm text-emerald-100 max-w-lg mx-auto">
+          Economize horas do seu dia e faça suas clientes se encantarem pelos seus produtos. Crie agora em menos de 3 minutos!
+        </p>
+
+        <div class="mt-8">
+          <a
+            href="/cadastrar"
+            id="final-cta-button"
+            class="cta-link inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-white hover:bg-slate-100 text-emerald-700 px-8 py-4 text-base font-extrabold shadow-2xl transition-all duration-200 hover:scale-[1.03]"
+          >
+            CRIAR MEU CATÁLOGO GRÁTIS →
+          </a>
+          <p class="mt-3 text-[11px] text-emerald-200 font-medium">
+            🔒 Sem compromisso · Sem cartão · Cancele quando quiser
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER MINIMAL (Zero distracting links) -->
+    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500">
+      <p>© 2026 Zapia — Catálogo Digital para WhatsApp. Todos os direitos reservados.</p>
+      <div class="mt-2 flex justify-center gap-4 text-[11px]">
+        <a href="/termos-de-uso" class="hover:underline">Termos de Uso</a>
+        <span>·</span>
+        <a href="/privacidade" class="hover:underline">Política de Privacidade</a>
+      </div>
+    </footer>
+
+    <!-- STICKY MOBILE CTA BAR (Captura de rolagem) -->
+    <div
+      id="sticky-mobile-cta"
+      class="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 shadow-2xl transition-transform duration-300 translate-y-full md:hidden"
+    >
+      <div class="flex items-center justify-between gap-3 max-w-md mx-auto">
+        <div class="leading-tight">
+          <p class="text-xs font-bold text-slate-900">Catálogo Digital Grátis</p>
+          <p class="text-[10px] text-emerald-600 font-semibold">Sem cartão · Em 3 min</p>
+        </div>
+        <a
+          href="/cadastrar"
+          id="sticky-cta-button"
+          class="cta-link flex-1 text-center rounded-xl bg-emerald-500 text-white font-extrabold text-xs py-3 px-4 shadow-md shadow-emerald-500/25 active:scale-95"
+        >
+          Criar Agora →
+        </a>
+      </div>
+    </div>
+
+    <!-- SCRIPT DE OTIMIZAÇÃO CRO & UTM PRESERVATION -->
+    <script>
+      // 1. Preserva UTMs e parâmetros de tráfego pago nos botões de CTA
+      document.addEventListener("DOMContentLoaded", function () {
+        const currentUrlParams = new URLSearchParams(window.location.search);
+        const utmString = currentUrlParams.toString();
+
+        if (utmString) {
+          document.querySelectorAll("a.cta-link").forEach(function (link) {
+            const baseUrl = link.getAttribute("href");
+            if (baseUrl && baseUrl.startsWith("/")) {
+              link.setAttribute(
+                "href",
+                baseUrl + (baseUrl.includes("?") ? "&" : "?") + utmString
+              );
+            }
+          });
+        }
+
+        // 2. Rastreamento de clique nos CTAs para GTM / Meta Pixel
+        document.querySelectorAll("a.cta-link").forEach(function (link) {
+          link.addEventListener("click", function () {
+            gtagTrack("lead_cta_click", "conversion", link.id || "cta_signup");
+          });
+        });
+
+        // 3. Controle da barra Sticky Mobile no scroll
+        const stickyBar = document.getElementById("sticky-mobile-cta");
+        window.addEventListener("scroll", function () {
+          if (window.scrollY > 350) {
+            stickyBar.classList.remove("translate-y-full");
+          } else {
+            stickyBar.classList.add("translate-y-full");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
