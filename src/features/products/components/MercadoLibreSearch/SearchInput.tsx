@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Search01Icon, BarCode02Icon } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
@@ -23,14 +23,11 @@ export function SearchInput({
   const [raw, setRaw] = useState(initialValue)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // When a barcode is scanned externally, the parent sets initialValue. Sync it.
-  useEffect(() => {
-    if (initialValue && initialValue !== raw) {
-      setRaw(initialValue)
-      onDebouncedChange(initialValue)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialValue])
+  const [prevInitial, setPrevInitial] = useState(initialValue)
+  if (initialValue !== prevInitial) {
+    setPrevInitial(initialValue)
+    setRaw(initialValue)
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value

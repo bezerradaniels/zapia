@@ -49,9 +49,7 @@ export async function getStoreCatalogStatus(
   storeId: string,
 ): Promise<StoreCatalogStatus | null> {
   const supabase = createBrowserClient()
-  // @ts-ignore - Database types not available
   const { data, error } = await supabase
-    // @ts-ignore - Database types not available
     .rpc('store_catalog_status', { target_store: storeId })
     .maybeSingle()
 

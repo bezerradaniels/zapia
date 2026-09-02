@@ -1,5 +1,5 @@
 import { ResultCard } from './ResultCard'
-import type { MlProductResult } from '../../types'
+import type { MlProductResult } from '@/features/products/types'
 
 interface Props {
   results: MlProductResult[]
@@ -23,8 +23,7 @@ export function ResultsGrid({
       <div className="flex flex-col gap-2">
         {Array.from({ length: 3 }).map((_, i) => (
           <div
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
+            key={`ml-skeleton-${i}`}
             className="h-24 animate-pulse rounded-lg border bg-muted"
           />
         ))}

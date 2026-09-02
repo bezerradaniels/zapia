@@ -99,7 +99,7 @@ export function ProductCard({
               ) : (
                 <span className="text-[16px] font-extrabold leading-none text-z-ink">
                   <span className="text-[12px]">R$&nbsp;</span>
-                  {formatMoney(finalPrice).replace(/^R\$[\s ]+/, '')}
+                  {formatMoney(finalPrice).replace(/^R\$[\s\u00A0]+/, '')}
                 </span>
               )}
               {hasPromo && (

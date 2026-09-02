@@ -23,10 +23,8 @@ export async function createCoupon(
   input: UpsertCouponInput,
 ): Promise<StoreCoupon> {
   const supabase = createBrowserClient()
-  // @ts-ignore - Database types not available
   const { data, error } = await supabase
     .from('store_coupons')
-    // @ts-ignore - Database types not available
     .insert({
       store_id: storeId,
       code: normalizeCode(input.code),
@@ -67,11 +65,9 @@ export async function updateCoupon(
   if (input.custom_url !== undefined)
     payload.custom_url = input.custom_url ? input.custom_url.trim().toLowerCase() : null
 
-  // @ts-ignore - Database types not available
   const { data, error } = await supabase
     .from('store_coupons')
-    // @ts-ignore - Database types not available
-    .update(payload)
+    .update(payload as never)
     .eq('id', id)
     .select('*')
     .single()
@@ -89,7 +85,6 @@ export async function deleteCoupon(id: string): Promise<void> {
 /** Bumps `used_count` atomically via RPC. Safe to call from anon. */
 export async function recordCouponUsage(couponId: string): Promise<void> {
   const supabase = createBrowserClient()
-  // @ts-ignore - Database types not available
   const { error } = await supabase.rpc('record_coupon_usage', {
     target_coupon: couponId,
   })

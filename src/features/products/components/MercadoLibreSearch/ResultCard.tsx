@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Download02Icon, ExternalLink, Package01Icon } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
-import type { MlProductResult } from '../../types'
+import type { MlProductResult } from '@/features/products/types'
 
 interface Props {
   result: MlProductResult

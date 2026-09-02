@@ -20,9 +20,9 @@ import { Cancel01Icon, InformationCircleIcon } from '@hugeicons/core-free-icons'
 import { SearchInput } from './SearchInput'
 import { BarcodeScanner } from './BarcodeScanner'
 import { ResultsGrid } from './ResultsGrid'
-import { useMercadoLibreSearch } from '../../hooks/useMercadoLibreSearch'
-import { useMercadoLibreImport } from '../../hooks/useMercadoLibreImport'
-import type { MlImportPayload, MlProductResult } from '../../types'
+import { useMercadoLibreSearch } from '@/features/products/hooks/useMercadoLibreSearch'
+import { useMercadoLibreImport } from '@/features/products/hooks/useMercadoLibreImport'
+import type { MlImportPayload, MlProductResult } from '@/features/products/types'
 
 interface Props {
   storeId: string

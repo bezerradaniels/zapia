@@ -20,10 +20,8 @@ export async function createStore(input: CreateStoreInput): Promise<Store> {
 
   const defaultGtmId = import.meta.env.VITE_DEFAULT_GTM_ID ?? null
 
-  // @ts-ignore - Database types not available
   const { data, error } = await supabase
     .from('stores')
-    // @ts-ignore - Database types not available
     .insert({
       name: input.name,
       slug: input.slug,
@@ -85,10 +83,8 @@ export async function updateStore(
     tiktok: input.social_tiktok?.trim() || undefined,
   }
 
-  // @ts-ignore - Database types not available
   const { data, error } = await supabase
     .from('stores')
-    // @ts-ignore - Database types not available
     .update({
       name: input.name,
       primary_color: input.primary_color,
@@ -120,7 +116,7 @@ export async function updateStore(
       delivery_area_scope: input.delivery_area_scope ?? 'city_only',
       delivery_area_custom_locations: input.delivery_area_custom_locations ?? [],
       custom_links: input.custom_links ?? [],
-      gallery_images: (input.gallery_images ?? []) as any,
+      gallery_images: input.gallery_images ?? [],
       social_links,
       about_us: input.about_us?.trim() || null,
       age_restricted: input.age_restricted ?? false,
@@ -152,8 +148,7 @@ export async function patchStore(
   patch: Record<string, unknown>,
 ): Promise<void> {
   const supabase = createBrowserClient()
-  // @ts-ignore - Database types not available
-  const { error } = await supabase.from('stores').update(patch).eq('id', storeId)
+  const { error } = await supabase.from('stores').update(patch as never).eq('id', storeId)
   if (error) throw error
 }
 

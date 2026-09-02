@@ -22,7 +22,6 @@ export function CookieConsentBanner() {
   const [visible, setVisible] = useState(() => shouldShowCookieBanner())
 
   useEffect(() => {
-    setVisible(shouldShowCookieBanner())
     const openPreferences = () => setVisible(true)
     window.addEventListener('zapia:cookie-consent-open', openPreferences)
     return () => {

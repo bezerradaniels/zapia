@@ -53,7 +53,6 @@ export async function createOrder(
   input: CreateOrderInput,
 ): Promise<OrderWithItems> {
   const supabase = createBrowserClient();
-  // @ts-ignore - Database types not available
   const { data, error } = await supabase.rpc("create_catalog_order", {
     p_store_id: input.storeId,
     p_customer_name: input.customerName.trim(),
@@ -109,10 +108,8 @@ export async function createManualOrder(
     coupon_id: null,
   };
 
-  // @ts-ignore - Database types not available
   const { data: order, error: orderError } = await supabase
     .from("orders")
-    // @ts-ignore - Database types not available
     .insert(orderPayload)
     .select("*")
     .single();
@@ -121,7 +118,6 @@ export async function createManualOrder(
     throw orderError ?? new Error("Failed to create order");
 
   const rows = input.items.map((i) => ({
-    // @ts-ignore - Database types not available
     order_id: order.id,
     product_id: i.productId,
     product_name: i.productName,
@@ -129,10 +125,8 @@ export async function createManualOrder(
     quantity: i.quantity,
   }));
 
-  // @ts-ignore - Database types not available
   const { data: items, error: itemsError } = await supabase
     .from("order_items")
-    // @ts-ignore - Database types not available
     .insert(rows)
     .select("*");
 
@@ -146,10 +140,8 @@ export async function updateOrderStatus(
   status: Order["status"],
 ): Promise<Order> {
   const supabase = createBrowserClient();
-  // @ts-ignore - Database types not available
   const { data, error } = await supabase
     .from("orders")
-    // @ts-ignore - Database types not available
     .update({ status })
     .eq("id", id)
     .select("*")
