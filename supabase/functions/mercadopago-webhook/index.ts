@@ -38,9 +38,12 @@ serve(async (req) => {
     });
   }
 
-  const mpAccessToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
+  const mpAccessToken =
+    Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") ||
+    Deno.env.get("MERCADOPAGO_ACCESS_TOKEN") ||
+    Deno.env.get("MP_ACCESS_TOKEN");
   if (!mpAccessToken) {
-    console.error("MERCADO_PAGO_ACCESS_TOKEN not configured");
+    console.error("MERCADO_PAGO_ACCESS_TOKEN not configured in Supabase secrets");
     return new Response("Missing secret", { status: 500 });
   }
 

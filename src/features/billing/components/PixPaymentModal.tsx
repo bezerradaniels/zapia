@@ -35,31 +35,51 @@ export function PixPaymentModal({
   const [isApproved, setIsApproved] = useState(false);
   const subscription = useSubscription(storeId);
 
-  // Check if subscription becomes active
+  // Reset approved state when modal opens or pixData changes
   useEffect(() => {
-    if (subscription.data?.status === "active" && !isLoading && pixData) {
-      setIsApproved(true);
-      if (onSuccess) onSuccess();
-    }
-  }, [subscription.data?.status, isLoading, pixData, onSuccess]);
+    setIsApproved(false);
+  }, [open, pixData?.mpPaymentId]);
 
-  // Realtime subscription listener
+  // Realtime & polling listener for payment completion
   useEffect(() => {
-    if (!open || !storeId) return;
+    if (!open || !storeId || !pixData || isApproved) return;
 
     const supabase = createBrowserClient();
+
+    // Check periodically if the invoice was marked as paid
+    const pollInterval = setInterval(async () => {
+      if (pixData.invoiceId) {
+        const { data: inv } = await supabase
+          .from("invoices")
+          .select("status")
+          .eq("id", pixData.invoiceId)
+          .maybeSingle();
+
+        if (inv?.status === "paid") {
+          setIsApproved(true);
+          subscription.refetch();
+          if (onSuccess) onSuccess();
+        }
+      }
+    }, 4000);
+
+    // Realtime invoice listener
     const channel = supabase
-      .channel(`subscription-pix-${storeId}`)
+      .channel(`invoice-pix-${storeId}`)
       .on(
         "postgres_changes",
         {
           event: "UPDATE",
           schema: "public",
-          table: "subscriptions",
+          table: "invoices",
           filter: `store_id=eq.${storeId}`,
         },
         (payload: any) => {
-          if (payload.new?.status === "active") {
+          if (
+            (payload.new?.id === pixData.invoiceId ||
+              payload.new?.mp_payment_id === pixData.mpPaymentId) &&
+            payload.new?.status === "paid"
+          ) {
             setIsApproved(true);
             subscription.refetch();
             if (onSuccess) onSuccess();
@@ -69,9 +89,10 @@ export function PixPaymentModal({
       .subscribe();
 
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
-  }, [open, storeId, subscription, onSuccess]);
+  }, [open, storeId, pixData, isApproved, subscription, onSuccess]);
 
   if (!open) return null;
 

@@ -43,12 +43,15 @@ serve(async (req) => {
       billingPeriod === "annual" ? planInfo.annual : planInfo.monthly;
     const transactionAmount = amountInCents / 100;
 
-    const mpAccessToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
+    const mpAccessToken =
+      Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") ||
+      Deno.env.get("MERCADOPAGO_ACCESS_TOKEN") ||
+      Deno.env.get("MP_ACCESS_TOKEN");
     if (!mpAccessToken) {
       return jsonResponse(
         {
           error: "missing_secret",
-          detail: "MERCADO_PAGO_ACCESS_TOKEN não configurado no servidor",
+          detail: "MERCADO_PAGO_ACCESS_TOKEN não configurado nas variáveis do Supabase",
         },
         { status: 500, req },
       );
