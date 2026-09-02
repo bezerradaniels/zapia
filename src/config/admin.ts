@@ -1,4 +1,7 @@
-export const ADMIN_EMAILS = ["manager@zapia.app"] as const;
+export const ADMIN_EMAILS = [
+  "daniel.ddsb@gmail.com",
+  "manager@zapia.app",
+] as const;
 
 export const PRIMARY_ADMIN_EMAIL = ADMIN_EMAILS[0];
 
