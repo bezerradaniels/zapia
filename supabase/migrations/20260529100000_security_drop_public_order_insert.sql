@@ -18,5 +18,5 @@ drop policy if exists "order_items_public_insert" on public.order_items;
 
 -- These helpers were only used by the dropped public policies. Revoke anon/authenticated
 -- execute so the now-unused functions are not callable from the client.
-revoke execute on function public.can_insert_catalog_order(uuid) from anon, authenticated;
-revoke execute on function public.can_insert_catalog_order_item(uuid) from anon, authenticated;
+drop function if exists private.can_insert_catalog_order(uuid);
+drop function if exists private.can_insert_catalog_order_item(uuid);
