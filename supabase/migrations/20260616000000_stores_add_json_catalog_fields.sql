@@ -6,3 +6,5 @@ ALTER TABLE public.stores
   ADD COLUMN IF NOT EXISTS delivery_hours  jsonb NOT NULL DEFAULT '[]'::jsonb,
   ADD COLUMN IF NOT EXISTS custom_links    jsonb NOT NULL DEFAULT '[]'::jsonb,
   ADD COLUMN IF NOT EXISTS gallery_images  jsonb NOT NULL DEFAULT '[]'::jsonb;
+
+grant select (delivery_hours, custom_links, gallery_images) on public.stores to anon, authenticated;
