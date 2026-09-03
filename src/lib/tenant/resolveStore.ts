@@ -6,6 +6,7 @@ const RESERVED_SUBDOMAINS = new Set([
   "staging",
   "admin",
   "site",
+  "gestao",
   "api",
   "mail",
 ]);
@@ -18,13 +19,19 @@ const RESERVED_PATHS = new Set([
   "recuperar-senha",
   "nova-loja",
   "dashboard",
+  "admin",
 ]);
 
 export function isAdminDomain(): boolean {
   const { hostname } = window.location;
-  if (hostname === "localhost" || hostname === "127.0.0.1") return false;
-  if (hostname === "admin.localhost" || hostname === "app.localhost") return true;
-  return hostname === `admin.${ROOT_DOMAIN}` || hostname === `app.${ROOT_DOMAIN}`;
+  if (hostname === "admin.localhost") return true;
+  return hostname === `admin.${ROOT_DOMAIN}`;
+}
+
+export function isGestaoDomain(): boolean {
+  const { hostname } = window.location;
+  if (hostname === "gestao.localhost" || hostname === "app.localhost") return true;
+  return hostname === `gestao.${ROOT_DOMAIN}` || hostname === `app.${ROOT_DOMAIN}`;
 }
 
 export function isSiteDomain(): boolean {
@@ -36,7 +43,7 @@ export function isSiteDomain(): boolean {
 export function isStoreDomain(): boolean {
   const { hostname } = window.location;
   if (hostname === "localhost" || hostname === "127.0.0.1") return false;
-  if (isAdminDomain() || isSiteDomain()) return false;
+  if (isAdminDomain() || isGestaoDomain() || isSiteDomain()) return false;
   if (hostname.endsWith(".localhost")) {
     const sub = hostname.slice(0, hostname.length - ".localhost".length);
     return !!sub && !RESERVED_SUBDOMAINS.has(sub);

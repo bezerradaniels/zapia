@@ -7,7 +7,7 @@ import { RequireGuest } from "@/components/RequireGuest";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { PageTracker } from "@/hooks/usePageTracking";
 import { ROUTES } from "@/config/routes";
-import { isStoreDomain, isAdminDomain } from "@/lib/tenant/resolveStore";
+import { isStoreDomain, isAdminDomain, isGestaoDomain } from "@/lib/tenant/resolveStore";
 
 // All routes are lazy-loaded so the dashboard pages (which pull in
 // react-hook-form + zod) never land in the initial bundle served to public
@@ -162,6 +162,7 @@ function AppRoutes() {
   if (isStoreDomain()) return <StoreRoutes />;
 
   const isAdmin = isAdminDomain();
+  const isGestao = isGestaoDomain();
 
   return (
     <Routes>
@@ -169,6 +170,8 @@ function AppRoutes() {
         path={ROUTES.home}
         element={
           isAdmin ? (
+            <Navigate to={ROUTES.admin} replace />
+          ) : isGestao ? (
             <Navigate to={ROUTES.dashboard} replace />
           ) : (
             <AppProviders>
