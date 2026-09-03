@@ -5,9 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:site && tsc -b && vite build && cp public/.htaccess public/index.php dist/ && cp -r site dist/site",
-    "build:site": "tailwindcss -i ./site/src/style/style.css -o ./site/src/style/output.css --minify",
-    "package:site": "npm run build:site && (cd site && zip -r ../site-deploy.zip . -x '*.DS_Store')",
+    "build": "npm run build:marketing && tsc -b && vite build && cp dist/index.html dist/app.html && cp marketing/index.html dist/home.html && cp marketing/termos.html dist/termos.html && cp marketing/privacidade.html dist/privacidade.html && mkdir -p dist/styles dist/img && cp -r marketing/styles/* dist/styles/ && cp -r marketing/img/* dist/img/ && cp public/.htaccess public/index.php dist/",
+    "build:marketing": "npx @tailwindcss/cli -i ./marketing/style.css -o ./marketing/styles/main.css --minify",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",

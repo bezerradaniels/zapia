@@ -1,13 +1,13 @@
 <?php
 /**
- * Zapia Routing Gateway
+ * Zapia Universal Gateway & Routing Engine
  *
- * Domain topology:
- * - admin.zapia.app: Platform Super Admin (React SPA)
- * - painel.zapia.app: Merchant App (React SPA)
- * - zapia.app / www.zapia.app: Pure HTML Marketing Site & LPs (served from /site/)
+ * Decoupled Domain Topology:
+ * - zapia.app / www.zapia.app: Static Marketing Site (home.html, termos.html, privacidade.html)
+ * - painel.zapia.app: Merchant Platform (app.html / React SPA)
+ * - admin.zapia.app: Platform Super Admin (app.html / React SPA)
+ * - [loja].zapia.app: Storefronts & Checkout (app.html / React SPA)
  * - site.zapia.app: 301 redirect to zapia.app
- * - [storeSlug].zapia.app: Store Catalogs (React SPA)
  */
 
 $rawHost = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
@@ -24,7 +24,7 @@ if ($host === 'site.zapia.app') {
     exit;
 }
 
-// Helper to serve a static file with correct MIME type
+// Helper to serve a static file with correct MIME type and caching headers
 function serveFile($filePath) {
     if (!is_file($filePath)) {
         return false;
@@ -48,40 +48,47 @@ function serveFile($filePath) {
         'woff' => 'font/woff',
         'ttf'  => 'font/ttf',
     ];
-    header('Content-Type: ' . ($types[$ext] ?? 'application/octet-stream'));
+
+    $mime = $types[$ext] ?? 'application/octet-stream';
+    header('Content-Type: ' . $mime);
+
+    // Cache headers for static immutable assets
+    if (in_array($ext, ['css', 'js', 'svg', 'png', 'jpg', 'jpeg', 'webp', 'woff2', 'ico'])) {
+        header('Cache-Control: public, max-age=31536000, immutable');
+    } else {
+        header('Cache-Control: public, max-age=3600');
+    }
+
     readfile($filePath);
     exit;
 }
 
-// 2. Global Asset Interceptor (handles any /assets/... regardless of prefix e.g. /admin/assets/...)
+// 2. Global Asset Interceptor (/assets/*, /styles/*, /img/*, /logos/*, favicon, robots, sitemap, llms)
 if (preg_match('#/assets/(.+)$#', $path, $matches)) {
     $assetFile = __DIR__ . '/assets/' . $matches[1];
     if (serveFile($assetFile)) exit;
 }
 
-// If direct physical static file exists on disk (excluding PHP and root index.html), serve it
 if (is_file(__DIR__ . $path) && !preg_match('#\.(php|html)$#', $path)) {
     serveFile(__DIR__ . $path);
 }
 
-// 3. ADMIN DOMAIN (admin.zapia.app / admin.localhost)
-// Bulletproof: NEVER issue a redirect to admin if already on admin
+// 3. ADMIN & PAINEL DOMAINS (admin.zapia.app / painel.zapia.app / gestao.zapia.app) -> React SPA
 if (strpos($host, 'admin.') === 0 || $host === 'admin.localhost') {
-    serveFile(__DIR__ . '/index.html');
+    serveFile(is_file(__DIR__ . '/app.html') ? __DIR__ . '/app.html' : __DIR__ . '/index.html');
 }
 
-// 4. PAINEL DOMAIN (painel.zapia.app / gestao.zapia.app / app.zapia.app)
-// Bulletproof: NEVER issue a redirect to painel if already on painel
 if (strpos($host, 'painel.') === 0 || strpos($host, 'gestao.') === 0 || strpos($host, 'app.') === 0 || $host === 'painel.localhost') {
-    serveFile(__DIR__ . '/index.html');
+    serveFile(is_file(__DIR__ . '/app.html') ? __DIR__ . '/app.html' : __DIR__ . '/index.html');
 }
 
-// 5. ROOT DOMAIN (zapia.app / www.zapia.app) - Pure HTML Marketing Site
+// 4. ROOT DOMAIN (zapia.app / www.zapia.app)
 $cleanPath = rtrim($path, '/');
 if ($cleanPath === '') {
     $cleanPath = '/';
 }
 
+// Forward merchant auth/app routes to painel.zapia.app
 $merchantPrefixes = [
     '/entrar',
     '/cadastrar',
@@ -104,36 +111,22 @@ if ($cleanPath === '/admin' || strpos($cleanPath, '/admin/') === 0) {
     exit;
 }
 
-// Static site assets (/src/... or /site/src/...)
-if (strpos($cleanPath, '/site/src/') === 0) {
-    $rel = substr($cleanPath, strlen('/site/src/'));
-    $target = __DIR__ . '/site/src/' . $rel;
-    if (serveFile($target)) exit;
-}
-if (strpos($cleanPath, '/src/') === 0) {
-    $rel = substr($cleanPath, strlen('/src/'));
-    $target = __DIR__ . '/site/src/' . $rel;
-    if (serveFile($target)) exit;
-}
-
-// Static HTML pages from site/
-if ($cleanPath === '/' || $cleanPath === '/index.html') {
-    serveFile(__DIR__ . '/site/index.html');
+// Serve Static Marketing HTML Pages directly
+if ($cleanPath === '/' || $cleanPath === '/index.html' || $cleanPath === '/home.html') {
+    if (serveFile(__DIR__ . '/home.html')) exit;
+    if (serveFile(__DIR__ . '/index.html')) exit;
 }
 if ($cleanPath === '/termos' || $cleanPath === '/termos.html' || $cleanPath === '/termos-de-uso') {
-    serveFile(__DIR__ . '/site/termos.html');
+    serveFile(__DIR__ . '/termos.html');
 }
 if ($cleanPath === '/privacidade' || $cleanPath === '/privacidade.html') {
-    serveFile(__DIR__ . '/site/privacidade.html');
+    serveFile(__DIR__ . '/privacidade.html');
 }
 
-// Root static files (logos, lp, experimente-gratis, robots, sitemap, favicon)
+// Direct static file match
 if (is_file(__DIR__ . $cleanPath)) {
     serveFile(__DIR__ . $cleanPath);
 }
-if (is_file(__DIR__ . $cleanPath . '/index.html')) {
-    serveFile(__DIR__ . $cleanPath . '/index.html');
-}
 
-// Default: Store slugs (e.g. zapia.app/minhaloja) and Tenant subdomains -> React SPA
-serveFile(__DIR__ . '/index.html');
+// Default Fallback for Store Slugs (e.g. zapia.app/minhaloja) and Tenant Subdomains -> React SPA
+serveFile(is_file(__DIR__ . '/app.html') ? __DIR__ . '/app.html' : __DIR__ . '/index.html');

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR" class="scroll-smooth bg-[#fafafa]">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +9,8 @@
       content="Crie seu catálogo digital online em 3 minutos. Compartilhe o link na bio do Instagram e receba pedidos organizados direto no seu WhatsApp. Comece grátis sem cartão!"
     />
     <link rel="canonical" href="https://zapia.app/" />
-    <link rel="icon" type="image/svg+xml" href="/site/src/img/favicon/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/img/favicon/favicon.svg" />
+    <meta name="view-transition" content="same-origin" />
 
     <!-- OpenGraph / Social Share -->
     <meta property="og:type" content="website" />
@@ -19,21 +20,25 @@
       property="og:description"
       content="Pare de mandar fotos uma a uma. Crie sua vitrine online, coloque o link na bio e receba pedidos montados no WhatsApp."
     />
-    <meta property="og:image" content="https://zapia.app/src/img/logo/zapia-logo.svg" />
+    <meta property="og:image" content="https://zapia.app/img/logo/zapia-logo.svg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Zapia — Catálogo Digital para WhatsApp" />
     <meta name="twitter:description" content="Seu catálogo online no ar em 3 minutos. Venda pelo WhatsApp de forma profissional." />
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-
     <!-- Compiled Tailwind CSS v4 Stylesheet -->
-    <link rel="stylesheet" href="/site/src/style/output.css" />
+    <link rel="stylesheet" href="/styles/main.css" />
+
+    <!-- Speculation Rules API for Instant Prerendering -->
+    <script type="speculationrules">
+      {
+        "prerender": [
+          {
+            "source": "list",
+            "urls": ["/termos.html", "/privacidade.html"]
+          }
+        ]
+      }
+    </script>
 
     <!-- Structured Data (JSON-LD) for SEO / AEO / GEO -->
     <script type="application/ld+json">
@@ -45,7 +50,7 @@
             "@id": "https://zapia.app/#organization",
             "name": "Zapia",
             "url": "https://zapia.app",
-            "logo": "https://zapia.app/src/img/logo/zapia-logo.svg",
+            "logo": "https://zapia.app/img/logo/zapia-logo.svg",
             "description": "Plataforma SaaS brasileira de catálogo digital e pedidos via WhatsApp para comércio local e lojistas.",
             "sameAs": [
               "https://www.instagram.com/zapia.app"
@@ -101,7 +106,7 @@
       <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <!-- Logo -->
         <a href="/" class="flex items-center gap-2.5">
-          <img src="/site/src/img/logo/zapia-logo.svg" alt="Zapia" class="h-8 w-auto" />
+          <img src="/img/logo/zapia-logo.svg" alt="Zapia" class="h-8 w-auto" />
         </a>
 
         <!-- Navigation Links -->
@@ -247,7 +252,6 @@
         </div>
 
         <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <!-- Card 1 -->
           <div class="rounded-2xl border border-slate-200 p-6 hover:border-emerald-300 hover:shadow-md transition-all">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 text-xl font-bold mb-4">
               🛍️
@@ -258,7 +262,6 @@
             </p>
           </div>
 
-          <!-- Card 2 -->
           <div class="rounded-2xl border border-slate-200 p-6 hover:border-emerald-300 hover:shadow-md transition-all">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 text-xl font-bold mb-4">
               👥
@@ -269,7 +272,6 @@
             </p>
           </div>
 
-          <!-- Card 3 -->
           <div class="rounded-2xl border border-slate-200 p-6 hover:border-emerald-300 hover:shadow-md transition-all">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 text-xl font-bold mb-4">
               📄
@@ -280,7 +282,6 @@
             </p>
           </div>
 
-          <!-- Card 4 -->
           <div class="rounded-2xl border border-slate-200 p-6 hover:border-emerald-300 hover:shadow-md transition-all">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 text-xl font-bold mb-4">
               🎟️
@@ -291,7 +292,6 @@
             </p>
           </div>
 
-          <!-- Card 5 -->
           <div class="rounded-2xl border border-slate-200 p-6 hover:border-emerald-300 hover:shadow-md transition-all">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 text-xl font-bold mb-4">
               ⚡
@@ -302,7 +302,6 @@
             </p>
           </div>
 
-          <!-- Card 6 -->
           <div class="rounded-2xl border border-slate-200 p-6 hover:border-emerald-300 hover:shadow-md transition-all">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 text-xl font-bold mb-4">
               📱
@@ -535,7 +534,7 @@
     <footer class="border-t border-slate-200 bg-white py-12 text-sm text-slate-500">
       <div class="mx-auto max-w-6xl px-6 flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-2">
-          <img src="/site/src/img/logo/zapia-logo.svg" alt="Zapia" class="h-6 w-auto" />
+          <img src="/img/logo/zapia-logo.svg" alt="Zapia" class="h-6 w-auto" />
           <span class="text-xs">© 2026 Zapia — Todos os direitos reservados.</span>
         </div>
 

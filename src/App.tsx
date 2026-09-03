@@ -7,19 +7,15 @@ import { RequireGuest } from "@/components/RequireGuest";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { PageTracker } from "@/hooks/usePageTracking";
 import { ROUTES } from "@/config/routes";
-import { isStoreDomain, isAdminDomain, isGestaoDomain } from "@/lib/tenant/resolveStore";
+import { isStoreDomain, isAdminDomain } from "@/lib/tenant/resolveStore";
 
 // All routes are lazy-loaded so the dashboard pages (which pull in
 // react-hook-form + zod) never land in the initial bundle served to public
 // catalog / landing visitors. The top-level <Suspense> below covers them.
-import LandingPage from "@/routes/marketing/LandingPage";
 import DashboardLayout from "@/routes/dashboard/DashboardLayout";
 const DashboardHome = lazy(() => import("@/routes/dashboard/HomePage"));
 const BillingPage = lazy(() => import("@/routes/dashboard/BillingPage"));
 const OrdersPage = lazy(() => import("@/routes/dashboard/OrdersPage"));
-const PricingPage = lazy(() => import("@/routes/marketing/PricingPage"));
-const TermsPage = lazy(() => import("@/routes/marketing/TermsPage"));
-const PrivacyPage = lazy(() => import("@/routes/marketing/PrivacyPage"));
 const LoginPage = lazy(() => import("@/routes/auth/LoginPage"));
 const SignupPage = lazy(() => import("@/routes/auth/SignupPage"));
 const ConfirmEmailPage = lazy(() => import("@/routes/auth/ConfirmEmailPage"));
@@ -159,7 +155,6 @@ function AppRoutes() {
   if (isStoreDomain()) return <StoreRoutes />;
 
   const isAdmin = isAdminDomain();
-  const isGestao = isGestaoDomain();
 
   return (
     <Routes>
@@ -168,37 +163,9 @@ function AppRoutes() {
         element={
           isAdmin ? (
             <Navigate to={ROUTES.admin} replace />
-          ) : isGestao ? (
-            <Navigate to={ROUTES.dashboard} replace />
           ) : (
-            <AppProviders>
-              <LandingPage />
-            </AppProviders>
+            <Navigate to={ROUTES.dashboard} replace />
           )
-        }
-      />
-      <Route
-        path={ROUTES.pricing}
-        element={
-          <AppProviders>
-            <PricingPage />
-          </AppProviders>
-        }
-      />
-      <Route
-        path={ROUTES.terms}
-        element={
-          <AppProviders>
-            <TermsPage />
-          </AppProviders>
-        }
-      />
-      <Route
-        path={ROUTES.privacy}
-        element={
-          <AppProviders>
-            <PrivacyPage />
-          </AppProviders>
         }
       />
       <Route
