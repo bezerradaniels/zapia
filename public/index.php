@@ -24,7 +24,7 @@ if ($host === 'site.zapia.app') {
     exit;
 }
 
-// Helper to serve a static file with correct MIME type and caching headers
+// Helper to serve static files with correct MIME type and caching headers
 function serveFile($filePath) {
     if (!is_file($filePath)) {
         return false;
@@ -34,6 +34,7 @@ function serveFile($filePath) {
         'html' => 'text/html; charset=UTF-8',
         'css'  => 'text/css; charset=UTF-8',
         'js'   => 'application/javascript; charset=UTF-8',
+        'mjs'  => 'application/javascript; charset=UTF-8',
         'svg'  => 'image/svg+xml',
         'png'  => 'image/png',
         'jpg'  => 'image/jpeg',
@@ -52,25 +53,36 @@ function serveFile($filePath) {
     $mime = $types[$ext] ?? 'application/octet-stream';
     header('Content-Type: ' . $mime);
 
-    // Cache headers for static immutable assets
-    if (in_array($ext, ['css', 'js', 'svg', 'png', 'jpg', 'jpeg', 'webp', 'woff2', 'ico'])) {
+    // Immutable caching for hashed static assets; no-cache for HTML files to prevent stale chunk mismatches
+    if (in_array($ext, ['css', 'js', 'mjs', 'svg', 'png', 'jpg', 'jpeg', 'webp', 'woff2', 'ico'])) {
         header('Cache-Control: public, max-age=31536000, immutable');
     } else {
-        header('Cache-Control: public, max-age=3600');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
     }
 
     readfile($filePath);
     exit;
 }
 
-// 2. Global Asset Interceptor (/assets/*, /styles/*, /img/*, /logos/*, favicon, robots, sitemap, llms)
-if (preg_match('#/assets/(.+)$#', $path, $matches)) {
-    $assetFile = __DIR__ . '/assets/' . $matches[1];
-    if (serveFile($assetFile)) exit;
-}
+// 2. Global Asset Interceptor (/assets/*, /styles/*, /img/*, /logos/*, .js, .css, etc.)
+$isAssetRequest = preg_match('#\.(js|mjs|css|map|woff2|woff|ttf|svg|png|jpg|jpeg|webp|gif|ico)$#i', $path)
+               || preg_match('#^/(assets|styles|img|logos)/#i', $path);
 
-if (is_file(__DIR__ . $path) && !preg_match('#\.(php|html)$#', $path)) {
-    serveFile(__DIR__ . $path);
+if ($isAssetRequest) {
+    // 2a. Check if directly in /assets/
+    if (preg_match('#/assets/(.+)$#', $path, $matches)) {
+        $assetFile = __DIR__ . '/assets/' . $matches[1];
+        if (serveFile($assetFile)) exit;
+    }
+    // 2b. Check direct physical file
+    if (is_file(__DIR__ . $path)) {
+        serveFile(__DIR__ . $path);
+    }
+    // 2c. If asset was not found, return 404 immediately. NEVER return HTML!
+    http_response_code(404);
+    header('Content-Type: text/plain; charset=UTF-8');
+    echo '404 - Asset not found: ' . htmlspecialchars($path);
+    exit;
 }
 
 // 3. ADMIN & PAINEL DOMAINS (admin.zapia.app / painel.zapia.app / gestao.zapia.app) -> React SPA

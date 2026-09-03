@@ -1,14 +1,20 @@
+# Explicit MIME types
+AddType application/javascript .js .mjs
+AddType text/css .css
+AddType image/svg+xml .svg
+AddType font/woff2 .woff2
+
+DirectoryIndex index.php index.html
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  # Allow direct access to existing files and folders (assets, images, etc.)
+  # Direct file passthrough for existing assets
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Route everything else through PHP Gateway
+  # Route everything else through PHP Universal Gateway
   RewriteRule . /index.php [L]
 </IfModule>
-
-DirectoryIndex index.php index.html
