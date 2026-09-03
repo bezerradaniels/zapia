@@ -12,7 +12,6 @@ import { useMyStores } from "@/features/catalog";
 import { loadOnboardingSession } from "@/features/onboarding/utils/onboardingSession";
 import { ROUTES } from "@/config/routes";
 import { isAdminEmail } from "@/config/admin";
-import { isAdminDomain } from "@/lib/tenant/resolveStore";
 import { Logo } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
