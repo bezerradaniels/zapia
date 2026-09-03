@@ -21,6 +21,6 @@ A Zapia permite que lojistas, varejistas, pequenas empresas e vendedores autôno
 ## Links Canônicos
 - Site Oficial: https://zapia.app/
 - Planos e Preços: https://zapia.app/precos
-- Teste Grátis (Trial de 7 dias): https://zapia.app/cadastrar-trial
+- Cadastro de Loja: https://painel.zapia.app/cadastrar
 - Termos de Uso: https://zapia.app/termos-de-uso
 - Política de Privacidade: https://zapia.app/privacidade

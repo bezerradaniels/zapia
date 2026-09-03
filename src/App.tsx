@@ -20,9 +20,6 @@ const OrdersPage = lazy(() => import("@/routes/dashboard/OrdersPage"));
 const PricingPage = lazy(() => import("@/routes/marketing/PricingPage"));
 const TermsPage = lazy(() => import("@/routes/marketing/TermsPage"));
 const PrivacyPage = lazy(() => import("@/routes/marketing/PrivacyPage"));
-const TrialSignupPage = lazy(
-  () => import("@/routes/marketing/TrialSignupPage"),
-);
 const LoginPage = lazy(() => import("@/routes/auth/LoginPage"));
 const SignupPage = lazy(() => import("@/routes/auth/SignupPage"));
 const ConfirmEmailPage = lazy(() => import("@/routes/auth/ConfirmEmailPage"));
@@ -205,18 +202,8 @@ function AppRoutes() {
         }
       />
       <Route
-        path={ROUTES.trialSignup}
-        element={
-          isAdmin ? (
-            <Navigate to={ROUTES.admin} replace />
-          ) : (
-            <AppProviders>
-              <RequireGuest>
-                <TrialSignupPage />
-              </RequireGuest>
-            </AppProviders>
-          )
-        }
+        path="/cadastrar-trial"
+        element={<Navigate to={ROUTES.signup} replace />}
       />
       <Route
         path={ROUTES.login}

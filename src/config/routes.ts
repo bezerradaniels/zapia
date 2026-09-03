@@ -2,7 +2,7 @@ export const ROUTES = {
   // Marketing
   home: "/",
   pricing: "/precos",
-  trialSignup: "/cadastrar-trial",
+  trialSignup: "/cadastrar",
   terms: "/termos-de-uso",
   privacy: "/privacidade",
 
