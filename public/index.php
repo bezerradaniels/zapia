@@ -21,10 +21,6 @@ $host = explode(':', $rawHost)[0];
 
 $rawUri = $_SERVER['REQUEST_URI'] ?? '/';
 $path = parse_url($rawUri, PHP_URL_PATH) ?: '/';
-$path = rtrim($path, '/');
-if ($path === '') {
-    $path = '/';
-}
 
 // 1. site.zapia.app -> 301 permanent redirect to zapia.app
 if ($host === 'site.zapia.app') {
@@ -63,7 +59,24 @@ function serveFile($filePath) {
     exit;
 }
 
-// 2. zapia.app / www.zapia.app (External site & LPs)
+// 2. Global Asset Interceptor (handles any /assets/... regardless of prefix e.g. /admin/assets/...)
+if (preg_match('#/assets/(.+)$#', $path, $matches)) {
+    $assetFile = __DIR__ . '/assets/' . $matches[1];
+    if (serveFile($assetFile)) exit;
+}
+
+// If direct physical file exists on disk (and is not a PHP file or index.html), serve it
+if (is_file(__DIR__ . $path) && !preg_match('#\.(php|html)$#', $path)) {
+    serveFile(__DIR__ . $path);
+}
+
+// Clean trailing slash for routing comparison
+$cleanPath = rtrim($path, '/');
+if ($cleanPath === '') {
+    $cleanPath = '/';
+}
+
+// 3. zapia.app / www.zapia.app (External site & LPs)
 $isRootDomain = ($host === 'zapia.app' || $host === 'www.zapia.app' || $host === 'localhost' || $host === '127.0.0.1');
 
 if ($isRootDomain) {
@@ -78,7 +91,7 @@ if ($isRootDomain) {
         '/onboard-complete',
     ];
     foreach ($merchantPrefixes as $prefix) {
-        if ($path === $prefix || strpos($path, $prefix . '/') === 0) {
+        if ($cleanPath === $prefix || strpos($cleanPath, $prefix . '/') === 0) {
             $query = isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] !== '' ? '?' . $_SERVER['QUERY_STRING'] : '';
             header('Location: https://painel.zapia.app' . $rawUri, true, 302);
             exit;
@@ -86,82 +99,69 @@ if ($isRootDomain) {
     }
 
     // B. Super Admin routes -> redirect to admin.zapia.app
-    if ($path === '/admin' || strpos($path, '/admin/') === 0) {
+    if ($cleanPath === '/admin' || strpos($cleanPath, '/admin/') === 0) {
         header('Location: https://admin.zapia.app' . $rawUri, true, 302);
         exit;
     }
 
     // C. Static site assets (/src/... or /site/src/...)
-    if (strpos($path, '/site/src/') === 0) {
-        $rel = substr($path, strlen('/site/src/'));
+    if (strpos($cleanPath, '/site/src/') === 0) {
+        $rel = substr($cleanPath, strlen('/site/src/'));
         $target = __DIR__ . '/site/src/' . $rel;
         if (serveFile($target)) exit;
     }
-    if (strpos($path, '/src/') === 0) {
-        $rel = substr($path, strlen('/src/'));
+    if (strpos($cleanPath, '/src/') === 0) {
+        $rel = substr($cleanPath, strlen('/src/'));
         $target = __DIR__ . '/site/src/' . $rel;
         if (serveFile($target)) exit;
     }
 
     // D. Static HTML pages from site/
-    if ($path === '/' || $path === '/index.html') {
+    if ($cleanPath === '/' || $cleanPath === '/index.html') {
         serveFile(__DIR__ . '/site/index.html');
     }
-    if ($path === '/termos' || $path === '/termos.html' || $path === '/termos-de-uso') {
+    if ($cleanPath === '/termos' || $cleanPath === '/termos.html' || $cleanPath === '/termos-de-uso') {
         serveFile(__DIR__ . '/site/termos.html');
     }
-    if ($path === '/privacidade' || $path === '/privacidade.html') {
+    if ($cleanPath === '/privacidade' || $cleanPath === '/privacidade.html') {
         serveFile(__DIR__ . '/site/privacidade.html');
     }
 
     // E. Root static files (logos, lp, experimente-gratis, robots, sitemap, favicon)
-    if (is_file(__DIR__ . $path)) {
-        serveFile(__DIR__ . $path);
+    if (is_file(__DIR__ . $cleanPath)) {
+        serveFile(__DIR__ . $cleanPath);
     }
-    if (is_file(__DIR__ . $path . '/index.html')) {
-        serveFile(__DIR__ . $path . '/index.html');
+    if (is_file(__DIR__ . $cleanPath . '/index.html')) {
+        serveFile(__DIR__ . $cleanPath . '/index.html');
     }
 
     // F. Store slugs on root domain (e.g. zapia.app/minhaloja) -> React SPA
     serveFile(__DIR__ . '/index.html');
 }
 
-// 3. painel.zapia.app (or gestao / app)
+// 4. painel.zapia.app (or gestao / app)
 if ($host === 'painel.zapia.app' || $host === 'gestao.zapia.app' || $host === 'app.zapia.app' || $host === 'painel.localhost') {
     // If admin route requested on painel, redirect to admin.zapia.app
-    if ($path === '/admin' || strpos($path, '/admin/') === 0) {
+    if ($cleanPath === '/admin' || strpos($cleanPath, '/admin/') === 0) {
         header('Location: https://admin.zapia.app' . $rawUri, true, 302);
         exit;
     }
 
-    // Static assets
-    if (is_file(__DIR__ . $path)) {
-        serveFile(__DIR__ . $path);
-    }
-
     // React SPA
     serveFile(__DIR__ . '/index.html');
 }
 
-// 4. admin.zapia.app
+// 5. admin.zapia.app
 if ($host === 'admin.zapia.app' || $host === 'admin.localhost') {
     // If merchant routes requested on admin, redirect to painel.zapia.app
-    if (strpos($path, '/dashboard') === 0 || strpos($path, '/nova-loja') === 0) {
+    if (strpos($cleanPath, '/dashboard') === 0 || strpos($cleanPath, '/nova-loja') === 0) {
         header('Location: https://painel.zapia.app' . $rawUri, true, 302);
         exit;
     }
 
-    // Static assets
-    if (is_file(__DIR__ . $path)) {
-        serveFile(__DIR__ . $path);
-    }
-
     // React SPA
     serveFile(__DIR__ . '/index.html');
 }
 
-// 5. Default / Tenant store subdomains (*.zapia.app) -> React SPA
-if (is_file(__DIR__ . $path)) {
-    serveFile(__DIR__ . $path);
-}
+// 6. Default / Tenant store subdomains (*.zapia.app) -> React SPA
 serveFile(__DIR__ . '/index.html');
