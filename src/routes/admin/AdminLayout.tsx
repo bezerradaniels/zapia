@@ -26,7 +26,13 @@ export default function AdminLayout() {
   }
 
   if (!isAdminEmail(session.user.email)) {
-    return <Navigate to={ROUTES.dashboard} replace />;
+    window.location.replace("https://painel.zapia.app/dashboard");
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f8f9fa] text-center p-6">
+        <h1 className="text-xl font-bold text-[#202124]">Acesso Exclusivo para Administradores</h1>
+        <p className="mt-2 text-sm text-[#5f6368]">Redirecionando para o painel da sua loja...</p>
+      </div>
+    );
   }
 
   async function handleSignOut() {

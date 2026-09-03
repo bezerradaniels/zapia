@@ -60,7 +60,7 @@ export default function OnboardingLayout() {
 
   if (!session) return <Navigate to={ROUTES.login} replace />;
 
-  if (isAdminEmail(session.user?.email) || isAdminDomain()) {
+  if (isAdminEmail(session.user?.email)) {
     return <Navigate to={ROUTES.admin} replace />;
   }
 

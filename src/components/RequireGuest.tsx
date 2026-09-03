@@ -11,8 +11,13 @@ export function RequireGuest({ children }: { children: ReactNode }) {
 
   if (isLoading) return null;
   if (session) {
-    if (isAdminEmail(session.user?.email) || isAdminDomain()) {
+    if (isAdminEmail(session.user?.email)) {
       return <Navigate to={ROUTES.admin} replace />;
+    }
+    // If on admin domain but not an admin, navigate to painel
+    if (isAdminDomain()) {
+      window.location.replace("https://painel.zapia.app/dashboard");
+      return null;
     }
     return <Navigate to={ROUTES.dashboard} replace />;
   }

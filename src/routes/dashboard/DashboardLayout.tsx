@@ -40,7 +40,7 @@ export default function DashboardLayout() {
   }
 
   // 2.1. Admins on admin domain (or with admin email and no store) should go to the platform admin panel
-  if (isAdminDomain() || (isAdminEmail(session.user?.email) && myStores.data?.length === 0)) {
+  if (isAdminEmail(session.user?.email) && (isAdminDomain() || myStores.data?.length === 0)) {
     return <Navigate to={ROUTES.admin} replace />;
   }
 
