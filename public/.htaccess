@@ -1,7 +1,15 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # ── site.zapia.app → serve from /site/ subfolder ──
+  RewriteCond %{HTTP_HOST} ^site\.zapia\.app$ [NC]
+  RewriteCond %{REQUEST_URI} !^/site/
+  RewriteRule ^(.*)$ /site/$1 [L]
+
+  # ── React SPA fallback (all other subdomains) ──
   RewriteRule ^index\.html$ - [L]
+  RewriteCond %{HTTP_HOST} !^site\.zapia\.app$ [NC]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
