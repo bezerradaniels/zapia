@@ -9,10 +9,26 @@ const COOKIE_CONSENT_KEY = "zapia_cookie_consent";
 
 type CookieConsent = "accepted" | "rejected";
 
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp("(^|; )" + name + "=([^;]+)"));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+function setCrossDomainCookie(name: string, value: string) {
+  if (typeof document === "undefined") return;
+  const hostname = window.location.hostname;
+  const isZapia = hostname.endsWith("zapia.app");
+  const domainPart = isZapia ? "; domain=.zapia.app" : "";
+  document.cookie = `${name}=${encodeURIComponent(value)}${domainPart}; path=/; max-age=31536000; SameSite=Lax; Secure`;
+}
+
 function shouldShowCookieBanner() {
   try {
-    const consent = window.localStorage.getItem(COOKIE_CONSENT_KEY);
-    return consent !== "accepted" && consent !== "rejected";
+    const cookieConsent = getCookie(COOKIE_CONSENT_KEY);
+    if (cookieConsent === "accepted" || cookieConsent === "rejected") return false;
+    const localConsent = window.localStorage.getItem(COOKIE_CONSENT_KEY);
+    return localConsent !== "accepted" && localConsent !== "rejected";
   } catch {
     return true;
   }
@@ -32,6 +48,7 @@ export function CookieConsentBanner() {
   const saveConsent = (consent: CookieConsent) => {
     try {
       window.localStorage.setItem(COOKIE_CONSENT_KEY, consent);
+      setCrossDomainCookie(COOKIE_CONSENT_KEY, consent);
     } catch {
       // Browsers can block storage; the choice still applies for this session.
     }
@@ -55,8 +72,8 @@ export function CookieConsentBanner() {
         <h2 className="text-sm font-bold text-z-text">Cookies no Zapia</h2>
         <p className="mt-1 text-sm leading-relaxed text-slate-600">
           Usamos cookies essenciais para manter o site funcionando e, com sua
-          permissao, cookies de analise para melhorar a experiencia. Voce pode
-          aceitar ou recusar os cookies nao essenciais.{" "}
+          permissão, cookies de análise para melhorar a experiência. Você pode
+          aceitar ou recusar os cookies não essenciais.{" "}
           <Link
             to={ROUTES.privacy}
             className="font-semibold text-z-primary hover:underline"

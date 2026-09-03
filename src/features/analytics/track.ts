@@ -13,6 +13,8 @@ const COOKIE_CONSENT_KEY = "zapia_cookie_consent";
 
 function hasAnalyticsConsent(): boolean {
   try {
+    const match = document.cookie.match(/(^|; )zapia_cookie_consent=([^;]+)/);
+    if (match && match[2] === "accepted") return true;
     return window.localStorage.getItem(COOKIE_CONSENT_KEY) === "accepted";
   } catch {
     return false;

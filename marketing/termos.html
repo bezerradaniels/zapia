@@ -60,5 +60,37 @@
     <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500">
       <p>© 2026 Zapia — Todos os direitos reservados.</p>
     </footer>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      (() => {
+        const consentKey = "zapia_cookie_consent";
+        const hasConsent = () => {
+          try {
+            const match = document.cookie.match(/(^|; )zapia_cookie_consent=([^;]+)/);
+            if (match && match[2] === "accepted") return true;
+            return window.localStorage.getItem(consentKey) === "accepted";
+          } catch {
+            return false;
+          }
+        };
+        const loadGtm = () => {
+          if (window.__gtmLoaded || !hasConsent()) return;
+          window.__gtmLoaded = true;
+          window.dataLayer.push({
+            "gtm.start": Date.now(),
+            event: "gtm.js",
+            page_subdomain: "marketing",
+            page_location: window.location.href,
+            page_path: window.location.pathname
+          });
+          const script = document.createElement("script");
+          script.async = true;
+          script.src = "https://www.googletagmanager.com/gtm.js?id=GTM-TXTFF99H";
+          document.head.appendChild(script);
+        };
+        window.addEventListener("load", loadGtm, { once: true });
+        window.addEventListener("zapia:cookie-consent-accepted", loadGtm);
+      })();
+    </script>
   </body>
 </html>

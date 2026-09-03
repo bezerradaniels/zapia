@@ -1,36 +1,49 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-export type SubdomainType = "site" | "admin" | "store";
+export type SubdomainType = "marketing" | "painel" | "admin" | "store";
 
 function detectSubdomain(): SubdomainType {
-  if (typeof window === "undefined") return "site";
+  if (typeof window === "undefined") return "marketing";
   const { hostname, pathname } = window.location;
 
   if (hostname.startsWith("admin.")) return "admin";
-  if (hostname.startsWith("site.")) return "site";
+  if (
+    hostname.startsWith("painel.") ||
+    hostname.startsWith("gestao.") ||
+    hostname.startsWith("app.")
+  ) {
+    return "painel";
+  }
+  if (
+    hostname.startsWith("site.") ||
+    hostname === "zapia.app" ||
+    hostname === "www.zapia.app"
+  ) {
+    return "marketing";
+  }
 
-  // Route-based detection when running on root domain or localhost
+  // Route-based detection when running on localhost or fallback
+  if (pathname.startsWith("/admin")) {
+    return "admin";
+  }
   if (
     pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/admin") ||
     pathname.startsWith("/nova-loja") ||
     pathname.startsWith("/entrar") ||
     pathname.startsWith("/cadastrar") ||
-    pathname.startsWith("/recuperar-senha")
+    pathname.startsWith("/recuperar-senha") ||
+    pathname.startsWith("/onboard")
   ) {
-    return "admin";
+    return "painel";
   }
 
   if (
     pathname === "/" ||
-    pathname.startsWith("/precos") ||
     pathname.startsWith("/termos") ||
-    pathname.startsWith("/privacidade") ||
-    pathname.startsWith("/cadastrar-trial") ||
-    pathname.startsWith("/lp")
+    pathname.startsWith("/privacidade")
   ) {
-    return "site";
+    return "marketing";
   }
 
   return "store";
@@ -45,9 +58,11 @@ export const usePageTracking = (subdomainOverride?: SubdomainType) => {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "virtual_page_view",
+        page_location: window.location.href,
         page_path: location.pathname + location.search,
         page_title: document.title,
         page_subdomain: subdomain,
+        page_hostname: window.location.hostname,
       });
     }
   }, [location, subdomainOverride]);

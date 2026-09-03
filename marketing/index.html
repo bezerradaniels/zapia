@@ -547,5 +547,81 @@
         </div>
       </div>
     </footer>
+    <!-- Analytics & Cross-Domain UTM Attribution Preservation -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      (() => {
+        // 1. Cross-subdomain UTM and attribution parameter preservation on CTAs
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "fbclid", "ttclid"];
+          const hasAttribution = utmKeys.some((key) => params.has(key));
+
+          if (hasAttribution) {
+            const preserveParams = () => {
+              document.querySelectorAll('a[href*="painel.zapia.app"]').forEach((link) => {
+                try {
+                  const url = new URL(link.href);
+                  params.forEach((val, key) => {
+                    if (!url.searchParams.has(key)) {
+                      url.searchParams.set(key, val);
+                    }
+                  });
+                  link.href = url.toString();
+                } catch (e) {}
+              });
+            };
+            if (document.readyState === "loading") {
+              document.addEventListener("DOMContentLoaded", preserveParams);
+            } else {
+              preserveParams();
+            }
+          }
+        } catch (e) {}
+
+        // 2. GTM / GA4 Loader with Cross-Domain Cookie Consent
+        const consentKey = "zapia_cookie_consent";
+        const hasConsent = () => {
+          try {
+            const match = document.cookie.match(/(^|; )zapia_cookie_consent=([^;]+)/);
+            if (match && match[2] === "accepted") return true;
+            return window.localStorage.getItem(consentKey) === "accepted";
+          } catch {
+            return false;
+          }
+        };
+
+        const loadGtm = () => {
+          if (window.__gtmLoaded || !hasConsent()) return;
+          window.__gtmLoaded = true;
+          window.dataLayer.push({
+            "gtm.start": Date.now(),
+            event: "gtm.js",
+            page_subdomain: "marketing",
+            page_location: window.location.href,
+            page_path: window.location.pathname
+          });
+          const script = document.createElement("script");
+          script.async = true;
+          script.src = "https://www.googletagmanager.com/gtm.js?id=GTM-TXTFF99H";
+          document.head.appendChild(script);
+        };
+
+        const schedule = () => {
+          if (!hasConsent()) return;
+          if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(loadGtm, { timeout: 3500 });
+            return;
+          }
+          window.setTimeout(loadGtm, 2000);
+        };
+
+        window.addEventListener("load", schedule, { once: true });
+        window.addEventListener("zapia:cookie-consent-accepted", loadGtm);
+        ["pointerdown", "keydown", "touchstart"].forEach((evt) => {
+          window.addEventListener(evt, loadGtm, { once: true, passive: true });
+        });
+      })();
+    </script>
   </body>
 </html>
