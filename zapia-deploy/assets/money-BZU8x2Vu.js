@@ -1,0 +1,1 @@
+var e=new Intl.NumberFormat(`pt-BR`,{style:`currency`,currency:`BRL`});function t(t){return e.format(t/100)}function n(e){let t=e.replace(/[^\d.,-]/g,``).replace(/\.(?=\d{3}(\D|$))/g,``).replace(`,`,`.`),n=Number(t);return Number.isFinite(n)?Math.round(n*100):NaN}export{n,t};

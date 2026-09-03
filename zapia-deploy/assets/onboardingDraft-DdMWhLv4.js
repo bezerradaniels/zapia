@@ -1,0 +1,1 @@
+var e=`zap_draft_step_`;function t(t,n){try{localStorage.setItem(`${e}${t}`,JSON.stringify(n))}catch{}}function n(t){try{let n=localStorage.getItem(`${e}${t}`);return n?JSON.parse(n):null}catch{return null}}function r(t){try{localStorage.removeItem(`${e}${t}`)}catch{}}function i(){for(let e=1;e<=4;e++)r(e)}export{n,t as r,i as t};

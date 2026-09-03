@@ -1,0 +1,26 @@
+# Zapia — Catálogo Digital e Automação de Vendas no WhatsApp
+
+> Zapia é a plataforma SaaS de catálogo digital interativo e automação de pedidos para WhatsApp no Brasil.
+
+## Sobre a Zapia
+A Zapia permite que lojistas, varejistas, pequenas empresas e vendedores autônomos criem um catálogo online profissional e responsivo em menos de 5 minutos, enviem links personalizados e recebam pedidos estruturados diretamente no WhatsApp com opções de pagamento via Pix ou cartão.
+
+## Principais Funcionalidades
+- **Catálogo Online Responsivo**: Criação de vitrine virtual rápida e moderna com fotos, variações, preços e busca de produtos.
+- **Pedidos Estruturados no WhatsApp**: Checkout simplificado que envia o pedido pronto para o WhatsApp da loja ou vendedor.
+- **Múltiplos Vendedores**: Gestão de equipes de vendas com comissionamento, catálogo compartilhado e atribuição de atendentes.
+- **Catálogo em PDF e QR Code**: Geração automática de catálogo em PDF para download e envio por WhatsApp, além de QR Code para balcão, vitrine e mesas.
+- **CRM e Recuperação de Vendas**: Cadastro e histórico de clientes, inteligência de recompra e cupons de desconto.
+- **Controle de Estoque e Categorias**: Organização simplificada de produtos, categorias e status de pedidos.
+
+## Planos e Preços
+- **Plano Básico (Gratuito)**: Ideal para quem está começando. Catálogo online para até 15 produtos, link de WhatsApp e suporte básico.
+- **Plano Pro**: Para lojas em crescimento. Produtos ilimitados, múltiplos vendedores, geração de catálogo em PDF e cupons de desconto.
+- **Plano Premium**: Para operações consolidadas. Todas as funcionalidades Pro com múltiplos vendedores ilimitados, domínio personalizado e suporte prioritário.
+
+## Links Canônicos
+- Site Oficial: https://zapia.app/
+- Planos e Preços: https://zapia.app/precos
+- Teste Grátis (Trial de 7 dias): https://zapia.app/cadastrar-trial
+- Termos de Uso: https://zapia.app/termos-de-uso
+- Política de Privacidade: https://zapia.app/privacidade

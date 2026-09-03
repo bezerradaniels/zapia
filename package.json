@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && cp public/.htaccess dist/.htaccess",
+    "build": "npm run build:site && tsc -b && vite build && cp public/.htaccess public/index.php dist/ && cp -r site dist/site",
     "build:site": "tailwindcss -i ./site/src/style/style.css -o ./site/src/style/output.css --minify",
     "package:site": "npm run build:site && (cd site && zip -r ../site-deploy.zip . -x '*.DS_Store')",
     "preview": "vite preview",

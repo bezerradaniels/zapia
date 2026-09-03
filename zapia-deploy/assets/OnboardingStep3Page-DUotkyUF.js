@@ -1,0 +1,1 @@
+import{a as e}from"./vendor-query-DMS1rumW.js";import{n as t}from"./onboarding-6vudTnk_.js";var n=e();function r(){return(0,n.jsx)(t,{})}export{r as default};

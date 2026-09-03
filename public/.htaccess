@@ -2,19 +2,13 @@
   RewriteEngine On
   RewriteBase /
 
-  # ── site.zapia.app: root → /site/index.html ──
-  RewriteCond %{HTTP_HOST} ^site\.zapia\.app$ [NC]
-  RewriteRule ^$ /site/index.html [L]
+  # Allow direct access to existing files and folders (assets, images, etc.)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
 
-  # ── site.zapia.app: any other path → /site/{path} ──
-  RewriteCond %{HTTP_HOST} ^site\.zapia\.app$ [NC]
-  RewriteCond %{REQUEST_URI} !^/site/
-  RewriteRule ^(.+)$ /site/$1 [L]
-
-  # ── React SPA fallback (all other subdomains) ──
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{HTTP_HOST} !^site\.zapia\.app$ [NC]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+  # Route everything else through PHP Gateway
+  RewriteRule . /index.php [L]
 </IfModule>
+
+DirectoryIndex index.php index.html

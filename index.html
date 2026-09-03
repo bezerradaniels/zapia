@@ -2,17 +2,6 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <script>
-      // Subdomain routing: site.zapia.app → static site
-      if (location.hostname === 'site.zapia.app') {
-        var p = location.pathname;
-        if (p === '/' || p === '') {
-          location.replace('/site/index.html');
-        } else if (!/^\/site\//.test(p)) {
-          location.replace('/site' + p);
-        }
-      }
-    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zapia — Catálogo Digital e Pedidos no WhatsApp</title>

@@ -1,0 +1,1 @@
+function e(e,t){return t?(e.variation_options??[]).find(e=>e.name===t)??null:null}function t(t,n){return e(t,n)?.image_url??t.images[0]??null}function n(t,n){return t.has_variations?e(t,n)?.stock??null:t.stock??null}function r(e){let t=(e.variation_options??[]).map(e=>e.stock).filter(e=>e!=null);return t.length===0?null:t.reduce((e,t)=>e+t,0)}export{t as n,n as r,r as t};

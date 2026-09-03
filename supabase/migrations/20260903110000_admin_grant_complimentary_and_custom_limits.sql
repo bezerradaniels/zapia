@@ -1,5 +1,24 @@
--- Migration: Add custom_limits and admin_grant_complimentary RPC
+-- Migration: Atualização do is_admin(), enum plan_id, coluna custom_limits e RPC admin_grant_complimentary
 
+-- 1. Atualizar is_admin() para reconhecer os emails de admin atuais
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public, auth
+AS $$
+  SELECT
+    lower(coalesce(auth.email(), '')) IN ('manager@zapia.app', 'daniel.ddsb@gmail.com', 'manager@zapable.com.br')
+    OR EXISTS (
+      SELECT 1 FROM public.platform_admins pa
+      WHERE pa.user_id = auth.uid()
+    );
+$$;
+
+GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, anon;
+
+-- 2. Expandir enum plan_id
 DO $$ BEGIN
   ALTER TYPE public.plan_id ADD VALUE IF NOT EXISTS 'avancado';
 EXCEPTION WHEN duplicate_object THEN null; END $$;
@@ -12,8 +31,10 @@ DO $$ BEGIN
   ALTER TYPE public.plan_id ADD VALUE IF NOT EXISTS 'custom';
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
+-- 3. Adicionar coluna custom_limits na tabela subscriptions
 ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS custom_limits jsonb;
 
+-- 4. Criar a RPC administrativa admin_grant_complimentary
 CREATE OR REPLACE FUNCTION public.admin_grant_complimentary(
   p_store_id uuid,
   p_plan_id text,
@@ -24,11 +45,11 @@ CREATE OR REPLACE FUNCTION public.admin_grant_complimentary(
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, auth
 AS $$
 BEGIN
   IF NOT public.is_admin() THEN
-    RAISE EXCEPTION 'Acesso negado';
+    RAISE EXCEPTION 'Acesso negado: apenas administradores da plataforma podem conceder gratuidade.';
   END IF;
 
   INSERT INTO public.subscriptions (
@@ -79,3 +100,6 @@ BEGIN
   END IF;
 END;
 $$;
+
+REVOKE ALL ON FUNCTION public.admin_grant_complimentary(uuid, text, timestamptz, text, jsonb) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.admin_grant_complimentary(uuid, text, timestamptz, text, jsonb) TO authenticated;

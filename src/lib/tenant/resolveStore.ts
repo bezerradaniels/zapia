@@ -3,6 +3,7 @@ export const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN ?? "zapia.app";
 const RESERVED_SUBDOMAINS = new Set([
   "www",
   "app",
+  "painel",
   "staging",
   "admin",
   "site",
@@ -16,6 +17,7 @@ const RESERVED_PATHS = new Set([
   "precos",
   "entrar",
   "cadastrar",
+  "cadastrar-trial",
   "recuperar-senha",
   "nova-loja",
   "dashboard",
@@ -28,22 +30,44 @@ export function isAdminDomain(): boolean {
   return hostname === `admin.${ROOT_DOMAIN}`;
 }
 
-export function isGestaoDomain(): boolean {
+export function isPainelDomain(): boolean {
   const { hostname } = window.location;
-  if (hostname === "gestao.localhost" || hostname === "app.localhost") return true;
-  return hostname === `gestao.${ROOT_DOMAIN}` || hostname === `app.${ROOT_DOMAIN}`;
+  if (
+    hostname === "painel.localhost" ||
+    hostname === "gestao.localhost" ||
+    hostname === "app.localhost"
+  ) {
+    return true;
+  }
+  return (
+    hostname === `painel.${ROOT_DOMAIN}` ||
+    hostname === `gestao.${ROOT_DOMAIN}` ||
+    hostname === `app.${ROOT_DOMAIN}`
+  );
+}
+
+export function isGestaoDomain(): boolean {
+  return isPainelDomain();
+}
+
+export function isRootDomain(): boolean {
+  const { hostname } = window.location;
+  if (hostname === "localhost" || hostname === "127.0.0.1") return true;
+  return (
+    hostname === ROOT_DOMAIN ||
+    hostname === `www.${ROOT_DOMAIN}` ||
+    hostname === `site.${ROOT_DOMAIN}`
+  );
 }
 
 export function isSiteDomain(): boolean {
-  const { hostname } = window.location;
-  if (hostname === "site.localhost") return true;
-  return hostname === `site.${ROOT_DOMAIN}` || hostname === ROOT_DOMAIN || hostname === `www.${ROOT_DOMAIN}`;
+  return isRootDomain();
 }
 
 export function isStoreDomain(): boolean {
   const { hostname } = window.location;
   if (hostname === "localhost" || hostname === "127.0.0.1") return false;
-  if (isAdminDomain() || isGestaoDomain() || isSiteDomain()) return false;
+  if (isAdminDomain() || isPainelDomain() || isRootDomain()) return false;
   if (hostname.endsWith(".localhost")) {
     const sub = hostname.slice(0, hostname.length - ".localhost".length);
     return !!sub && !RESERVED_SUBDOMAINS.has(sub);
