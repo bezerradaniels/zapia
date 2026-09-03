@@ -44,6 +44,45 @@ export function usePlanLimits(storeId: string | undefined): PlanLimits {
     const isSubscriptionActive =
       subscription?.status === "active" || isTrialActive;
 
+    const custom = subscription?.custom_limits;
+
+    if (isSubscriptionActive && (planId === "custom" || !!custom)) {
+      return {
+        plan: plan ?? {
+          id: "custom",
+          name: "Custom",
+          price_in_cents: 0,
+          max_products: custom?.maxProducts ?? 9999,
+          max_sellers: custom?.maxSellers ?? 99,
+          has_ai_helpers: true,
+          has_pdf_export: custom?.hasPdfExport ?? true,
+          has_custom_theme: true,
+          stripe_price_id: null,
+          stripe_price_monthly: null,
+          stripe_price_annual: null,
+        },
+        subscription,
+        isLoading: sub.isLoading || plans.isLoading,
+        canUse: (feature) => {
+          if (feature === "pdf") return custom?.hasPdfExport ?? true;
+          if (feature === "theme") return true;
+          if (feature === "ai") return true;
+          if (feature === "featured") return custom?.hasFeaturedProducts ?? true;
+          if (feature === "gallery") return true;
+          return false;
+        },
+        productLimit: custom?.maxProducts ?? null,
+        sellerLimit:
+          custom && typeof custom.maxSellers === "number"
+            ? custom.maxSellers
+            : null,
+        couponLimit:
+          custom && typeof custom.maxCoupons === "number"
+            ? custom.maxCoupons
+            : null,
+      };
+    }
+
     const config = isTrialActive
       ? PLANS.full
       : isSubscriptionActive && planId && PLANS[planId]

@@ -9,12 +9,14 @@ import { deleteAdminStore } from "@/features/admin/api/mutations";
 import { deleteAllCustomers } from "@/features/customers";
 import { ROUTES } from "@/config/routes";
 import { buildStoreUrl } from "@/lib/tenant/resolveStore";
-import type { PlanId } from "@/types/domain";
 
 const PLAN_LABELS: Record<string, string> = {
-  basico: "Gratuito",
-  pro: "Pro",
-  premium: "Premium",
+  basico: "Básico",
+  avancado: "Avançado",
+  full: "Full",
+  pro: "Avançado",
+  premium: "Full",
+  custom: "Custom",
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -84,9 +86,31 @@ export default function AdminStorePage() {
   const navigate = useNavigate();
   const { data, isLoading, error } = useAdminStore(id ?? "");
   const [isDeleting, setIsDeleting] = useState(false);
-  const [grantPlan, setGrantPlan] = useState<PlanId>("premium");
-  const [grantExpiry, setGrantExpiry] = useState("");
+
+  // Gratuidade states
+  const [grantType, setGrantType] = useState<"full" | "custom">("full");
+  const [grantExpiry, setGrantExpiry] = useState(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().split("T")[0];
+  });
   const [grantNotes, setGrantNotes] = useState("");
+
+  // Custom limits states
+  const [customSellersEnabled, setCustomSellersEnabled] = useState(true);
+  const [customSellers, setCustomSellers] = useState<number | "unlimited">(3);
+
+  const [customProductsEnabled, setCustomProductsEnabled] = useState(true);
+  const [customProducts, setCustomProducts] = useState<number | "unlimited">(50);
+
+  const [customFeaturedEnabled, setCustomFeaturedEnabled] = useState(true);
+  const [customFeatured, setCustomFeatured] = useState<4 | 8>(4);
+
+  const [customCouponsEnabled, setCustomCouponsEnabled] = useState(true);
+  const [customCoupons, setCustomCoupons] = useState<1 | 5 | "unlimited">(5);
+
+  const [customPdfExport, setCustomPdfExport] = useState(true);
+
   const grantComplimentary = useGrantComplimentary();
 
   async function handleDeleteCustomers() {
@@ -347,33 +371,273 @@ export default function AdminStorePage() {
           onSubmit={(e) => {
             e.preventDefault();
             if (!id || !grantExpiry) return;
-            grantComplimentary.mutate({
-              storeId: id,
-              planId: grantPlan,
-              expiresAt: grantExpiry,
-              notes: grantNotes || undefined,
-            });
+
+            if (grantType === "full") {
+              grantComplimentary.mutate({
+                storeId: id,
+                planId: "full",
+                expiresAt: grantExpiry,
+                notes: grantNotes || undefined,
+                customLimits: null,
+              });
+            } else {
+              grantComplimentary.mutate({
+                storeId: id,
+                planId: "custom",
+                expiresAt: grantExpiry,
+                notes: grantNotes || undefined,
+                customLimits: {
+                  maxProducts: customProductsEnabled
+                    ? customProducts === "unlimited"
+                      ? null
+                      : Number(customProducts)
+                    : 10,
+                  maxSellers: customSellersEnabled
+                    ? customSellers === "unlimited"
+                      ? null
+                      : Number(customSellers)
+                    : 0,
+                  hasFeaturedProducts: customFeaturedEnabled,
+                  maxFeaturedProducts: customFeaturedEnabled ? customFeatured : 0,
+                  hasCoupons: customCouponsEnabled,
+                  maxCoupons: customCouponsEnabled
+                    ? customCoupons === "unlimited"
+                      ? null
+                      : Number(customCoupons)
+                    : 0,
+                  hasPdfExport: customPdfExport,
+                },
+              });
+            }
           }}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-4"
         >
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-[#5f6368]">
-                Plano
-              </label>
-              <select
-                value={grantPlan}
-                onChange={(e) => setGrantPlan(e.target.value as PlanId)}
-                className="h-9 w-full rounded-lg border border-[#dadce0] bg-white px-3 text-xs text-[#202124] focus:border-[#1a73e8] focus:outline-none"
+          {/* Segmented control: Full vs Custom */}
+          <div>
+            <label className="mb-2 block text-xs font-semibold text-[#5f6368]">
+              Tipo de gratuidade
+            </label>
+            <div className="inline-flex rounded-lg border border-[#dadce0] p-0.5 bg-[#f8f9fa]">
+              <button
+                type="button"
+                onClick={() => setGrantType("full")}
+                className={`rounded-md px-3.5 py-1.5 text-xs font-medium transition-all ${
+                  grantType === "full"
+                    ? "bg-white text-[#1a73e8] font-bold shadow-sm"
+                    : "text-[#5f6368] hover:text-[#202124]"
+                }`}
               >
-                <option value="basico">Básico</option>
-                <option value="pro">Pro</option>
-                <option value="premium">Ilimitado</option>
-              </select>
+                Full (Padrão)
+              </button>
+              <button
+                type="button"
+                onClick={() => setGrantType("custom")}
+                className={`rounded-md px-3.5 py-1.5 text-xs font-medium transition-all ${
+                  grantType === "custom"
+                    ? "bg-white text-[#1a73e8] font-bold shadow-sm"
+                    : "text-[#5f6368] hover:text-[#202124]"
+                }`}
+              >
+                Personalizada (Custom)
+              </button>
             </div>
+            <p className="mt-1 text-[11px] text-[#80868b]">
+              {grantType === "full"
+                ? "Plano Full: todos os recursos e limites liberados sem restrição."
+                : "Plano Custom: defina individualmente quais recursos e limites serão concedidos."}
+            </p>
+          </div>
+
+          {/* Custom options if Personalizada */}
+          {grantType === "custom" && (
+            <div className="rounded-xl border border-[#dadce0] bg-[#f8f9fa] p-4 space-y-4">
+              <p className="text-xs font-bold text-[#202124] uppercase tracking-wide">
+                Limites e Recursos Personalizados
+              </p>
+
+              {/* 1. Vendedores */}
+              <div className="flex flex-col gap-2 rounded-lg border border-[#e8eaed] bg-white p-3">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-xs font-semibold text-[#202124] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customSellersEnabled}
+                      onChange={(e) => setCustomSellersEnabled(e.target.checked)}
+                      className="h-4 w-4 rounded border-[#dadce0] text-[#1a73e8] focus:ring-[#1a73e8]"
+                    />
+                    <span>Vendedores</span>
+                  </label>
+                  <span className="text-[11px] text-[#5f6368]">
+                    {customSellersEnabled ? "Ativado" : "Desativado (0)"}
+                  </span>
+                </div>
+                {customSellersEnabled && (
+                  <div className="mt-1 flex flex-wrap gap-1.5">
+                    {([1, 3, 5, 10, "unlimited"] as const).map((opt) => (
+                      <button
+                        key={String(opt)}
+                        type="button"
+                        onClick={() => setCustomSellers(opt)}
+                        className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
+                          customSellers === opt
+                            ? "border-[#1a73e8] bg-[#e8f0fe] font-bold text-[#1a73e8]"
+                            : "border-[#dadce0] bg-white text-[#5f6368] hover:bg-[#f1f3f4]"
+                        }`}
+                      >
+                        {opt === "unlimited" ? "Ilimitados" : `${opt} ${opt === 1 ? "vendedor" : "vendedores"}`}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Produtos */}
+              <div className="flex flex-col gap-2 rounded-lg border border-[#e8eaed] bg-white p-3">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-xs font-semibold text-[#202124] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customProductsEnabled}
+                      onChange={(e) => setCustomProductsEnabled(e.target.checked)}
+                      className="h-4 w-4 rounded border-[#dadce0] text-[#1a73e8] focus:ring-[#1a73e8]"
+                    />
+                    <span>Produtos</span>
+                  </label>
+                  <span className="text-[11px] text-[#5f6368]">
+                    {customProductsEnabled ? "Ativado" : "Padrão (10)"}
+                  </span>
+                </div>
+                {customProductsEnabled && (
+                  <div className="mt-1 flex flex-wrap gap-1.5">
+                    {([10, 20, 30, 50, 100, "unlimited"] as const).map((opt) => (
+                      <button
+                        key={String(opt)}
+                        type="button"
+                        onClick={() => setCustomProducts(opt)}
+                        className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
+                          customProducts === opt
+                            ? "border-[#1a73e8] bg-[#e8f0fe] font-bold text-[#1a73e8]"
+                            : "border-[#dadce0] bg-white text-[#5f6368] hover:bg-[#f1f3f4]"
+                        }`}
+                      >
+                        {opt === "unlimited" ? "Ilimitados" : `${opt} produtos`}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Destaques */}
+              <div className="flex flex-col gap-2 rounded-lg border border-[#e8eaed] bg-white p-3">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-xs font-semibold text-[#202124] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customFeaturedEnabled}
+                      onChange={(e) => setCustomFeaturedEnabled(e.target.checked)}
+                      className="h-4 w-4 rounded border-[#dadce0] text-[#1a73e8] focus:ring-[#1a73e8]"
+                    />
+                    <span>Destaques</span>
+                  </label>
+                  <span className="text-[11px] text-[#5f6368]">
+                    {customFeaturedEnabled ? "Ativado" : "Desativado (0)"}
+                  </span>
+                </div>
+                {customFeaturedEnabled && (
+                  <div className="mt-1 flex flex-wrap gap-1.5">
+                    {([4, 8] as const).map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setCustomFeatured(opt)}
+                        className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
+                          customFeatured === opt
+                            ? "border-[#1a73e8] bg-[#e8f0fe] font-bold text-[#1a73e8]"
+                            : "border-[#dadce0] bg-white text-[#5f6368] hover:bg-[#f1f3f4]"
+                        }`}
+                      >
+                        {`${opt} destaques`}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 4. Cupons */}
+              <div className="flex flex-col gap-2 rounded-lg border border-[#e8eaed] bg-white p-3">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-xs font-semibold text-[#202124] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={customCouponsEnabled}
+                      onChange={(e) => setCustomCouponsEnabled(e.target.checked)}
+                      className="h-4 w-4 rounded border-[#dadce0] text-[#1a73e8] focus:ring-[#1a73e8]"
+                    />
+                    <span>Cupons</span>
+                  </label>
+                  <span className="text-[11px] text-[#5f6368]">
+                    {customCouponsEnabled ? "Ativado" : "Desativado (0)"}
+                  </span>
+                </div>
+                {customCouponsEnabled && (
+                  <div className="mt-1 flex flex-wrap gap-1.5">
+                    {([1, 5, "unlimited"] as const).map((opt) => (
+                      <button
+                        key={String(opt)}
+                        type="button"
+                        onClick={() => setCustomCoupons(opt)}
+                        className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
+                          customCoupons === opt
+                            ? "border-[#1a73e8] bg-[#e8f0fe] font-bold text-[#1a73e8]"
+                            : "border-[#dadce0] bg-white text-[#5f6368] hover:bg-[#f1f3f4]"
+                        }`}
+                      >
+                        {opt === "unlimited" ? "Ilimitados" : `${opt} ${opt === 1 ? "cupom" : "cupons"}`}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 5. Exportação PDF */}
+              <div className="flex items-center justify-between rounded-lg border border-[#e8eaed] bg-white p-3">
+                <div>
+                  <p className="text-xs font-semibold text-[#202124]">Exportação PDF</p>
+                  <p className="text-[11px] text-[#5f6368]">Gerar catálogo diagramado em PDF</p>
+                </div>
+                <div className="inline-flex rounded-md border border-[#dadce0] bg-[#f8f9fa] p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setCustomPdfExport(true)}
+                    className={`rounded px-2.5 py-1 text-xs transition-colors ${
+                      customPdfExport
+                        ? "bg-[#1a73e8] font-semibold text-white shadow-sm"
+                        : "text-[#5f6368] hover:text-[#202124]"
+                    }`}
+                  >
+                    Sim
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCustomPdfExport(false)}
+                    className={`rounded px-2.5 py-1 text-xs transition-colors ${
+                      !customPdfExport
+                        ? "bg-[#5f6368] font-semibold text-white shadow-sm"
+                        : "text-[#5f6368] hover:text-[#202124]"
+                    }`}
+                  >
+                    Não
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Válido até + Observações */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs font-semibold text-[#5f6368]">
-                Válido até
+                Válido até *
               </label>
               <input
                 type="date"
@@ -383,27 +647,28 @@ export default function AdminStorePage() {
                 className="h-9 w-full rounded-lg border border-[#dadce0] bg-white px-3 text-xs text-[#202124] focus:border-[#1a73e8] focus:outline-none"
               />
             </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-[#5f6368]">
+                Observações (opcional)
+              </label>
+              <input
+                type="text"
+                value={grantNotes}
+                onChange={(e) => setGrantNotes(e.target.value)}
+                placeholder="Ex: parceria, cortesia, influencer..."
+                className="h-9 w-full rounded-lg border border-[#dadce0] bg-white px-3 text-xs text-[#202124] placeholder-[#80868b] focus:border-[#1a73e8] focus:outline-none"
+              />
+            </div>
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold text-[#5f6368]">
-              Observações (opcional)
-            </label>
-            <input
-              type="text"
-              value={grantNotes}
-              onChange={(e) => setGrantNotes(e.target.value)}
-              placeholder="Ex: parceria, cortesia, influencer..."
-              className="h-9 w-full rounded-lg border border-[#dadce0] bg-white px-3 text-xs text-[#202124] placeholder-[#80868b] focus:border-[#1a73e8] focus:outline-none"
-            />
-          </div>
+
           <button
             type="submit"
             disabled={grantComplimentary.isPending || !grantExpiry}
-            className="self-start rounded-lg bg-[#1a73e8] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#174ea6] disabled:opacity-50"
+            className="self-start rounded-lg bg-[#1a73e8] px-5 py-2.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#174ea6] disabled:opacity-50"
           >
             {grantComplimentary.isPending
               ? "Concedendo..."
-              : "Conceder gratuidade"}
+              : `Conceder gratuidade ${grantType === "full" ? "Full" : "Custom"}`}
           </button>
         </form>
       </Card>

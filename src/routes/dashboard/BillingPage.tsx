@@ -70,6 +70,10 @@ const PLAN_FEATURE_TEXT: Record<PlanId, string[]> = {
     "Cores personalizadas",
     "Assistente de IA",
   ],
+  custom: [
+    "Recursos e limites personalizados",
+    "Configurado pelo suporte / administrador",
+  ],
 };
 
 const PLAN_SUBTITLE: Record<PlanId, string> = {
@@ -78,6 +82,7 @@ const PLAN_SUBTITLE: Record<PlanId, string> = {
   full: "Sem limites para escalar",
   pro: "Crescimento acelerado",
   premium: "Sem limites para escalar",
+  custom: "Plano sob medida",
 };
 
 const STATUS_TONE: Record<

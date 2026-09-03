@@ -1,5 +1,5 @@
 import { createBrowserClient } from "@/lib/supabase";
-import type { PlanId } from "@/types/domain";
+import type { CustomPlanLimits, PlanId } from "@/types/domain";
 
 export async function deleteAdminStore(storeId: string): Promise<void> {
   const supabase = createBrowserClient();
@@ -14,9 +14,12 @@ export async function grantComplimentary(
   planId: PlanId,
   expiresAt: string,
   notes?: string,
+  customLimits?: CustomPlanLimits | null,
 ): Promise<void> {
   const supabase = createBrowserClient();
-  const { error } = await (
+
+  // 1. Tenta a RPC administrativa primeiro
+  const { error: rpcError } = await (
     supabase as unknown as {
       rpc: (
         name: string,
@@ -28,6 +31,27 @@ export async function grantComplimentary(
     p_plan_id: planId,
     p_expires_at: expiresAt,
     p_notes: notes,
+    p_custom_limits: customLimits ?? null,
   });
-  if (error) throw error;
+
+  if (!rpcError) return;
+
+  // 2. Fallback direto caso a RPC ainda não esteja na migration do Supabase remoto
+  const payload: Record<string, unknown> = {
+    plan_id: planId,
+    status: "active",
+    current_period_end: new Date(expiresAt).toISOString(),
+    trial_ends_at: null,
+    custom_limits: customLimits ?? null,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error: updateError } = await supabase
+    .from("subscriptions")
+    .upsert({
+      store_id: storeId,
+      ...payload,
+    });
+
+  if (updateError) throw updateError;
 }

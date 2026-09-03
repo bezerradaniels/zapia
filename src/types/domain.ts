@@ -225,7 +225,23 @@ export type Customer = {
   created_at: string;
 };
 
-export type PlanId = "basico" | "avancado" | "full" | "pro" | "premium";
+export type PlanId =
+  | "basico"
+  | "avancado"
+  | "full"
+  | "pro"
+  | "premium"
+  | "custom";
+
+export type CustomPlanLimits = {
+  maxProducts: number | null; // 10, 20, 30, 50, 100, null (ilimitado)
+  maxSellers: number | null; // 1, 3, 5, 10, null (ilimitado)
+  hasFeaturedProducts: boolean;
+  maxFeaturedProducts: number; // 4 ou 8
+  hasCoupons: boolean;
+  maxCoupons: number | null; // 1, 5, null (ilimitado)
+  hasPdfExport: boolean;
+};
 
 export type SubscriptionStatus =
   | "none"
@@ -249,6 +265,7 @@ export type Subscription = {
   current_period_end: string | null;
   trial_ends_at: string | null;
   cancel_at_period_end: boolean;
+  custom_limits?: CustomPlanLimits | null;
   created_at: string;
   updated_at: string;
 };
