@@ -21,8 +21,27 @@ type BaseParams = {
 };
 
 export type AnalyticsEventMap = {
+  // ── Navegação Virtual (SPA) ───────────────────────────────────────────────
+  virtual_page_view: {
+    page_path: string;
+    page_title: string;
+    page_subdomain: string;
+  };
+
+  // ── Aquisição & Funil de Conversão ────────────────────────────────────────
+  begin_signup_click: {
+    cta_location: string;
+    cta_label: string;
+    plan_interest?: string;
+  };
+
   // ── Autenticação ──────────────────────────────────────────────────────────
-  sign_up: { method: "email" };
+  sign_up: {
+    method: "email" | "google" | "apple";
+    user_id?: string;
+    tenant_slug?: string;
+    plan_tier?: string;
+  };
   login: { method: "email" };
   logout: Record<string, never>;
 

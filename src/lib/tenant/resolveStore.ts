@@ -5,6 +5,7 @@ const RESERVED_SUBDOMAINS = new Set([
   "app",
   "staging",
   "admin",
+  "site",
   "api",
   "mail",
 ]);

@@ -5,6 +5,7 @@ import { AppLoadingShell } from "@/components/AppLoadingShell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { RequireGuest } from "@/components/RequireGuest";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { PageTracker } from "@/hooks/usePageTracking";
 import { ROUTES } from "@/config/routes";
 import { isStoreDomain } from "@/lib/tenant/resolveStore";
 
@@ -379,6 +380,7 @@ export function App() {
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
         <ScrollToTop />
+        <PageTracker />
         <Suspense fallback={<AppLoadingShell />}>
           <AppRoutes />
         </Suspense>

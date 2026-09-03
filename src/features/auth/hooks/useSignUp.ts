@@ -5,8 +5,12 @@ import { signUp } from "../api/mutations";
 export function useSignUp() {
   return useMutation({
     mutationFn: signUp,
-    onSuccess: () => {
-      track("sign_up", { method: "email" });
+    onSuccess: (data) => {
+      track("sign_up", {
+        method: "email",
+        user_id: data.user?.id,
+        plan_tier: "trial",
+      });
     },
   });
 }

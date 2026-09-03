@@ -39,3 +39,4 @@ docs/*.pdf
 coverage
 .eslintcache
 *.tsbuildinfo
+*.zip

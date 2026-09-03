@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ROUTES } from "@/config/routes";
+import { track } from "@/features/analytics";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { MarketingNavbar } from "./_shared/MarketingNavbar";
 
@@ -606,7 +607,17 @@ function Hero() {
             size="lg"
             className="h-14 rounded-2xl bg-emerald-500 px-8 text-base font-bold text-white hover:bg-emerald-600 shadow-md shadow-emerald-500/20 transition-all duration-300 hover:scale-[1.02]"
           >
-            <Link id="lp-hero-cta-signup" to={ROUTES.signup}>
+            <Link
+              id="lp-hero-cta-signup"
+              to={ROUTES.signup}
+              onClick={() =>
+                track("begin_signup_click", {
+                  cta_location: "hero_section",
+                  cta_label: "Criar catálogo da minha loja",
+                  plan_interest: "free_trial",
+                })
+              }
+            >
               Criar catálogo da minha loja
               <HugeiconsIcon icon={ArrowRight02Icon} size={18} />
             </Link>
@@ -1282,7 +1293,17 @@ function FinalCTA() {
 
         <div className="mt-10" style={revealStyle(visible, 200)}>
           <Button asChild variant="primary" size="lg">
-            <Link id="lp-final-cta-signup" to={ROUTES.signup}>
+            <Link
+              id="lp-final-cta-signup"
+              to={ROUTES.signup}
+              onClick={() =>
+                track("begin_signup_click", {
+                  cta_location: "final_section",
+                  cta_label: "Comece grátis",
+                  plan_interest: "free_trial",
+                })
+              }
+            >
               Comece grátis
               <HugeiconsIcon icon={ArrowRight02Icon} size={18} />
             </Link>
