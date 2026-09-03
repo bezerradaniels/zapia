@@ -98,8 +98,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', "Inter", ...fontFamily.sans],
-        display: ['"Plus Jakarta Sans"', "Inter", ...fontFamily.sans],
+        sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", '"Segoe UI"', "Roboto", "sans-serif"],
+        display: ["system-ui", "-apple-system", "BlinkMacSystemFont", '"Segoe UI"', "Roboto", "sans-serif"],
       },
       letterSpacing: {
         tightest: "-0.04em",

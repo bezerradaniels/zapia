@@ -1,1 +1,0 @@
-var e={all:[`customers`],list:t=>[...e.all,`list`,t],detail:t=>[...e.all,`detail`,t],orders:t=>[...e.all,`orders`,t]};export{e as t};

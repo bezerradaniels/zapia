@@ -1,1 +1,0 @@
-import{n as e}from"./vendor-query-DMS1rumW.js";import{t}from"./keys-CLNzhvfW.js";import{m as n,p as r}from"./index-CgnmiyUo.js";function i(n){return e({queryKey:t.detail(n??``),queryFn:()=>r(n),enabled:!!n})}function a(r){return e({queryKey:t.orders(r?.id??``),queryFn:()=>n(r),enabled:!!r})}export{a as n,i as t};
