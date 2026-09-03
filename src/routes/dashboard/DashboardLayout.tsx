@@ -7,6 +7,8 @@ import { useActiveStore } from "@/lib/tenant";
 import { useOrderNotifications } from "@/features/orders";
 import { useNotificationRealtime } from "@/features/notifications";
 import { ROUTES } from "@/config/routes";
+import { isAdminEmail } from "@/config/admin";
+import { isAdminDomain } from "@/lib/tenant/resolveStore";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { BottomBar } from "@/components/layout/BottomBar";
@@ -35,6 +37,11 @@ export default function DashboardLayout() {
   // 2. Redirect if no session
   if (!session) {
     return <Navigate to={ROUTES.login} replace />;
+  }
+
+  // 2.1. Admins on admin domain (or with admin email and no store) should go to the platform admin panel
+  if (isAdminDomain() || (isAdminEmail(session.user?.email) && myStores.data?.length === 0)) {
+    return <Navigate to={ROUTES.admin} replace />;
   }
 
   // 3. Keep layout visible while myStores loads

@@ -11,6 +11,8 @@ import { useSession } from "@/features/auth";
 import { useMyStores } from "@/features/catalog";
 import { loadOnboardingSession } from "@/features/onboarding/utils/onboardingSession";
 import { ROUTES } from "@/config/routes";
+import { isAdminEmail } from "@/config/admin";
+import { isAdminDomain } from "@/lib/tenant/resolveStore";
 import { Logo } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
@@ -57,6 +59,10 @@ export default function OnboardingLayout() {
   }
 
   if (!session) return <Navigate to={ROUTES.login} replace />;
+
+  if (isAdminEmail(session.user?.email) || isAdminDomain()) {
+    return <Navigate to={ROUTES.admin} replace />;
+  }
 
   // Redirect to dashboard only if user already has a store AND there's no
   // active onboarding session (which means they're mid-flow after step 1).

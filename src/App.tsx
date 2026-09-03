@@ -207,11 +207,15 @@ function AppRoutes() {
       <Route
         path={ROUTES.trialSignup}
         element={
-          <AppProviders>
-            <RequireGuest>
-              <TrialSignupPage />
-            </RequireGuest>
-          </AppProviders>
+          isAdmin ? (
+            <Navigate to={ROUTES.admin} replace />
+          ) : (
+            <AppProviders>
+              <RequireGuest>
+                <TrialSignupPage />
+              </RequireGuest>
+            </AppProviders>
+          )
         }
       />
       <Route
@@ -227,11 +231,15 @@ function AppRoutes() {
       <Route
         path={ROUTES.signup}
         element={
-          <AppProviders>
-            <RequireGuest>
-              <SignupPage />
-            </RequireGuest>
-          </AppProviders>
+          isAdmin ? (
+            <Navigate to={ROUTES.admin} replace />
+          ) : (
+            <AppProviders>
+              <RequireGuest>
+                <SignupPage />
+              </RequireGuest>
+            </AppProviders>
+          )
         }
       />
       <Route
@@ -253,9 +261,13 @@ function AppRoutes() {
       <Route
         path={ROUTES.onboarding}
         element={
-          <AppProviders>
-            <OnboardingLayout />
-          </AppProviders>
+          isAdmin ? (
+            <Navigate to={ROUTES.admin} replace />
+          ) : (
+            <AppProviders>
+              <OnboardingLayout />
+            </AppProviders>
+          )
         }
       >
         <Route index element={<Navigate to="etapa-um" replace />} />
@@ -295,9 +307,13 @@ function AppRoutes() {
       <Route
         path={ROUTES.onboardComplete}
         element={
-          <AppProviders>
-            <OnboardCompletePage />
-          </AppProviders>
+          isAdmin ? (
+            <Navigate to={ROUTES.admin} replace />
+          ) : (
+            <AppProviders>
+              <OnboardCompletePage />
+            </AppProviders>
+          )
         }
       />
 
