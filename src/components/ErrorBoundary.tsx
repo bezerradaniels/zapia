@@ -22,6 +22,24 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("[ErrorBoundary]", error, errorInfo);
+
+    // Auto-reload once on deployment chunk hash mismatch
+    const msg = error?.message || "";
+    const isChunkError =
+      msg.includes("dynamically imported module") ||
+      msg.includes("Loading chunk") ||
+      msg.includes("Failed to fetch") ||
+      error?.name === "ChunkLoadError";
+
+    if (isChunkError) {
+      const storageKey = "zapia_chunk_reload";
+      const lastReload = sessionStorage.getItem(storageKey);
+      const now = Date.now();
+      if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+        sessionStorage.setItem(storageKey, String(now));
+        window.location.reload();
+      }
+    }
   }
 
   render() {
