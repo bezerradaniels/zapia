@@ -20,9 +20,23 @@ const RESERVED_PATHS = new Set([
   "dashboard",
 ]);
 
+export function isAdminDomain(): boolean {
+  const { hostname } = window.location;
+  if (hostname === "localhost" || hostname === "127.0.0.1") return false;
+  if (hostname === "admin.localhost" || hostname === "app.localhost") return true;
+  return hostname === `admin.${ROOT_DOMAIN}` || hostname === `app.${ROOT_DOMAIN}`;
+}
+
+export function isSiteDomain(): boolean {
+  const { hostname } = window.location;
+  if (hostname === "site.localhost") return true;
+  return hostname === `site.${ROOT_DOMAIN}` || hostname === ROOT_DOMAIN || hostname === `www.${ROOT_DOMAIN}`;
+}
+
 export function isStoreDomain(): boolean {
   const { hostname } = window.location;
   if (hostname === "localhost" || hostname === "127.0.0.1") return false;
+  if (isAdminDomain() || isSiteDomain()) return false;
   if (hostname.endsWith(".localhost")) {
     const sub = hostname.slice(0, hostname.length - ".localhost".length);
     return !!sub && !RESERVED_SUBDOMAINS.has(sub);
