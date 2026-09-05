@@ -18,7 +18,7 @@ import { useCustomers } from "@/features/customers";
 import { useSession } from "@/features/auth";
 import { formatMoney } from "@/lib/format";
 import { ROUTES } from "@/config/routes";
-import { Badge, Button, Skeleton } from "@/components/ui";
+import { Button, Skeleton } from "@/components/ui";
 import type { Order } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
@@ -91,16 +91,6 @@ const STATUS_LABEL: Record<Order["status"], string> = {
   cancelled: "Cancelado",
 };
 
-const STATUS_TONE: Record<
-  Order["status"],
-  React.ComponentProps<typeof Badge>["tone"]
-> = {
-  pending: "amber",
-  confirmed: "lilac",
-  completed: "green",
-  cancelled: "rose",
-};
-
 export default function HomePage() {
   const { store } = useActiveStore();
   const { session } = useSession();
@@ -151,55 +141,54 @@ export default function HomePage() {
       {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
 
       {/* Greeting */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tighter text-z-text">
-          {getGreeting()}, {firstName}!
+      <div className="flex flex-col gap-0.5">
+        <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-neutral-900">
+          {getGreeting()}, {firstName}
         </h1>
+        <p className="text-[12px] text-neutral-400 font-normal">
+          Aqui está o resumo da sua loja hoje.
+        </p>
       </div>
 
-      {/* Quick actions — white cards with mint icon (handoff) */}
-      <div className="grid grid-cols-3 gap-2.5">
+      {/* Quick actions — single line */}
+      <div className="grid grid-cols-3 gap-2">
         {[
           {
-            label: "Novo produto",
-            icon: Add01Icon,
-            href: "/dashboard/produtos/novo",
+            label: "Produtos",
+            icon: PackageIcon,
+            href: ROUTES.dashboardProducts,
+            iconClass: "bg-emerald-50 text-emerald-800 border border-emerald-200/60 group-hover:bg-emerald-100",
           },
           {
-            label: "Ver pedidos",
+            label: "Pedidos",
             icon: InvoiceIcon,
             href: ROUTES.dashboardOrders,
+            iconClass: "bg-sky-50 text-sky-800 border border-sky-200/60 group-hover:bg-sky-100",
           },
           {
-            label: "Personalizar catálogo",
+            label: "Personalizar",
             icon: Share01Icon,
             href: ROUTES.dashboardCatalog,
+            iconClass: "bg-violet-50 text-violet-800 border border-violet-200/60 group-hover:bg-violet-100",
           },
-        ].map((action) => {
-          const inner = (
-            <>
-              <div className="flex h-[62px] w-full items-center justify-center rounded-2xl border border-z-border bg-slate-900 text-white transition-colors group-hover:border-[#10b981]/40">
-                <HugeiconsIcon icon={action.icon} size={24} />
-              </div>
-              <span className="text-center text-[10.5px] font-semibold leading-tight text-z-text-muted">
-                {action.label}
-              </span>
-            </>
-          );
-          return (
-            <Link
-              key={action.label}
-              to={action.href}
-              className="group flex flex-col items-center gap-1.5"
-            >
-              {inner}
-            </Link>
-          );
-        })}
+        ].map((action) => (
+          <Link
+            key={action.label}
+            to={action.href}
+            className="group flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-neutral-200/80 bg-white px-2 py-2 sm:px-3 sm:py-2 transition-all hover:border-neutral-300 hover:bg-neutral-50/70"
+          >
+            <div className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-lg transition-colors", action.iconClass)}>
+              <HugeiconsIcon icon={action.icon} size={14} />
+            </div>
+            <span className="truncate text-[12px] font-medium text-[rgb(24,24,26)]">
+              {action.label}
+            </span>
+          </Link>
+        ))}
       </div>
 
       {/* Stats */}
-      <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4">
         <StatCard
           label="Pedidos hoje"
           value={todayOrders.length.toString()}
@@ -232,63 +221,63 @@ export default function HomePage() {
       </section>
 
       {/* Chart + recent orders */}
-      <section className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
-        <div className="rounded-2xl border border-z-border bg-white p-5">
-          <div className="mb-1 text-sm font-semibold text-z-text">
-            Pedidos — últimos 7 dias
+      <section className="grid gap-3.5 lg:grid-cols-[1fr_1.4fr]">
+        <div className="rounded-xl border border-neutral-200/80 bg-white p-4 sm:p-5">
+          <div className="mb-0.5 text-[13px] font-semibold text-neutral-900">
+            Pedidos dos últimos dias
           </div>
-          <div className="mb-4 text-xs text-z-text-muted">
+          <div className="mb-3 text-[11px] text-neutral-400">
             {billable.length} pedido{billable.length === 1 ? "" : "s"} no total
           </div>
           <WeeklyBars orders={list} />
         </div>
 
-        <div className="rounded-2xl border border-z-border bg-white p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="text-sm font-semibold text-z-text">
+        <div className="rounded-xl border border-neutral-200/80 bg-white p-4 sm:p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="text-[13px] font-semibold text-neutral-900">
               Últimos pedidos
             </div>
             <Link
               to={ROUTES.dashboardOrders}
-              className="inline-flex items-center gap-1 text-xs font-medium text-z-text-muted hover:text-z-text"
+              className="inline-flex items-center gap-1 text-[11.5px] font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
             >
               Ver todos
-              <HugeiconsIcon icon={ArrowRightIcon} size={12} />
+              <HugeiconsIcon icon={ArrowRightIcon} size={11} />
             </Link>
           </div>
           {orders.isLoading ? (
             <div className="flex flex-col gap-2">
               {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-10 rounded-xl" />
+                <Skeleton key={i} className="h-9 rounded-lg" />
               ))}
             </div>
           ) : recent.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-z-border py-10 text-center">
+            <div className="flex flex-col items-center gap-2.5 rounded-lg border border-dashed border-neutral-200 py-8 text-center">
               <HugeiconsIcon
                 icon={PackageIcon}
-                size={32}
-                className="text-z-text-hint"
+                size={26}
+                className="text-neutral-300"
               />
-              <p className="text-sm text-z-text-muted">Nenhum pedido ainda.</p>
+              <p className="text-xs text-neutral-400">Nenhum pedido ainda.</p>
               <Link
                 to={ROUTES.dashboardCatalog}
-                className="text-xs font-medium text-black hover:underline"
+                className="text-xs font-medium text-neutral-900 hover:underline"
               >
                 Compartilhar catálogo →
               </Link>
             </div>
           ) : (
-            <div className="flex flex-col divide-y divide-z-border/60">
+            <div className="flex flex-col divide-y divide-neutral-100">
               {recent.map((o) => (
                 <div
                   key={o.id}
-                  className="flex items-center justify-between gap-2 py-2.5"
+                  className="flex items-center justify-between gap-2 py-2"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-medium">
+                    <p className="truncate text-[12.5px] font-medium text-neutral-900">
                       {o.customer_name}
                     </p>
-                    <p className="text-xs text-z-text-muted">
+                    <p className="text-[10.5px] text-neutral-400">
                       {new Intl.DateTimeFormat("pt-BR", {
                         timeZone: "America/Sao_Paulo",
                         dateStyle: "short",
@@ -296,13 +285,13 @@ export default function HomePage() {
                       }).format(new Date(o.created_at))}
                     </p>
                   </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className="text-[13px] font-semibold tabular-nums">
+                  <div className="flex shrink-0 flex-col items-end gap-0.5">
+                    <span className="text-[12.5px] font-semibold text-neutral-900 tabular-nums">
                       {formatMoney(o.total_in_cents)}
                     </span>
-                    <Badge tone={STATUS_TONE[o.status]}>
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700">
                       {STATUS_LABEL[o.status]}
-                    </Badge>
+                    </span>
                   </div>
                 </div>
               ))}
@@ -328,23 +317,23 @@ function StatCard({
   icon: IconSvgElement;
 }) {
   return (
-    <div className="rounded-[18px] border border-z-border bg-white p-4">
-      <div className="mb-3.5 flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold text-z-text-muted">{label}</span>
-        <HugeiconsIcon
-          icon={icon}
-          size={18}
-          className="shrink-0 text-z-text-hint"
-        />
+    <div className="rounded-xl border border-neutral-200/80 bg-white p-3.5 sm:p-4 transition-all hover:border-neutral-300">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-[11px] font-bold text-[rgb(24,24,26)]">{label}</span>
+        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-neutral-100 text-neutral-600">
+          <HugeiconsIcon icon={icon} size={13} />
+        </div>
       </div>
-      <div className="text-[26px] font-bold leading-none tracking-tighter">
+      <div className="text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 leading-none">
         {value}
       </div>
       {sub && (
         <div
           className={cn(
-            "mt-1.5 text-[11px] font-semibold",
-            subPositive ? "text-black" : "text-z-text-muted",
+            "mt-1.5 text-[10.5px]",
+            subPositive
+              ? "font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.2 rounded-md w-fit"
+              : "text-neutral-400",
           )}
         >
           {sub}
@@ -384,8 +373,8 @@ function WeeklyBars({ orders }: { orders: Order[] }) {
         <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
           <div
             className={cn(
-              "w-full rounded-t-lg",
-              i === counts.length - 1 ? "bg-[#10b981]" : "bg-z-sand-deep",
+              "w-full rounded-t-lg transition-colors",
+              i === counts.length - 1 ? "bg-[#a78bfa]" : "bg-neutral-100 hover:bg-neutral-200/80",
             )}
             style={{ height: `${(v / max) * 88 + 4}px` }}
             title={`${v} pedido${v === 1 ? "" : "s"}`}
@@ -394,8 +383,8 @@ function WeeklyBars({ orders }: { orders: Order[] }) {
             className={cn(
               "text-[10px]",
               i === counts.length - 1
-                ? "font-semibold text-black"
-                : "text-z-text-hint",
+                ? "font-semibold text-violet-900"
+                : "text-neutral-400",
             )}
           >
             {labels[i]}

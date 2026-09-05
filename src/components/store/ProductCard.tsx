@@ -8,7 +8,7 @@ import {
   StarIcon,
 } from "@hugeicons/core-free-icons";
 import type { Product } from "@/types/domain";
-import { discountPercent } from "@/features/products/utils/price";
+import { discountPercent, getPromoPaymentMethodLabel } from "@/features/products/utils/price";
 import { useCartStore, buildCartKey } from "@/features/cart";
 import { formatMoney, toTitleCase } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -94,7 +94,7 @@ export function ProductCard({
                 {formatMoney(p.price_in_cents)}
               </span>
             )}
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               {finalPrice === 0 ? (
                 <span className="text-[13px] font-medium leading-none text-z-text-hint">
                   Valor a combinar
@@ -106,8 +106,13 @@ export function ProductCard({
                 </span>
               )}
               {hasPromo && (
-                <span className="rounded-md bg-[#e8f8ef] px-1.5 py-0.5 text-[11px] font-bold text-[#02a650]">
+                <span className="rounded-md bg-[#e6f7ef] px-1.5 py-0.5 text-[11px] font-bold text-[#02a650]">
                   {discount}% OFF
+                </span>
+              )}
+              {getPromoPaymentMethodLabel(p.promo_payment_method) && (
+                <span className="rounded-md bg-[#e6f7ef] px-1.5 py-0.5 text-[11px] font-bold text-[#02a650]">
+                  {getPromoPaymentMethodLabel(p.promo_payment_method)}
                 </span>
               )}
             </div>
@@ -124,7 +129,7 @@ export function ProductCard({
                       ),
                     )}
                   </span>
-                  {p.installment_total_in_cents <= finalPrice && (
+                  {p.installment_total_in_cents === finalPrice && (
                     <span className="text-[#02a650]"> sem juros</span>
                   )}
                 </span>

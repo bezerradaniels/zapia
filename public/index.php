@@ -10,7 +10,7 @@
  * - site.zapia.app: 301 redirect to zapia.app
  */
 
-$rawHost = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+$rawHost = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
 $host = strtolower(trim(explode(':', explode(',', $rawHost)[0])[0]));
 
 $rawUri = $_SERVER['REQUEST_URI'] ?? '/';
@@ -54,7 +54,7 @@ function serveFile($filePath) {
     header('Content-Type: ' . $mime);
 
     // Immutable caching for hashed static assets; no-cache for HTML files to prevent stale chunk mismatches
-    if (in_array($ext, ['css', 'js', 'mjs', 'svg', 'png', 'jpg', 'jpeg', 'webp', 'woff2', 'ico'])) {
+    if (in_array($ext, ['css', 'js', 'mjs', 'svg', 'png', 'jpg', 'jpeg', 'webp', 'woff2', 'woff', 'ttf', 'ico'])) {
         header('Cache-Control: public, max-age=31536000, immutable');
     } else {
         header('Cache-Control: no-cache, no-store, must-revalidate');
@@ -95,44 +95,50 @@ if (strpos($host, 'painel.') === 0 || strpos($host, 'gestao.') === 0 || strpos($
 }
 
 // 4. ROOT DOMAIN (zapia.app / www.zapia.app)
+$isRoot = ($host === 'zapia.app' || $host === 'www.zapia.app' || $host === 'localhost');
 $cleanPath = rtrim($path, '/');
 if ($cleanPath === '') {
     $cleanPath = '/';
 }
 
-// Forward merchant auth/app routes to painel.zapia.app
-$merchantPrefixes = [
-    '/entrar',
-    '/cadastrar',
-    '/cadastrar-trial',
-    '/recuperar-senha',
-    '/nova-loja',
-    '/dashboard',
-    '/onboard-complete',
-];
-foreach ($merchantPrefixes as $prefix) {
-    if ($cleanPath === $prefix || strpos($cleanPath, $prefix . '/') === 0) {
-        $query = isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] !== '' ? '?' . $_SERVER['QUERY_STRING'] : '';
-        header('Location: https://painel.zapia.app' . $rawUri, true, 302);
+if ($isRoot) {
+    // Forward merchant auth/app routes to painel.zapia.app
+    $merchantPrefixes = [
+        '/entrar',
+        '/cadastrar',
+        '/cadastrar-trial',
+        '/recuperar-senha',
+        '/nova-loja',
+        '/dashboard',
+        '/onboard-complete',
+    ];
+    foreach ($merchantPrefixes as $prefix) {
+        if ($cleanPath === $prefix || strpos($cleanPath, $prefix . '/') === 0) {
+            $query = isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] !== '' ? '?' . $_SERVER['QUERY_STRING'] : '';
+            header('Location: https://painel.zapia.app' . $rawUri, true, 302);
+            exit;
+        }
+    }
+
+    if ($cleanPath === '/admin' || strpos($cleanPath, '/admin/') === 0) {
+        header('Location: https://admin.zapia.app' . $rawUri, true, 302);
         exit;
     }
-}
 
-if ($cleanPath === '/admin' || strpos($cleanPath, '/admin/') === 0) {
-    header('Location: https://admin.zapia.app' . $rawUri, true, 302);
-    exit;
-}
-
-// Serve Static Marketing HTML Pages directly
-if ($cleanPath === '/' || $cleanPath === '/index.html' || $cleanPath === '/home.html') {
-    if (serveFile(__DIR__ . '/home.html')) exit;
-    if (serveFile(__DIR__ . '/index.html')) exit;
-}
-if ($cleanPath === '/termos' || $cleanPath === '/termos.html' || $cleanPath === '/termos-de-uso') {
-    serveFile(__DIR__ . '/termos.html');
-}
-if ($cleanPath === '/privacidade' || $cleanPath === '/privacidade.html') {
-    serveFile(__DIR__ . '/privacidade.html');
+    // Serve Static Marketing HTML Pages directly
+    if ($cleanPath === '/' || $cleanPath === '/index.html' || $cleanPath === '/home.html') {
+        if (serveFile(__DIR__ . '/home.html')) exit;
+        if (serveFile(__DIR__ . '/index.html')) exit;
+    }
+    if ($cleanPath === '/precos' || $cleanPath === '/precos.html') {
+        serveFile(__DIR__ . '/precos.html');
+    }
+    if ($cleanPath === '/termos' || $cleanPath === '/termos.html' || $cleanPath === '/termos-de-uso') {
+        serveFile(__DIR__ . '/termos.html');
+    }
+    if ($cleanPath === '/privacidade' || $cleanPath === '/privacidade.html') {
+        serveFile(__DIR__ . '/privacidade.html');
+    }
 }
 
 // Direct static file match

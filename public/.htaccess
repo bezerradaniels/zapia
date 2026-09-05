@@ -18,3 +18,13 @@ DirectoryIndex index.php index.html
   # Route everything else through PHP Universal Gateway
   RewriteRule . /index.php [L]
 </IfModule>
+
+<IfModule mod_headers.c>
+  # Prevent caching of HTML files so updates are immediately visible
+  <FilesMatch "\.(html|htm|php)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+  </FilesMatch>
+</IfModule>
+

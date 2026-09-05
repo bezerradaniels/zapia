@@ -304,7 +304,10 @@ export default function CheckoutPage() {
                     )}
                   </span>
                   <span className="shrink-0 font-semibold text-z-text tabular-nums">
-                    {formatMoney(effectivePrice(item.product) * item.quantity)}
+                    {formatMoney(
+                      effectivePrice(item.product, item.selectedVariation) *
+                        item.quantity,
+                    )}
                   </span>
                 </li>
               ))}

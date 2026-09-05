@@ -6,6 +6,7 @@ import {
   useCustomer,
   useUpdateCustomer,
   useDeleteCustomer,
+  useAnonymizeCustomer,
 } from "@/features/customers";
 import { CustomerForm } from "@/features/customers/components/CustomerForm";
 import { ROUTES } from "@/config/routes";
@@ -19,6 +20,7 @@ export default function EditCustomerPage() {
   const customer = useCustomer(id);
   const updateCustomer = useUpdateCustomer(id ?? "", store?.id ?? "");
   const deleteCustomer = useDeleteCustomer(store?.id ?? "");
+  const anonymizeCustomer = useAnonymizeCustomer(store?.id ?? "");
 
   if (storeLoading || customer.isLoading) {
     return <p className="text-sm text-z-text-muted">Carregando...</p>;
@@ -56,13 +58,15 @@ export default function EditCustomerPage() {
 
   async function handleDelete() {
     if (!id) return;
-    if (
-      !confirm(
-        `Excluir o cliente "${customer.data!.name}"? Esta ação não pode ser desfeita.`,
-      )
-    )
-      return;
-    await deleteCustomer.mutateAsync(id);
+    const confirmed = confirm(
+      `Excluir o cliente "${customer.data!.name}"?\n\nEsta ação removerá o cadastro e anonimizará os dados pessoais no histórico de pedidos (LGPD - Direito ao Esquecimento).`,
+    );
+    if (!confirmed) return;
+    try {
+      await anonymizeCustomer.mutateAsync(id);
+    } catch {
+      await deleteCustomer.mutateAsync(id);
+    }
     navigate(ROUTES.dashboardCustomers);
   }
 

@@ -1,4 +1,6 @@
 import type { DeliverySlot } from "@/types/domain";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, Add01Icon } from "@hugeicons/core-free-icons";
 
 const DAY_OPTIONS = [
   { value: "all", label: "Todos os dias" },
@@ -87,10 +89,10 @@ export function DeliveryHoursEditor({ value, onChange }: Props) {
               <button
                 type="button"
                 onClick={() => remove(index)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-z-text-hint transition-colors hover:bg-z-primary/10 hover:text-z-primary"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
                 aria-label="Remover horário"
               >
-                ✕
+                <HugeiconsIcon icon={Cancel01Icon} size={15} />
               </button>
             </div>
           ))}
@@ -100,9 +102,10 @@ export function DeliveryHoursEditor({ value, onChange }: Props) {
       <button
         type="button"
         onClick={add}
-        className="flex w-fit items-center gap-1.5 text-sm font-medium text-[#10b981] hover:underline"
+        className="flex w-fit items-center gap-1.5 text-xs font-medium text-neutral-900 hover:underline"
       >
-        + Adicionar horário
+        <HugeiconsIcon icon={Add01Icon} size={14} />
+        Adicionar horário
       </button>
     </div>
   );

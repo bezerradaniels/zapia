@@ -30,11 +30,19 @@ export function RoundSingleCheck({ options, value, onChange }: Props) {
             <span
               className={cn(
                 "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                checked ? "border-[#11b981]" : "border-slate-300",
+                checked ? "border-[#11b981] bg-[#11b981]" : "border-slate-300",
               )}
             >
               {checked && (
-                <span className="h-2.5 w-2.5 rounded-full bg-[#11b981]" />
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                  <path
+                    d="M1 4L3.5 6.5L9 1.5"
+                    stroke="white"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               )}
             </span>
             <span

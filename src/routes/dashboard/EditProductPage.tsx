@@ -49,6 +49,7 @@ export default function EditProductPage() {
     cost_in_cents: p.cost_in_cents ?? null,
     price_in_cents: p.price_in_cents,
     promo_price_in_cents: p.promo_price_in_cents,
+    promo_payment_method: p.promo_payment_method ?? null,
     installment_count: p.installment_count ?? null,
     installment_total_in_cents: p.installment_total_in_cents ?? null,
     is_active: p.is_active,
@@ -64,7 +65,7 @@ export default function EditProductPage() {
   const catalogUrl = store.slug ? buildStoreUrl(store.slug) : undefined;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pt-4">
       <header className="flex items-center gap-2">
         <Link
           to={ROUTES.dashboardProducts}

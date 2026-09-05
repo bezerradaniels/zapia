@@ -18,5 +18,10 @@ export function canAccessCatalog(
 ): boolean {
   if (!status) return false;
 
+  if (status.status === "trialing") {
+    if (!status.trial_ends_at) return true;
+    return new Date(status.trial_ends_at).getTime() > Date.now();
+  }
+
   return ACTIVE_STATUSES.includes(status.status);
 }

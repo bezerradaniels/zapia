@@ -18,6 +18,7 @@ function toDbPayload(input: ProductInput) {
     category: input.category?.trim().toLowerCase() || null,
     subcategory: input.subcategory?.trim().toLowerCase() || null,
     promo_price_in_cents: input.promo_price_in_cents ?? null,
+    promo_payment_method: input.promo_payment_method ?? null,
     installment_count: input.installment_count ?? null,
     installment_total_in_cents: input.installment_total_in_cents ?? null,
     brand: input.has_no_brand ? null : input.brand?.trim() || null,
@@ -50,11 +51,23 @@ export async function createProduct(
   const supabase = createBrowserClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const payload: any = { store_id: storeId, ...toDbPayload(input) };
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("products")
     .insert(payload)
     .select("*")
     .single();
+
+  if (error && error.message?.includes("promo_payment_method")) {
+    delete payload.promo_payment_method;
+    const retry = await supabase
+      .from("products")
+      .insert(payload)
+      .select("*")
+      .single();
+    if (retry.error) throw retry.error;
+    data = retry.data;
+    error = null;
+  }
 
   if (error) throw error;
   return data as Product;
@@ -67,12 +80,25 @@ export async function updateProduct(
   const supabase = createBrowserClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const payload: any = toDbPayload(input);
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("products")
     .update(payload)
     .eq("id", id)
     .select("*")
     .single();
+
+  if (error && error.message?.includes("promo_payment_method")) {
+    delete payload.promo_payment_method;
+    const retry = await supabase
+      .from("products")
+      .update(payload)
+      .eq("id", id)
+      .select("*")
+      .single();
+    if (retry.error) throw retry.error;
+    data = retry.data;
+    error = null;
+  }
 
   if (error) throw error;
   return data as Product;

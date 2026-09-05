@@ -56,6 +56,18 @@ export async function deleteCustomer(id: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function anonymizeCustomer(
+  storeId: string,
+  customerId: string,
+): Promise<void> {
+  const supabase = createBrowserClient();
+  const { error } = await supabase.rpc("anonymize_customer_data", {
+    target_customer_id: customerId,
+    target_store_id: storeId,
+  });
+  if (error) throw error;
+}
+
 export async function deleteAllCustomers(storeId: string): Promise<void> {
   const supabase = createBrowserClient();
   const { error } = await supabase

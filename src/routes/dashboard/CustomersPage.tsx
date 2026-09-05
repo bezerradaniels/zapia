@@ -20,6 +20,8 @@ import { Skeleton, Sheet, Button } from "@/components/ui";
 import { EmptyState } from "@/components/feedback";
 import type { Customer } from "@/features/customers/types";
 
+const ITEMS_PER_PAGE = 25;
+
 export default function CustomersPage() {
   const navigate = useNavigate();
   const { store } = useActiveStore();
@@ -31,6 +33,7 @@ export default function CustomersPage() {
   const [intelligenceFilter, setIntelligenceFilter] =
     useState<IntelligenceFilter | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const activeFilterCount = (tagFilter ? 1 : 0) + (sellerFilter ? 1 : 0);
 
   // Memoize so the `?? []` fallback keeps a stable reference and the
@@ -58,6 +61,33 @@ export default function CustomersPage() {
       return true;
     });
   }, [list, search, tagFilter, sellerFilter]);
+
+  const [prevFilter, setPrevFilter] = useState({
+    search,
+    tagFilter,
+    sellerFilter,
+    intelligenceFilter,
+  });
+  if (
+    prevFilter.search !== search ||
+    prevFilter.tagFilter !== tagFilter ||
+    prevFilter.sellerFilter !== sellerFilter ||
+    prevFilter.intelligenceFilter !== intelligenceFilter
+  ) {
+    setPrevFilter({
+      search,
+      tagFilter,
+      sellerFilter,
+      intelligenceFilter,
+    });
+    setCurrentPage(1);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const paginatedCustomers = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filtered.slice(start, start + ITEMS_PER_PAGE);
+  }, [filtered, currentPage]);
 
   function handleDetails(customer: Customer) {
     navigate(`${ROUTES.dashboardCustomers}/${customer.id}`);
@@ -91,7 +121,7 @@ export default function CustomersPage() {
                 placeholder="Pesquisar nos dados do cliente"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-11 w-full rounded-xl border border-z-border bg-white pl-9 pr-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none"
+                className="h-10 w-full rounded-xl border border-neutral-200/80 bg-white pl-9 pr-3 text-xs text-[rgb(24,24,26)] placeholder:text-neutral-400 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 focus:outline-none"
               />
             </div>
 
@@ -99,11 +129,11 @@ export default function CustomersPage() {
               type="button"
               onClick={() => setFiltersOpen(true)}
               aria-label="Filtros"
-              className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-z-border bg-white text-z-text-muted hover:bg-z-bg"
+              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-200/80 bg-white text-neutral-500 transition-colors hover:border-violet-300 hover:bg-violet-50/40 hover:text-violet-700"
             >
               <HugeiconsIcon icon={FilterHorizontalIcon} size={16} />
               {activeFilterCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-z-green text-[10px] font-bold text-z-ink">
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-400 text-[10px] font-bold text-neutral-950">
                   {activeFilterCount}
                 </span>
               )}
@@ -113,9 +143,9 @@ export default function CustomersPage() {
               type="button"
               onClick={() => navigate(ROUTES.dashboardCustomersNew)}
               aria-label="Novo cliente"
-              className="flex h-11 shrink-0 items-center gap-2 rounded-xl bg-z-green px-4 text-sm font-semibold text-z-ink transition-opacity hover:opacity-90"
+              className="flex h-10 shrink-0 items-center gap-1.5 rounded-xl bg-violet-400 px-3.5 text-xs font-medium text-white transition-all hover:bg-violet-500"
             >
-              <HugeiconsIcon icon={Add01Icon} size={16} />
+              <HugeiconsIcon icon={Add01Icon} size={15} />
               <span className="hidden sm:inline">Novo cliente</span>
             </button>
           </div>
@@ -203,7 +233,7 @@ export default function CustomersPage() {
             />
           ) : (
             <div className="flex flex-col gap-2">
-              {filtered.map((c) => (
+              {paginatedCustomers.map((c) => (
                 <CustomerRow
                   key={c.id}
                   customer={c}
@@ -214,6 +244,32 @@ export default function CustomersPage() {
                 <p className="py-6 text-center text-sm text-z-text-muted">
                   Nenhum cliente encontrado para "{search}".
                 </p>
+              )}
+
+              {totalPages > 1 && (
+                <div className="mt-2 flex items-center justify-between border-t border-z-border pt-4 text-xs font-semibold text-z-text-muted">
+                  <span>
+                    Página {currentPage} de {totalPages} ({filtered.length} clientes)
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={currentPage <= 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      className="rounded-lg border border-z-border bg-white px-3 py-1.5 font-medium text-z-text transition-colors hover:bg-z-bg disabled:opacity-40"
+                    >
+                      Anterior
+                    </button>
+                    <button
+                      type="button"
+                      disabled={currentPage >= totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      className="rounded-lg border border-z-border bg-white px-3 py-1.5 font-medium text-z-text transition-colors hover:bg-z-bg disabled:opacity-40"
+                    >
+                      Próxima
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           )}

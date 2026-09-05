@@ -4,19 +4,22 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-opacity disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-z-primary focus-visible:ring-offset-2 hover:opacity-85",
+  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 hover:opacity-90",
   {
     variants: {
       variant: {
-        primary: "bg-z-green text-z-ink",
-        lime: "bg-z-lime text-z-lime-fg",
-        ghost: "bg-z-bg2 text-z-text",
-        outline: "bg-transparent text-z-text border-[1.5px] border-z-ink",
+        primary: "bg-violet-500 text-white font-medium hover:bg-violet-600 shadow-xs",
+        emerald: "bg-violet-500 text-white font-medium hover:bg-violet-600 shadow-xs",
+        violet: "bg-violet-500 text-white font-medium hover:bg-violet-600 shadow-xs",
+        sky: "bg-sky-400 text-neutral-950 font-semibold hover:bg-sky-300 shadow-xs",
+        lime: "bg-violet-500 text-white font-medium hover:bg-violet-600 shadow-xs",
+        ghost: "bg-transparent text-[rgb(24,24,26)] hover:bg-neutral-100/70",
+        outline: "bg-transparent text-[rgb(24,24,26)] border border-neutral-300 hover:bg-violet-50/60",
         outlineW: "bg-transparent text-white border-[1.5px] border-white/50",
         whatsapp: "bg-[#25d366] text-white",
-        ink: "bg-z-ink text-white",
+        ink: "bg-neutral-900 text-white",
         store: "bg-store-primary text-store-primary-fg",
-        link: "bg-transparent text-z-primary hover:underline p-0 h-auto",
+        link: "bg-transparent text-[rgb(24,24,26)] hover:text-violet-600 hover:underline p-0 h-auto",
       },
       size: {
         sm: "h-9 px-4 text-[13px]",

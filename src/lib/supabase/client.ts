@@ -2,19 +2,21 @@ import { createClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/types/database";
 
-const DEFAULT_SUPABASE_URL = "https://xopesjswojsesjmvazel.supabase.co";
-const DEFAULT_SUPABASE_KEY = "sb_publishable_1MqkyaZBHj5GkHqVAT9wPw_aCTpl2dl";
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey =
   import.meta.env.VITE_SUPABASE_ANON_KEY ??
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-  DEFAULT_SUPABASE_KEY;
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 let client: ReturnType<typeof createClient<Database>> | null = null;
 
 export function createBrowserClient() {
   if (client) return client;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      "Missing Supabase environment variables. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.",
+    );
+  }
 
   // SECURITY: the session (access + refresh JWT) is persisted in the default
   // origin-isolated localStorage — NOT in a cookie scoped to the parent domain.

@@ -16,25 +16,20 @@ export async function listOrdersForStore(storeId: string): Promise<Order[]> {
 export async function getOrderById(id: string): Promise<OrderWithItems | null> {
   const supabase = createBrowserClient();
 
-  const { data: order, error: orderError } = await supabase
+  const { data, error } = await supabase
     .from("orders")
-    .select("*")
+    .select("*, items:order_items(*)")
     .eq("id", id)
+    .order("created_at", { referencedTable: "order_items", ascending: true })
     .maybeSingle();
 
-  if (orderError) throw orderError;
-  if (!order) return null;
+  if (error) throw error;
+  if (!data) return null;
 
-  const { data: items, error: itemsError } = await supabase
-    .from("order_items")
-    .select("*")
-    .eq("order_id", id)
-    .order("created_at", { ascending: true });
-
-  if (itemsError) throw itemsError;
+  const { items, ...order } = data;
 
   return {
     ...(order as unknown as Order),
-    items: (items ?? []) as OrderItem[],
+    items: (items as unknown as OrderItem[]) ?? [],
   };
 }

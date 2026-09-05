@@ -344,7 +344,7 @@ export default function NewOrderPage() {
               <h2 className="font-semibold text-z-text">Vendedor</h2>
               {!canAssignSeller && (
                 <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-                  Premium 👑
+                  Plano Premium
                 </span>
               )}
             </div>
@@ -549,7 +549,7 @@ export default function NewOrderPage() {
           type="button"
           disabled={create.isPending}
           onClick={handleSubmit}
-          className="rounded-full bg-z-green px-8 py-2.5 text-sm font-semibold text-z-ink transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="rounded-xl bg-violet-400 px-8 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-500 disabled:opacity-60"
         >
           {create.isPending ? "Criando..." : "Criar novo pedido"}
         </button>

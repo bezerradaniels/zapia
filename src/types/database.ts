@@ -1016,6 +1016,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      anonymize_customer_data: {
+        Args: { target_customer_id: string; target_store_id: string };
+        Returns: boolean;
+      };
       add_seller_by_email: {
         Args: { target_email: string; target_store: string };
         Returns: string;

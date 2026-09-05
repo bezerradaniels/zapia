@@ -103,7 +103,7 @@ export const useCartStore = create<CartStore>()(
             item_id: product.id,
             item_name: product.name,
             quantity: 1,
-            price: effectivePrice(product),
+            price: effectivePrice(product, selectedVariation),
           });
         }
       },
@@ -160,7 +160,8 @@ export const useCartStore = create<CartStore>()(
       },
       subtotalInCents: () =>
         get().items.reduce(
-          (sum, i) => sum + effectivePrice(i.product) * i.quantity,
+          (sum, i) =>
+            sum + effectivePrice(i.product, i.selectedVariation) * i.quantity,
           0,
         ),
       discountInCents: () => {

@@ -61,3 +61,92 @@ export function track<E extends AnalyticsEventName>(
 
   pushToDataLayer({ event, ...(params ?? {}) });
 }
+
+export interface SubscriptionPurchaseParams {
+  transactionId: string;
+  planId: string;
+  planName: string;
+  value: number; // Valor em reais, ex: 14.90 ou 149.00
+  billingPeriod?: "monthly" | "annual" | string;
+  storeId?: string;
+  paymentMethod?: "pix" | "stripe" | "card";
+}
+
+/**
+ * Registra formalmente a compra confirmada de uma assinatura no padrão E-commerce do GA4 (`purchase`).
+ * Inclui:
+ * - Deduplicação automática via `sessionStorage` para não inflar métricas em caso de recarregamento
+ * - Limpeza prévia do objeto `ecommerce` no dataLayer (`ecommerce: null`)
+ * - Payload padronizado com `transaction_id`, `value`, `currency: 'BRL'` e array de `items`
+ */
+export function trackSubscriptionPurchase(
+  params: SubscriptionPurchaseParams,
+): boolean {
+  if (typeof window === "undefined") return false;
+
+  const dedupKey = `zapia_purchase_tracked_${params.transactionId}`;
+  try {
+    if (sessionStorage.getItem(dedupKey)) {
+      if (import.meta.env.DEV) {
+        console.log(
+          "[analytics:purchase] Ignorado: compra já registrada nesta sessão:",
+          params.transactionId,
+        );
+      }
+      return false;
+    }
+    sessionStorage.setItem(dedupKey, "1");
+  } catch {
+    // sessionStorage pode falhar em modo anônimo estrito
+  }
+
+  const items = [
+    {
+      item_id: params.planId,
+      item_name: params.planName,
+      item_category: "subscription",
+      item_variant: params.billingPeriod ?? "monthly",
+      price: params.value,
+      quantity: 1,
+    },
+  ];
+
+  const ecommerce = {
+    transaction_id: params.transactionId,
+    value: params.value,
+    currency: "BRL",
+    tax: 0,
+    shipping: 0,
+    items,
+  };
+
+  if (import.meta.env.DEV) {
+    console.log("[analytics:ecommerce] purchase (assinatura confirmada):", {
+      event: "purchase",
+      ecommerce,
+      plan_tier: params.planId,
+      billing_period: params.billingPeriod,
+      payment_method: params.paymentMethod,
+      store_id: params.storeId,
+    });
+    return true;
+  }
+
+  if (!hasAnalyticsConsent()) return false;
+
+  pushToDataLayer({ ecommerce: null });
+  pushToDataLayer({
+    event: "purchase",
+    ecommerce,
+    transaction_id: params.transactionId,
+    value: params.value,
+    currency: "BRL",
+    plan_tier: params.planId,
+    billing_period: params.billingPeriod,
+    payment_method: params.paymentMethod,
+    store_id: params.storeId,
+  });
+
+  return true;
+}
+

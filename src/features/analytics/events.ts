@@ -111,6 +111,8 @@ export type AnalyticsEventMap = {
   // Nomes alinhados às recomendações de e-commerce do GA4 para os relatórios
   // de e-commerce funcionarem sem configuração extra.
   view_item: { item_id: string; item_name: string };
+  view_item_list: { item_list_id?: string; item_list_name?: string; items?: unknown[] };
+  select_item: { item_id: string; item_name?: string; item_list_name?: string };
   add_to_cart: {
     item_id: string;
     item_name: string;
@@ -118,7 +120,7 @@ export type AnalyticsEventMap = {
     price: number;
   };
   remove_from_cart: { item_id: string; quantity: number };
-  begin_checkout: { item_count: number; value: number };
+  begin_checkout: { item_count?: number; value?: number; plan_tier?: string; billing_period?: string };
   /** Pedido enviado ao lojista via WhatsApp (equivalente a `purchase`). */
   order_submitted: {
     order_id: string;
@@ -126,8 +128,29 @@ export type AnalyticsEventMap = {
     item_count: number;
     has_coupon: boolean;
   };
+  /** Compra confirmada de e-commerce (assinatura ou pedido) */
+  purchase: {
+    transaction_id: string;
+    value: number;
+    currency?: string;
+    plan_tier?: string;
+    billing_period?: string;
+    tax?: number;
+    shipping?: number;
+    items?: unknown[];
+  };
 
-  // ── Engajamento ──────────────────────────────────────────────────────────
+  // ── Engajamento & Marketing ──────────────────────────────────────────────
+  cta_click: {
+    cta_label: string;
+    cta_location: string;
+    cta_target?: string;
+    plan_interest?: string;
+  };
+  faq_toggle: {
+    question_title: string;
+    is_open?: boolean;
+  };
   share_link_copied: {
     link_type: "store" | "product" | "seller";
     item_id: string;
@@ -135,10 +158,18 @@ export type AnalyticsEventMap = {
   search_performed: { search_term: string; result_count: number };
 
   // ── Faturamento (assinatura do lojista) ─────────────────────────────────────
-  pricing_page_viewed: Record<string, never>;
+  pricing_page_viewed: { store_id?: string };
   free_plan_started: { plan_tier: string };
-  subscription_started: { plan_tier: string };
-  pix_generated: { plan_tier: string; billing_period: string };
+  subscription_started: { plan_tier: string; billing_period?: string; value?: number };
+  pix_generated: { plan_tier: string; billing_period: string; value?: number };
+
+  // ── Observabilidade & Erros ───────────────────────────────────────────────
+  client_error_captured: {
+    error_message: string;
+    component_stack?: string;
+    route?: string;
+    fatal?: boolean;
+  };
 };
 
 /** Nomes válidos de evento. */

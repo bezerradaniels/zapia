@@ -237,9 +237,8 @@ export function ImageCropUploader({
           <button
             type="button"
             onClick={pick}
-            style={{ backgroundColor: "#10b981" }}
             className={cn(
-              "flex w-fit items-center gap-2 rounded-lg text-xs font-medium text-white transition-opacity hover:opacity-85",
+              "flex w-fit items-center gap-2 rounded-lg bg-[#a78bfa] text-xs font-medium text-white transition-opacity hover:opacity-90",
               compact ? "px-3 py-1.5" : "px-4 py-2",
             )}
           >

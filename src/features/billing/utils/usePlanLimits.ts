@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { PLANS } from "@/config/plans";
 import type { PlanFeatures, Subscription } from "@/types/domain";
 import { useSubscription } from "../hooks/useSubscription";
@@ -24,6 +24,7 @@ export type PlanLimits = {
  * instead of hardcoding plan IDs.
  */
 export function usePlanLimits(storeId: string | undefined): PlanLimits {
+  const [now] = useState(() => Date.now());
   const sub = useSubscription(storeId);
   const plans = usePlanFeatures();
 
@@ -39,7 +40,7 @@ export function usePlanLimits(storeId: string | undefined): PlanLimits {
     const isTrialActive =
       subscription?.status === "trialing" &&
       (!subscription.trial_ends_at ||
-        new Date(subscription.trial_ends_at).getTime() > Date.now());
+        new Date(subscription.trial_ends_at).getTime() > now);
 
     const isSubscriptionActive =
       subscription?.status === "active" || isTrialActive;

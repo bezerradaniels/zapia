@@ -239,11 +239,11 @@ function PickerContent({
                         className={cn(
                           "h-9 rounded-xl px-4 text-sm font-medium transition-colors",
                           isAdded
-                            ? "border border-z-green/30 bg-z-green/10 text-[#10b981]"
-                            : "bg-z-green text-z-ink hover:opacity-90",
+                            ? "border border-violet-200 bg-violet-50 text-violet-800 font-medium"
+                            : "bg-violet-400 text-white font-medium hover:bg-violet-500",
                         )}
                       >
-                        {isAdded ? "Adicionado ✓" : "Adicionar"}
+                        {isAdded ? "Adicionado" : "Adicionar"}
                       </button>
                     </div>
                   </li>

@@ -132,30 +132,30 @@ export function Topbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b border-z-border bg-slate-100 px-4 lg:bg-slate-100 lg:px-6">
+      <header className="sticky top-0 z-20 flex h-[52px] items-center justify-between gap-4 border-b border-neutral-200/80 bg-white/95 px-4 backdrop-blur-md lg:px-6">
         {/* Store identity — avatar + name + plan (opens user menu) */}
         <div className="relative flex min-w-0 items-center gap-3">
           <button
             type="button"
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             aria-label="Menu da conta"
-            className="flex items-center gap-3"
+            className="flex items-center gap-3 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-neutral-100/60"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-z-ink text-[13px] font-extrabold tracking-tight text-[#10b981]">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-900 text-[12px] font-semibold text-white">
               {storeInitials}
             </span>
-            <span className="flex min-w-0 flex-col text-left leading-tight">
-              <span className="truncate text-[15px] font-extrabold tracking-tight text-z-text">
+            <span className="flex min-w-0 flex-col gap-1">
+              <span className="truncate text-[13px] font-semibold text-[rgb(24,24,26)] leading-tight">
                 {store?.name ?? "Sua loja"}
               </span>
-              <span className="truncate text-[11px] font-medium text-z-text-hint">
+              <span className="w-fit truncate rounded-md border border-violet-200/70 bg-violet-50/90 px-1.5 py-0.5 text-[9.5px] font-medium text-violet-800 leading-none">
                 {planLabel}
               </span>
             </span>
             <HugeiconsIcon
               icon={ArrowDown01Icon}
-              size={14}
-              className="hidden text-z-text-hint lg:block"
+              size={13}
+              className="hidden text-neutral-400 lg:block"
             />
           </button>
 
@@ -166,33 +166,33 @@ export function Topbar() {
                 className="fixed inset-0 z-10"
                 onClick={() => setIsUserMenuOpen(false)}
               />
-              <div className="absolute left-0 top-full z-20 mt-2 w-56 rounded-xl border border-z-border bg-white py-1 shadow-z-lg">
+              <div className="absolute left-0 top-full z-20 mt-1.5 w-52 rounded-xl border border-neutral-200/80 bg-white p-1">
                 {store?.slug && (
                   <a
                     href={buildStoreUrl(store.slug)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setIsUserMenuOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-z-text hover:bg-z-bg"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-[12.5px] font-normal text-[rgb(24,24,26)] hover:bg-neutral-100/70"
                   >
-                    <HugeiconsIcon icon={Globe02Icon} size={16} />
+                    <HugeiconsIcon icon={Globe02Icon} size={15} className="text-neutral-500" />
                     Acessar loja
                   </a>
                 )}
                 <Link
                   to={ROUTES.dashboardProfile}
                   onClick={() => setIsUserMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-z-text hover:bg-z-bg"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-[12.5px] font-normal text-[rgb(24,24,26)] hover:bg-neutral-100/70"
                 >
-                  <HugeiconsIcon icon={User02Icon} size={16} />
+                  <HugeiconsIcon icon={User02Icon} size={15} className="text-neutral-500" />
                   Meu perfil
                 </Link>
                 <button
                   onClick={handleSignOut}
                   disabled={signOut.isPending}
-                  className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-z-text hover:bg-z-bg disabled:opacity-50"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-[12.5px] font-normal text-[rgb(24,24,26)] hover:bg-neutral-100/70 disabled:opacity-50"
                 >
-                  <HugeiconsIcon icon={Logout01Icon} size={16} />
+                  <HugeiconsIcon icon={Logout01Icon} size={15} className="text-red-500" />
                   {signOut.isPending ? "Saindo..." : "Sair"}
                 </button>
               </div>
@@ -205,9 +205,10 @@ export function Topbar() {
             type="button"
             aria-label="Buscar"
             onClick={() => setIsSearchOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-[13px] border border-z-border bg-white text-z-text-muted transition-colors hover:bg-z-bg2"
+            className="flex h-8 items-center gap-2 rounded-lg border border-neutral-200/80 bg-neutral-50 px-2.5 text-[12px] text-neutral-400 transition-colors hover:border-violet-300 hover:bg-violet-50/40 hover:text-violet-700"
           >
-            <HugeiconsIcon icon={SearchIcon} size={19} />
+            <HugeiconsIcon icon={SearchIcon} size={15} className="text-violet-500" />
+            <span className="hidden sm:inline text-neutral-400 font-normal">Buscar...</span>
           </button>
 
           <NotificationsBell storeId={store?.id} />
@@ -297,9 +298,9 @@ function SearchResultLink({
     <Link
       to={result.href}
       onClick={onClick}
-      className="flex items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-z-bg"
+      className="flex items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-violet-50/50"
     >
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-z-bg text-z-primary">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
         <HugeiconsIcon icon={result.icon} size={20} />
       </span>
       <span className="min-w-0 flex-1">

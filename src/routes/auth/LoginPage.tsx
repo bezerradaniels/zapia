@@ -18,7 +18,7 @@ export default function LoginPage() {
   });
 
   return (
-    <AuthShell title="Entrar na sua conta" subtitle="Bem-vindo de volta 👋">
+    <AuthShell title="Entrar na sua conta" subtitle="Bem-vindo de volta">
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
         <Field
           label="E-mail"

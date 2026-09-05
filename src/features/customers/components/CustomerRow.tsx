@@ -36,7 +36,7 @@ export function CustomerRow({ customer, onDetails }: Props) {
   const colorClass = avatarColor(customer.name);
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-z-border bg-white px-4 py-3 transition-shadow hover:shadow-sm">
+    <div className="flex items-center gap-4 rounded-2xl border border-neutral-200/80 bg-white px-4 py-3 transition-colors hover:bg-neutral-50/80">
       {/* Avatar */}
       <div
         className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold ${colorClass}`}
@@ -54,11 +54,11 @@ export function CustomerRow({ customer, onDetails }: Props) {
 
       {/* Info */}
       <div className="min-w-0 flex-1">
-        <p className="truncate font-semibold leading-tight text-z-text">
+        <p className="truncate text-[13px] font-semibold leading-tight text-[rgb(24,24,26)]">
           {customer.name}
         </p>
         {customer.tags.length > 0 && (
-          <p className="mt-0.5 truncate text-xs text-z-text-muted">
+          <p className="mt-0.5 truncate text-xs text-neutral-400">
             {customer.tags.slice(0, 2).join(" · ")}
           </p>
         )}
@@ -71,14 +71,14 @@ export function CustomerRow({ customer, onDetails }: Props) {
           target="_blank"
           rel="noopener noreferrer"
           title="Abrir WhatsApp"
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-z-text-hint transition-colors hover:bg-z-bg2 hover:text-[#10b981]"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-emerald-500"
         >
           <HugeiconsIcon icon={WhatsappIcon} size={18} />
         </a>
         <button
           type="button"
           onClick={() => onDetails(customer)}
-          className="flex h-9 items-center justify-center rounded-xl border border-z-border px-3 text-xs font-semibold text-z-text-muted transition-colors hover:border-z-green hover:text-z-text"
+          className="flex h-9 items-center justify-center rounded-xl border border-neutral-200/80 bg-white px-3 text-xs font-medium text-neutral-600 transition-colors hover:border-violet-300 hover:bg-neutral-50 hover:text-[rgb(24,24,26)]"
         >
           Ver detalhes
         </button>

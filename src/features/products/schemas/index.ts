@@ -11,6 +11,19 @@ const variationOptionSchema = z.object({
     .optional(),
   sku: z.string().max(40, "Máximo 40 caracteres").nullable().optional(),
   attributes: z.record(z.string(), z.string()).nullable().optional(),
+  price_in_cents: z
+    .number()
+    .int()
+    .min(0, "Preço deve ser positivo")
+    .nullable()
+    .optional(),
+  promo_price_in_cents: z
+    .number()
+    .int()
+    .min(0, "Preço promocional deve ser positivo")
+    .nullable()
+    .optional(),
+  is_active: z.boolean().optional(),
 });
 
 export const productSchema = z
@@ -66,6 +79,10 @@ export const productSchema = z
       .number()
       .int()
       .min(0, "Promoção deve ser zero ou positiva")
+      .nullable()
+      .optional(),
+    promo_payment_method: z
+      .enum(["pix", "dinheiro", "pix_dinheiro"])
       .nullable()
       .optional(),
     installment_count: z

@@ -4,6 +4,7 @@ import {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  anonymizeCustomer,
   deleteAllCustomers,
 } from "../api/mutations";
 import { customersKeys } from "../api/keys";
@@ -42,6 +43,18 @@ export function useDeleteCustomer(storeId: string) {
     onSuccess: (_data, id) => {
       track("customer_deleted", { store_id: storeId, customer_id: id });
       qc.invalidateQueries({ queryKey: customersKeys.list(storeId) });
+    },
+  });
+}
+
+export function useAnonymizeCustomer(storeId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => anonymizeCustomer(storeId, id),
+    onSuccess: (_data, id) => {
+      track("customer_deleted", { store_id: storeId, customer_id: id });
+      qc.invalidateQueries({ queryKey: customersKeys.list(storeId) });
+      qc.invalidateQueries({ queryKey: ["orders", storeId] });
     },
   });
 }

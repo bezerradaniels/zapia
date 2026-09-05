@@ -149,7 +149,7 @@ export default function SellersPage() {
               placeholder="Pesquise por vendedores"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-10 w-full rounded-xl border border-z-border bg-white pl-9 pr-3 text-sm placeholder:text-z-text-hint focus:border-z-green focus:outline-none"
+              className="h-9 w-full rounded-xl border border-neutral-200/80 bg-white pl-9 pr-3 text-xs placeholder:text-neutral-400 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 focus:outline-none"
             />
           </div>
           {isOwner && (
@@ -157,7 +157,7 @@ export default function SellersPage() {
               type="button"
               onClick={() => setShowNewSellerModal(true)}
               disabled={atLimit}
-              className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-z-green px-5 text-sm font-semibold text-z-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-violet-500 px-4 text-xs font-medium text-white shadow-xs transition-all hover:bg-violet-600 disabled:opacity-50"
             >
               Cadastrar vendedor
             </button>

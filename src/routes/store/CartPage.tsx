@@ -234,7 +234,7 @@ export default function CartPage() {
                         </div>
                       )}
                     <div className="text-[14px] font-bold text-z-ink">
-                      {formatMoney(effectivePrice(product))} / un.
+                      {formatMoney(effectivePrice(product, selectedVariation))} / un.
                       {product.promo_price_in_cents != null &&
                         product.promo_price_in_cents <
                           product.price_in_cents && (
@@ -322,7 +322,9 @@ export default function CartPage() {
                         )}
                       </span>
                       <span className="shrink-0 font-semibold tabular-nums text-z-text">
-                        {formatMoney(effectivePrice(product) * quantity)}
+                        {formatMoney(
+                          effectivePrice(product, selectedVariation) * quantity,
+                        )}
                       </span>
                     </div>
                   ),

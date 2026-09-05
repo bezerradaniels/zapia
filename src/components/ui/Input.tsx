@@ -18,7 +18,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           type={finalType}
           className={cn(
-            "flex h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm outline-none transition-colors",
+            "flex h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-[12px] sm:text-[14px] outline-none transition-colors",
             "placeholder:text-z-text-hint",
             "focus:border-z-green focus:ring-0",
             "disabled:cursor-not-allowed disabled:opacity-50",

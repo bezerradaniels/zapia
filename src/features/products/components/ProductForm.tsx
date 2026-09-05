@@ -15,13 +15,14 @@ import {
   Home01Icon,
   ColorPickerIcon,
   RulerIcon,
+  AiMagicIcon,
   Settings01Icon,
 } from "@hugeicons/core-free-icons";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import { ROUTES } from "@/config/routes";
 import { productSchema, type ProductInput } from "../schemas";
-import { marginPercent } from "../utils/price";
+import { marginPercent, getPromoPaymentMethodLabel } from "../utils/price";
 import { MAX_FEATURED_PRODUCTS, featuredSlots } from "../utils/featured";
 import { formatMoney } from "@/lib/format";
 import { MoneyInput } from "@/components/forms/MoneyInput";
@@ -130,6 +131,11 @@ export function ProductForm({
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("info");
   const [variationModalOpen, setVariationModalOpen] = useState(false);
+  const [variationModalType, setVariationModalType] =
+    useState<VariationType | null>(null);
+  const [variationModalLabel, setVariationModalLabel] = useState<string | null>(
+    null,
+  );
   const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [homeModalOpen, setHomeModalOpen] = useState(false);
@@ -161,6 +167,7 @@ export function ProductForm({
       cost_in_cents: null,
       price_in_cents: 0,
       promo_price_in_cents: null,
+      promo_payment_method: null,
       installment_count: null,
       installment_total_in_cents: null,
       is_active: true,
@@ -186,11 +193,30 @@ export function ProductForm({
   const priceCents = form.watch("price_in_cents") ?? 0;
   const costCents = form.watch("cost_in_cents") ?? null;
   const promoCents = form.watch("promo_price_in_cents") ?? null;
+  const promoPaymentMethod = form.watch("promo_payment_method");
   const installmentCount = form.watch("installment_count") ?? null;
   const installmentTotal = form.watch("installment_total_in_cents") ?? null;
+  const effectivePrice =
+    promoCents != null && promoCents < priceCents ? promoCents : priceCents;
   const hasVariations = form.watch("has_variations");
   const variationType = form.watch("variation_type");
   const variationLabel = form.watch("variation_label");
+
+  const handleTogglePromoPaymentMethod = (
+    type: "pix" | "dinheiro",
+    checked: boolean,
+  ) => {
+    const current = form.getValues("promo_payment_method");
+    let hasPix = current === "pix" || current === "pix_dinheiro";
+    let hasDinheiro = current === "dinheiro" || current === "pix_dinheiro";
+    if (type === "pix") hasPix = checked;
+    if (type === "dinheiro") hasDinheiro = checked;
+    let nextValue: "pix" | "dinheiro" | "pix_dinheiro" | null = null;
+    if (hasPix && hasDinheiro) nextValue = "pix_dinheiro";
+    else if (hasPix) nextValue = "pix";
+    else if (hasDinheiro) nextValue = "dinheiro";
+    form.setValue("promo_payment_method", nextValue, { shouldDirty: true });
+  };
   const variationOptions = form.watch("variation_options");
 
   const hasBarcodeType = !!form.watch("barcode_type");
@@ -317,25 +343,27 @@ export function ProductForm({
       {/* Tab + content area */}
       <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:gap-4 xl:gap-6">
         {/* Tabs — single row on mobile, vertical sidebar on desktop */}
-        <nav className="grid w-full grid-cols-4 gap-1 sticky top-14 z-10 self-start rounded-2xl border border-z-border bg-white/70 p-1.5 shadow-sm backdrop-blur-md lg:static lg:flex lg:w-48 lg:shrink-0 lg:flex-col lg:gap-1 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "flex flex-col items-center gap-1 rounded-xl px-2 py-2.5 text-xs font-medium transition-colors",
-                "lg:flex-row lg:w-full lg:gap-2 lg:px-4 lg:py-2.5 lg:text-sm lg:text-left",
-                activeTab === tab.id
-                  ? "bg-z-text text-white"
-                  : "text-z-text-muted hover:bg-z-bg2 hover:text-z-text",
-              )}
-            >
-              <HugeiconsIcon icon={tab.icon} size={15} className="shrink-0" />
-              <span className="lg:hidden">{tab.shortLabel}</span>
-              <span className="hidden lg:inline">{tab.label}</span>
-            </button>
-          ))}
+        <nav className="sticky top-0 z-20 -mx-4 px-4 py-2.5 bg-[#fafafa] border-b border-neutral-200/80 shadow-none lg:static lg:top-auto lg:z-auto lg:mx-0 lg:p-0 lg:bg-transparent lg:border-0 lg:w-48 lg:shrink-0">
+          <div className="grid w-full grid-cols-4 gap-1 rounded-xl border border-z-border bg-white p-1 lg:flex lg:flex-col lg:gap-1 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex flex-col items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium transition-colors",
+                  "lg:flex-row lg:w-full lg:gap-2 lg:px-4 lg:py-2.5 lg:text-sm lg:text-left lg:rounded-xl",
+                  activeTab === tab.id
+                    ? "bg-z-text text-white"
+                    : "text-z-text-muted hover:bg-z-bg2 hover:text-z-text",
+                )}
+              >
+                <HugeiconsIcon icon={tab.icon} size={15} className="shrink-0" />
+                <span className="lg:hidden">{tab.shortLabel}</span>
+                <span className="hidden lg:inline">{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </nav>
 
         {/* Tab content */}
@@ -756,57 +784,100 @@ export function ProductForm({
                       },
                       {
                         type: "other" as VariationType,
+                        label: "Personalizado",
+                        icon: AiMagicIcon,
+                      },
+                      {
+                        type: "other" as VariationType,
                         label: "Outro tipo",
                         icon: Settings01Icon,
                       },
-                    ].map((opt) => (
-                      <button
-                        key={opt.type}
-                        type="button"
-                        onClick={() => setVariationModalOpen(true)}
-                        className={cn(
-                          "flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors",
-                          variationType === opt.type
-                            ? "border-z-green bg-z-green/10 text-[#10b981]"
-                            : "border-z-border text-z-text-muted hover:border-z-text hover:text-z-text",
-                        )}
-                      >
-                        <HugeiconsIcon icon={opt.icon} size={16} />
-                        {opt.label}
-                      </button>
-                    ))}
+                    ].map((opt) => {
+                      const isSelected =
+                        opt.label === "Cor"
+                          ? variationType === "color"
+                          : opt.label === "Tamanho"
+                            ? variationType === "size"
+                            : opt.label === "Personalizado"
+                              ? variationLabel === "Personalizado"
+                              : variationType === "other" &&
+                                variationLabel !== "Personalizado";
+
+                      return (
+                        <button
+                          key={opt.label}
+                          type="button"
+                          onClick={() => {
+                            setVariationModalType(opt.type);
+                            setVariationModalLabel(opt.label);
+                            setVariationModalOpen(true);
+                          }}
+                          className={cn(
+                            "flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors",
+                            isSelected
+                              ? "border-z-green bg-z-green/10 text-[#10b981]"
+                              : "border-z-border text-z-text-muted hover:border-z-text hover:text-z-text",
+                          )}
+                        >
+                          <HugeiconsIcon icon={opt.icon} size={16} />
+                          {opt.label}
+                        </button>
+                      );
+                    })}
                   </div>
 
                   {variationType &&
                     variationOptions &&
                     variationOptions.length > 0 && (
                       <div className="mt-4 rounded-xl border border-z-border bg-z-bg p-4">
-                        <p className="mb-2 text-xs font-semibold text-z-text-hint">
-                          {variationLabel} configurado
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {variationOptions.map((opt) => (
-                            <span
-                              key={opt.name}
-                              className="inline-flex items-center gap-2 rounded-lg border border-z-border bg-white px-2.5 py-1 text-sm text-z-text"
-                            >
-                              {opt.name}
-                              <span className="text-xs text-z-text-hint">
-                                ·{" "}
-                                {opt.stock == null
-                                  ? "ilimitado"
-                                  : `${opt.stock} un.`}
-                              </span>
-                            </span>
-                          ))}
+                        <div className="mb-2.5 flex items-center justify-between">
+                          <p className="text-xs font-semibold text-z-text-hint">
+                            {variationLabel} configurado ·{" "}
+                            {
+                              variationOptions.filter(
+                                (opt) => opt.is_active !== false,
+                              ).length
+                            }{" "}
+                            ativa(s) de {variationOptions.length} combinações
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setVariationModalType(variationType ?? "color");
+                              setVariationModalLabel(variationLabel ?? "Cor");
+                              setVariationModalOpen(true);
+                            }}
+                            className="text-xs font-medium text-[#10b981] hover:underline"
+                          >
+                            Editar variações
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setVariationModalOpen(true)}
-                          className="mt-3 text-xs font-medium text-[#10b981] hover:underline"
-                        >
-                          Editar variação
-                        </button>
+                        <div className="flex flex-wrap gap-2">
+                          {variationOptions.map((opt) => {
+                            const isActive = opt.is_active !== false;
+                            return (
+                              <span
+                                key={opt.name}
+                                className={cn(
+                                  "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium",
+                                  isActive
+                                    ? "border-z-border bg-white text-z-text"
+                                    : "border-dashed border-z-border bg-z-bg text-z-text-hint line-through opacity-60",
+                                )}
+                              >
+                                {opt.name}
+                                <span className="text-[11px] text-z-text-hint not-italic">
+                                  ·{" "}
+                                  {opt.stock == null
+                                    ? "ilimitado"
+                                    : `${opt.stock} un.`}
+                                  {opt.price_in_cents != null &&
+                                    ` · ${formatMoney(opt.price_in_cents)}`}
+                                </span>
+                              </span>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
 
@@ -954,7 +1025,7 @@ export function ProductForm({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-semibold text-z-text-hint">
+                  <label className="text-[12px] sm:text-[14px] font-medium text-[rgb(24,24,26)]">
                     Preço promocional
                   </label>
                   <MoneyInput
@@ -983,6 +1054,43 @@ export function ProductForm({
                   ) : (
                     <span className="text-xs text-z-text-hint">Opcional</span>
                   )}
+
+                  {/* Condição para ativar o desconto */}
+                  <div className="mt-2 flex flex-col gap-2">
+                    <label className="text-[12px] sm:text-[14px] font-medium text-[rgb(24,24,26)]">
+                      Condição para ativar o desconto
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <label className="flex cursor-pointer items-center gap-2 text-[12px] sm:text-[14px] text-z-text">
+                        <input
+                          type="checkbox"
+                          checked={
+                            promoPaymentMethod === "pix" ||
+                            promoPaymentMethod === "pix_dinheiro"
+                          }
+                          onChange={(e) =>
+                            handleTogglePromoPaymentMethod("pix", e.target.checked)
+                          }
+                          className="h-4 w-4 rounded border-z-border text-[#02a650] accent-[#02a650] focus:ring-[#02a650]"
+                        />
+                        <span>Pix</span>
+                      </label>
+                      <label className="flex cursor-pointer items-center gap-2 text-[12px] sm:text-[14px] text-z-text">
+                        <input
+                          type="checkbox"
+                          checked={
+                            promoPaymentMethod === "dinheiro" ||
+                            promoPaymentMethod === "pix_dinheiro"
+                          }
+                          onChange={(e) =>
+                            handleTogglePromoPaymentMethod("dinheiro", e.target.checked)
+                          }
+                          className="h-4 w-4 rounded border-z-border text-[#02a650] accent-[#02a650] focus:ring-[#02a650]"
+                        />
+                        <span>Dinheiro</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Parcelamento */}
@@ -1039,8 +1147,8 @@ export function ProductForm({
                     <div className="flex flex-col gap-4">
                       <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-[11px] font-semibold text-z-text-hint">
-                            Valor parcelado
+                          <label className="text-[12px] sm:text-[14px] font-medium text-[rgb(24,24,26)]">
+                            Valor total parcelado
                           </label>
                           <MoneyInput
                             valueInCents={installmentTotal}
@@ -1057,8 +1165,8 @@ export function ProductForm({
                           />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-[11px] font-semibold text-z-text-hint">
-                            Em até
+                          <label className="text-[12px] sm:text-[14px] font-medium text-[rgb(24,24,26)]">
+                            Quantidade de parcelas
                           </label>
                           <select
                             value={installmentCount ?? 2}
@@ -1097,7 +1205,7 @@ export function ProductForm({
                                     {formatMoney(priceCents)}
                                   </span>
                                 )}
-                              <div className="flex items-center gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-2xl font-bold text-z-ink">
                                   {formatMoney(promoCents ?? priceCents)}
                                 </span>
@@ -1110,6 +1218,11 @@ export function ProductForm({
                                       % OFF
                                     </span>
                                   )}
+                                {getPromoPaymentMethodLabel(promoPaymentMethod) && (
+                                  <span className="rounded-full bg-[#e6f7ef] px-2 py-0.5 text-[11px] font-bold text-[#02a650]">
+                                    {getPromoPaymentMethodLabel(promoPaymentMethod)}
+                                  </span>
+                                )}
                               </div>
                               <span className="text-sm text-z-text-muted">
                                 ou{" "}
@@ -1121,13 +1234,13 @@ export function ProductForm({
                                     ),
                                   )}
                                 </strong>
-                                {installmentTotal <=
-                                  (promoCents ?? priceCents) && (
-                                  <span className="text-[#02a650]">
-                                    {" "}
-                                    sem juros
-                                  </span>
-                                )}
+                                {effectivePrice > 0 &&
+                                  installmentTotal === effectivePrice && (
+                                    <span className="text-[#02a650]">
+                                      {" "}
+                                      sem juros
+                                    </span>
+                                  )}
                               </span>
                             </div>
                           </div>
@@ -1142,7 +1255,7 @@ export function ProductForm({
 
         {/* Card preview — sticky right column, visible on xl+ */}
         <div className="hidden xl:block xl:w-64 xl:shrink-0">
-          <div className="sticky top-14 flex flex-col gap-3">
+          <div className="sticky top-4 flex flex-col gap-3">
             <p className="text-[11px] font-semibold text-z-text-hint">
               Preview do card
             </p>
@@ -1186,15 +1299,29 @@ export function ProductForm({
                         {formatMoney(priceCents)}
                       </span>
                     )}
-                  <span className="text-[17px] font-bold text-z-ink">
-                    {priceCents > 0 ? (
-                      formatMoney(promoCents ?? priceCents)
-                    ) : (
-                      <span className="text-z-text-hint text-sm font-normal">
-                        Sem preço
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-[17px] font-bold text-z-ink">
+                      {priceCents > 0 ? (
+                        formatMoney(promoCents ?? priceCents)
+                      ) : (
+                        <span className="text-z-text-hint text-sm font-normal">
+                          Sem preço
+                        </span>
+                      )}
+                    </span>
+                    {promoCents != null &&
+                      priceCents > 0 &&
+                      promoCents < priceCents && (
+                        <span className="rounded-md bg-[#e6f7ef] px-1.5 py-0.5 text-[11px] font-bold text-[#02a650]">
+                          {Math.round((1 - promoCents / priceCents) * 100)}% OFF
+                        </span>
+                      )}
+                    {getPromoPaymentMethodLabel(promoPaymentMethod) && (
+                      <span className="rounded-md bg-[#e6f7ef] px-1.5 py-0.5 text-[11px] font-bold text-[#02a650]">
+                        {getPromoPaymentMethodLabel(promoPaymentMethod)}
                       </span>
                     )}
-                  </span>
+                  </div>
                   {installmentCount != null &&
                     installmentTotal != null &&
                     installmentTotal > 0 && (
@@ -1203,9 +1330,10 @@ export function ProductForm({
                         {formatMoney(
                           Math.ceil(installmentTotal / installmentCount),
                         )}
-                        {installmentTotal <= (promoCents ?? priceCents) && (
-                          <span className="text-[#02a650]"> sem juros</span>
-                        )}
+                        {effectivePrice > 0 &&
+                          installmentTotal === effectivePrice && (
+                            <span className="text-[#02a650]"> sem juros</span>
+                          )}
                       </span>
                     )}
                 </div>
@@ -1224,7 +1352,7 @@ export function ProductForm({
       </div>
 
       {/* Bottom action bar - fixed */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-z-border bg-white px-4 py-3 shadow-lg md:px-6 lg:left-[240px]">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-z-border bg-white px-4 py-3 md:px-6 lg:left-[240px]">
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-3">
           {!isEditing ? (
             <>
@@ -1255,7 +1383,7 @@ export function ProductForm({
                   type="button"
                   disabled={isSubmitting}
                   onClick={handlePublish}
-                  className="flex items-center gap-2 rounded-xl bg-z-green px-6 py-2.5 text-sm font-semibold text-z-ink transition-opacity hover:bg-green-600 disabled:opacity-60"
+                  className="flex items-center gap-2 rounded-xl bg-violet-400 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-500 disabled:opacity-60"
                 >
                   {isSubmitting && (
                     <svg
@@ -1300,7 +1428,7 @@ export function ProductForm({
               <button
                 type="submit"
                 disabled={isSubmitting || !isDirty}
-                className="rounded-xl bg-z-green px-6 py-2.5 text-sm font-semibold text-z-ink transition-opacity hover:bg-green-600 disabled:opacity-60"
+                className="rounded-xl bg-violet-400 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-500 disabled:opacity-60"
               >
                 {isSubmitting ? "Salvando..." : "Salvar alterações"}
               </button>
@@ -1312,7 +1440,7 @@ export function ProductForm({
       {/* Home / exit modal */}
       {homeModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 p-4 sm:items-center">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6">
             <h3 className="mb-1 font-semibold text-z-text">
               Sair do cadastro?
             </h3>
@@ -1325,7 +1453,7 @@ export function ProductForm({
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleDraftAndNavigate}
-                className="rounded-xl bg-z-green px-4 py-2.5 text-sm font-semibold text-z-ink hover:bg-green-600 disabled:opacity-60"
+                className="rounded-xl bg-violet-400 px-4 py-2.5 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-60"
               >
                 {isSubmitting ? "Salvando..." : "Salvar rascunho e sair"}
               </button>
@@ -1418,16 +1546,20 @@ export function ProductForm({
 
       {/* Variation modal */}
       <ProductVariationModal
+        key={`variation-modal-${variationModalType ?? variationType ?? ""}-${variationModalLabel ?? variationLabel ?? ""}-${(variationOptions ?? []).length}`}
         open={variationModalOpen}
         productName={name}
         productStock={form.watch("stock") ?? null}
-        initialType={variationType ?? null}
-        initialLabel={variationLabel ?? null}
+        productPriceInCents={form.watch("price_in_cents") ?? null}
+        initialType={variationModalType ?? variationType ?? null}
+        initialLabel={variationModalLabel ?? variationLabel ?? null}
         initialOptions={variationOptions ?? null}
         onSave={(type, label, options) => {
           form.setValue("variation_type", type, { shouldDirty: true });
           form.setValue("variation_label", label, { shouldDirty: true });
           form.setValue("variation_options", options, { shouldDirty: true });
+          setVariationModalType(type);
+          setVariationModalLabel(label);
         }}
         onClose={() => setVariationModalOpen(false)}
       />
@@ -1482,7 +1614,7 @@ export function ProductForm({
                   disabled={
                     !newCategoryName.trim() || createCategoryMutation.isPending
                   }
-                  className="flex-1 rounded-xl bg-z-green px-4 py-2.5 text-sm font-semibold text-z-ink hover:bg-green-600 disabled:opacity-60"
+                  className="flex-1 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-xs hover:bg-violet-600 disabled:opacity-60"
                 >
                   {createCategoryMutation.isPending ? "Criando..." : "Criar"}
                 </button>

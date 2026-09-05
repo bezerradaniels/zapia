@@ -833,9 +833,32 @@ export function CustomerForm({
         </div>
       </div>
 
+      {onDelete && (
+        <section className="min-w-0 rounded-2xl border border-rose-200 bg-rose-50/40 p-4 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-rose-900">
+                Excluir cadastro do cliente
+              </p>
+              <p className="text-xs text-rose-700/80">
+                Exclui o cadastro e anonimiza os dados pessoais no histórico de pedidos (LGPD · Direito ao Esquecimento).
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={isSubmitting}
+              className="h-9 shrink-0 rounded-xl border border-rose-300 bg-white px-4 text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
+            >
+              Excluir cliente
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* Mobile Floating Action Bar */}
       {isDirty && (
-        <div className="fixed bottom-20 inset-x-4 mx-auto max-w-sm z-40 flex items-center justify-between gap-3 rounded-2xl border border-z-border bg-white/95 px-4 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.12)] backdrop-blur-md sm:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed bottom-20 inset-x-4 mx-auto max-w-sm z-40 flex items-center justify-between gap-3 rounded-2xl border border-neutral-200/80 bg-white/95 px-4 py-2.5 backdrop-blur-md sm:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
           <button
             type="button"
             onClick={onCancel}
@@ -847,7 +870,7 @@ export function CustomerForm({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="h-10 rounded-xl bg-[#10b981] px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
+            className="h-10 rounded-xl bg-violet-400 hover:bg-violet-500 px-6 text-sm font-semibold text-white transition-colors disabled:opacity-60"
           >
             {isSubmitting ? "Salvando..." : "Salvar"}
           </button>
@@ -855,18 +878,18 @@ export function CustomerForm({
       )}
 
       {/* Desktop Footer */}
-      <div className="sticky bottom-0 z-10 hidden sm:flex items-center justify-center gap-3 border-t border-z-border bg-white px-4 py-4 sm:px-6">
+      <div className="sticky bottom-0 z-10 hidden sm:flex items-center justify-center gap-3 border-t border-neutral-200/80 bg-white px-4 py-4 sm:px-6">
         <button
           type="button"
           onClick={onCancel}
-          className="h-10 rounded-full border border-z-border bg-white px-6 text-sm font-medium text-z-text-muted transition-colors hover:bg-z-bg hover:text-z-text"
+          className="h-10 rounded-xl border border-neutral-200/80 bg-white px-6 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="h-10 rounded-full bg-[#10b981] px-8 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="h-10 rounded-xl bg-violet-400 hover:bg-violet-500 px-8 text-sm font-semibold text-white transition-colors disabled:opacity-60"
         >
           {isSubmitting ? "Salvando..." : "Salvar dados"}
         </button>

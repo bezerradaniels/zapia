@@ -124,6 +124,14 @@ export type VariationOption = {
   stock?: number | null;
   sku?: string | null;
   attributes?: Record<string, string> | null;
+  price_in_cents?: number | null;
+  promo_price_in_cents?: number | null;
+  is_active?: boolean;
+};
+
+export type VariationAxis = {
+  name: string;
+  values: string[];
 };
 
 export type ProductCondition = "new" | "used" | "refurbished";
@@ -137,6 +145,7 @@ export type Product = {
   description: string | null;
   price_in_cents: number;
   promo_price_in_cents: number | null;
+  promo_payment_method?: "pix" | "dinheiro" | "pix_dinheiro" | null;
   installment_count: number | null;
   installment_total_in_cents: number | null;
   category: string | null;

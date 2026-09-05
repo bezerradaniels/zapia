@@ -210,8 +210,7 @@ export function GalleryUploader({ storeId, value, onChange }: Props) {
           <button
             type="button"
             onClick={pick}
-            className="flex w-fit items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-85"
-            style={{ backgroundColor: "#10b981" }}
+            className="flex w-fit items-center gap-1.5 rounded-lg bg-[#a78bfa] px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
           >
             <HugeiconsIcon icon={ImageAddIcon} size={16} />
             Adicionar foto ({value.length}/{MAX_IMAGES})

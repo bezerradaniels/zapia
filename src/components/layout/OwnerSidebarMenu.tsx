@@ -112,7 +112,7 @@ export function OwnerSidebarMenu({
                     key={item.label}
                     type="button"
                     onClick={item.onClick}
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-z-text transition-colors hover:bg-z-bg2"
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-[rgb(24,24,26)] transition-colors hover:bg-z-bg2"
                   >
                     <HugeiconsIcon
                       icon={item.icon}

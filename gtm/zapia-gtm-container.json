@@ -1,0 +1,979 @@
+{
+  "exportFormatVersion": 2,
+  "exportTime": "2026-09-04 11:00:00",
+  "containerVersion": {
+    "path": "accounts/6000000000/containers/20000000",
+    "accountId": "6000000000",
+    "containerId": "20000000",
+    "container": {
+      "path": "accounts/6000000000/containers/20000000",
+      "accountId": "6000000000",
+      "containerId": "20000000",
+      "name": "Zapia - Container Oficial GA4",
+      "publicId": "GTM-TXTFF99H",
+      "usageContext": [
+        "WEB"
+      ]
+    },
+    "tag": [
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "tagId": "1",
+        "name": "GA4 - Configuração Principal (Google Tag)",
+        "type": "googtag",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "tagId",
+            "value": "{{Constant - GA4 Measurement ID}}"
+          }
+        ],
+        "firingTriggerId": [
+          "2147479553"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "tagId": "2",
+        "name": "GA4 - Evento Purchase (E-commerce de Assinaturas Confirmadas)",
+        "type": "gaawe",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{Constant - GA4 Measurement ID}}"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "eventName",
+            "value": "purchase"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "sendEcommerceData",
+            "value": "true"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "getEcommerceDataFrom",
+            "value": "dataLayer"
+          },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "store_id"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - store_id}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "plan_tier"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - plan_tier}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "billing_period"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - billing_period}}"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "firingTriggerId": [
+          "101"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "tagId": "3",
+        "name": "GA4 - Evento Sign Up (Cadastro de Novo Lojista)",
+        "type": "gaawe",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{Constant - GA4 Measurement ID}}"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "eventName",
+            "value": "sign_up"
+          },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "method"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - method}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "plan_tier"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - plan_tier}}"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "firingTriggerId": [
+          "102"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "tagId": "4",
+        "name": "GA4 - Evento Begin Checkout (Início de Pagamento do Plano)",
+        "type": "gaawe",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{Constant - GA4 Measurement ID}}"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "eventName",
+            "value": "begin_checkout"
+          },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "value"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - ecommerce.value}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "currency"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - ecommerce.currency}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "plan_tier"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - plan_tier}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "store_id"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - store_id}}"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "firingTriggerId": [
+          "103"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "tagId": "5",
+        "name": "GA4 - Evento CTA Click (Conversão no Site)",
+        "type": "gaawe",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{Constant - GA4 Measurement ID}}"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "eventName",
+            "value": "cta_click"
+          },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "cta_label"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - cta_label}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "cta_location"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - cta_location}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "cta_target"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - cta_target}}"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "firingTriggerId": [
+          "104"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "tagId": "6",
+        "name": "GA4 - Evento Order Submitted (Pedido WhatsApp)",
+        "type": "gaawe",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{Constant - GA4 Measurement ID}}"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "eventName",
+            "value": "order_submitted"
+          },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "order_id"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - order_id}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "store_id"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - store_id}}"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "firingTriggerId": [
+          "105"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "tagId": "7",
+        "name": "GA4 - Roteador de Ações da Plataforma",
+        "type": "gaawe",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{Constant - GA4 Measurement ID}}"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "eventName",
+            "value": "{{Event}}"
+          },
+          {
+            "type": "LIST",
+            "key": "eventParameters",
+            "list": [
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "store_id"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - store_id}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "plan_tier"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - plan_tier}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "product_name"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - product_name}}"
+                  }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "name",
+                    "value": "question_title"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "value",
+                    "value": "{{DLV - question_title}}"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "firingTriggerId": [
+          "106"
+        ],
+        "tagFiringOption": "ONCE_PER_EVENT"
+      }
+    ],
+    "trigger": [
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "triggerId": "2147479553",
+        "name": "All Pages",
+        "type": "PAGEVIEW"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "triggerId": "101",
+        "name": "Custom Event - purchase",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "purchase"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "triggerId": "102",
+        "name": "Custom Event - sign_up",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "sign_up"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "triggerId": "103",
+        "name": "Custom Event - begin_checkout",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "begin_checkout"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "triggerId": "104",
+        "name": "Custom Event - cta_click",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "cta_click"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "triggerId": "105",
+        "name": "Custom Event - order_submitted",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "EQUALS",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "order_submitted"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "triggerId": "106",
+        "name": "Custom Event - Ações da Plataforma",
+        "type": "CUSTOM_EVENT",
+        "customEventFilter": [
+          {
+            "type": "MATCH_REGEX",
+            "parameter": [
+              {
+                "type": "TEMPLATE",
+                "key": "arg0",
+                "value": "{{_event}}"
+              },
+              {
+                "type": "TEMPLATE",
+                "key": "arg1",
+                "value": "^(product_|seller_|customer_|category_|coupon_|store_|onboarding_|view_item|add_to_cart|remove_from_cart|pix_generated|pricing_page_viewed|faq_toggle).*$"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "variable": [
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "1",
+        "name": "Constant - GA4 Measurement ID",
+        "type": "c",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "value",
+            "value": "G-XXXXXXXXXX"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "2",
+        "name": "DLV - ecommerce.transaction_id",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "ecommerce.transaction_id"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "3",
+        "name": "DLV - ecommerce.value",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "ecommerce.value"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "4",
+        "name": "DLV - ecommerce.currency",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "ecommerce.currency"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "5",
+        "name": "DLV - ecommerce.items",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "ecommerce.items"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "6",
+        "name": "DLV - store_id",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "store_id"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "7",
+        "name": "DLV - plan_tier",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "plan_tier"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "8",
+        "name": "DLV - billing_period",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "billing_period"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "9",
+        "name": "DLV - cta_label",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "cta_label"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "10",
+        "name": "DLV - cta_location",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "cta_location"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "11",
+        "name": "DLV - cta_target",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "cta_target"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "12",
+        "name": "DLV - method",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "method"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "13",
+        "name": "DLV - product_id",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "product_id"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "14",
+        "name": "DLV - product_name",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "product_name"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "15",
+        "name": "DLV - order_id",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "order_id"
+          }
+        ]
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "variableId": "16",
+        "name": "DLV - question_title",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "question_title"
+          }
+        ]
+      }
+    ],
+    "builtInVariable": [
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "type": "EVENT",
+        "name": "Event"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "type": "PAGE_URL",
+        "name": "Page URL"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "type": "PAGE_PATH",
+        "name": "Page Path"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "type": "CLICK_TEXT",
+        "name": "Click Text"
+      },
+      {
+        "accountId": "6000000000",
+        "containerId": "20000000",
+        "type": "CLICK_URL",
+        "name": "Click URL"
+      }
+    ]
+  }
+}

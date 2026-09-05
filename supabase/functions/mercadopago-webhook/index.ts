@@ -12,7 +12,7 @@ const PLAN_LIMITS: Record<string, number | null> = {
 serve(async (req) => {
   // Mercado Pago webhooks can send IPN (query params) or Webhook events (JSON body)
   const url = new URL(req.url);
-  const topic = url.searchParams.get("topic") || url.searchParams.get("type");
+  const _topic = url.searchParams.get("topic") || url.searchParams.get("type");
   const idFromQuery = url.searchParams.get("id") || url.searchParams.get("data.id");
 
   let paymentId = idFromQuery;
@@ -127,7 +127,7 @@ serve(async (req) => {
       .from("subscriptions")
       .upsert({
         store_id: storeId,
-        plan_id: planId as any,
+        plan_id: planId as never,
         status: "active",
         gateway: "mercadopago",
         mp_payment_id: String(paymentId),
@@ -159,9 +159,10 @@ serve(async (req) => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Webhook processing error:", err);
-    return new Response(JSON.stringify({ error: err?.message }), {
+    const message = err instanceof Error ? err.message : "Erro desconhecido";
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

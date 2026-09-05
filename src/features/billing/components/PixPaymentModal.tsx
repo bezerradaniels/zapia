@@ -12,6 +12,7 @@ import { Button } from "@/components/ui";
 import { formatMoney } from "@/lib/format";
 import { useSubscription } from "../hooks/useSubscription";
 import { createBrowserClient } from "@/lib/supabase";
+import { trackSubscriptionPurchase } from "@/features/analytics";
 import type { PixPaymentResponse } from "../api/mutations";
 
 interface PixPaymentModalProps {
@@ -21,6 +22,7 @@ interface PixPaymentModalProps {
   pixData: PixPaymentResponse | null;
   isLoading: boolean;
   billingPeriod?: "monthly" | "annual";
+  planId?: string;
   onSuccess?: () => void;
 }
 
@@ -31,6 +33,7 @@ export function PixPaymentModal({
   pixData,
   isLoading,
   billingPeriod,
+  planId,
   onSuccess,
 }: PixPaymentModalProps) {
   const [copied, setCopied] = useState(false);
@@ -38,15 +41,46 @@ export function PixPaymentModal({
   const subscription = useSubscription(storeId);
 
   // Reset approved state when modal opens or pixData changes
-  useEffect(() => {
+  const [prevTracked, setPrevTracked] = useState({
+    open,
+    mpPaymentId: pixData?.mpPaymentId,
+  });
+  if (
+    prevTracked.open !== open ||
+    prevTracked.mpPaymentId !== pixData?.mpPaymentId
+  ) {
+    setPrevTracked({ open, mpPaymentId: pixData?.mpPaymentId });
     setIsApproved(false);
-  }, [open, pixData?.mpPaymentId]);
+  }
 
   // Realtime & polling listener for payment completion
   useEffect(() => {
     if (!open || !storeId || !pixData || isApproved) return;
 
     const supabase = createBrowserClient();
+
+    const triggerPurchaseSuccess = () => {
+      setIsApproved(true);
+      subscription.refetch();
+
+      const transactionId =
+        pixData.mpPaymentId || pixData.invoiceId || `pix_${Date.now()}`;
+      const amountReais = (pixData.amountInCents ?? 0) / 100;
+      const finalPlanId = planId || pixData.planName?.toLowerCase() || "assinatura";
+      const finalPlanName = pixData.planName || `Plano ${finalPlanId}`;
+
+      trackSubscriptionPurchase({
+        transactionId,
+        planId: finalPlanId,
+        planName: finalPlanName,
+        value: amountReais,
+        billingPeriod: billingPeriod ?? "monthly",
+        storeId,
+        paymentMethod: "pix",
+      });
+
+      if (onSuccess) onSuccess();
+    };
 
     // Check periodically if the invoice was marked as paid
     const pollInterval = setInterval(async () => {
@@ -58,9 +92,7 @@ export function PixPaymentModal({
           .maybeSingle();
 
         if (inv?.status === "paid") {
-          setIsApproved(true);
-          subscription.refetch();
-          if (onSuccess) onSuccess();
+          triggerPurchaseSuccess();
         }
       }
     }, 4000);
@@ -76,15 +108,15 @@ export function PixPaymentModal({
           table: "invoices",
           filter: `store_id=eq.${storeId}`,
         },
-        (payload: any) => {
+        (payload: {
+          new?: { id?: string; mp_payment_id?: string; status?: string };
+        }) => {
           if (
             (payload.new?.id === pixData.invoiceId ||
               payload.new?.mp_payment_id === pixData.mpPaymentId) &&
             payload.new?.status === "paid"
           ) {
-            setIsApproved(true);
-            subscription.refetch();
-            if (onSuccess) onSuccess();
+            triggerPurchaseSuccess();
           }
         },
       )
@@ -94,7 +126,7 @@ export function PixPaymentModal({
       clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
-  }, [open, storeId, pixData, isApproved, subscription, onSuccess]);
+  }, [open, storeId, pixData, isApproved, subscription, billingPeriod, onSuccess]);
 
   if (!open) return null;
 

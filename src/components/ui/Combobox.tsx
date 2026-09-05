@@ -116,7 +116,7 @@ export function Combobox({
         placeholder={loading ? "Carregando..." : placeholder}
         autoComplete="off"
         className={cn(
-          "h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 text-sm outline-none",
+          "h-11 w-full rounded-lg border border-slate-300 bg-white px-3.5 text-[12px] sm:text-[14px] outline-none",
           "placeholder:text-z-text-hint focus:border-z-green",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}

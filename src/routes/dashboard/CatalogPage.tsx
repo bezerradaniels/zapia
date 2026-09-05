@@ -25,6 +25,7 @@ import {
   Edit02Icon,
   Delete02Icon,
   ArrowDown01Icon,
+  ArrowRight01Icon,
   ArrowRight02Icon,
   CheckmarkCircle02Icon,
   Cancel01Icon,
@@ -34,10 +35,8 @@ import {
 import {
   updateStoreSchema,
   useUpdateStore,
-  useGenerateStoreCopy,
   useSlugAvailability,
   type UpdateStoreInput,
-  type StoreCopyKind,
 } from "@/features/catalog";
 import { useProducts } from "@/features/products";
 import {
@@ -64,10 +63,8 @@ import {
   Field,
   Textarea,
   Label,
-  AiGenerateButton,
 } from "@/components/ui";
 import { ROUTES } from "@/config/routes";
-import { track } from "@/features/analytics";
 import { cn } from "@/lib/utils";
 import { COLOR_PRESETS } from "@/config/colorPresets";
 import { STATES } from "@/lib/br";
@@ -134,26 +131,6 @@ function catalogSectionPath(section: TabId): string {
   return `${ROUTES.dashboardCatalog}/${section}`;
 }
 
-/** Most frequent product category, used as real context for AI copy
- * generation instead of letting the model guess the store's segment. */
-function mostCommonProductCategory(
-  products: { category: string | null }[],
-): string | undefined {
-  const counts = new Map<string, number>();
-  for (const p of products) {
-    if (!p.category) continue;
-    counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
-  }
-  let best: string | undefined;
-  let bestCount = 0;
-  for (const [category, count] of counts) {
-    if (count > bestCount) {
-      best = category;
-      bestCount = count;
-    }
-  }
-  return best;
-}
 
 /* -------------------------------------------------------------------------- */
 /* CategoriesTab — reads categories derived from product.category field       */
@@ -489,34 +466,34 @@ function MobileCatalogCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-[22px] border border-z-border bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+    <section className="rounded-2xl border border-neutral-200/80 bg-white p-4">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center gap-4 text-left"
+        className="flex w-full items-center gap-3 text-left"
       >
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f4efe7] text-z-text">
-          <HugeiconsIcon icon={icon} size={25} />
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-[rgb(24,24,26)]">
+          <HugeiconsIcon icon={icon} size={18} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-xl font-extrabold leading-tight text-z-text">
+          <span className="block text-[14px] font-semibold leading-tight text-[rgb(24,24,26)]">
             {title}
           </span>
-          <span className="block truncate text-base font-medium leading-tight text-z-text-hint">
+          <span className="block truncate text-[12px] font-normal leading-tight text-neutral-400 mt-0.5">
             {subtitle}
           </span>
         </span>
         <HugeiconsIcon
-          icon={open ? ArrowDown01Icon : ArrowRight02Icon}
-          size={22}
+          icon={ArrowDown01Icon}
+          size={16}
           className={cn(
-            "shrink-0 text-z-text-hint transition-transform",
+            "shrink-0 text-neutral-400 transition-transform duration-200",
             open && "rotate-180",
           )}
         />
       </button>
       {open && (
-        <div className="mt-5 flex flex-col gap-4 border-t border-z-border pt-5">
+        <div className="mt-4 flex flex-col gap-3.5 border-t border-neutral-200/80 pt-4">
           {children}
         </div>
       )}
@@ -534,14 +511,14 @@ function InfoValue({
   swatch?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <span className="text-base font-extrabold text-z-text-muted">
+    <div className="flex flex-col gap-1">
+      <span className="text-[12px] font-medium text-[rgb(24,24,26)]">
         {label}
       </span>
-      <div className="flex min-h-12 items-center gap-3 rounded-xl border border-z-border bg-z-bg2 px-4 text-base font-extrabold text-z-text">
+      <div className="flex min-h-10 items-center gap-2.5 rounded-xl border border-neutral-200/80 bg-neutral-50 px-3 text-[12px] font-normal text-[rgb(24,24,26)]">
         {swatch && (
           <span
-            className="h-5 w-5 shrink-0 rounded-full"
+            className="h-4 w-4 shrink-0 rounded-full"
             style={{ backgroundColor: swatch }}
           />
         )}
@@ -597,7 +574,7 @@ function SectionSaveBar({
   onCancel,
 }: {
   fields: (keyof UpdateStoreInput)[];
-  dirtyFields: Record<string, any>;
+  dirtyFields: Record<string, unknown>;
   isPending?: boolean;
   onCancel: () => void;
 }) {
@@ -643,19 +620,15 @@ export default function CatalogPage() {
   const canTheme = limits.canUse("theme");
   const canPdf = limits.canUse("pdf");
   const canGallery = limits.canUse("gallery");
-  const canAi = limits.canUse("ai");
   const products = useProducts(store?.id);
   const categoriesQuery = useCategories(store?.id);
   const createCategory = useCreateCategory();
   const { download: downloadPdf, isGenerating: isGeneratingPdf } =
     useCatalogPdf();
-  const { generate: generateStoreCopy } = useGenerateStoreCopy();
-  const [generatingKind, setGeneratingKind] = useState<StoreCopyKind | null>(
-    null,
-  );
-  const [mobileOpenCard, setMobileOpenCard] = useState<
-    "gerais" | "visual" | "contato" | "pagamento" | "categorias"
-  >("gerais");
+  const [openCards, setOpenCards] = useState<Record<string, boolean>>({});
+  const toggleCard = (cardId: string) => {
+    setOpenCards((prev) => ({ ...prev, [cardId]: !prev[cardId] }));
+  };
   const [visualModalOpen, setVisualModalOpen] = useState(false);
   const [paymentDeliveryModalOpen, setPaymentDeliveryModalOpen] =
     useState(false);
@@ -663,6 +636,7 @@ export default function CatalogPage() {
   const [mobileCategoryName, setMobileCategoryName] = useState("");
   const [mobileSubcategoryName, setMobileSubcategoryName] = useState("");
   const [pdfUpgradeModalOpen, setPdfUpgradeModalOpen] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const activeTab = isTabId(section) ? section : "gerais";
 
   const form = useForm<UpdateStoreInput>({
@@ -811,7 +785,7 @@ export default function CatalogPage() {
 
   const handleResetFields = (fieldsToReset: (keyof UpdateStoreInput)[]) => {
     if (!store) return;
-    const initialValuesMap: Partial<Record<keyof UpdateStoreInput, any>> = {
+    const initialValuesMap: Partial<UpdateStoreInput> = {
       slug: store.slug,
       name: store.name,
       primary_color: store.primary_color,
@@ -875,27 +849,7 @@ export default function CatalogPage() {
     }
   };
 
-  const handleGenerateCopy = async (kind: StoreCopyKind) => {
-    setGeneratingKind(kind);
-    try {
-      const text = await generateStoreCopy({
-        storeId: store.id,
-        kind,
-        name: form.getValues("name") || store.name,
-        category: mostCommonProductCategory(products.data ?? []),
-        slogan: form.getValues("slogan") || undefined,
-        aboutUs: form.getValues("about_us") || undefined,
-      });
-      form.setValue(kind === "slogan" ? "slogan" : "about_us", text, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    } catch {
-      toast.error("Não foi possível gerar o texto. Tente novamente.");
-    } finally {
-      setGeneratingKind(null);
-    }
-  };
+
 
   const logoPreview = form.watch("logo_url");
   const primaryColor = form.watch("primary_color");
@@ -961,54 +915,39 @@ export default function CatalogPage() {
         onSubmit={onSubmit}
         className="flex flex-col gap-4 lg:hidden"
       >
-        <div className="mb-3 flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Link
             to={ROUTES.dashboardMore}
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-z-border bg-white text-z-text shadow-sm"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-neutral-200/80 bg-white text-[rgb(24,24,26)] transition-colors hover:bg-neutral-50"
             aria-label="Voltar"
           >
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
           </Link>
-          <h1 className="min-w-0 text-[28px] font-extrabold leading-tight text-z-text">
+          <h1 className="min-w-0 text-[18px] font-semibold leading-tight text-[rgb(24,24,26)]">
             Personalizar catálogo
           </h1>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            navigator.clipboard.writeText(buildStoreUrl(store.slug));
-            track("share_link_copied", {
-              store_id: store.id,
-              link_type: "store",
-              item_id: store.id,
-            });
-          }}
-          className="flex items-center gap-3 rounded-[22px] bg-z-ink px-5 py-4 text-left text-white"
+        <a
+          href={buildStoreUrl(store.slug)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between rounded-xl border border-neutral-200/80 bg-white px-3.5 py-2.5 text-[12px] font-medium text-[rgb(24,24,26)] transition-all hover:border-emerald-300 hover:bg-emerald-50/40"
         >
+          <span className="truncate text-[rgb(24,24,26)]">Acessar loja</span>
           <HugeiconsIcon
-            icon={Globe02Icon}
-            size={22}
-            className="shrink-0 text-z-green"
+            icon={ArrowRight01Icon}
+            size={13}
+            className="shrink-0 text-[rgb(24,24,26)]"
           />
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-lg font-extrabold leading-tight">
-              {buildStoreUrl(store.slug).replace(/^https?:\/\//, "")}
-            </span>
-            <span className="block text-sm font-medium text-white/55">
-              Toque para copiar o link
-            </span>
-          </span>
-        </button>
+        </a>
 
         <MobileCatalogCard
           icon={Settings01Icon}
           title="Informações gerais"
           subtitle="Nome, slogan, sobre"
-          open={mobileOpenCard === "gerais"}
-          onToggle={() =>
-            setMobileOpenCard(mobileOpenCard === "gerais" ? "visual" : "gerais")
-          }
+          open={!!openCards["gerais"]}
+          onToggle={() => toggleCard("gerais")}
         >
           <Field
             label="Nome da loja"
@@ -1089,14 +1028,12 @@ export default function CatalogPage() {
           icon={PaintBrush01Icon}
           title="Logo, banner e cores"
           subtitle="Identidade visual"
-          open={mobileOpenCard === "visual"}
-          onToggle={() =>
-            setMobileOpenCard(mobileOpenCard === "visual" ? "gerais" : "visual")
-          }
+          open={!!openCards["visual"]}
+          onToggle={() => toggleCard("visual")}
         >
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-bold text-z-text">Cor primária</Label>
+              <Label className="text-[14px] font-semibold text-[rgb(24,24,26)]">Cor primária</Label>
               {!canTheme && (
                 <Link
                   to={ROUTES.dashboardBilling}
@@ -1109,57 +1046,69 @@ export default function CatalogPage() {
             </div>
 
             <fieldset disabled={!canTheme} className={cn("flex flex-col gap-3", !canTheme && "opacity-60")}>
-              <div className="flex items-center gap-3 rounded-xl border border-z-border bg-z-bg2 p-3">
-                <div
-                  className="h-8 w-8 shrink-0 rounded-full border border-z-border shadow-sm"
-                  style={{ backgroundColor: primaryColor ?? "#000000" }}
-                />
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs text-z-text-hint">Cor selecionada</span>
-                  <span className="text-sm font-mono font-bold text-z-text">
-                    {(primaryColor ?? "").toUpperCase()}
-                  </span>
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200/80 bg-neutral-50/50 p-3">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="h-8 w-8 shrink-0 rounded-full border border-neutral-200"
+                    style={{ backgroundColor: primaryColor ?? "#000000" }}
+                  />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[12px] text-neutral-400">Cor selecionada</span>
+                    <span className="text-[12px] font-mono font-bold text-[rgb(24,24,26)]">
+                      {(primaryColor ?? "").toUpperCase()}
+                    </span>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowColorPicker(!showColorPicker)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200/80 bg-white px-3 py-1.5 text-[12px] font-medium text-[rgb(24,24,26)] transition-colors hover:bg-neutral-50"
+                >
+                  <HugeiconsIcon icon={PaintBrush01Icon} size={14} className="text-violet-500" />
+                  {showColorPicker ? "Ocultar cores" : "Escolher cor"}
+                </button>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                {COLOR_PRESETS.map((preset) => {
-                  const isSelected =
-                    primaryColor?.toLowerCase() === preset.toLowerCase();
-                  return (
-                    <button
-                      key={preset}
-                      type="button"
-                      onClick={() =>
-                        form.setValue("primary_color", preset, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
-                      }
-                      className={cn(
-                        "relative h-8 w-8 rounded-full transition-transform active:scale-95 disabled:cursor-not-allowed",
-                        isSelected
-                          ? "ring-2 ring-z-ink ring-offset-2 scale-105"
-                          : "hover:scale-105",
-                      )}
-                      style={{ backgroundColor: preset }}
-                      aria-label={`Selecionar cor ${preset}`}
-                    >
-                      {isSelected && (
-                        <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
-                          ✓
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+              {showColorPicker && (
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  {COLOR_PRESETS.map((preset) => {
+                    const isSelected =
+                      primaryColor?.toLowerCase() === preset.toLowerCase();
+                    return (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() =>
+                          form.setValue("primary_color", preset, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          })
+                        }
+                        className={cn(
+                          "relative h-8 w-8 rounded-full transition-transform active:scale-95 disabled:cursor-not-allowed",
+                          isSelected
+                            ? "ring-2 ring-z-ink ring-offset-2 scale-105"
+                            : "hover:scale-105",
+                        )}
+                        style={{ backgroundColor: preset }}
+                        aria-label={`Selecionar cor ${preset}`}
+                      >
+                        {isSelected && (
+                          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
+                            ✓
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </fieldset>
           </div>
 
           {/* Logo do catálogo */}
-          <div className="flex flex-col gap-1.5 pt-3 border-t border-z-border">
-            <Label className="text-sm font-bold text-z-text">Logo do catálogo</Label>
+          <div className="flex flex-col gap-1.5 pt-3 border-t border-neutral-100">
+            <Label className="text-[14px] font-semibold text-[rgb(24,24,26)]">Logo do catálogo</Label>
             <ImageCropUploader
               bucket="store-logos"
               storeId={store.id}
@@ -1183,8 +1132,8 @@ export default function CatalogPage() {
           </div>
 
           {/* Banner do catálogo */}
-          <div className="flex flex-col gap-1.5 pt-3 border-t border-z-border">
-            <Label className="text-sm font-bold text-z-text">Banner do catálogo</Label>
+          <div className="flex flex-col gap-1.5 pt-3 border-t border-neutral-100">
+            <Label className="text-[14px] font-semibold text-[rgb(24,24,26)]">Banner do catálogo</Label>
             <ImageCropUploader
               bucket="store-logos"
               storeId={store.id}
@@ -1212,17 +1161,13 @@ export default function CatalogPage() {
           icon={ContactIcon}
           title="WhatsApp e contatos"
           subtitle="Onde os pedidos chegam"
-          open={mobileOpenCard === "contato"}
-          onToggle={() =>
-            setMobileOpenCard(
-              mobileOpenCard === "contato" ? "gerais" : "contato",
-            )
-          }
+          open={!!openCards["contato"]}
+          onToggle={() => toggleCard("contato")}
         >
           <div className="flex flex-col gap-1.5">
-            <Label>WhatsApp de pedidos</Label>
+            <Label>WhatsApp para receber os pedidos</Label>
             <PhoneInput
-              className="h-12 w-full rounded-xl border border-z-border bg-z-bg2 px-4 text-base font-semibold"
+              className="h-11 w-full rounded-lg border border-neutral-200/80 bg-white px-3.5 text-[12px] font-normal text-[rgb(24,24,26)]"
               value={form.watch("whatsapp_phone") ?? ""}
               onChange={(masked) =>
                 form.setValue("whatsapp_phone", masked, {
@@ -1243,12 +1188,8 @@ export default function CatalogPage() {
           icon={CreditCardIcon}
           title="Pagamento e entrega"
           subtitle="Métodos aceitos"
-          open={mobileOpenCard === "pagamento"}
-          onToggle={() =>
-            setMobileOpenCard(
-              mobileOpenCard === "pagamento" ? "gerais" : "pagamento",
-            )
-          }
+          open={!!openCards["pagamento"]}
+          onToggle={() => toggleCard("pagamento")}
         >
           <InfoValue
             label="Pagamento"
@@ -1276,7 +1217,7 @@ export default function CatalogPage() {
           <button
             type="button"
             onClick={() => setPaymentDeliveryModalOpen(true)}
-            className="h-11 rounded-xl bg-z-ink px-4 text-sm font-extrabold text-white"
+            className="h-10 rounded-xl bg-[#a78bfa] hover:bg-violet-500 px-4 text-xs font-semibold text-white transition-colors"
           >
             Editar pagamento e entrega
           </button>
@@ -1286,12 +1227,8 @@ export default function CatalogPage() {
           icon={LockedIcon}
           title="Categorias"
           subtitle={`${topLevelCategories.length} categorias ativas`}
-          open={mobileOpenCard === "categorias"}
-          onToggle={() =>
-            setMobileOpenCard(
-              mobileOpenCard === "categorias" ? "gerais" : "categorias",
-            )
-          }
+          open={!!openCards["categorias"]}
+          onToggle={() => toggleCard("categorias")}
         >
           <InfoValue
             label="Categorias"
@@ -1304,7 +1241,7 @@ export default function CatalogPage() {
           <button
             type="button"
             onClick={() => setMobileCategoryModalOpen(true)}
-            className="h-11 rounded-xl bg-z-ink px-4 text-sm font-extrabold text-white"
+            className="h-10 rounded-xl bg-[#a78bfa] hover:bg-violet-500 px-4 text-xs font-semibold text-white transition-colors"
           >
             Adicionar categoria
           </button>
@@ -1312,8 +1249,8 @@ export default function CatalogPage() {
       </form>
 
       <div className="hidden flex-col gap-5 lg:flex lg:flex-row lg:gap-6">
-        {/* Tabs — single row on mobile, vertical sidebar on desktop */}
-        <nav className="grid w-full grid-cols-3 gap-1 sticky top-14 z-10 self-start rounded-2xl border border-z-border bg-white/70 p-1.5 shadow-sm backdrop-blur-md lg:static lg:flex lg:w-48 lg:shrink-0 lg:flex-col lg:gap-1 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none sm:grid-cols-5 lg:grid-cols-1">
+        {/* Tabs — vertical sidebar on desktop */}
+        <nav className="hidden lg:flex lg:sticky lg:top-4 lg:w-48 lg:shrink-0 lg:flex-col lg:gap-1 lg:self-start">
           {TABS.map((tab) => (
             <Link
               key={tab.id}
@@ -1396,14 +1333,7 @@ export default function CatalogPage() {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="slogan">Slogan da loja</Label>
-                      <AiGenerateButton
-                        canUse={canAi}
-                        isLoading={generatingKind === "slogan"}
-                        onClick={() => handleGenerateCopy("slogan")}
-                      />
-                    </div>
+                    <Label htmlFor="slogan">Slogan da loja</Label>
                     <Field
                       id="slogan"
                       placeholder="Produtos que encantam, feitos para você!"
@@ -1413,14 +1343,7 @@ export default function CatalogPage() {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="sobre">Sobre nós</Label>
-                      <AiGenerateButton
-                        canUse={canAi}
-                        isLoading={generatingKind === "about"}
-                        onClick={() => handleGenerateCopy("about")}
-                      />
-                    </div>
+                    <Label htmlFor="sobre">Sobre nós</Label>
                     <Textarea
                       id="sobre"
                       placeholder="Conte um pouco sobre a sua loja..."
@@ -1443,8 +1366,8 @@ export default function CatalogPage() {
                   />
                 </section>
 
-                <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
-                  <div className="mb-2 flex items-center justify-between">
+                <section className="flex flex-col gap-2.5 rounded-2xl border border-z-border bg-white p-6">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex h-6 w-8 items-center justify-center rounded border border-z-border text-xs font-bold text-z-text-muted">
                         18+
@@ -1455,11 +1378,11 @@ export default function CatalogPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 ml-11">
+                  <div className="flex flex-col gap-2 ml-11">
                     <span className="text-sm text-z-text-muted">
                       Seus produtos são restritos a adultos?
                     </span>
-                    <div className="flex items-center gap-6 mt-1">
+                    <div className="flex items-center gap-6 mt-0.5">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
@@ -1499,8 +1422,8 @@ export default function CatalogPage() {
                   />
                 </section>
 
-                <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
-                  <div className="mb-2 flex items-center justify-between">
+                <section className="flex flex-col gap-2.5 rounded-2xl border border-z-border bg-white p-6">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <HugeiconsIcon
                         icon={EyeIcon}
@@ -1513,7 +1436,7 @@ export default function CatalogPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-4 ml-7">
+                  <div className="flex flex-col gap-2 ml-7">
                     <p className="text-sm text-z-text-muted">
                       Produtos que estão fora de estoque não serão exibidos em
                       seu catálogo.
@@ -1542,8 +1465,8 @@ export default function CatalogPage() {
                   />
                 </section>
 
-                <section className="flex flex-col gap-5 rounded-2xl border border-z-border bg-white p-6">
-                  <div className="mb-2 flex items-center justify-between">
+                <section className="flex flex-col gap-2.5 rounded-2xl border border-z-border bg-white p-6">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex h-6 w-8 items-center justify-center rounded border border-z-border text-xs font-bold text-z-text-muted">
                         A Z
@@ -1554,7 +1477,7 @@ export default function CatalogPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-4 ml-11">
+                  <div className="flex flex-col gap-2 ml-11">
                     <p className="text-sm text-z-text-muted">
                       Defina como deve ser a ordem de exibição dos seus produtos
                       no seu catálogo
@@ -1762,7 +1685,7 @@ export default function CatalogPage() {
                       </p>
                       <Link
                         to={ROUTES.dashboardBilling}
-                        className="mx-auto mt-1 inline-flex items-center gap-1.5 rounded-lg bg-z-green px-4 py-2 text-sm font-semibold text-z-ink hover:opacity-90"
+                        className="mx-auto mt-1 inline-flex items-center gap-1.5 rounded-xl bg-violet-500 px-4 py-2 text-sm font-medium text-white shadow-xs transition-colors hover:bg-violet-600"
                       >
                         Fazer upgrade para Pro
                       </Link>
@@ -1940,7 +1863,7 @@ export default function CatalogPage() {
 
                     <div className="flex items-start gap-3 rounded-xl border border-[#FDE047] bg-[#FEF9C3] p-4 text-sm text-[#854D0E]">
                       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white">
-                        <span className="text-lg">💡</span>
+                        <HugeiconsIcon icon={Alert01Icon} size={15} className="text-[#854D0E]" />
                       </div>
                       <p>
                         <strong>Importante:</strong> Com o carrinho ativado,
@@ -3012,7 +2935,7 @@ export default function CatalogPage() {
       )}
 
       {form.formState.isDirty && (
-        <div className="fixed bottom-20 inset-x-4 mx-auto max-w-sm z-40 flex items-center justify-between gap-3 rounded-2xl border border-z-border bg-white/95 px-4 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.12)] backdrop-blur-md lg:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed bottom-20 inset-x-4 mx-auto max-w-sm z-40 flex items-center justify-between gap-3 rounded-2xl border border-neutral-200/80 bg-white/95 px-4 py-2.5 backdrop-blur-md lg:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
           <button
             type="button"
             onClick={() =>
@@ -3031,7 +2954,7 @@ export default function CatalogPage() {
             type="submit"
             form="catalog-mobile-form"
             disabled={updateStore.isPending}
-            className="h-10 rounded-xl bg-[#10b981] px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
+            className="h-10 rounded-xl bg-violet-400 hover:bg-violet-500 px-6 text-sm font-semibold text-white transition-colors disabled:opacity-60"
           >
             {updateStore.isPending ? "Salvando..." : "Salvar"}
           </Button>

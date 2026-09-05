@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { getCorsHeaders, preflight, jsonResponse } from "../_shared/cors.ts";
+import { preflight, jsonResponse } from "../_shared/cors.ts";
 import { adminClient, requireStoreMember } from "../_shared/auth.ts";
 
 const PLAN_PRICES: Record<string, { monthly: number; annual: number; name: string }> = {
@@ -58,6 +58,25 @@ serve(async (req) => {
     }
 
     const admin = adminClient();
+
+    // Rate limit / abuse prevention: limit generation to at most 1 attempt per 10 seconds per store
+    const tenSecondsAgo = new Date(Date.now() - 10000).toISOString();
+    const { data: recentInvoices } = await admin
+      .from("invoices")
+      .select("id")
+      .eq("store_id", storeId)
+      .gt("created_at", tenSecondsAgo)
+      .limit(1);
+
+    if (recentInvoices && recentInvoices.length > 0) {
+      return jsonResponse(
+        {
+          error: "rate_limited",
+          detail: "Aguarde alguns segundos antes de gerar um novo código PIX.",
+        },
+        { status: 429, req },
+      );
+    }
 
     // Fetch user profile info
     const { data: profile } = await admin
@@ -148,12 +167,13 @@ serve(async (req) => {
       },
       { status: 200, req },
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Unhandled error creating PIX:", err);
+    const message = err instanceof Error ? err.message : "Erro interno ao processar pagamento";
     return jsonResponse(
       {
         error: "internal_error",
-        detail: err?.message || "Erro interno ao processar pagamento",
+        detail: message,
       },
       { status: 500, req },
     );

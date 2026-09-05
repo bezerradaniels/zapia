@@ -12,6 +12,7 @@ import { isAdminDomain } from "@/lib/tenant/resolveStore";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { BottomBar } from "@/components/layout/BottomBar";
+import { cn } from "@/lib/utils";
 
 export default function DashboardLayout() {
   const { session, isLoading } = useSession();
@@ -20,6 +21,7 @@ export default function DashboardLayout() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { pathname } = useLocation();
   const hideBottomBar = pathname.startsWith("/dashboard/produtos/");
+  const isProductEdit = pathname.startsWith("/dashboard/produtos/");
 
   // Live toast for new orders + bell-icon badge realtime invalidation.
   useOrderNotifications(store?.id);
@@ -46,29 +48,34 @@ export default function DashboardLayout() {
 
   // 3. Keep layout visible while myStores loads
   return (
-    <div className="flex h-screen bg-slate-100 overflow-hidden">
+    <div className="flex h-screen bg-[#fafafa] text-neutral-900 overflow-hidden">
       <Sidebar
         isMobileOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
       />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar />
-        <main className="flex-1 overflow-y-auto px-4 py-4 pb-24 lg:px-6 lg:py-6 lg:pb-6">
+        <main
+          className={cn(
+            "flex-1 overflow-y-auto px-4 pb-20 lg:px-6 lg:py-6 lg:pb-6",
+            isProductEdit ? "pt-0" : "py-4",
+          )}
+        >
           {myStores.isLoading ? (
-            <div className="flex h-64 items-center justify-center text-sm text-z-text-muted">
+            <div className="flex h-64 items-center justify-center text-xs text-neutral-400">
               Carregando dados da loja...
             </div>
           ) : myStores.isError ? (
-            <div className="flex h-64 flex-col gap-4 items-center justify-center text-sm text-z-text-muted">
+            <div className="flex h-64 flex-col gap-3 items-center justify-center text-xs text-neutral-500">
               <p>Ocorreu um erro ao carregar os dados. O banco de dados pode estar indisponível.</p>
-              <button className="px-4 py-2 bg-z-ink text-white rounded" onClick={() => window.location.reload()}>Tentar novamente</button>
+              <button className="px-3.5 py-2 bg-neutral-900 text-white rounded-xl text-xs font-medium hover:bg-neutral-800 transition-colors" onClick={() => window.location.reload()}>Tentar novamente</button>
             </div>
           ) : myStores.data && (myStores.data.length === 0 || !myStores.data.some((s) => s.onboarding_completed)) ? (
             <Navigate to={ROUTES.onboarding} replace />
           ) : (
             <Suspense
               fallback={
-                <div className="flex h-64 items-center justify-center text-sm text-z-text-muted">
+                <div className="flex h-64 items-center justify-center text-xs text-neutral-400">
                   Carregando...
                 </div>
               }
@@ -86,7 +93,7 @@ export default function DashboardLayout() {
         toastOptions={{
           classNames: {
             toast:
-              "rounded-2xl border border-z-border bg-white shadow-z-lg font-sans",
+              "rounded-xl border border-neutral-200 bg-white shadow-md font-sans text-xs",
           },
         }}
       />

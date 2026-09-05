@@ -1,54 +1,129 @@
+/* ─────────────────────────────────────────────────────────────
+   Zapia — entrada do Tailwind v4 (CLI)
+   Compile:  npx @tailwindcss/cli -i ./marketing/style.css -o ./marketing/styles/main.css --minify
+   Tokens derivados do design system "Organic": ground cream + sand,
+   acento re-tonalizado para roxo, segundo acento sage, raios grandes.
+   ───────────────────────────────────────────────────────────── */
+
 @import "tailwindcss";
 
-@theme {
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --color-brand: #10b981;
-  --color-brand-hover: #059669;
-  --color-brand-dark: #064e3b;
-  --color-brand-light: #ecfdf5;
-  --color-ink: #0f172a;
-  --color-muted: #64748b;
-  --color-border-light: #e2e8f0;
+/* Fontes — auto-hospede os .woff2 em /fonts para evitar CLS.
+   Enquanto não converter, use o <link> do Google Fonts no <head>. */
+@font-face {
+  font-family: "Caprasimo";
+  src: url("/fonts/caprasimo-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/figtree-variable.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
 }
 
+@theme {
+  /* — tipografia — */
+  --font-display: "Caprasimo", ui-serif, Georgia, serif;
+  --font-sans: "Figtree", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* — ground e tinta — */
+  --color-cream: #f5ead8; /* fundo da página */
+  --color-sand: #ebddc5;  /* superfície tonal */
+  --color-paper: #fffdf7; /* cartão elevado */
+  --color-ink: #201e1d;   /* texto */
+
+  /* — acento primário: roxo (ramp 100–900, mesma escala perceptual do Organic) — */
+  --color-p-100: #f4f0fe;
+  --color-p-200: #e8e0fb;
+  --color-p-300: #d0c2f5;
+  --color-p-400: #a892e8;
+  --color-p-500: #7f5fd4;
+  --color-p-600: #6344bd; /* base de UI: preenchimento de botão */
+  --color-p-700: #4c3196; /* texto de acento sobre cream (>= 4.5:1) */
+  --color-p-800: #37236e; /* blocos escuros */
+  --color-p-900: #241748;
+
+  /* — segundo acento: sage (voz de apoio, estados positivos) — */
+  --color-sage-100: #f0fae1;
+  --color-sage-200: #e1eecc;
+  --color-sage-500: #7a8a5e;
+  --color-sage-700: #56633f;
+  --color-sage-800: #3d472b;
+
+  /* — alerta / "antes" (nunca como cor de marca) — */
+  --color-alert-100: #fdeceb;
+  --color-alert-700: #8f3a34;
+
+  /* — raios: over-rounded, controles em pílula — */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 28px;
+  --radius-xl: 32px;
+
+  /* — elevação afinada ao ground cream — */
+  --shadow-sm: 0 1px 2px rgba(46, 43, 37, 0.1);
+  --shadow-md: 0 6px 18px rgba(46, 43, 37, 0.12);
+  --shadow-lg: 0 22px 50px rgba(46, 43, 37, 0.16);
+}
+
+/* — base — */
 @layer base {
   html {
     scroll-behavior: smooth;
-    font-family: var(--font-sans);
+    background: var(--color-cream);
   }
   body {
-    background-color: #fafafa;
-    color: #0f172a;
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+  a {
+    color: var(--color-p-700);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--color-p-600);
+  }
+  ::selection {
+    background: var(--color-p-200);
+  }
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-p-600);
+    outline-offset: 2px;
+  }
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  details[open] .chev {
+    transform: rotate(180deg);
   }
 }
 
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.animate-float {
-  animation: float-slow 4s ease-in-out infinite;
-}
-
-.pulse-brand {
-  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
-  animation: pulse-ring 2s infinite;
-}
-
-@keyframes pulse-ring {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
-  }
-  70% {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
+/* — utilitário: placeholder listrado onde entra foto real — */
+@utility photo-slot {
+  background-color: var(--color-sand);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(32, 30, 29, 0.055) 0 7px,
+    transparent 7px 14px
+  );
 }

@@ -63,7 +63,7 @@ export default function ProductsPage() {
   return (
     <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between gap-3">
-        <h1 className="text-[25px] font-extrabold tracking-tighter">
+        <h1 className="text-lg font-semibold tracking-tight text-[rgb(24,24,26)]">
           Produtos
         </h1>
         {atLimit ? (
@@ -74,26 +74,26 @@ export default function ProductsPage() {
           <button
             type="button"
             onClick={() => setNewProductOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-[#10b981] px-3.5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+            className="flex items-center gap-1.5 rounded-xl bg-violet-400 px-3.5 py-2 text-xs font-medium text-white transition-all hover:bg-violet-500"
           >
-            <HugeiconsIcon icon={PlusSignIcon} size={16} />
-            Novo
+            <HugeiconsIcon icon={PlusSignIcon} size={15} />
+            Novo produto
           </button>
         )}
       </header>
 
       {/* Search */}
-      <div className="flex h-11 items-center gap-2.5 rounded-[13px] border border-z-border bg-white px-3.5">
+      <div className="flex h-10 items-center gap-2.5 rounded-xl border border-neutral-200/80 bg-white px-3.5 focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-400/20">
         <HugeiconsIcon
           icon={SearchIcon}
-          size={18}
-          className="shrink-0 text-z-text-hint"
+          size={16}
+          className="shrink-0 text-neutral-400"
         />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar por nome ou SKU"
-          className="min-w-0 flex-1 bg-transparent text-sm text-z-text outline-none placeholder:text-z-text-hint"
+          className="min-w-0 flex-1 bg-transparent text-xs text-[rgb(24,24,26)] outline-none placeholder:text-neutral-400"
         />
       </div>
 
@@ -144,7 +144,7 @@ export default function ProductsPage() {
             return (
               <div
                 key={product.id}
-                className="flex items-center gap-3 rounded-[18px] border border-z-border bg-white p-3"
+                className="flex items-center gap-3 rounded-2xl border border-neutral-200/80 bg-white p-3 transition-colors hover:bg-neutral-50/80"
               >
                 <button
                   type="button"
@@ -153,7 +153,7 @@ export default function ProductsPage() {
                   }
                   className="flex min-w-0 flex-1 items-center gap-3 text-left"
                 >
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[13px] bg-z-sand">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-neutral-100">
                     {product.images[0] ? (
                       <img
                         src={product.images[0]}
@@ -164,14 +164,14 @@ export default function ProductsPage() {
                       <HugeiconsIcon
                         icon={PackageIcon}
                         size={22}
-                        className="text-z-text-hint"
+                        className="text-neutral-400"
                       />
                     )}
                   </div>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <p className="truncate text-[14px] font-bold tracking-tight">
+                      <p className="truncate text-[13px] font-semibold text-[rgb(24,24,26)]">
                         {product.name}
                       </p>
                       {!product.is_active && (
@@ -179,19 +179,19 @@ export default function ProductsPage() {
                       )}
                     </div>
                     {product.category && (
-                      <p className="mt-0.5 truncate text-xs text-z-text-muted">
+                      <p className="mt-0.5 truncate text-xs text-neutral-400">
                         {product.category}
                       </p>
                     )}
                     <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                      <span className="text-[15px] font-extrabold tracking-tight text-black">
+                      <span className="text-[13px] font-semibold tabular-nums text-[rgb(24,24,26)]">
                         {formatMoney(
                           product.promo_price_in_cents ??
                             product.price_in_cents,
                         )}
                       </span>
                       {hasPromo && (
-                        <span className="text-xs text-z-text-hint line-through">
+                        <span className="text-xs text-neutral-400 line-through">
                           {formatMoney(product.price_in_cents)}
                         </span>
                       )}
@@ -261,7 +261,7 @@ export default function ProductsPage() {
         <Link
           to={ROUTES.dashboardBilling}
           aria-label="Aumentar limite de produtos"
-          className="fixed bottom-20 right-4 z-30 flex items-center gap-2 rounded-full bg-z-amber px-4 py-3 text-sm font-semibold text-z-amber-fg shadow-lg transition-transform active:scale-95 sm:hidden"
+          className="fixed bottom-20 right-4 z-30 flex items-center gap-2 rounded-full bg-z-amber px-4 py-3 text-sm font-semibold text-z-amber-fg transition-transform active:scale-95 sm:hidden"
         >
           Aumentar limite
           <HugeiconsIcon icon={ArrowRight01Icon} size={16} />

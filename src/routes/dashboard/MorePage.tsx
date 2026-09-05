@@ -78,35 +78,33 @@ export default function MorePage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[430px] flex-col px-1 pb-12 pt-2 sm:px-0 lg:max-w-none">
-      <h1 className="mb-6 text-[31px] font-extrabold tracking-tight text-z-text">
-        Mais
+    <div className="mx-auto flex w-full max-w-[430px] flex-col px-1 pb-12 pt-1 sm:px-0 lg:max-w-none">
+      <h1 className="mb-4 text-xl font-bold tracking-tight text-[rgb(24,24,26)]">
+        Mais opções
       </h1>
 
-      <section className="overflow-hidden rounded-[22px] border border-z-border bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-        {items.map((item, index) => (
+      <section className="overflow-hidden rounded-2xl border border-neutral-200/80 bg-white divide-y divide-neutral-100">
+        {items.map((item) => (
           <Link
             key={item.label}
             to={item.to}
-            className={`flex min-h-[82px] items-center gap-4 px-5 py-4 transition-colors hover:bg-z-bg2 ${
-              index < items.length - 1 ? "border-b border-z-border" : ""
-            }`}
+            className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-neutral-50/80"
           >
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-white">
-              <HugeiconsIcon icon={item.icon} size={25} />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100/90 text-neutral-700">
+              <HugeiconsIcon icon={item.icon} size={18} />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[19px] font-extrabold leading-tight text-z-text">
+              <span className="block truncate text-[13px] font-semibold text-[rgb(24,24,26)]">
                 {item.label}
               </span>
-              <span className="mt-0.5 block truncate text-[15px] font-medium leading-tight text-z-text-hint">
+              <span className="block truncate text-[12px] font-normal text-neutral-400 mt-0.5">
                 {item.description}
               </span>
             </span>
             <HugeiconsIcon
               icon={ArrowRight01Icon}
-              size={22}
-              className="shrink-0 text-z-text-hint"
+              size={15}
+              className="shrink-0 text-neutral-300"
             />
           </Link>
         ))}
@@ -116,14 +114,14 @@ export default function MorePage() {
         type="button"
         onClick={handleSignOut}
         disabled={signOut.isPending}
-        className="mt-6 flex h-16 w-full items-center justify-center gap-3 rounded-[22px] border border-z-border bg-white text-[18px] font-extrabold text-red-800 transition-colors hover:bg-red-50 disabled:opacity-60"
+        className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-neutral-200/80 bg-white text-[13px] font-semibold text-[rgb(24,24,26)] transition-colors hover:bg-neutral-50 hover:text-red-600 disabled:opacity-60"
       >
-        <HugeiconsIcon icon={Logout01Icon} size={24} />
+        <HugeiconsIcon icon={Logout01Icon} size={16} />
         {signOut.isPending ? "Saindo..." : "Sair da conta"}
       </button>
 
-      <p className="mt-8 text-center text-sm font-medium text-z-text-hint">
-        Zapable · v2.0 · feito no Brasil
+      <p className="mt-6 text-center text-[11px] text-neutral-400">
+        Zapia · Plataforma de Catálogo
       </p>
     </div>
   );

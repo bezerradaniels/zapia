@@ -20,21 +20,21 @@ export function AuthShell({
   contentClassName,
 }: AuthShellProps) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-z-bg p-6">
+    <main className="flex min-h-screen items-center justify-center bg-[#fafafa] p-4 sm:p-6 text-neutral-900">
       <div
         className={cn(
-          "w-full rounded-2xl border border-z-border bg-white p-9 shadow-z",
+          "w-full rounded-2xl border border-neutral-200/80 bg-white p-6 sm:p-8 shadow-sm",
           contentClassName,
         )}
         style={{ maxWidth: width }}
       >
-        <div className="mb-7 flex flex-col items-center text-center">
-          <Link to={ROUTES.home} aria-label="Início">
-            <Logo size="lg" />
+        <div className="mb-6 flex flex-col items-center text-center">
+          <Link to={ROUTES.home} aria-label="Início" className="transition-opacity hover:opacity-90">
+            <Logo size="md" />
           </Link>
-          <h1 className="mt-5 text-[22px] font-bold tracking-tight">{title}</h1>
+          <h1 className="mt-4 text-lg sm:text-xl font-semibold tracking-tight text-neutral-900">{title}</h1>
           {subtitle && (
-            <p className="mt-1 text-sm text-z-text-muted">{subtitle}</p>
+            <p className="mt-1 text-xs text-neutral-500 font-normal">{subtitle}</p>
           )}
         </div>
         {children}

@@ -34,9 +34,9 @@ const STATUS_TONE: Record<
   OrderStatus,
   React.ComponentProps<typeof Badge>["tone"]
 > = {
-  pending: "amber",
-  confirmed: "lilac",
-  completed: "green",
+  pending: "sky",
+  confirmed: "violet",
+  completed: "emerald",
   cancelled: "rose",
 };
 
@@ -77,6 +77,9 @@ export default function OrdersPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
 
+  const PAGE_SIZE = 25;
+  const [currentPage, setCurrentPage] = useState(1);
+
   const q = search.trim().toLowerCase();
   const list = allOrders.filter((o) => {
     if (statusFilter !== "all" && o.status !== statusFilter) return false;
@@ -90,31 +93,48 @@ export default function OrdersPage() {
     return true;
   });
 
+  const [prevFilter, setPrevFilter] = useState({ search, statusFilter });
+  if (
+    prevFilter.search !== search ||
+    prevFilter.statusFilter !== statusFilter
+  ) {
+    setPrevFilter({ search, statusFilter });
+    setCurrentPage(1);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  const paginatedOrders = list.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between gap-3">
-        <h1 className="text-[25px] font-extrabold tracking-tighter">Pedidos</h1>
+        <h1 className="text-lg font-semibold tracking-tight text-[rgb(24,24,26)]">
+          Pedidos
+        </h1>
         <Link
           to={ROUTES.dashboardOrdersNew}
-          className="flex items-center gap-1.5 rounded-xl bg-[#10b981] px-3.5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+          className="flex items-center gap-1.5 rounded-xl bg-violet-400 px-3.5 py-2 text-xs font-medium text-white transition-all hover:bg-violet-500"
         >
-          <HugeiconsIcon icon={PlusSignIcon} size={16} />
-          Novo
+          <HugeiconsIcon icon={PlusSignIcon} size={15} />
+          Novo pedido
         </Link>
       </header>
 
       {/* Search */}
-      <div className="flex h-11 items-center gap-2.5 rounded-[13px] border border-z-border bg-white px-3.5">
+      <div className="flex h-10 items-center gap-2.5 rounded-xl border border-neutral-200/80 bg-white px-3.5 focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-400/20">
         <HugeiconsIcon
           icon={SearchIcon}
-          size={18}
-          className="shrink-0 text-z-text-hint"
+          size={16}
+          className="shrink-0 text-neutral-400"
         />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar pedido ou cliente"
-          className="min-w-0 flex-1 bg-transparent text-sm text-z-text outline-none placeholder:text-z-text-hint"
+          className="min-w-0 flex-1 bg-transparent text-xs text-[rgb(24,24,26)] outline-none placeholder:text-neutral-400"
         />
       </div>
 
@@ -128,10 +148,10 @@ export default function OrdersPage() {
               type="button"
               onClick={() => setStatusFilter(f.value)}
               className={cn(
-                "shrink-0 rounded-full px-3.5 py-2 text-[12.5px] font-bold transition-colors",
+                "shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all",
                 active
-                  ? "bg-z-ink text-white"
-                  : "border border-z-border bg-white text-z-text-muted hover:bg-z-sand",
+                  ? "bg-violet-400 text-neutral-950 font-semibold"
+                  : "border border-neutral-200/80 bg-white text-neutral-600 hover:bg-violet-50/50 hover:text-neutral-900",
               )}
             >
               {f.label}
@@ -143,7 +163,7 @@ export default function OrdersPage() {
       {orders.isLoading ? (
         <div className="flex flex-col gap-2.5">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-[78px] rounded-[18px]" />
+            <Skeleton key={i} className="h-[78px] rounded-2xl" />
           ))}
         </div>
       ) : allOrders.length === 0 ? (
@@ -160,15 +180,15 @@ export default function OrdersPage() {
         />
       ) : (
         <div className="flex flex-col gap-2.5">
-          {list.map((o) => (
+          {paginatedOrders.map((o) => (
             <button
               key={o.id}
               type="button"
               onClick={() => setSelectedId(o.id)}
-              className="flex flex-col gap-2.5 rounded-[18px] border border-z-border bg-white p-4 text-left transition-colors hover:bg-z-bg active:bg-z-bg"
+              className="flex flex-col gap-2.5 rounded-2xl border border-neutral-200/80 bg-white p-3.5 text-left transition-colors hover:bg-neutral-50/80 active:bg-neutral-50"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="truncate text-[15px] font-extrabold tracking-tight">
+                <span className="truncate text-[13px] font-semibold text-[rgb(24,24,26)]">
                   {o.customer_name}
                 </span>
                 <Badge tone={STATUS_TONE[o.status]}>
@@ -176,15 +196,41 @@ export default function OrdersPage() {
                 </Badge>
               </div>
               <div className="flex items-center justify-between gap-2">
-                <span className="truncate text-xs text-z-text-muted">
+                <span className="truncate text-xs text-neutral-400">
                   #{o.order_number} · {formatDateTime(o.created_at)}
                 </span>
-                <span className="shrink-0 text-[15px] font-extrabold tracking-tight tabular-nums">
+                <span className="shrink-0 text-[13px] font-semibold tabular-nums text-[rgb(24,24,26)]">
                   {formatMoney(o.total_in_cents)}
                 </span>
               </div>
             </button>
           ))}
+
+          {totalPages > 1 && (
+            <div className="mt-2 flex items-center justify-between border-t border-z-border pt-4 text-xs font-semibold text-z-text-muted">
+              <span>
+                Página {currentPage} de {totalPages} ({list.length} pedidos)
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="rounded-lg border border-z-border bg-white px-3 py-1.5 font-medium text-z-text transition-colors hover:bg-z-bg disabled:opacity-40"
+                >
+                  Anterior
+                </button>
+                <button
+                  type="button"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="rounded-lg border border-z-border bg-white px-3 py-1.5 font-medium text-z-text transition-colors hover:bg-z-bg disabled:opacity-40"
+                >
+                  Próxima
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -335,10 +381,10 @@ function OrderDetailContent({
                   updateStatus.mutate({ id: o.id, status, oldStatus: o.status })
                 }
                 className={cn(
-                  "rounded-full border px-2.5 py-1 text-xs font-medium transition disabled:opacity-60",
+                  "rounded-full border px-3 py-1 text-xs font-medium transition-all disabled:opacity-60",
                   o.status === status
-                    ? "border-z-green bg-z-green text-z-ink"
-                    : "border-z-border bg-white text-z-text-muted hover:bg-z-bg2",
+                    ? "border-violet-500 bg-violet-500 text-white font-medium"
+                    : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50",
                 )}
               >
                 {STATUS_LABEL[status]}

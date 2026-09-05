@@ -12,58 +12,98 @@ import { cn } from "@/lib/utils";
 
 export function BottomBar() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 flex h-[76px] items-stretch border-t border-z-border bg-white/95 px-2 backdrop-blur lg:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-30 flex h-14 items-stretch border-t border-neutral-200/80 bg-white/95 px-2 backdrop-blur-md lg:hidden pb-[env(safe-area-inset-bottom)]">
       <NavLink
         to={ROUTES.dashboard}
         end
         className={({ isActive }) =>
           cn(
-            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 text-[11px] font-extrabold leading-none transition-colors",
-            isActive ? "text-[#10b981]" : "text-z-text-hint",
+            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium leading-none transition-colors",
+            isActive
+              ? "text-[rgb(24,24,26)] font-semibold"
+              : "text-neutral-400 hover:text-[rgb(24,24,26)]",
           )
         }
       >
-        <HugeiconsIcon icon={HomeIcon} size={24} />
-        Início
+        {({ isActive }) => (
+          <>
+            <HugeiconsIcon
+              icon={HomeIcon}
+              size={19}
+              className={isActive ? "text-violet-500" : "text-neutral-400"}
+            />
+            Início
+          </>
+        )}
       </NavLink>
 
       <NavLink
         to={ROUTES.dashboardOrders}
         className={({ isActive }) =>
           cn(
-            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 text-[11px] font-extrabold leading-none transition-colors",
-            isActive ? "text-[#10b981]" : "text-z-text-hint",
+            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium leading-none transition-colors",
+            isActive
+              ? "text-[rgb(24,24,26)] font-semibold"
+              : "text-neutral-400 hover:text-[rgb(24,24,26)]",
           )
         }
       >
-        <HugeiconsIcon icon={InvoiceIcon} size={24} />
-        Pedidos
+        {({ isActive }) => (
+          <>
+            <HugeiconsIcon
+              icon={InvoiceIcon}
+              size={19}
+              className={isActive ? "text-violet-500" : "text-neutral-400"}
+            />
+            Pedidos
+          </>
+        )}
       </NavLink>
 
       <NavLink
         to={ROUTES.dashboardProducts}
         className={({ isActive }) =>
           cn(
-            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 text-[11px] font-extrabold leading-none transition-colors",
-            isActive ? "text-[#10b981]" : "text-z-text-hint",
+            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium leading-none transition-colors",
+            isActive
+              ? "text-[rgb(24,24,26)] font-semibold"
+              : "text-neutral-400 hover:text-[rgb(24,24,26)]",
           )
         }
       >
-        <HugeiconsIcon icon={PackageIcon} size={24} />
-        Produtos
+        {({ isActive }) => (
+          <>
+            <HugeiconsIcon
+              icon={PackageIcon}
+              size={19}
+              className={isActive ? "text-violet-500" : "text-neutral-400"}
+            />
+            Produtos
+          </>
+        )}
       </NavLink>
 
       <NavLink
         to={ROUTES.dashboardCustomers}
         className={({ isActive }) =>
           cn(
-            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 text-[11px] font-extrabold leading-none transition-colors",
-            isActive ? "text-[#10b981]" : "text-z-text-hint",
+            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium leading-none transition-colors",
+            isActive
+              ? "text-[rgb(24,24,26)] font-semibold"
+              : "text-neutral-400 hover:text-[rgb(24,24,26)]",
           )
         }
       >
-        <HugeiconsIcon icon={UserGroupIcon} size={24} />
-        Clientes
+        {({ isActive }) => (
+          <>
+            <HugeiconsIcon
+              icon={UserGroupIcon}
+              size={19}
+              className={isActive ? "text-violet-500" : "text-neutral-400"}
+            />
+            Clientes
+          </>
+        )}
       </NavLink>
 
       <NavLink
@@ -71,13 +111,23 @@ export function BottomBar() {
         aria-label="Mais opções"
         className={({ isActive }) =>
           cn(
-            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 text-[11px] font-extrabold leading-none transition-colors",
-            isActive ? "text-[#10b981]" : "text-z-text-hint",
+            "flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium leading-none transition-colors",
+            isActive
+              ? "text-[rgb(24,24,26)] font-semibold"
+              : "text-neutral-400 hover:text-[rgb(24,24,26)]",
           )
         }
       >
-        <HugeiconsIcon icon={Menu01Icon} size={24} />
-        Mais
+        {({ isActive }) => (
+          <>
+            <HugeiconsIcon
+              icon={Menu01Icon}
+              size={19}
+              className={isActive ? "text-violet-500" : "text-neutral-400"}
+            />
+            Mais
+          </>
+        )}
       </NavLink>
     </nav>
   );

@@ -1,9 +1,18 @@
 @import "tailwindcss";
 @config "../../tailwind.config.ts";
 
+@font-face {
+  font-family: "Google Sans Flex";
+  src: url("/fonts/GoogleSansFlex-VariableFont.ttf") format("truetype-variations"),
+       url("/fonts/GoogleSansFlex-VariableFont.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
-    /* Zapia Modern Emerald & Slate defaults */
+    /* Zapia Violet 400 & Neutral defaults */
     --background: 210 40% 98%; /* #f8fafc */
     --foreground: 222 47% 11%; /* #0f172a */
 
@@ -13,24 +22,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 158 64% 52%; /* #10b981 */
-    --primary-foreground: 0 0% 100%; /* #ffffff */
+    --primary: 258 90% 76%; /* Violet 400 #a78bfa */
+    --primary-foreground: 222 47% 11%; /* High-contrast dark text on Violet 400 */
 
-    --secondary: 152 76% 96%; /* #ecfdf5 */
-    --secondary-foreground: 161 94% 19%; /* #064e3b */
+    --secondary: 255 100% 97%; /* Violet 50 #f5f3ff */
+    --secondary-foreground: 258 90% 25%; /* High-contrast dark violet text */
 
     --muted: 210 40% 96%; /* #f1f5f9 */
     --muted-foreground: 215 16% 47%; /* #64748b */
 
-    --accent: 158 64% 52%; /* #10b981 */
-    --accent-foreground: 0 0% 100%;
+    --accent: 258 90% 76%; /* Violet 400 #a78bfa */
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 214 32% 91%; /* #e2e8f0 */
     --input: 214 32% 91%; /* #e2e8f0 */
-    --ring: 158 64% 52%; /* #10b981 */
+    --ring: 258 90% 76%; /* Violet 400 #a78bfa */
 
     --radius: 0.75rem;
 
@@ -38,6 +47,16 @@
     --color-primary: #10b981;
     --color-primary-fg: #ffffff;
     --color-primary-hover: #059669;
+
+    /* Menus & Sidebar typography color */
+    --sidebar-text: rgb(24, 24, 26);
+    --menu-text: rgb(24, 24, 26);
+
+    /* Emerald & Sky action/highlight tokens */
+    --emerald-action: #4ade80;
+    --emerald-action-fg: #052e16;
+    --sky-action: #38bdf8;
+    --sky-action-fg: #082f49;
   }
 
   .dark {
@@ -47,8 +66,8 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 14%;
     --popover-foreground: 210 40% 98%;
-    --primary: 158 64% 52%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 258 90% 76%;
+    --primary-foreground: 222 47% 11%;
     --secondary: 222 47% 20%;
     --secondary-foreground: 210 40% 98%;
     --muted: 222 47% 20%;
@@ -59,7 +78,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 222 47% 22%;
     --input: 222 47% 22%;
-    --ring: 158 64% 52%;
+    --ring: 258 90% 76%;
   }
 }
 
@@ -127,26 +146,93 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-family:
-      "Plus Jakarta Sans",
-      Inter,
+      "Google Sans Flex",
       -apple-system,
       BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
       sans-serif;
   }
   body {
     @apply bg-background text-foreground;
     font-family:
-      "Plus Jakarta Sans",
-      Inter,
+      "Google Sans Flex",
       -apple-system,
       BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
       sans-serif;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
   }
   h1,
   h2,
   h3,
-  h4 {
+  h4,
+  h5,
+  h6 {
     @apply font-display text-z-ink;
+    font-family:
+      "Google Sans Flex",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+    letter-spacing: -0.02em;
+  }
+  button,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    font-family:
+      "Google Sans Flex",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+    cursor: pointer;
+  }
+  a,
+  select,
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [type="button"]:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  /* Form labels and fields font-size standardization: 12px mobile, 14px desktop */
+  label {
+    font-size: 12px;
+  }
+  @media (min-width: 640px) {
+    label {
+      font-size: 14px;
+    }
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 12px;
+  }
+  @media (min-width: 640px) {
+    input,
+    textarea,
+    select {
+      font-size: 14px;
+    }
+  }
+
+  /* Complete shadow elimination */
+  *, ::before, ::after {
+    --tw-shadow: 0 0 #0000 !important;
+    --tw-shadow-colored: 0 0 #0000 !important;
   }
 }

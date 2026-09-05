@@ -5,8 +5,26 @@ import type { Product } from "@/types/domain";
  * Falls back to the regular price when there's no active promotion.
  */
 export function effectivePrice(
-  p: Pick<Product, "price_in_cents" | "promo_price_in_cents">,
+  p: Pick<Product, "price_in_cents" | "promo_price_in_cents"> & {
+    variation_options?: import("@/types/domain").VariationOption[] | null;
+  },
+  selectedVariation?: string | null,
 ): number {
+  if (selectedVariation && p.variation_options) {
+    const opt = p.variation_options.find((o) => o.name === selectedVariation);
+    if (opt) {
+      if (
+        opt.promo_price_in_cents != null &&
+        opt.price_in_cents != null &&
+        opt.promo_price_in_cents < opt.price_in_cents
+      ) {
+        return opt.promo_price_in_cents;
+      }
+      if (opt.price_in_cents != null) {
+        return opt.price_in_cents;
+      }
+    }
+  }
   if (
     p.promo_price_in_cents != null &&
     p.promo_price_in_cents < p.price_in_cents
@@ -37,4 +55,15 @@ export function discountPercent(
   if (p.promo_price_in_cents == null || p.price_in_cents <= 0) return null;
   if (p.promo_price_in_cents >= p.price_in_cents) return null;
   return Math.round((1 - p.promo_price_in_cents / p.price_in_cents) * 100);
+}
+
+/** Label for the payment method condition attached to a promotional discount. */
+export function getPromoPaymentMethodLabel(
+  method: string | null | undefined,
+): string | null {
+  if (!method) return null;
+  if (method === "pix") return "no Pix";
+  if (method === "dinheiro") return "no Dinheiro";
+  if (method === "pix_dinheiro") return "no Pix ou Dinheiro";
+  return null;
 }

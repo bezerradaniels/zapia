@@ -10,7 +10,7 @@ export function BillingToggle({ value, onChange, className }: Props) {
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border border-[#475569] bg-z-bg p-1",
+        "inline-flex items-center gap-1 rounded-[10px] border border-neutral-200/80 bg-neutral-100/70 p-1",
         className,
       )}
     >
@@ -18,13 +18,10 @@ export function BillingToggle({ value, onChange, className }: Props) {
         type="button"
         onClick={() => onChange("monthly")}
         className={cn(
-          "rounded-full px-4 py-1.5 text-base font-medium transition-all",
+          "rounded-[8px] px-3 py-1.5 text-xs font-medium transition-all",
           value === "monthly"
-            ? "bg-[#10b981] text-white shadow-sm"
-            : cn(
-                "text-z-text-muted hover:text-z-text",
-                value === "annual" && "font-bold ",
-              ),
+            ? "bg-violet-400 text-white"
+            : "text-neutral-600 hover:text-neutral-900",
         )}
       >
         Mensal
@@ -33,22 +30,19 @@ export function BillingToggle({ value, onChange, className }: Props) {
         type="button"
         onClick={() => onChange("annual")}
         className={cn(
-          "flex items-center gap-1.5 rounded-full px-4 py-1.5 text-base font-medium transition-all",
+          "flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-xs font-medium transition-all",
           value === "annual"
-            ? "bg-[#10b981] text-white shadow-sm"
-            : cn(
-                "text-z-text-muted hover:text-z-text",
-                value === "monthly" && "font-bold ",
-              ),
+            ? "bg-violet-400 text-white"
+            : "text-neutral-600 hover:text-neutral-900",
         )}
       >
         Anual
         <span
           className={cn(
-            "rounded-full px-1.5 py-0.5 text-[11px] font-bold",
+            "rounded px-1.5 py-0.5 text-[10px] font-bold",
             value === "annual"
-              ? "bg-white/20 text-white"
-              : "bg-[#10b981]/10 text-[#10b981]",
+              ? "bg-white/25 text-white"
+              : "bg-violet-100 text-violet-700",
           )}
         >
           até -30%

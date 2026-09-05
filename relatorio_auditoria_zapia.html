@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zapia — Relatório Executivo de Auditoria Técnica</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      .tab-pane { display: block !important; margin-bottom: 2rem; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+  <!-- Top Navigation Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+          Z
+        </div>
+        <div>
+          <h1 class="text-base font-bold text-slate-900 leading-tight">Zapia — Auditoria Técnica e Arquitetural</h1>
+          <p class="text-xs text-slate-500">Relatório Executivo para Tomada de Decisão Estratégica</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 no-print">
+        <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          Imprimir / PDF
+        </button>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          Auditoria Concluída
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <!-- Header Highlights Banner -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-8 space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            Diagnóstico Geral: Fundações Sólidas com Ações Imediatas de Estabilização
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Diagnóstico Estrutural, Performance e Segurança do SaaS
+          </h2>
+          <p class="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl">
+            A Zapia possui modelo de negócio validado e arquitetura moderna voltada ao comércio via WhatsApp. 
+            Esta auditoria detalha vulnerabilidades de publicação manual, regras de faturamento e gargalos de banco de dados, 
+            apresentando um plano ordenado em 4 fases para viabilizar escala segura.
+          </p>
+        </div>
+        <div class="lg:col-span-4 grid grid-cols-2 gap-3">
+          <div class="bg-red-50/80 border border-red-200/80 rounded-xl p-3 text-center">
+            <div class="text-2xl font-black text-red-600">2</div>
+            <div class="text-xs font-medium text-red-700">Críticas</div>
+            <div class="text-[10px] text-red-500">Ação imediata</div>
+          </div>
+          <div class="bg-orange-50/80 border border-orange-200/80 rounded-xl p-3 text-center">
+            <div class="text-2xl font-black text-orange-600">4</div>
+            <div class="text-xs font-medium text-orange-700">Altas</div>
+            <div class="text-[10px] text-orange-500">Ciclo atual</div>
+          </div>
+          <div class="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3 text-center">
+            <div class="text-2xl font-black text-amber-600">4</div>
+            <div class="text-xs font-medium text-amber-700">Médias</div>
+            <div class="text-[10px] text-amber-500">Agendar</div>
+          </div>
+          <div class="bg-blue-50/80 border border-blue-200/80 rounded-xl p-3 text-center">
+            <div class="text-2xl font-black text-blue-600">2</div>
+            <div class="text-xs font-medium text-blue-700">Baixas</div>
+            <div class="text-[10px] text-blue-500">Melhoria</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="border-b border-slate-200 no-print">
+      <nav class="flex space-x-2 sm:space-x-8 overflow-x-auto pb-px" id="tabs">
+        <button onclick="switchTab('resumo')" id="tab-btn-resumo" class="tab-button border-b-2 border-emerald-600 text-emerald-700 py-3 px-1 text-sm font-semibold whitespace-nowrap">
+          1. Resumo Executivo
+        </button>
+        <button onclick="switchTab('pilares')" id="tab-btn-pilares" class="tab-button border-b-2 border-transparent text-slate-500 hover:text-slate-700 py-3 px-1 text-sm font-semibold whitespace-nowrap">
+          2. Pilares Auditados
+        </button>
+        <button onclick="switchTab('matriz')" id="tab-btn-matriz" class="tab-button border-b-2 border-transparent text-slate-500 hover:text-slate-700 py-3 px-1 text-sm font-semibold whitespace-nowrap">
+          3. Matriz de Prioridades (12)
+        </button>
+        <button onclick="switchTab('roteiro')" id="tab-btn-roteiro" class="tab-button border-b-2 border-transparent text-slate-500 hover:text-slate-700 py-3 px-1 text-sm font-semibold whitespace-nowrap">
+          4. Roteiro em 4 Fases
+        </button>
+      </nav>
+    </div>
+
+    <!-- TAB 1: RESUMO EXECUTIVO -->
+    <section id="pane-resumo" class="tab-pane space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Card 1 -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 leading-snug">Pontos Fortes da Arquitetura</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Interface extremamente rápida para compradores de WhatsApp, separação correta de sessões de lojistas por subdomínio para impedir invasões, e regras financeiras críticas controladas no banco de dados.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 leading-snug">Vulnerabilidades Imediatas</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Deploy manual que gerou quebra de rotas no ar, e regra de negócio que marcava lojas de novos clientes em teste grátis como "expiradas", bloqueando a exibição das vitrines para os consumidores.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 leading-snug">Gargalos de Escala</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Vitrine e painel sem paginação trazem todo o banco de uma só vez, o tráfego de borda roda sem criptografia ponta a ponta na hospedagem, e não há monitoramento de erros em tempo real no cliente.
+          </p>
+        </div>
+      </div>
+
+      <!-- Executive Overview Text Card -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-4">
+        <h3 class="text-xl font-bold text-slate-900">Visão Geral para a Liderança</h3>
+        <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+          O sistema Zapia foi concebido sobre uma base tecnológica moderna e enxuta, combinando uma interface rápida para celulares com serviços em nuvem gerenciados. O modelo de negócios (catálogo digital acessível por subdomínios personalizados para vendas via WhatsApp) possui grande aderência comercial e baixo custo fixo de infraestrutura.
+        </p>
+        <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+          Contudo, o crescimento de clientes colocará pressão direta sobre as lacunas identificadas: sem automação de publicação, cada atualização de software envolve risco de parada de serviço; sem limites nas consultas de catálogo e pedidos, a plataforma ficará lenta em conexões móveis; e sem a correção das regras de teste, lojistas recém-cadastrados perdem o interesse na ferramenta logo no primeiro dia.
+        </p>
+        <div class="pt-2">
+          <button onclick="switchTab('matriz')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-xs">
+            Ver Tabela de Pendências por Criticidade
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: PILARES AUDITADOS -->
+    <section id="pane-pilares" class="tab-pane hidden space-y-6">
+      <!-- Pillar 1: Estrutura & Configuração -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-purple-100 text-purple-800">Pilar 1</span>
+          <h3 class="text-xl font-bold text-slate-900">Estrutura, Configuração e Entrega</h3>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          A arquitetura do front-end é bem organizada em camadas funcionais, mas o elo de entrega para os servidores em nuvem é manual e frágil.
+        </p>
+
+        <div class="space-y-3 pt-2">
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-slate-900 text-sm">Publicação manual por arquivos compactados</h4>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-orange-100 text-orange-800">Alta</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              <strong>Causa e Efeito:</strong> O processo de compilação gera pacotes estáticos que são enviados manualmente para a pasta pública da hospedagem. Essa falta de esteira contínua gerou divergências entre o código da máquina local e o servidor, exibindo páginas incorretas aos compradores.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono bg-white p-2 rounded border border-slate-200">
+              Arquivo: package.json (linhas 8-9) e fluxo zapia-deploy.zip
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-slate-900 text-sm">Comunicação sem criptografia na perna final da rede</h4>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-orange-100 text-orange-800">Alta</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              <strong>Causa e Efeito:</strong> O modo SSL flexível permitiu que a ponta do visitante ficasse protegida, mas a conexão entre o distribuidor e a hospedagem passou a trafegar em texto aberto, permitindo interceptação e manipulação de pacotes na rede externa.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono bg-white p-2 rounded border border-slate-200">
+              Painel Cloudflare SSL/TLS & Hospedagem compartilhada
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-slate-900 text-sm">Chaves de produção como valor padrão no código</h4>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800">Média</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              <strong>Causa e Efeito:</strong> A inclusão de dados de conexão com a base oficial de produção como valores padrão no código faz com que qualquer ambiente de teste execute sobre a base real de lojistas, com risco de poluição de dados.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono bg-white p-2 rounded border border-slate-200">
+              Arquivo: src/lib/supabase/client.ts (linhas 5-12)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pillar 2: Performance & Velocidade -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-800">Pilar 2</span>
+          <h3 class="text-xl font-bold text-slate-900">Performance, Velocidade e Banco de Dados</h3>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          O aplicativo do cliente é leve, mas a ausência de paginação e de índices específicos provocará degradação severa conforme as lojas crescerem.
+        </p>
+
+        <div class="space-y-3 pt-2">
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-slate-900 text-sm">Consultas de vitrine e painel sem paginação</h4>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-orange-100 text-orange-800">Alta</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              <strong>Causa e Efeito:</strong> A vitrine pública baixa todos os produtos ativos de uma só vez, e o painel baixa a totalidade de pedidos e clientes sem limitar o resultado. Em lojas com catálogos grandes ou alto volume de vendas, o carregamento consumirá grande quantidade de dados móveis e travará celulares modestos.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono bg-white p-2 rounded border border-slate-200">
+              Arquivos: src/features/products/api/queries.ts (linhas 27-40), src/features/orders/api/queries.ts (linhas 4-14)
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-slate-900 text-sm">Relações de pedidos e cupons sem índices de busca rápida</h4>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800">Média</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              <strong>Causa e Efeito:</strong> A tabela de itens de pedidos referencia os produtos sem índice de apoio. Quando um produto é excluído ou modificado, o banco precisa fazer uma varredura sequencial completa em todos os itens de pedidos, sobrecarregando o processador e encarecendo a infraestrutura.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono bg-white p-2 rounded border border-slate-200">
+              Arquivo: supabase/migrations/20260424220829_orders_init.sql (linha 27)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pillar 3: Segurança & Conformidade -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-rose-100 text-rose-800">Pilar 3</span>
+          <h3 class="text-xl font-bold text-slate-900">Segurança, Regras de Negócio e LGPD</h3>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Embora o isolamento de sessões tenha sido corrigido com excelência, falhas em regras de negócio e concessões administrativas manuais representam riscos comerciais e legais.
+        </p>
+
+        <div class="space-y-3 pt-2">
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-slate-900 text-sm">Bloqueio imediato de lojas em período de teste gratuito</h4>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-red-100 text-red-800">Crítica</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              <strong>Causa e Efeito:</strong> A validação de acesso público não considerava contas em teste grátis como ativas, fazendo com que a vitrine de novos clientes exibisse mensagem de período encerrado assim que criada, bloqueando as vendas de novos lojistas.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono bg-white p-2 rounded border border-slate-200">
+              Arquivo: src/features/billing/utils/canAccessCatalog.ts (linhas 3-22)
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-slate-900 text-sm">Superadministrador concedido a conta de correio eletrônico pessoal</h4>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-orange-100 text-orange-800">Alta</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              <strong>Causa e Efeito:</strong> A concessão de superadministrador foi inserida no banco de dados referenciando um endereço pessoal do Gmail. Em caso de comprometimento da senha pessoal do usuário, o invasor terá acesso irrestrito a todos os dados comerciais e lojas da plataforma.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono bg-white p-2 rounded border border-slate-200">
+              Arquivo: supabase/migrations/20260902184000_admin_email_daniel.sql (linhas 9-15)
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-slate-900 text-sm">Exclusão de clientes não anonimiza o histórico de pedidos (LGPD)</h4>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800">Média</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              <strong>Causa e Efeito:</strong> O botão de apagar cliente remove apenas a ficha da agenda, mas mantém o nome, telefone e observações do consumidor nos pedidos antigos. Se um cliente exercer o direito legal ao esquecimento, a empresa descumprirá a LGPD por não descaracterizar esses dados.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono bg-white p-2 rounded border border-slate-200">
+              Arquivo: src/features/customers/api/mutations.ts (linhas 53-57)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MATRIZ DE PRIORIDADES -->
+    <section id="pane-matriz" class="tab-pane hidden space-y-6">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-xl font-bold text-slate-900">Matriz de Pendências por Criticidade</h3>
+            <p class="text-xs sm:text-sm text-slate-500">Classificação ordenada por impacto direto no faturamento e na estabilidade</p>
+          </div>
+          <!-- Filter Controls -->
+          <div class="flex flex-wrap items-center gap-2 no-print">
+            <button onclick="filterTable('all')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 text-white transition-colors" data-filter="all">Todas</button>
+            <button onclick="filterTable('Crítica')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-100 text-red-800 hover:bg-red-200 transition-colors" data-filter="Crítica">Críticas (2)</button>
+            <button onclick="filterTable('Alta')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-100 text-orange-800 hover:bg-orange-200 transition-colors" data-filter="Alta">Altas (4)</button>
+            <button onclick="filterTable('Média')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-100 text-amber-800 hover:bg-amber-200 transition-colors" data-filter="Média">Médias (4)</button>
+            <button onclick="filterTable('Baixa')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors" data-filter="Baixa">Baixas (2)</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse" id="priority-table">
+            <thead>
+              <tr class="border-b border-slate-200 bg-slate-50/75 text-xs font-bold text-slate-600 uppercase tracking-wider">
+                <th class="py-3 px-4">Prioridade</th>
+                <th class="py-3 px-4">Pendência Identificada</th>
+                <th class="py-3 px-4">Onde foi encontrada</th>
+                <th class="py-3 px-4">Risco se não for corrigida</th>
+                <th class="py-3 px-4">Esforço</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Crítica">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">Crítica</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Bloqueio indevido de lojas no teste gratuito</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">canAccessCatalog.ts:3</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Lojistas recém-cadastrados não conseguem vender e cancelam a conta</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-emerald-700">Baixo</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Crítica">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">Crítica</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Subdomínio da loja entregando página institucional</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">public/index.php:97 & Worker</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Clientes da loja caem na página do Zapia em vez do catálogo</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-emerald-700">Baixo</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Alta">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">Alta</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Superadministrador atrelado a e-mail pessoal</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">20260902184000_admin.sql:10</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Sequestro de todas as lojas caso o e-mail pessoal seja invadido</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-emerald-700">Baixo</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Alta">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">Alta</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Tráfego de rede entre distribuidor e servidor sem criptografia</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">Painel Cloudflare SSL (Flexible)</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Possibilidade de espionagem e adulteração de dados em trânsito</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-amber-700">Médio</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Alta">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">Alta</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Consultas de vitrine e painel sem paginação</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">products/api/queries.ts:30</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Lentidão progressiva e travamento da vitrine em celulares de clientes</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-amber-700">Médio</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Alta">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">Alta</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Processo de deploy dependente de transferências manuais</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">package.json:8 e zapia-deploy.zip</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Erros frequentes em novas versões e indisponibilidade não planejada</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-amber-700">Médio</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Média">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Média</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Chaves estrangeiras sem índices no banco de dados</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">orders_init.sql:27</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Gargalos de processamento ao excluir ou atualizar produtos no catálogo</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-emerald-700">Baixo</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Média">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Média</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Exclusão de clientes não anonimiza o histórico (LGPD)</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">customers/api/mutations.ts:53</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Multas e sanções legais por reter dados pessoais após solicitação</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-amber-700">Médio</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Média">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Média</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Ausência de monitoramento de erros no cliente</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">CLAUDE.md:775</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Compradores enfrentam erros no checkout sem que a equipe saiba</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-emerald-700">Baixo</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Média">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Média</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Chaves de produção gravadas como contingência no código</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">supabase/client.ts:5</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Execuções de teste poluindo a base real de produção</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-emerald-700">Baixo</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Baixa">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">Baixa</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Consultas de detalhes do pedido em requisições separadas</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">orders/api/queries.ts:16</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Pequeno atraso perceptível na visualização detalhada de pedidos</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-emerald-700">Baixo</td>
+              </tr>
+              <tr class="table-row hover:bg-slate-50/60 transition-colors" data-severity="Baixa">
+                <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">Baixa</span></td>
+                <td class="py-3.5 px-4 font-semibold text-slate-900">Falta de trava no banco para identificador do Google Tag Manager</td>
+                <td class="py-3.5 px-4 text-xs text-slate-500 font-mono">StoreLayout.tsx:70</td>
+                <td class="py-3.5 px-4 text-xs text-slate-600">Inserção de códigos de rastreio mal formatados quebrando a vitrine</td>
+                <td class="py-3.5 px-4 text-xs font-semibold text-emerald-700">Baixo</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ROTEIRO EM 4 FASES -->
+    <section id="pane-roteiro" class="tab-pane hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Fase 1 -->
+        <div class="bg-white border-2 border-red-200 rounded-2xl p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">Fase 1</span>
+            <span class="text-xs font-bold text-red-600 uppercase">Urgente</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Contenção Imediata de Receita e Blindagem de Acessos</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Esta fase reúne as correções que afetam diretamente o funcionamento do funil de vendas e a integridade da administração central. Nenhum investimento em atração de lojistas surtirá efeito se a vitrine não abrir ou se o acesso superadministrador estiver exposto.
+          </p>
+          <div class="border-t border-slate-100 pt-3 space-y-2">
+            <div class="text-xs font-semibold text-slate-700">Itens resolvidos:</div>
+            <ul class="text-xs text-slate-600 space-y-1 list-disc pl-4">
+              <li>Liberação do acesso às vitrines durante o período de testes gratuito.</li>
+              <li>Correção do roteamento de subdomínio para entregar o catálogo da loja.</li>
+              <li>Revogação do e-mail pessoal no controle de superadministrador.</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-xl text-xs text-slate-700 border border-slate-200/60">
+            <strong>Resultado:</strong> Lojistas abrem suas lojas instantaneamente e o acesso master fica sob governança estrita.
+          </div>
+        </div>
+
+        <!-- Fase 2 -->
+        <div class="bg-white border-2 border-orange-200 rounded-2xl p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800">Fase 2</span>
+            <span class="text-xs font-bold text-orange-600 uppercase">Ciclo Atual</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Estabilização da Infraestrutura e Fluxo de Dados</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Elimina gargalos que degradam a confiabilidade da operação e expõem a empresa a riscos de conformidade jurídica e técnica, preparando a plataforma para suportar a entrada contínua de lojas.
+          </p>
+          <div class="border-t border-slate-100 pt-3 space-y-2">
+            <div class="text-xs font-semibold text-slate-700">Itens resolvidos:</div>
+            <ul class="text-xs text-slate-600 space-y-1 list-disc pl-4">
+              <li>Instalação de certificado de origem para criptografia integral na rede.</li>
+              <li>Implementação de paginação na vitrine, pedidos e clientes.</li>
+              <li>Criação de esteira automática de deploy contínuo (GitHub Actions).</li>
+              <li>Remoção de credenciais de produção fixadas no código.</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-xl text-xs text-slate-700 border border-slate-200/60">
+            <strong>Resultado:</strong> Tráfego 100% criptografado, deploys automáticos sem paradas e painéis sempre velozes.
+          </div>
+        </div>
+
+        <!-- Fase 3 -->
+        <div class="bg-white border-2 border-amber-200 rounded-2xl p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Fase 3</span>
+            <span class="text-xs font-bold text-amber-600 uppercase">Próximo Ciclo</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Otimização de Banco, LGPD e Observabilidade</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Reduz o custo computacional com banco de dados, blinda a empresa contra penalidades da LGPD e assegura visibilidade técnica sobre o comportamento dos clientes na vitrine.
+          </p>
+          <div class="border-t border-slate-100 pt-3 space-y-2">
+            <div class="text-xs font-semibold text-slate-700">Itens resolvidos:</div>
+            <ul class="text-xs text-slate-600 space-y-1 list-disc pl-4">
+              <li>Criação de índices em chaves de relacionamento de pedidos e cupons.</li>
+              <li>Rotina de anonimização no histórico de pedidos (Direito ao Esquecimento).</li>
+              <li>Integração de ferramenta de monitoramento de erros em tempo real.</li>
+              <li>Otimização da consulta de pedidos para chamada única.</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-xl text-xs text-slate-700 border border-slate-200/60">
+            <strong>Resultado:</strong> Banco de dados operando com folga, conformidade plena com LGPD e detecção antecipada de bugs.
+          </div>
+        </div>
+
+        <!-- Fase 4 -->
+        <div class="bg-white border-2 border-blue-200 rounded-2xl p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">Fase 4</span>
+            <span class="text-xs font-bold text-blue-600 uppercase">Evolução Contínua</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Evolução Arquitetural e Automação Preventiva</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Melhorias preventivas que consolidam a robustez do software a longo prazo, aumentando a defesa contra ataques maliciosos e garantindo previsibilidade para novas integrações.
+          </p>
+          <div class="border-t border-slate-100 pt-3 space-y-2">
+            <div class="text-xs font-semibold text-slate-700">Itens resolvidos:</div>
+            <ul class="text-xs text-slate-600 space-y-1 list-disc pl-4">
+              <li>Limitação de taxa contra abusos nos gatilhos de pagamento.</li>
+              <li>Travas de validação rigorosas diretamente no banco de dados.</li>
+              <li>Bateria de testes automatizados ponta a ponta no checkout.</li>
+            </ul>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-xl text-xs text-slate-700 border border-slate-200/60">
+            <strong>Resultado:</strong> Plataforma sólida para receber investimentos e expandir comercialmente com previsibilidade.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Note -->
+    <footer class="text-center text-xs text-slate-400 py-6 border-t border-slate-200">
+      Zapia — Relatório Técnico de Auditoria • Realizado com base na análise direta do repositório de código-fonte
+    </footer>
+  </main>
+
+  <script>
+    function switchTab(tabId) {
+      // Hide all panes
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      // Deselect all tab buttons
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('border-emerald-600', 'text-emerald-700');
+        btn.classList.add('border-transparent', 'text-slate-500');
+      });
+
+      // Show selected pane
+      const targetPane = document.getElementById('pane-' + tabId);
+      if (targetPane) targetPane.classList.remove('hidden');
+
+      // Highlight active button
+      const activeBtn = document.getElementById('tab-btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-slate-500');
+        activeBtn.classList.add('border-emerald-600', 'text-emerald-700');
+      }
+    }
+
+    function filterTable(severity) {
+      // Update filter button styles
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-filter') === severity) {
+          btn.classList.remove('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+          btn.classList.add('bg-slate-900', 'text-white');
+        } else {
+          btn.classList.remove('bg-slate-900', 'text-white');
+          btn.classList.add('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+        }
+      });
+
+      // Filter rows
+      document.querySelectorAll('#priority-table .table-row').forEach(row => {
+        if (severity === 'all' || row.getAttribute('data-severity') === severity) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

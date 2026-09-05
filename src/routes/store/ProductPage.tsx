@@ -17,10 +17,12 @@ import type { Product, Store, VariationOption } from "@/types/domain";
 // storefront page doesn't pull in ProductForm's dashboard-only weight.
 import { useProductBySlug } from "@/features/products/hooks/useProductBySlug";
 import { usePublicProducts } from "@/features/products/hooks/useProducts";
-import { discountPercent } from "@/features/products/utils/price";
+import { getPromoPaymentMethodLabel } from "@/features/products/utils/price";
 import {
   getTotalVariationStock,
   getVariationStock,
+  getVariationPrice,
+  checkValueAvailability,
 } from "@/features/products/utils/variation";
 import { useCartStore, buildCartKey } from "@/features/cart";
 import { buildStoreTitle } from "@/features/catalog";
@@ -232,10 +234,13 @@ export default function ProductPage() {
     );
   }
 
-  const promo = p.promo_price_in_cents;
-  const hasPromo = promo != null && promo < p.price_in_cents;
-  const finalPrice = hasPromo ? promo : p.price_in_cents;
-  const discount = discountPercent(p);
+  const priceInfo = getVariationPrice(p, selectedVariation);
+  const hasPromo = priceInfo.hasPromo;
+  const finalPrice = priceInfo.price;
+  const discount =
+    priceInfo.hasPromo && priceInfo.originalPrice > 0
+      ? Math.round((1 - priceInfo.price / priceInfo.originalPrice) * 100)
+      : null;
   const selectedStock = getVariationStock(p, selectedVariation);
   const totalVariationStock = p.has_variations
     ? getTotalVariationStock(p)
@@ -377,7 +382,7 @@ export default function ProductPage() {
           <div className="flex flex-col gap-1">
             {hasPromo && (
               <span className="text-[15px] text-z-text-hint line-through">
-                {formatMoney(p.price_in_cents)}
+                {formatMoney(priceInfo.originalPrice)}
               </span>
             )}
             <div className="flex items-center gap-2">
@@ -407,8 +412,13 @@ export default function ProductPage() {
                     })()}
               </span>
               {hasPromo && (
-                <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[13px] font-bold text-[#02a650]">
+                <span className="rounded-lg bg-[#e6f7ef] px-2.5 py-1 text-[13px] font-bold text-[#02a650]">
                   {discount}% OFF
+                </span>
+              )}
+              {getPromoPaymentMethodLabel(p.promo_payment_method) && (
+                <span className="rounded-lg bg-[#e6f7ef] px-2.5 py-1 text-[13px] font-bold text-[#02a650]">
+                  {getPromoPaymentMethodLabel(p.promo_payment_method)}
                 </span>
               )}
             </div>
@@ -426,7 +436,7 @@ export default function ProductPage() {
                       ),
                     )}
                   </span>
-                  {p.installment_total_in_cents <= finalPrice ? (
+                  {p.installment_total_in_cents === finalPrice ? (
                     <span className="text-[#02a650]"> sem juros</span>
                   ) : null}
                 </span>
@@ -643,18 +653,30 @@ function VariationPicker({
               {group.values.map((item) => {
                 const isSelected = selectedValues[group.label] === item.value;
                 const itemQuantity = cartQuantityByOption[item.value] ?? 0;
+                const availability = checkValueAvailability(
+                  options,
+                  selectedValues,
+                  group.label,
+                  item.value,
+                  label,
+                );
+                const isUnavailable = !availability.isSelectable;
+                const isOutOfStock =
+                  availability.isSelectable && !availability.hasStock;
+                const isDisabled = isUnavailable || isOutOfStock;
+
                 return (
                   <button
                     key={`${group.label}-${item.value}`}
                     type="button"
                     onClick={() => onValueSelect(group.label, item.value)}
-                    disabled={item.isOutOfStock}
+                    disabled={isDisabled}
                     className={cn(
                       "flex min-h-11 items-center gap-2 rounded-xl border bg-white px-3 py-2 text-[13px] font-medium transition-all",
                       isSelected
                         ? "text-z-ink shadow-sm"
                         : "text-z-text hover:border-z-ink",
-                      item.isOutOfStock && "cursor-not-allowed opacity-45",
+                      isDisabled && "cursor-not-allowed opacity-45",
                     )}
                     style={
                       isSelected
@@ -667,7 +689,12 @@ function VariationPicker({
                     }
                   >
                     {toTitleCase(item.value)}
-                    {item.isOutOfStock && (
+                    {isUnavailable && (
+                      <span className="text-[11px] font-semibold text-z-text-hint">
+                        Indisponível
+                      </span>
+                    )}
+                    {isOutOfStock && (
                       <span className="text-[11px] font-semibold text-z-text-hint">
                         Esgotado
                       </span>
@@ -729,10 +756,12 @@ function VariationPicker({
         )}
       </div>
       <div className="flex flex-wrap gap-2">
-        {options.map((opt) => {
-          const isSelected = selected === opt.name;
-          const isOutOfStock = opt.stock === 0;
-          const itemQuantity = cartQuantityByOption[opt.name] ?? 0;
+        {options
+          .filter((opt) => opt.is_active !== false)
+          .map((opt) => {
+            const isSelected = selected === opt.name;
+            const isOutOfStock = opt.stock === 0;
+            const itemQuantity = cartQuantityByOption[opt.name] ?? 0;
           return (
             <button
               key={opt.name}

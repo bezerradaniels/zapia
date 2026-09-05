@@ -1,14 +1,12 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Cancel01Icon,
   InformationCircleIcon,
-  ToggleOffIcon,
-  ToggleOnIcon,
   CheckmarkCircle01Icon,
   ViewIcon,
   Edit01Icon,
@@ -22,16 +20,25 @@ import { useCategories, useCreateCategory } from "@/features/categories";
 import { productSchema, type ProductInput } from "../schemas";
 import { ROUTES } from "@/config/routes";
 import { buildStorePath } from "@/lib/tenant";
+import { getPromoPaymentMethodLabel } from "../utils/price";
 
-function FieldLabel({ children }: { children: ReactNode }) {
+function FieldLabel({
+  children,
+  showInfo = false,
+}: {
+  children: ReactNode;
+  showInfo?: boolean;
+}) {
   return (
-    <label className="text-base font-semibold text-z-text">
+    <label className="flex items-center text-[12px] sm:text-[14px] font-medium text-[rgb(24,24,26)]">
       {children}
-      <HugeiconsIcon
-        icon={InformationCircleIcon}
-        size={14}
-        className="ml-1 inline text-z-text-hint"
-      />
+      {showInfo && (
+        <HugeiconsIcon
+          icon={InformationCircleIcon}
+          size={14}
+          className="ml-1 inline text-neutral-400"
+        />
+      )}
     </label>
   );
 }
@@ -86,7 +93,7 @@ function CreateCategoryDialog({
             type="button"
             onClick={onCreate}
             disabled={!value.trim() || isSubmitting}
-            className="flex-1 rounded-xl bg-z-green px-4 py-2.5 text-sm font-semibold text-z-ink hover:bg-green-600 disabled:opacity-60"
+            className="flex-1 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-xs hover:bg-violet-600 disabled:opacity-60"
           >
             {isSubmitting ? "Criando..." : "Criar"}
           </button>
@@ -120,6 +127,7 @@ const DEFAULT_VALUES: ProductInput = {
   cost_in_cents: null,
   price_in_cents: 0,
   promo_price_in_cents: null,
+  promo_payment_method: null,
   installment_count: 12,
   installment_total_in_cents: null,
   is_active: true,
@@ -173,8 +181,26 @@ export function NewProductFullModal({
   const availableSubcategories = categories.filter(
     (category) => category.parent_id === selectedCategoryObj?.id,
   );
-  const autoSku = form.watch("auto_sku");
+  const promoPaymentMethod = form.watch("promo_payment_method");
+  const effectivePrice =
+    promoCents != null && promoCents < priceCents ? promoCents : priceCents;
   const remainingNameChars = 120 - name.length;
+
+  const handleTogglePromoPaymentMethod = (
+    type: "pix" | "dinheiro",
+    checked: boolean,
+  ) => {
+    const current = form.getValues("promo_payment_method");
+    let hasPix = current === "pix" || current === "pix_dinheiro";
+    let hasDinheiro = current === "dinheiro" || current === "pix_dinheiro";
+    if (type === "pix") hasPix = checked;
+    if (type === "dinheiro") hasDinheiro = checked;
+    let nextValue: "pix" | "dinheiro" | "pix_dinheiro" | null = null;
+    if (hasPix && hasDinheiro) nextValue = "pix_dinheiro";
+    else if (hasPix) nextValue = "pix";
+    else if (hasDinheiro) nextValue = "dinheiro";
+    form.setValue("promo_payment_method", nextValue, { shouldDirty: true });
+  };
 
   const handleCreateCategory = async () => {
     const name = newCategoryName.trim();
@@ -272,14 +298,7 @@ export function NewProductFullModal({
                 </h3>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-base font-semibold text-z-text">
-                    Título
-                    <HugeiconsIcon
-                      icon={InformationCircleIcon}
-                      size={14}
-                      className="ml-1 inline text-z-text-hint"
-                    />
-                  </label>
+                  <FieldLabel showInfo>Título</FieldLabel>
                   <input
                     maxLength={120}
                     placeholder="Ex: Vestido Prada"
@@ -302,14 +321,7 @@ export function NewProductFullModal({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-base font-semibold text-z-text">
-                    Descrição
-                    <HugeiconsIcon
-                      icon={InformationCircleIcon}
-                      size={14}
-                      className="ml-1 inline text-z-text-hint"
-                    />
-                  </label>
+                  <FieldLabel showInfo>Descrição</FieldLabel>
                   <textarea
                     rows={6}
                     placeholder="Conte algo sobre o produto..."
@@ -383,7 +395,7 @@ export function NewProductFullModal({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <FieldLabel>Estoque</FieldLabel>
+                  <FieldLabel showInfo>Estoque</FieldLabel>
                   <input
                     type="number"
                     min={0}
@@ -413,7 +425,7 @@ export function NewProductFullModal({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <FieldLabel>Preço promocional</FieldLabel>
+                  <FieldLabel showInfo>Preço promocional</FieldLabel>
                   <MoneyInput
                     valueInCents={null}
                     allowEmpty
@@ -436,15 +448,48 @@ export function NewProductFullModal({
                       {form.formState.errors.promo_price_in_cents.message}
                     </span>
                   )}
+
+                  {/* Condição para ativar o desconto */}
+                  <div className="mt-2 flex flex-col gap-2">
+                    <FieldLabel>Condição para ativar o desconto</FieldLabel>
+                    <div className="flex items-center gap-4">
+                      <label className="flex cursor-pointer items-center gap-2 text-[12px] sm:text-[14px] text-z-text">
+                        <input
+                          type="checkbox"
+                          checked={
+                            promoPaymentMethod === "pix" ||
+                            promoPaymentMethod === "pix_dinheiro"
+                          }
+                          onChange={(e) =>
+                            handleTogglePromoPaymentMethod("pix", e.target.checked)
+                          }
+                          className="h-4 w-4 rounded border-z-border text-[#02a650] accent-[#02a650] focus:ring-[#02a650]"
+                        />
+                        <span>Pix</span>
+                      </label>
+                      <label className="flex cursor-pointer items-center gap-2 text-[12px] sm:text-[14px] text-z-text">
+                        <input
+                          type="checkbox"
+                          checked={
+                            promoPaymentMethod === "dinheiro" ||
+                            promoPaymentMethod === "pix_dinheiro"
+                          }
+                          onChange={(e) =>
+                            handleTogglePromoPaymentMethod("dinheiro", e.target.checked)
+                          }
+                          className="h-4 w-4 rounded border-z-border text-[#02a650] accent-[#02a650] focus:ring-[#02a650]"
+                        />
+                        <span>Dinheiro</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Parcelamento */}
                 <div className="flex flex-col gap-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-[11px] font-semibold text-z-text-hint">
-                        Valor parcelado
-                      </span>
+                      <FieldLabel>Valor total parcelado</FieldLabel>
                       <MoneyInput
                         valueInCents={installmentTotal}
                         allowEmpty
@@ -458,9 +503,7 @@ export function NewProductFullModal({
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-[11px] font-semibold text-z-text-hint">
-                        Quantidade de parcelas
-                      </span>
+                      <FieldLabel>Quantidade de parcelas</FieldLabel>
                       <select
                         value={installmentCount ?? 12}
                         onChange={(e) =>
@@ -496,7 +539,7 @@ export function NewProductFullModal({
                               {formatMoney(priceCents)}
                             </span>
                           )}
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="text-2xl font-bold text-z-text">
                               {formatMoney(promoCents ?? priceCents)}
                             </span>
@@ -508,6 +551,11 @@ export function NewProductFullModal({
                                 % OFF
                               </span>
                             )}
+                            {getPromoPaymentMethodLabel(promoPaymentMethod) && (
+                              <span className="rounded-full bg-[#e6f7ef] px-2 py-0.5 text-[11px] font-bold text-[#02a650]">
+                                {getPromoPaymentMethodLabel(promoPaymentMethod)}
+                              </span>
+                            )}
                           </div>
                           <span className="text-sm text-z-text-hint">
                             ou{" "}
@@ -517,12 +565,13 @@ export function NewProductFullModal({
                                 Math.ceil(installmentTotal / installmentCount),
                               )}
                             </strong>
-                            {installmentTotal <= (promoCents ?? priceCents) && (
-                              <span className="font-semibold text-[#02a650]">
-                                {" "}
-                                sem juros
-                              </span>
-                            )}
+                            {effectivePrice > 0 &&
+                              installmentTotal === effectivePrice && (
+                                <span className="font-semibold text-[#02a650]">
+                                  {" "}
+                                  sem juros
+                                </span>
+                              )}
                           </span>
                         </div>
                       </div>
@@ -622,53 +671,10 @@ export function NewProductFullModal({
                 </div>
               </section>
 
-              <SectionDivider />
-
-              <section className="flex flex-col gap-4">
-                <h3 className="text-lg font-bold text-z-text">
-                  Códigos de identificação
-                </h3>
-                <div className="max-w-sm">
-                  <div className="flex flex-col gap-1.5">
-                    <FieldLabel>Código interno (SKU)</FieldLabel>
-                    <input
-                      placeholder="Seu código interno (SKU)"
-                      disabled={autoSku}
-                      value={autoSku ? "" : undefined}
-                      className="h-12 rounded-lg border border-z-border bg-white px-4 text-base text-z-text placeholder:text-z-text-hint focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/30 disabled:bg-z-bg disabled:text-z-text-hint"
-                      {...(autoSku ? {} : form.register("sku"))}
-                    />
-                    <Controller
-                      control={form.control}
-                      name="auto_sku"
-                      render={({ field }) => (
-                        <label className="mt-1 flex cursor-pointer items-center gap-2 text-sm font-medium text-z-text">
-                          <button
-                            type="button"
-                            onClick={() => field.onChange(!field.value)}
-                            className="text-[#10b981]"
-                          >
-                            <HugeiconsIcon
-                              icon={field.value ? ToggleOnIcon : ToggleOffIcon}
-                              size={28}
-                              className={
-                                field.value
-                                  ? "text-[#10b981]"
-                                  : "text-z-text-hint"
-                              }
-                            />
-                          </button>
-                          Gerar automaticamente
-                        </label>
-                      )}
-                    />
-                  </div>
-                </div>
-              </section>
             </div>
           </div>
 
-          <div className="border-t border-z-border bg-white px-5 py-4 shadow-[0_-8px_30px_rgba(15,23,42,0.08)]">
+          <div className="border-t border-neutral-200/80 bg-white px-5 py-4">
             <div className="mx-auto flex max-w-[728px] flex-col items-center gap-3">
               {submitError && (
                 <p className="w-full rounded-lg bg-red-50 px-4 py-3 text-center text-sm text-red-600">
@@ -678,7 +684,7 @@ export function NewProductFullModal({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-[18px] bg-[#10b981] px-7 text-base font-extrabold text-white shadow-sm transition hover:bg-[#0ea371] disabled:opacity-60"
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-violet-400 hover:bg-violet-500 px-7 text-sm font-semibold text-white transition-colors disabled:opacity-60"
               >
                 {isSubmitting && (
                   <svg

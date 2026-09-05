@@ -12,12 +12,16 @@ export { productSchema } from "./schemas";
 export type { ProductInput } from "./schemas";
 export { ProductForm } from "./components/ProductForm";
 export { NewProductFullModal } from "./components/NewProductFullModal";
-export { effectivePrice, discountPercent } from "./utils/price";
+export { effectivePrice, discountPercent, getPromoPaymentMethodLabel } from "./utils/price";
 export {
   getVariationOption,
   getVariationImage,
   getVariationStock,
   getTotalVariationStock,
+  getVariationPrice,
+  generateCartesianVariants,
+  checkValueAvailability,
+  inferAxesFromExisting,
 } from "./utils/variation";
 export { MercadoLibreSearch } from "./components/MercadoLibreSearch/MercadoLibreSearch";
 export type { MlImportPayload, MlProductResult } from "./types";

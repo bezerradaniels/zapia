@@ -51,6 +51,8 @@ const CATALOG_HERO_PATHS = new Set(["/", "/catalogo"]);
 
 function GtmScript({ gtmId }: { gtmId: string }) {
   useEffect(() => {
+    if (!gtmId || !/^GTM-[A-Z0-9]{4,15}$/.test(gtmId)) return;
+
     const consentKey = "zapia_cookie_consent";
     let idleId: number | undefined;
     let timerId: number | undefined;

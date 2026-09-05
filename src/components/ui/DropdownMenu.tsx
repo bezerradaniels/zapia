@@ -128,7 +128,7 @@ export function DropdownMenuItem({
         onClick?.();
       }}
       className={cn(
-        "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-z-text hover:bg-z-bg",
+        "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-[rgb(24,24,26)] hover:bg-z-bg",
         className,
       )}
     >

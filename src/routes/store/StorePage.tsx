@@ -51,6 +51,23 @@ export default function StorePage() {
   const [selectedCategory, setSelectedCategory] =
     useState<string>(ALL_CATEGORY);
 
+  const INITIAL_BATCH_SIZE = 24;
+  const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH_SIZE);
+  const [prevFilter, setPrevFilter] = useState({
+    search,
+    sort,
+    selectedCategory,
+  });
+
+  if (
+    prevFilter.search !== search ||
+    prevFilter.sort !== sort ||
+    prevFilter.selectedCategory !== selectedCategory
+  ) {
+    setPrevFilter({ search, sort, selectedCategory });
+    setVisibleCount(INITIAL_BATCH_SIZE);
+  }
+
   // Memoize so the `?? []` fallback keeps a stable reference and the
   // dependent useMemos below don't recompute on every render.
   const list = useMemo(() => products.data ?? [], [products.data]);
@@ -231,16 +248,33 @@ export default function StorePage() {
           className="mt-5"
         />
       ) : (
-        <div className="mt-5 grid grid-cols-2 gap-[6px] sm:gap-[12px] lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((p) => (
-            <ProductCard
-              key={p.id}
-              product={p}
-              storeSlug={store.slug}
-              onAdd={() => addItem(p)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="mt-5 grid grid-cols-2 gap-[6px] sm:gap-[12px] lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.slice(0, visibleCount).map((p) => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                storeSlug={store.slug}
+                onAdd={() => addItem(p)}
+              />
+            ))}
+          </div>
+
+          {visibleCount < filtered.length && (
+            <div className="mt-8 flex flex-col items-center justify-center gap-2 pb-6">
+              <p className="text-xs text-z-text-muted">
+                Exibindo {Math.min(visibleCount, filtered.length)} de {filtered.length} produtos
+              </p>
+              <button
+                type="button"
+                onClick={() => setVisibleCount((prev) => prev + INITIAL_BATCH_SIZE)}
+                className="inline-flex items-center justify-center rounded-xl border border-z-border bg-white px-5 py-2.5 text-sm font-semibold text-z-text shadow-xs transition-colors hover:bg-slate-50 active:scale-[0.98]"
+              >
+                Carregar mais produtos
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

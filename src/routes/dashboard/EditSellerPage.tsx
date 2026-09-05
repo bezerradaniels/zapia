@@ -538,7 +538,7 @@ export default function EditSellerPage() {
 
             {catalogProducts === "all" && (
               <div className="mt-4 flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-3">
-                <span className="text-lg">💡</span>
+                <HugeiconsIcon icon={InformationCircleIcon} size={16} className="text-amber-600 shrink-0 mt-0.5" />
                 <p className="text-xs text-z-text-muted">
                   Todos os produtos serão mostrados no catálogo deste vendedor.
                 </p>
@@ -563,7 +563,7 @@ export default function EditSellerPage() {
 
         {/* Mobile Floating Action Bar */}
         {isDirty && (
-          <div className="fixed bottom-20 inset-x-4 mx-auto max-w-sm z-40 flex items-center justify-between gap-3 rounded-2xl border border-z-border bg-white/95 px-4 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.12)] backdrop-blur-md sm:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <div className="fixed bottom-20 inset-x-4 mx-auto max-w-sm z-40 flex items-center justify-between gap-3 rounded-2xl border border-neutral-200/80 bg-white/95 px-4 py-2.5 backdrop-blur-md sm:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
             <button
               type="button"
               onClick={() => navigate(`${ROUTES.dashboardSellers}/${id}`)}
@@ -575,7 +575,7 @@ export default function EditSellerPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="h-10 rounded-xl bg-[#10b981] px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 shadow-sm"
+              className="h-10 rounded-xl bg-violet-400 hover:bg-violet-500 px-6 text-sm font-semibold text-white transition-colors disabled:opacity-60"
             >
               {isSubmitting ? "Salvando..." : "Salvar"}
             </button>
@@ -601,7 +601,7 @@ export default function EditSellerPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="h-10 rounded-full bg-z-green px-8 text-sm font-semibold text-z-ink hover:opacity-90 disabled:opacity-60"
+            className="h-10 rounded-xl bg-violet-500 px-8 text-sm font-medium text-white shadow-xs transition-colors hover:bg-violet-600 disabled:opacity-60"
           >
             {isSubmitting ? "Salvando..." : "Salvar alterações"}
           </button>

@@ -61,13 +61,13 @@ export default function CouponsPage() {
     <div className="flex flex-col gap-6">
       <header className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-[22px] font-bold tracking-tighter">Cupons</h1>
-          <p className="text-sm text-z-text-muted">
+          <h1 className="text-lg font-semibold tracking-tight text-[rgb(24,24,26)]">Cupons</h1>
+          <p className="text-xs text-neutral-400 font-normal">
             Crie códigos de desconto que seus clientes podem usar no checkout.
           </p>
         </div>
-        <Button onClick={handleOpenCreate}>
-          <HugeiconsIcon icon={PlusSignIcon} size={16} />
+        <Button onClick={handleOpenCreate} variant="emerald" size="sm">
+          <HugeiconsIcon icon={PlusSignIcon} size={15} />
           Novo cupom
         </Button>
       </header>
@@ -489,7 +489,7 @@ function CouponFormDialog({
               Categoria (opcional)
             </span>
             <select
-              className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
+              className="h-10 w-full rounded-lg border border-neutral-200/80 bg-white px-3.5 text-xs focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20"
               {...form.register("category_id")}
             >
               <option value="">Todas as categorias</option>
@@ -508,7 +508,7 @@ function CouponFormDialog({
                   </option>
                 ))}
             </select>
-            <span className="text-xs text-z-text-hint">
+            <span className="text-xs text-neutral-400 font-normal">
               Restringe o cupom a produtos desta categoria/subcategoria
             </span>
             {form.formState.errors.category_id && (
@@ -536,10 +536,10 @@ function CouponFormDialog({
                   onClick={() => field.onChange(!field.value)}
                   aria-pressed={field.value}
                   className={cn(
-                    "mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-2 transition-colors",
+                    "mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border transition-colors",
                     field.value
-                      ? "border-z-green bg-z-green"
-                      : "border-z-border bg-white",
+                      ? "border-emerald-400 bg-emerald-400 text-neutral-950"
+                      : "border-neutral-300 bg-white",
                   )}
                 >
                   {field.value && (
@@ -607,7 +607,7 @@ function FixedDiscountInput({
         inputMode="decimal"
         placeholder="R$ 0,00"
         defaultValue={value ? formatMoney(value) : ""}
-        className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
+        className="h-10 w-full rounded-lg border border-neutral-200/80 bg-white px-3.5 text-xs focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20"
         onChange={(e) => {
           const cents = parseMoneyToCents(e.target.value);
           onChange(Number.isNaN(cents) ? 0 : cents);
@@ -616,8 +616,8 @@ function FixedDiscountInput({
       {error ? (
         <span className="text-xs text-destructive">{error}</span>
       ) : (
-        <span className="text-xs text-z-text-muted">
-          Atual: <strong className="text-z-text">{formatMoney(value)}</strong>
+        <span className="text-xs text-neutral-400">
+          Atual: <strong className="text-[rgb(24,24,26)]">{formatMoney(value)}</strong>
         </span>
       )}
     </div>
@@ -633,14 +633,14 @@ function MinSubtotalInput({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-semibold text-z-text-hint">
+      <span className="text-[11px] font-semibold text-neutral-400">
         Pedido mínimo
       </span>
       <input
         inputMode="decimal"
         placeholder="R$ 0,00 (sem mínimo)"
         defaultValue={value ? formatMoney(value) : ""}
-        className="h-11 w-full rounded-lg border border-z-border bg-white px-3.5 text-sm focus:border-z-green focus:outline-none focus:ring-2 focus:ring-z-green/20"
+        className="h-10 w-full rounded-lg border border-neutral-200/80 bg-white px-3.5 text-xs focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-400/20"
         onChange={(e) => {
           const cents = parseMoneyToCents(e.target.value);
           onChange(Number.isNaN(cents) ? 0 : cents);
